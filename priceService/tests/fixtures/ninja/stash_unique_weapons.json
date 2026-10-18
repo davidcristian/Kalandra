@@ -1,0 +1,179 @@
+{
+  "core": {
+    "items": [
+      {
+        "id": "divine",
+        "name": "Divine Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+        "category": "Currency",
+        "detailsId": "divine-orb"
+      },
+      {
+        "id": "exalted",
+        "name": "Exalted Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+        "category": "Currency",
+        "detailsId": "exalted-orb"
+      },
+      {
+        "id": "chaos",
+        "name": "Chaos Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+        "category": "Currency",
+        "detailsId": "chaos-orb"
+      }
+    ],
+    "rates": {
+      "exalted": 527.2,
+      "chaos": 8.72
+    },
+    "primary": "divine",
+    "secondary": "chaos"
+  },
+  "lines": [
+    {
+      "id": 727,
+      "itemId": "Redbeak Shortsword",
+      "detailsId": "redbeak-shortsword",
+      "name": "Redbeak",
+      "baseType": "Shortsword",
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9PbmVIYW5kU3dvcmRzL1VuaXF1ZXMvUmVkYmVhayIsInciOjIsImgiOjMsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/33c430b8b4/Redbeak.png",
+      "flavourText": "As battle calms, blood turns to rust.",
+      "levelRequired": 0,
+      "category": "[Sword|One Hand Sword]",
+      "primaryValue": 5863,
+      "listingCount": 12,
+      "corrupted": false,
+      "sparkLine": {
+        "totalChange": -7.76,
+        "data": [
+          0,
+          0.22,
+          -2.55,
+          null,
+          -3.67,
+          -6.48,
+          -7.76
+        ]
+      },
+      "explicitModifiers": [
+        {
+          "text": "Adds (4-6) to (7-10) [Physical|Physical] Damage",
+          "optional": false
+        },
+        {
+          "text": "10% increased [Attack] Speed",
+          "optional": false
+        },
+        {
+          "text": "Gain 3 Life per enemy killed",
+          "optional": false
+        },
+        {
+          "text": "100% increased [Attack|Attack] Damage while on [LowLife|Low Life]",
+          "optional": false
+        }
+      ],
+      "propertyModifiers": [
+        {
+          "text": "[Physical] Damage: (10-13)-(16-23)",
+          "optional": false
+        },
+        {
+          "text": "[Critical|Critical Hit] Chance: 5%",
+          "optional": false
+        },
+        {
+          "text": "[Lightning|Lightning] Damage: 1-30",
+          "optional": true
+        },
+        {
+          "text": "Attacks per Second: 1.71",
+          "optional": false
+        }
+      ],
+      "requirementModifiers": [
+        {
+          "text": "Level: (30-50)",
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": 754,
+      "itemId": "The Dancing Dervish Scimitar",
+      "detailsId": "the-dancing-dervish-scimitar",
+      "name": "The Dancing Dervish",
+      "baseType": "Scimitar",
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9PbmVIYW5kU3dvcmRzL0Jhc2V0eXBlcy8xSFN3b3JkMDQiLCJ3IjoyLCJoIjozLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b15a3c6a0f/1HSword04.png",
+      "flavourText": "Take your partners by the hand,\r\nKeep your steps in time.\r\nSwing together, spin apart,\r\nAnd dance with death sublime.",
+      "levelRequired": 16,
+      "category": "[Sword|One Hand Sword]",
+      "primaryValue": 4854,
+      "listingCount": 8,
+      "corrupted": false,
+      "sparkLine": {
+        "totalChange": -6.64,
+        "data": [
+          0,
+          0.19,
+          -2.18,
+          null,
+          -3.14,
+          -5.55,
+          -6.64
+        ]
+      },
+      "explicitModifiers": [
+        {
+          "text": "Triggers Level 15 Manifest Dancing Dervishes on Rampage",
+          "optional": false
+        },
+        {
+          "text": "Cannot be used while Manifested",
+          "optional": false
+        },
+        {
+          "text": "Manifested Dancing Dervishes die when Rampage ends",
+          "optional": false
+        },
+        {
+          "text": "[Melee] Hits count as Rampage Kills\nRampage",
+          "optional": false
+        }
+      ],
+      "propertyModifiers": [
+        {
+          "text": "[Physical] Damage: 14-23",
+          "optional": false
+        },
+        {
+          "text": "[Critical|Critical Hit] Chance: 5%",
+          "optional": false
+        },
+        {
+          "text": "Attacks per Second: 1.55",
+          "optional": false
+        },
+        {
+          "text": "[Lightning|Lightning] Damage: 1-(10-40)",
+          "optional": true
+        }
+      ],
+      "requirementModifiers": [
+        {
+          "text": "Level: (16-50)",
+          "optional": false
+        },
+        {
+          "text": "[Strength|Str]: 19",
+          "optional": false
+        },
+        {
+          "text": "[Dexterity|Dex]: 19",
+          "optional": false
+        }
+      ]
+    }
+  ]
+}

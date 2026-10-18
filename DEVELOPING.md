@@ -69,3 +69,8 @@ sh testUpdate.sh
 ```
 
 Read the contents of `testUpdate.sh` to understand what it does. Running random scripts from the internet is not recommended so you really should read the code before running it.
+
+# Price service
+
+The app reads its prices from the files that [priceService/](priceService/README.md) builds from poe.ninja once an
+hour. The service runs on its own server, outside the app; its README covers running, testing and deploying it.

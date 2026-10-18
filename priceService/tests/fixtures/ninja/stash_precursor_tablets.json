@@ -1,0 +1,87 @@
+{
+  "core": {
+    "items": [
+      {
+        "id": "divine",
+        "name": "Divine Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+        "category": "Currency",
+        "detailsId": "divine-orb"
+      },
+      {
+        "id": "exalted",
+        "name": "Exalted Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+        "category": "Currency",
+        "detailsId": "exalted-orb"
+      },
+      {
+        "id": "chaos",
+        "name": "Chaos Orb",
+        "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+        "category": "Currency",
+        "detailsId": "chaos-orb"
+      }
+    ],
+    "rates": {
+      "exalted": 518.0,
+      "chaos": 8.76
+    },
+    "primary": "divine",
+    "secondary": "chaos"
+  },
+  "lines": [
+    {
+      "id": 747,
+      "itemId": "Ritual Tablet Ritual Tablet Normal",
+      "detailsId": "ritual-tablet-ritual-tablet-normal",
+      "name": "Ritual Tablet",
+      "baseType": "Ritual Tablet",
+      "variant": "Normal",
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRSaXR1YWwiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/23c5248469/PrecursorTabletRitual.png",
+      "levelRequired": 0,
+      "category": "Tablet",
+      "primaryValue": 0.4568,
+      "listingCount": 4556,
+      "corrupted": false,
+      "sparkLine": {
+        "totalChange": -28.29,
+        "data": [
+          0,
+          -26.41,
+          -20.45,
+          null,
+          -24.57,
+          -10.38,
+          -28.29
+        ]
+      }
+    },
+    {
+      "id": 748,
+      "itemId": "Ritual Tablet Ritual Tablet Magic",
+      "detailsId": "ritual-tablet-ritual-tablet-magic",
+      "name": "Ritual Tablet",
+      "baseType": "Ritual Tablet",
+      "variant": "Magic",
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRSaXR1YWwiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/23c5248469/PrecursorTabletRitual.png",
+      "levelRequired": 0,
+      "category": "Tablet",
+      "primaryValue": 0.193,
+      "listingCount": 10000,
+      "corrupted": false,
+      "sparkLine": {
+        "totalChange": 51.49,
+        "data": [
+          0,
+          280.2,
+          179.0,
+          null,
+          179.8,
+          174.3,
+          51.49
+        ]
+      }
+    }
+  ]
+}

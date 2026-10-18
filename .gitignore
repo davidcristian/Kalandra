@@ -28,3 +28,7 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 
 *.bin
+
+# Python
+__pycache__/
+priceService/.env

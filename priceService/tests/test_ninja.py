@@ -1,0 +1,132 @@
+import gzip
+import threading
+import unittest
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+from price_service.ninja import MAX_LEAGUES, NinjaClient, NinjaError, Reply, urllib_get
+from price_service.transform import Category
+from support import FakeGet, fixture, ok
+
+CURRENCY = Category("Currency", exchange=True)
+WEAPONS = Category("UniqueWeapons", exchange=False)
+
+
+def client_for(get: FakeGet, sleeps: list[float] | None = None) -> NinjaClient:
+    recorded = sleeps if sleeps is not None else []
+    return NinjaClient(get, user_agent="test-agent (+contact)", delay_seconds=0.5, sleep=recorded.append)
+
+
+class OverviewTest(unittest.TestCase):
+    def test_requests_the_exchange_and_stash_endpoints_with_an_encoded_league(self) -> None:
+        get = FakeGet({"type=": [ok({"lines": []})]})
+        client = client_for(get)
+        client.overview("Runes of Aldur", CURRENCY)
+        client.overview("Runes of Aldur", WEAPONS)
+        self.assertEqual(
+            [url for url, _ in get.calls],
+            [
+                "https://poe.ninja/poe2/api/economy/exchange/current/overview?league=Runes%20of%20Aldur&type=Currency",
+                "https://poe.ninja/poe2/api/economy/stash/current/item/overview?league=Runes%20of%20Aldur&type=UniqueWeapons",
+            ],
+        )
+
+    def test_identifies_itself_and_waits_after_every_request(self) -> None:
+        sleeps: list[float] = []
+        get = FakeGet({"type=": [ok({"lines": []})]})
+        client = client_for(get, sleeps)
+        client.overview("Standard", CURRENCY)
+        client.overview("Standard", WEAPONS)
+        headers = get.calls[0][1]
+        self.assertEqual(headers["User-Agent"], "test-agent (+contact)")
+        self.assertEqual(headers["Accept-Encoding"], "gzip")
+        self.assertEqual(sleeps, [0.5, 0.5])
+
+    def test_revalidates_with_the_etag_and_reuses_the_body_on_304(self) -> None:
+        get = FakeGet({"type=Currency": [ok({"lines": [1]}, etag='"v1"'), Reply(304, b"", '"v1"')]})
+        client = client_for(get)
+        first = client.overview("Standard", CURRENCY)
+        second = client.overview("Standard", CURRENCY)
+        self.assertNotIn("If-None-Match", get.calls[0][1])
+        self.assertEqual(get.calls[1][1]["If-None-Match"], '"v1"')
+        self.assertEqual(second, first)
+
+    def test_falls_back_to_the_last_good_copy_when_a_request_fails(self) -> None:
+        for failure in (Reply(503, b"", None), OSError("connection reset"), Reply(200, b"not json", None)):
+            get = FakeGet({"type=Currency": [ok({"lines": [1]}), failure]})
+            client = client_for(get)
+            client.overview("Standard", CURRENCY)
+            with self.assertLogs("price_service.ninja", "WARNING"):
+                self.assertEqual(client.overview("Standard", CURRENCY), {"lines": [1]})
+
+    def test_raises_when_a_request_fails_and_nothing_is_cached(self) -> None:
+        for failure in (Reply(503, b"", None), OSError("connection reset"), Reply(200, b"not json", None), ok([1])):
+            client = client_for(FakeGet({"type=Currency": [failure]}))
+            with self.assertRaises(NinjaError):
+                client.overview("Standard", CURRENCY)
+
+
+class LeaguesTest(unittest.TestCase):
+    def test_returns_the_league_ids_in_order(self) -> None:
+        client = client_for(FakeGet({"/leagues": [ok(fixture("leagues.json"))]}))
+        self.assertEqual(client.leagues()[:2], ["Forbidden Rites", "Runes of Aldur"])
+
+    def test_skips_malformed_entries_and_caps_the_count(self) -> None:
+        entries = [{"id": f"League {n}"} for n in range(MAX_LEAGUES + 5)] + [{"id": 7}, "x"]
+        client = client_for(FakeGet({"/leagues": [ok(entries)]}))
+        self.assertEqual(len(client.leagues()), MAX_LEAGUES)
+
+    def test_rejects_a_league_list_that_is_not_a_list(self) -> None:
+        with self.assertRaises(NinjaError):
+            client_for(FakeGet({"/leagues": [ok({"id": "Standard"})]})).leagues()
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self) -> None:
+        if self.path == "/gzip":
+            body = gzip.compress(b'{"ok": true}')
+            self.send_response(200)
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("ETag", '"abc"')
+        elif self.path == "/plain":
+            body = b'{"ok": true}'
+            self.send_response(200)
+        elif self.path == "/same" and self.headers.get("If-None-Match") == '"abc"':
+            body = b""
+            self.send_response(304)
+            self.send_header("ETag", '"abc"')
+        else:
+            body = b""
+            self.send_response(500)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, format: str, *args: object) -> None:
+        pass
+
+
+class UrllibGetTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.server = HTTPServer(("127.0.0.1", 0), Handler)
+        cls.base = f"http://127.0.0.1:{cls.server.server_port}"
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.server.shutdown()
+        cls.server.server_close()
+
+    def test_decompresses_gzip_and_returns_the_etag(self) -> None:
+        self.assertEqual(urllib_get(f"{self.base}/gzip", {}, 5), Reply(200, b'{"ok": true}', '"abc"'))
+
+    def test_returns_a_plain_body_unchanged(self) -> None:
+        self.assertEqual(urllib_get(f"{self.base}/plain", {}, 5).body, b'{"ok": true}')
+
+    def test_returns_304_and_errors_as_replies(self) -> None:
+        self.assertEqual(urllib_get(f"{self.base}/same", {"If-None-Match": '"abc"'}, 5), Reply(304, b"", '"abc"'))
+        self.assertEqual(urllib_get(f"{self.base}/missing", {}, 5).status, 500)
+
+
+if __name__ == "__main__":
+    unittest.main()

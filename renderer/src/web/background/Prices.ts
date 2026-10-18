@@ -4,7 +4,12 @@ import { Host } from "@/web/background/IPC";
 import { useLeagues } from "./Leagues";
 import { AppConfig } from "../Config";
 import { PriceCheckWidget } from "../overlay/widgets";
-import { DropEntry, ITEM_BY_REF } from "@/assets/data";
+import {
+  DropEntry,
+  ITEM_BY_REF,
+  ITEM_DROP as BUNDLED_ITEM_DROP,
+} from "@/assets/data";
+import { priceFileUrl } from "./price-source";
 
 export type NinjaSchema = NinjaSchemaV1;
 type NinjaSchemaV1 = {
@@ -169,11 +174,7 @@ export const usePoeninja = createGlobalState(() => {
       isLoading.value = true;
       downloadController = new AbortController();
 
-      ITEM_DROP.value = JSON.parse(
-        await Host.proxy("api.exiledexchange2.dev/proxy/data/item-drop.json", {
-          signal: downloadController.signal,
-        }).then((r) => r.text()),
-      );
+      ITEM_DROP.value = BUNDLED_ITEM_DROP;
 
       availableCoreCurrencies.value = getAvailableCoreCurrencies().map(
         (currency) => ({
@@ -188,20 +189,17 @@ export const usePoeninja = createGlobalState(() => {
         selectedCoreCurrencyId.value = "exalted";
       }
 
-      const ninjaSchema: NinjaSchema = JSON.parse(
-        await Host.proxy(
-          "api.exiledexchange2.dev/proxy/data/namespaceMap.json",
-          {
-            signal: downloadController.signal,
-          },
-        ).then((r) => r.text()),
-      );
-      const response = await Host.proxy(
-        `api.exiledexchange2.dev/proxy/${selectedLeagueToUrl(true)}/overviewData.json`,
-        {
+      const ninjaSchema: NinjaSchema = await (
+        await fetch(`${import.meta.env.BASE_URL}data/namespaceMap.json`, {
           signal: downloadController.signal,
-        },
-      );
+        })
+      ).json();
+      const response = await Host.proxy(priceFileUrl(league.id), {
+        signal: downloadController.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`No price file for ${league.id} (${response.status})`);
+      }
       const jsonBlob = await response.text();
 
       const ninjaXchg = parseXchg(jsonBlob);
@@ -242,16 +240,13 @@ export const usePoeninja = createGlobalState(() => {
     load();
   }
 
-  function selectedLeagueToUrl(proxy: boolean): string {
+  function selectedLeagueToUrl(): string {
     const league = leagues.selectedId.value!;
     switch (league) {
       case "Standard":
         return "standard";
       case "Hardcore":
         return "hardcore";
-    }
-    if (proxy) {
-      return league;
     }
 
     const ninjaLeague = league.toLowerCase().replaceAll(" ", "");
@@ -262,32 +257,13 @@ export const usePoeninja = createGlobalState(() => {
   }
 
   function findPriceByQuery(query: DbQuery) {
-    // NOTE: order of keys is important
-    const searchString = JSON.stringify({
-      name: query.name,
-      variant: query.variant,
-      primaryValue: 0,
-    }).replace(":0}", ":");
-    const endSearchString = "}}";
-
-    for (const { ns, cx, url, lines } of PRICES_DB) {
-      if (ns !== query.ns) continue;
-
-      const startPos = lines.indexOf(searchString);
-      if (startPos === -1) continue;
-      const endPos = lines.indexOf(endSearchString, startPos);
-
-      const info: NinjaDenseExchangeInfo | NinjaDenseStashInfo = JSON.parse(
-        lines.slice(startPos, endPos + endSearchString.length),
-      );
-
-      return {
-        ...info,
-        cx,
-        url: `https://poe.ninja/poe2/economy/${selectedLeagueToUrl(false)}/${url}/${info.detailsId}`,
-      };
-    }
-    return null;
+    const found = findInDatabase(PRICES_DB, query);
+    if (!found) return null;
+    return {
+      ...found.info,
+      cx: found.cx,
+      url: `https://poe.ninja/poe2/economy/${selectedLeagueToUrl()}/${found.url}/${found.info.detailsId}`,
+    };
   }
 
   /**
@@ -468,6 +444,30 @@ export const usePoeninja = createGlobalState(() => {
   };
 });
 
+function findInDatabase(database: PriceDatabase, query: DbQuery) {
+  // NOTE: order of keys is important
+  const searchString = JSON.stringify({
+    name: query.name,
+    variant: query.variant,
+    primaryValue: 0,
+  }).replace(":0}", ":");
+  const endSearchString = "}}";
+
+  for (const { ns, cx, url, lines } of database) {
+    if (ns !== query.ns) continue;
+
+    const startPos = lines.indexOf(searchString);
+    if (startPos === -1) continue;
+    const endPos = lines.indexOf(endSearchString, startPos);
+
+    const info: NinjaDenseExchangeInfo | NinjaDenseStashInfo = JSON.parse(
+      lines.slice(startPos, endPos + endSearchString.length),
+    );
+    return { info, cx, url };
+  }
+  return null;
+}
+
 function parseXchg(jsonBlob: string): NinjaXchgRates {
   const RATES = '{"rates":';
   const END_RATES = '"}';
@@ -571,4 +571,5 @@ export function displayRounding(
 export const __testExports = {
   parseXchg,
   splitJsonBlob,
+  findInDatabase,
 };

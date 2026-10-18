@@ -12,10 +12,9 @@ const PROXY_HOSTS = [
   { host: "es.pathofexile.com", official: true },
   { host: "br.pathofexile.com", official: true },
   { host: "fr.pathofexile.com", official: true },
-  { host: "poe.ninja", official: false },
   { host: "www.poeprices.info", official: false },
-  // Exiled Exchange 2 price data server, run by Kvan7
-  { host: "api.exiledexchange2.dev", official: false },
+  // Kalandra's price files; poe.ninja asks apps to use their own backend
+  { host: "kalandra.ashoal.com", official: false },
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class

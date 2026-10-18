@@ -25,6 +25,8 @@ app in three parts, plus a data tool and a docs site:
   and trade exports. This copy is the only source of the data: a new game patch needs a new run of it
   ([dataParser/README.md](dataParser/README.md)). Exiled Exchange 2 developed it in a private repo, so the data
   committed here can be newer than this copy of the tool.
+- `priceService/`: a Python service, standard library only, that builds the hourly price files from poe.ninja and
+  serves them at `kalandra.ashoal.com` through a Cloudflare Tunnel ([priceService/README.md](priceService/README.md)).
 - `docs/`: the VitePress user docs, published to GitHub Pages when `docs/**` changes on `master`.
 
 ## The one hard rule
@@ -55,9 +57,12 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
   `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a deliberate change to that
   list. The official trade site rate limits and bans clients that exceed its limits, so every trade request goes
-  through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`. Price data comes from
-  `api.exiledexchange2.dev` (`renderer/src/web/background/Prices.ts`), the Exiled Exchange 2 server that Kvan7 runs
-  and this project does not control.
+  through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`.
+- **Prices come from `priceService/`, never from poe.ninja directly.** poe.ninja asks apps to use their own backend,
+  so `renderer/src/web/background/Prices.ts` reads `kalandra.ashoal.com/prices/<league>.json` and poe.ninja is not
+  in `PROXY_HOSTS`. Both read the categories from `renderer/public/data/namespaceMap.json`. The app searches the
+  price file's raw text, so its key order is a format: `priceService/tests/fixtures/price_file.json` is read by both
+  test suites, and a format change updates the service, the app and that file in one commit.
 - **Widgets register in one place.** A widget is a Vue component with a static `widget: WidgetSpec`, added by one
   `registry.widgets.push` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
   `renderer/src/web/overlay/widgets.ts`, and its defaults follow the hard rule above.
@@ -93,6 +98,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    it on Windows, Linux and macOS, so a platform-specific path or API needs a `process.platform` check.
 4. **The data tool**, only when `dataParser/` changes: `python -m pytest` in `dataParser/`, plus Ruff, Bandit and the
    other hooks in `dataParser/.pre-commit-config.yaml`.
+   **The price service**, when `priceService/`, `namespaceMap.json`, `Prices.ts` or `price-source.ts` changes:
+   `python -m unittest discover -s tests` in `priceService/`, which CI also runs.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower
@@ -187,7 +194,9 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **External input is untrusted.** Clipboard item text, client log lines and trade responses can be malformed or
   come from a game patch the data does not know yet. Parse them without throwing and log what failed.
 - **Be polite to other services.** No loops or tests against the live trade site, poe.ninja or poeprices. A
-  `dataParser` run that pulls trade data or downloads images is slow and network heavy, so ask first.
+  `dataParser` run that pulls trade data or downloads images is slow and network heavy, so ask first. Only
+  `priceService/` calls poe.ninja's API: one request at a time, at most once an hour per category, with its
+  User-Agent. A live `python -m price_service --once` sends about 140 requests, so ask before running it.
 
 ## Working agreement
 

@@ -1,7 +1,16 @@
+import fs from "fs";
+import path from "path";
 import { __testExports, NinjaSchema } from "@/web/background/Prices";
+import { leagueFileName } from "@/web/background/price-source";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
+
+const SERVICE_FIXTURES = path.resolve(
+  __dirname,
+  "../../../priceService/tests/fixtures",
+);
+const readText = (file: string) => fs.readFileSync(file, "utf-8");
 
 describe("useTradeApi", () => {
   beforeEach(async () => {
@@ -43,5 +52,55 @@ describe("useTradeApi", () => {
 
     const result = __testExports.splitJsonBlob(blob, blobSchema);
     expect(result).toHaveLength(1);
+  });
+
+  it("reads the price file the price service writes", () => {
+    const schema: NinjaSchema = JSON.parse(
+      readText(path.resolve(__dirname, "../../public/data/namespaceMap.json")),
+    );
+    const blob = readText(path.join(SERVICE_FIXTURES, "price_file.json"));
+    const { findInDatabase, parseXchg, splitJsonBlob } = __testExports;
+
+    expect(parseXchg(blob)).toEqual({
+      rates: { exalted: 541.6, chaos: 8.53 },
+      primary: "divine",
+      secondary: "chaos",
+    });
+    const database = splitJsonBlob(blob, schema);
+    expect(database.map(({ ns, url }) => [ns, url])).toEqual([
+      ["ITEM", "currency"],
+      ["UNIQUE", "unique-weapons"],
+      ["ITEM", "precursor-tablets"],
+    ]);
+    expect(
+      findInDatabase(database, { ns: "ITEM", name: "Exalted Orb" })?.info
+        .primaryValue,
+    ).toBe(0.001846);
+    expect(
+      findInDatabase(database, {
+        ns: "UNIQUE",
+        name: "Redbeak",
+        variant: "Shortsword",
+      })?.info.detailsId,
+    ).toBe("redbeak-shortsword");
+    expect(
+      findInDatabase(database, {
+        ns: "ITEM",
+        name: "Ritual Tablet",
+        variant: "Magic",
+      })?.info.primaryValue,
+    ).toBe(0.193);
+    expect(
+      findInDatabase(database, { ns: "UNIQUE", name: "Exalted Orb" }),
+    ).toBeNull();
+  });
+
+  it("names league files the way the price service does", () => {
+    const cases: Record<string, string> = JSON.parse(
+      readText(path.join(SERVICE_FIXTURES, "league_files.json")),
+    );
+    for (const [leagueId, fileName] of Object.entries(cases)) {
+      expect(leagueFileName(leagueId)).toBe(fileName);
+    }
   });
 });

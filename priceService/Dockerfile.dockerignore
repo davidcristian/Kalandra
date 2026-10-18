@@ -1,0 +1,4 @@
+*
+!priceService/price_service/
+!renderer/public/data/namespaceMap.json
+**/__pycache__
