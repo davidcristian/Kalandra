@@ -1,0 +1,2 @@
+# The full campaign client log test fails when this fixture has CRLF endings.
+renderer/specs/web/FullCampaign.txt text eol=lf
