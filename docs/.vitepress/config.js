@@ -7,6 +7,8 @@ export default defineConfig({
   description: 'A Path of Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more.',
   base: BASE,
   mpa: true,
+  // The developer docs are read on GitHub, not on this site
+  srcExclude: ['dev/**'],
   head: [
     ['link', { rel: 'shortcut icon', type: 'image/png', href: `${BASE}favicon.png` }]
   ],

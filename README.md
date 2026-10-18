@@ -30,7 +30,8 @@ Kalandra installs beside both and keeps its settings in its own folder. The
 
 ### Development
 
-See [DEVELOPING.md](./DEVELOPING.md). The rules every change follows are in [AGENTS.md](./AGENTS.md).
+See [DEVELOPING.md](./DEVELOPING.md) to run and build the app, and [docs/dev/](./docs/dev/index.md) for the
+architecture, the decisions and the module docs. The rules every change follows are in [AGENTS.md](./AGENTS.md).
 
 ### Acknowledgments
 

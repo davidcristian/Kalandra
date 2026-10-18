@@ -1,11 +1,13 @@
 # Kalandra engineering rules
 
 Every agent and every person working in this repo follows these rules. A change that breaks one of them is **not
-done**, even when it works. This file is the contract. How to build and release is in [DEVELOPING.md](DEVELOPING.md),
-and the user documentation is the VitePress site in [docs/](docs/index.md).
+done**, even when it works. This file is the contract; the detail lives in `docs/dev/`: the index
+[docs/dev/index.md](docs/dev/index.md), the map [docs/dev/architecture.md](docs/dev/architecture.md) and the decisions
+`docs/dev/adr/`. The development loop is in [DEVELOPING.md](DEVELOPING.md), and the user documentation is the
+VitePress site in [docs/](docs/index.md), which leaves out `docs/dev/`.
 
-Read this file, then only the files of the part you are changing. Needing the whole codebase in view to make one
-change means a boundary is missing: say so rather than reading everything.
+Read this file, then the module doc in `docs/dev/modules/` and the files of the part you are changing. Needing the
+whole codebase in view to make one change means a boundary is missing: say so rather than reading everything.
 
 ## What this is
 
@@ -27,7 +29,8 @@ app in three parts, plus a data tool and a docs site:
   committed here can be newer than this copy of the tool.
 - `priceService/`: a Python service, standard library only, that builds the hourly price files from poe.ninja and
   serves them at `kalandra.ashoal.com` through a Cloudflare Tunnel ([priceService/README.md](priceService/README.md)).
-- `docs/`: the VitePress user docs, published to GitHub Pages when `docs/**` changes on `master`.
+- `docs/`: the VitePress user docs, published to GitHub Pages when `docs/` outside `docs/dev/` changes on `master`,
+  or by hand from the Actions tab. `docs/dev/` holds the developer docs, read on GitHub.
 
 ## The one hard rule
 
@@ -44,7 +47,9 @@ app in three parts, plus a data tool and a docs site:
    only when a test reads its config.
 
 Never edit, reorder or delete an existing upgrade step: a user can skip any number of versions, and every step runs
-in order from theirs. A setting that `main` needs also goes through `getConfigForHost()` into `HostConfig`.
+in order from theirs. A setting that `main` needs also goes through `getConfigForHost()` into `HostConfig`. The
+reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the code is
+[docs/dev/modules/config.md](docs/dev/modules/config.md).
 
 ## Architecture rules
 
@@ -54,20 +59,23 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
 - **The boundary is [ipc/types.ts](ipc/types.ts).** The two processes talk only through `IpcEvent` messages on the
   `/events` WebSocket and the `/config`, `/uploads` and `/proxy` HTTP routes that `main/src/server.ts` serves. An
   event name states its direction (`CLIENT->MAIN::save-config`, `MAIN->CLIENT::item-text`). A new message starts as
-  a new member of the `IpcEvent` union, then gets its sender and its handler.
+  a new member of the `IpcEvent` union, then gets its sender and its handler
+  ([ADR-0004](docs/dev/adr/ADR-0004-process-boundary.md)).
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
   `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a deliberate change to that
   list. The official trade site rate limits and bans clients that exceed its limits, so every search, fetch and
-  exchange request goes through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`.
+  exchange request goes through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`
+  ([ADR-0005](docs/dev/adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
 - **Prices come from `priceService/`, never from poe.ninja directly.** poe.ninja asks apps to use their own backend,
   so `renderer/src/web/background/Prices.ts` reads `kalandra.ashoal.com/prices/<league>.json` and poe.ninja is not
   in `PROXY_HOSTS`. Both read the categories from `renderer/public/data/namespaceMap.json`. The app searches the
   price file's raw text, so its key order is a format: `priceService/tests/fixtures/price_file.json` is read by both
-  test suites, and a format change updates the service, the app and that file in one commit.
+  test suites, and a format change updates the service, the app and that file in one commit
+  ([ADR-0006](docs/dev/adr/ADR-0006-own-price-service.md)).
 - **Widgets register in one place.** A widget is a Vue component with a static `widget: WidgetSpec`, added by one
   `registry.widgets.push` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
-  `renderer/src/web/overlay/widgets.ts` or in a `widget.ts` in its own folder, and its defaults follow the hard
-  rule above.
+  `renderer/src/web/overlay/widgets.ts` or in a `widget.ts` in its own folder, and its defaults follow the hard rule
+  above ([docs/dev/modules/renderer-widgets.md](docs/dev/modules/renderer-widgets.md)).
 - **Game text comes from the game data, never from string literals.** The app supports every language listed in
   `renderer/src/assets/make-index-files.mjs`. The parser matches item text through `CLIENT_STRINGS`, loaded from
   `client_strings.js`, and through the stat matchers in `stats.ndjson`, so matching new item text means a client
@@ -75,13 +83,13 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
 - **Generated files are regenerated, not edited.** `stats.ndjson`, `items.ndjson` and `client_strings.js` under
   `renderer/public/data/<lang>/` are `dataParser` output: fix the generator or its inputs and run it again. If the
   copy here cannot produce the fix, stop and ask. The `*.index.bin` files are written by `npm run make-index-files`
-  and ignored by git.
+  and ignored by git. Both rules are [ADR-0007](docs/dev/adr/ADR-0007-game-text-from-game-data.md).
 - **English is the source of UI text.** A new UI string goes into `renderer/public/data/en/app_i18n.json`. No
   translation service is connected to this project, so other languages get the string only when someone who speaks
   them adds it, and until then a missing key falls back to English. The product name is not translated.
 - **One version, five places.** `versionCheck.py` fails unless `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml`,
   `docs/.vitepress/config.js`, `main/package.json` and `main/package-lock.json` agree. Releasing follows
-  DEVELOPING.md and is the maintainer's job.
+  [docs/dev/runbooks/release.md](docs/dev/runbooks/release.md) and is the maintainer's job.
 
 ## What every change must pass
 
@@ -102,8 +110,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    other hooks in `dataParser/.pre-commit-config.yaml`.
    **The price service**, when `priceService/`, `namespaceMap.json`, `Prices.ts` or `price-source.ts` changes:
    `python -m unittest discover -s tests` in `priceService/`, which CI also runs.
-   **The docs site**, when `docs/` changes: `npm ci` and `npm run build` in `docs/`, which fails on a dead link or
-   a missing image. CI also runs it.
+   **The docs site**, when `docs/` outside `docs/dev/` changes: `npm ci` and `npm run build` in `docs/`, which
+   fails on a dead link or a missing image. CI also runs it.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower
@@ -117,12 +125,16 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, no `eval` and no
    blanket `noqa`.
 8. **Documentation is part of done.** A change users can see updates its page in `docs/` (features, widgets, price
-   check, FAQ). A change to how the app is built or released updates DEVELOPING.md. A change that makes a rule here
-   false updates this file in the same commit.
+   check, FAQ). A change to a module's contract updates its doc in `docs/dev/modules/`, a change to a procedure
+   updates its runbook in `docs/dev/runbooks/` or DEVELOPING.md, and work deliberately left for later gets a task
+   file in [docs/dev/refinements/](docs/dev/refinements/index.md). A change that makes a rule here false updates
+   this file in the same commit.
 9. **The game is out of reach; everything else is not.** An agent cannot run Path of Exile 2, so hotkeys, overlay
    focus, clipboard capture and OCR inside the game need the maintainer on Windows. Check everything else yourself:
    parser cases with real item text, unit tests and both builds. In the summary, name each in-game behavior left to
-   check and mark it unverified.
+   check and mark it unverified. [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md) says how
+   to check each one, and [docs/dev/host/](docs/dev/host/index.md) lists every host check, with its status in its
+   own file.
 
 ## Prose
 
@@ -191,14 +203,15 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 
 - **Kalandra does not merge Exiled Exchange 2.** The `upstream` remote, where it exists, points at
   `Kvan7/Exiled-Exchange-2` and is only read. A fix from there comes in by cherry-pick, one commit at a time, with its
-  original author kept.
+  original author kept ([ADR-0001](docs/dev/adr/ADR-0001-kalandra-continues-exiled-exchange-2.md), steps in
+  [docs/dev/runbooks/cherry-pick-upstream.md](docs/dev/runbooks/cherry-pick-upstream.md)).
 - **Agent work never goes there.** Its contribution policy allows AI help only as end of line completion and asks
   contributors not to use agents. Never open an issue or PR against `Kvan7/Exiled-Exchange-2`; a PR an agent opens
   targets `origin`.
 - **Credit stays.** Kalandra is under the AGPL v3 (`LICENSE`). The code inherited from Awakened PoE Trade and
   Exiled Exchange 2 is under the MIT License, whose notice must stay with it in `LICENSES/MIT.txt`; a fix
-  cherry-picked from there is under the same notice. The README credits both projects, and the Patreon links to
-  Awakened PoE Trade's author stay.
+  cherry-picked from there is under the same notice ([ADR-0002](docs/dev/adr/ADR-0002-agpl-with-mit-notice.md)). The
+  README credits both projects, and the Patreon links to Awakened PoE Trade's author stay.
 
 ## Safety
 
@@ -231,6 +244,7 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **Small, complete slices.** Each change is a thin end-to-end path that passes its checks and has its docs. No
   scaffolding of empty layers.
 - **Decisions are written down.** A non-obvious choice gets its reason in the commit body, and one that governs
-  future changes goes into this file or DEVELOPING.md. When a request is underspecified, record your reading of it,
-  continue, and name the riskiest assumption in your summary.
+  future changes becomes an ADR in `docs/dev/adr/` (format in its README) plus a row in `docs/dev/index.md`, with any
+  rule it adds written here. When a request is underspecified, record your reading of it, continue, and name the
+  riskiest assumption in your summary.
 - Keep this file and all docs short and full of pointers; context bloat is a defect.

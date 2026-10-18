@@ -1,0 +1,126 @@
+# ipc/: the types both processes share
+
+**Purpose.** `ipc/` holds the TypeScript types and key tables that main and the renderer both import, so both
+ends of every message are checked against one definition ([ADR-0004](../adr/ADR-0004-process-boundary.md)). It
+has no `package.json` or `tsconfig.json` of its own. main imports it by relative path (`../../ipc/types`), the
+renderer through the `@ipc/*` alias in `renderer/tsconfig.json` and `renderer/vite.config.mts`, and each process's
+type check covers the files it imports. The routes that move the messages are in
+[architecture.md](../architecture.md#the-boundary-between-the-processes), and the code on each end is in
+[main.md](main.md) and `renderer/src/web/background/IPC.ts`.
+
+## Public contract
+
+`types.ts`:
+
+- `IpcEvent` is the union of every message. Each member is `{ name, payload }`, built from the file's private
+  `Event<TName, TPayload>` interface, with `payload: undefined` when there is none. `IpcEventPayload<Name>` is the
+  payload type for a name. In main, `onEventAnyClient()` and `sendEventTo()` in `server.ts` take only these; in the
+  renderer, `Host.sendEvent()`, `Host.onEvent()` and `Host.selfDispatch()` do. `selfDispatch()` delivers an event to
+  the page's own listeners: every incoming message goes through it, and `WidgetMenu.vue`, `WidgetItemSearch.vue`
+  and `ReloadTradeData.vue` use it to hand the price check an item without main.
+- A name is `<direction>::<action>`. The four directions are in
+  [architecture.md](../architecture.md#the-boundary-between-the-processes). Every message, with its payload fields,
+  the code that sends it and the code that handles it:
+
+| Event | Payload | Sent by | Handled by |
+| --- | --- | --- | --- |
+| `CLIENT->MAIN::save-config` | `contents`, `isTemporary` | `saveConfig()` in `Config.ts` | `ConfigStore` |
+| `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
+| `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus | `server.ts` (the last active client), `OverlayWindow` |
+| `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
+| `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start`, `name?`, `header?`; `client-log-event` with `data` and `close` | `WidgetLibrary.vue`, `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
+| `CLIENT->MAIN::re-parse-log` | none | `settings-leveling.vue` | `GameLogWatcher` |
+| `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
+| `MAIN->CLIENT::ocr-text` | `target`, `pressTime`, `ocrTime`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
+| `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
+| `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
+| `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history to a new client | `Host` (`Host.logs`) |
+| `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater` | `Host` (`Host.updateInfo`) |
+| `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
+| `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
+| `MAIN->OVERLAY::focus-change` | `game`, `overlay`, `usingHotkey` | `OverlayWindow` | `OverlayWindow.vue` |
+| `MAIN->OVERLAY::visibility` | `isVisible` | `OverlayVisibility` | `OverlayWindow.vue` |
+| `MAIN->OVERLAY::hide-exclusive-widget` | none | `WidgetAreaTracker` | `PriceCheckWindow.vue` |
+| `OVERLAY->MAIN::focus-game` | none | `OverlayWindow.vue`, `PriceCheckWindow.vue` | `OverlayWindow.assertGameActive()` |
+| `OVERLAY->MAIN::render-state` | `shouldShow` | `OverlayWindow.vue` | `OverlayWindow` |
+| `OVERLAY->MAIN::track-area` | `holdKey`, `closeThreshold`, `from`, `area`, `dpr` | `PriceCheckWindow.vue` | `WidgetAreaTracker` |
+
+Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sent to every client.
+
+- `HostConfig` holds the settings main reads. `getConfigForHost()` in `renderer/src/web/Config.ts` builds it, and
+  the `CLIENT->MAIN::update-host-config` handler in `main/src/main.ts` passes each field on:
+
+| Field | Built from | Used by |
+| --- | --- | --- |
+| `shortcuts` | every hotkey in the config, as `ShortcutAction`s | `Shortcuts.updateActions()` |
+| `restoreClipboard`, `stashScroll`, `logKeys` | the setting of the same name | `Shortcuts.updateActions()` |
+| `language` | `language` | `Shortcuts.updateActions()`, for the OCR language |
+| `initialDelay` | the price check widget's `initialDelay` | `Shortcuts.updateDelay()`, the first clipboard poll |
+| `overlayKey`, `windowTitle`, `hideOverlayOnBlur` | the setting of the same name | `OverlayWindow.updateOpts()`; `overlayKey` also `AppTray` |
+| `clientLog`, `readClientLog` | `clientLog` (`null` for the default path), `readClientLog` | `GameLogWatcher.restart()` |
+| `gameConfig` | `gameConfig` (`null` for the default path) | `GameConfig.readConfig()` |
+| `libraryAlpha` | `enableAlphas` with `library` in `alphas` | `FileWriter.restart()` |
+| `libraryOutputPath` | the library widget's `libraryOutputPath` | `FileWriter.restart()` |
+
+- `ShortcutAction` is one hotkey and what it does. `shortcut` is key names joined by ` + `, with the modifiers first
+  in the order `Ctrl`, `Shift`, `Alt` (`hotkeyToString()`), such as `Ctrl + Alt + D`. With `keepModKeys`, main
+  releases only the key that is not a modifier after the press, so a held modifier stays down. The `action` types:
+
+| `type` | Fields | What main does | Built from |
+| --- | --- | --- | --- |
+| `copy-item` | `target`, `focusOverlay?` | presses the copy keys and sends `item-text` with `target` | the price check (`price-check`), the item check widget (`item-check`, `open-wiki`, `open-craft-of-exile`, `open-poedb`, `search-similar`, `search-same-priced`), the library (`log-item`) |
+| `ocr-text` | `target: "heist-gems"` | reads text from the game window, on Windows only | the item search widget's `ocrGemsKey` |
+| `trigger-event` | `target` | broadcasts `widget-action` with `target` | `delve-grid`, and `stopwatch-start-stop:<wmId>` and `stopwatch-reset:<wmId>` per stopwatch |
+| `stash-search` | `text` | types `text` into the stash search | the stash search widget's entries, when its hotkeys are on |
+| `toggle-overlay` | none | moves the focus between the overlay and the game | `overlayKey` |
+| `paste-in-chat` | `text`, `send` | types a chat command | each entry in `commands` with a hotkey |
+| `test-only` | none | nothing: `updateActions()` adds one for the copy keys, and its reserved-key filter removes it again | |
+
+- `UpdateInfo` is the updater's state, by `state`: `initial`, `checking-for-update`, `update-available` (with
+  `version` and `noDownloadReason`: `not-supported`, `disabled-by-flag` or `null`), `update-downloaded` (with
+  `version`), and `update-not-available` or `error` (with `checkedAt`).
+- `HostState` is the body of `GET /config`: `contents` (the text of `config.json`, or `null`), `version` and
+  `updater`.
+- `ClientLogEvent` is the union of the entries the renderer's client log parser (`renderer/src/web/client-log/`)
+  makes from `Client.txt` lines. Each has `ts`, `ms` and `type`: `GeneralLogEvent` (`log`, `game-start`, `login`),
+  `LoadZoneEvent`, `LevelUpEvent`, `GameVersionEvent`, `AltTabEvent`, `NpcEvent`, `PlayerDeathEvent`,
+  `PassiveTreeEvent`, `PermanentBonusEvent`, `SkillPointEvent`, `MapNavEvent` and `AfkEvent`. Every entry but
+  `log` goes to main in `write-data`. While `libraryAlpha` is on, `FileWriter` writes each one as a JSON line of
+  `client-log.ndjson`, whose format the user page [client-log-parser.md](../../client-log-parser.md) documents.
+
+`KeyToCode.ts`:
+
+- `KeyToCode` maps a key name to its numeric key code (`Backspace` is 8, `Enter` is 13), and `CodeToKey` is the
+  reverse, which `GameConfig` uses to read the key codes in the game's config file. `KeyToElectron` maps a key name
+  to Electron's accelerator name. `hotkeyToString(keys, ctrl, shift, alt)` writes a hotkey string,
+  `mergeTwoHotkeys(a, b)` joins two of them (main adds the advanced description key to `Ctrl + C` with it), and
+  `isModKey(key)` is true for `Ctrl`, `Shift` and `Alt`. `HotkeyInput.vue` in the renderer records a hotkey with
+  `KeyToCode` and `hotkeyToString()`.
+
+## Invariants
+
+- Every message is a member of `IpcEvent`. The send and listen functions on both ends take only its names and
+  payloads, so `tsc` fails on an unknown name or a wrong payload. A new message starts as a new union member, then
+  gets its sender and its handler ([AGENTS.md](../../../AGENTS.md#architecture-rules)).
+- The name states the direction. `Host.onEvent()` does not listen for a `MAIN->OVERLAY::` message in a page outside
+  Electron, so a browser tab never acts on focus, visibility or area tracking.
+- A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
+  `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
+- Neither end validates a message: `server.ts` casts `JSON.parse()` to `IpcEvent`, and `IPC.ts` passes the
+  untyped result of `JSON.parse()` to `selfDispatch()`. main serves the renderer files it was packaged with, so
+  both ends come from one build.
+- A new `HostConfig` field is set in `getConfigForHost()`, whose return type makes `tsc` fail until it is, and is
+  read in the `main.ts` handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
+- Saved configs store hotkeys as `hotkeyToString()` writes them, so renaming a key in these tables changes what a
+  saved hotkey means.
+- A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates
+  [client-log-parser.md](../../client-log-parser.md) in the same commit.
+
+**Dependencies.** None: `types.ts` and `KeyToCode.ts` import nothing. main imports them in `server.ts`,
+`AppUpdater.ts`, `Shortcuts.ts` and `GameConfig.ts`; the renderer in `IPC.ts`, `Config.ts`, `client-log/` and
+`HotkeyInput.vue`.
+
+**Tests.** `ipc/` has no tests of its own; `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent`
+values the parser makes. The type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`.
+The pre-commit type check hooks run only for a change under `main/` or `renderer/`, so a change to `ipc/` alone
+runs both by hand or `pre-commit run --all-files`; CI's Lint & Format job runs every hook over all files.

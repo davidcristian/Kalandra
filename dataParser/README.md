@@ -1,12 +1,22 @@
 # Data Parser
 
-See [main.py](./src/main.py) for the main entry point. This should be ran from the dataParser folder with the following command:
+Builds the game data the app matches item text against: `stats.ndjson`, `items.ndjson` and `client_strings.js` for
+each language, from an export of the game's files and the trade site's data endpoints.
+
+- What it reads and writes, its flags and its tests:
+  [docs/dev/modules/dataparser.md](../docs/dev/modules/dataparser.md).
+- Updating the app's data for a game patch, step by step:
+  [docs/dev/runbooks/game-data-update.md](../docs/dev/runbooks/game-data-update.md).
+
+[main.py](./src/main.py) is the entry point. Run it from this folder:
 
 ```bash
 python ./src/main.py
 ```
 
-You can use `--help` to see all options. Running with images will take forever so keep that in mind.
+`--help` lists every option. An `--image-mode` other than `noLookup` sends a trade search and a fetch for each item
+it looks up, and waits for the trade site's rate limits between them, so a run is slow and network heavy. `--pull` also
+sends requests to the trade sites. Ask the maintainer before running either.
 
 ## Updating the app's data
 

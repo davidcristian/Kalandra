@@ -1,0 +1,141 @@
+# renderer/src/parser: item text to `ParsedItem`
+
+**Purpose.** The parser turns the item text that the game puts on the clipboard into a `ParsedItem`, the typed
+record that the price check, item check and library widgets read and that the item search widget builds. Item text
+is the block of lines the game copies for an item, split into sections by lines of `--------`. The main process
+makes the game copy it by pressing Ctrl + C together with the game's key for advanced item descriptions
+(`show_advanced_item_descriptions` in the game config, `Alt` when unset), so each modifier comes with a `{ ... }`
+line that names its type, tier and tags ([main.md](main.md)). The parser sends no request. It reads the game
+data that [renderer/src/assets/data/](../../../renderer/src/assets/data/index.ts) loads, which the second half of
+this doc describes.
+
+## Public contract
+
+[renderer/src/parser/index.ts](../../../renderer/src/parser/index.ts) exports `parseClipboard`, the `ParsedItem`
+type, `ItemRarity`, `ItemInfluence`, `itemIsModifiable` and `ItemCategory`. Code outside the parser, mostly the
+price check, also imports `@/parser/<file>` directly for `ParsedItem`, `Parser`, `meta`, `modifiers`,
+`advanced-mod-desc`, `stat-translations`, `calc-base`, `calc-q20` and `augment-builder`. `Parser.ts` exports
+`parseModifiersPoe2`, `parseStatsFromMod`, `parseAffixStrings`, `getMaxSockets` and `replaceHashWithValues` for
+that use.
+
+- `parseClipboard(clipboard)` returns a neverthrow `Result<ParsedItem, string>`. It splits the text into sections,
+  checks that the first one starts with the item class line, reads rarity, name and base type from it
+  (`parseNamePlate`), then runs the `parsers` list in [Parser.ts](../../../renderer/src/parser/Parser.ts) in
+  order. A section parser returns `SECTION_PARSED` (the section is removed from the list), `SECTION_SKIPPED` (try
+  the next section) or `PARSER_SKIPPED` (stop this parser). Each section is parsed by at most one parser and each
+  parser parses at most one section. An entry `{ virtual: fn }` runs once on the item without a section and can
+  end the parse with an error.
+- The error is an i18n key: `item.parse_error`, `item.unknown` (no record in the item data or the trade data
+  matches), or `item.wrong_language|<game language>|<app language>` with display names such as `English`. The
+  price check shows the text of the key and of the key plus `_help` from
+  `app_i18n.json` ("An error occurred while parsing the item", "Unknown Item", "POE2 language doesn't match
+  Kalandra"). The callers are `PriceCheckWindow.vue`, `item-check/WidgetItemCheck.vue`,
+  `item-check/hotkeyable-actions.ts` and `library/SingleItemSession.vue`.
+- `ParsedItem` ([ParsedItem.ts](../../../renderer/src/parser/ParsedItem.ts)) holds the item's properties
+  (`rarity`, `category`, `itemLevel`, armour and weapon values, `quality`, `augmentSockets`, `requires` and
+  others), `info`, the matched `BaseType` record from `items.ndjson` (or one built from the trade site's item list
+  when `items.ndjson` has none), and `rawText`, the copied text. `newMods` is every modifier as a
+  `ParsedModifier`: its `ModifierInfo` (type, generation such as prefix or suffix, name, tier, tags) and its
+  `ParsedStat` list. `statsByType` is the same stats grouped by stat and modifier type, each with the modifiers
+  it comes from (`sumStatsByModType`).
+  `unknownModifiers` is every line that matched no stat; the filters block shows them as "Not recognized
+  modifier". `createVirtualItem(props)` builds a `ParsedItem` whose `rawText` is `VIRTUAL_ITEM`, which the item
+  search widget sends to the price check.
+
+The other files, each called from `Parser.ts` or from the price check:
+
+| File | What it does |
+| --- | --- |
+| `advanced-mod-desc.ts` | `parseModInfoLine` reads one `{ ... }` line, `groupLinesByMod` pairs it with its stat lines, `parseModType` reads a suffix such as ` (implicit)`, ` (enchant)` or ` (rune)` |
+| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text |
+| `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
+| `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
+| `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others |
+| `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
+| `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting |
+| `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
+
+A module exports the internal functions its tests call as `__testExports` (`Parser.ts`, `stat-translations.ts`,
+`assets/data/index.ts`).
+
+## The game data
+
+[renderer/src/assets/data/index.ts](../../../renderer/src/assets/data/index.ts) loads the files under
+`renderer/public/data/` over HTTP from the page's own server and exposes them as module variables.
+
+- `init(lang)` runs once from `renderer/src/main.ts`. It loads `CLIENT_STRINGS_REF` (the English client strings),
+  `item-drop.json` and `patrons.json`, then calls `loadForLang(lang)`. A change to the language setting calls
+  `loadForLang` again.
+- `loadForLang(lang)` loads `CLIENT_STRINGS` from `data/<lang>/client_strings.js` (through
+  `client-string-loader.ts`), the items and the stats, builds the rune, soul core and catalyst lookups
+  (`loadUltraLateItems`), and loads the trade site's item and stat lists through `useTradeData()` in
+  `web/background/TradeData.ts`.
+- Lookups: `ITEM_BY_REF(namespace, refName)` and `ITEM_BY_TRANSLATED(namespace, name)` return `BaseType[]`, where
+  the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns a
+  `Stat`; `STAT_BY_MATCH_STR(text)` returns the `Stat` and the `StatMatcher` whose text is exactly `text`;
+  `ITEMS_ITERATOR` and `STATS_ITERATOR` scan the raw text for a substring. `TRADE_ITEM_BY_REF`,
+  `TRADE_STAT_BY_MATCH_STR` and `TRADE_STAT_BY_STAT_ID` read the trade site lists, for items and stats that the
+  game data does not have yet.
+- `stat(text)` records a stat ref that code depends on. After loading, `init` logs `Cannot find stat` with the
+  list of recorded refs that `stats.ndjson` does not contain.
+
+The files, per language under `renderer/public/data/<lang>/`:
+
+| File | Content | Written by |
+| --- | --- | --- |
+| `client_strings.js` | the `TranslationDict` (type in `interfaces.ts`): every game string and regular expression the parser matches | `dataParser` |
+| `items.ndjson` | one `BaseType` JSON object per line | `dataParser` |
+| `stats.ndjson` | one `Stat` per line: its `ref`, its matchers (the stat texts with `#` for each number) and its trade ids | `dataParser` |
+| `*.index.bin` | sorted pairs of a 32-bit FNV-1a hash and the start of a line in the `.ndjson` file, as a JavaScript string index | `npm run make-index-files` |
+| `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)) | by hand |
+
+A lookup hashes its key with `@sindresorhus/fnv1a`, binary searches the index file, and parses the line that
+starts there. An item lookup also reads the following lines with the same namespace and name while each record
+has a `unique` or `disc` (variant) field, so it returns every variant. `STAT_BY_MATCH_STR` compares the
+matcher text after the lookup and returns `undefined` on a hash collision.
+[make-index-files.mjs](../../../renderer/src/assets/make-index-files.mjs) writes `stats-ref`,
+`stats-matcher`, `items-name` and `items-ref` for each language in its `LANGUAGES` list: `en`, `ru`, `cmn-Hant`,
+`ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.
+`renderer/public/data/th/` has only `app_i18n.json`.
+
+## Invariants
+
+- **Game text is matched through the game data**, never through an English literal (AGENTS.md, and the reasons
+  in [ADR-0007](../adr/ADR-0007-game-text-from-game-data.md)). A new stat comes from `stats.ndjson`. Matching a
+  new item text line that is not a stat needs a new key in `TranslationDict` in `assets/data/interfaces.ts` and a
+  new entry in `dataParser/src/constants/client_string_data.py`, then a `dataParser` run that writes it into
+  every language's `client_strings.js` ([dataparser.md](dataparser.md),
+  [runbooks/game-data-update.md](../runbooks/game-data-update.md)). The literals that match item text directly
+  include the modifier suffix constants in `advanced-mod-desc.ts` and the `LANGUAGE_DETECTOR` table in
+  `Parser.ts`. That table lists each language's item class and rarity prefix. When the first line is not the
+  app language's item class line and the next line starts with a rarity prefix from the table, the parse returns
+  `item.wrong_language` with the display name of that prefix's language.
+- **The generated files are regenerated, never edited**: `client_strings.js`, `items.ndjson` and `stats.ndjson`
+  come from `dataParser`, and the `*.index.bin` files from `npm run make-index-files`. Git ignores `*.bin`, so the
+  index files must be written before the tests, `npm run dev` or a build, and again after any data change.
+- **Item text is untrusted.** `parseClipboard` runs inside a `try`, logs what it caught and returns
+  `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat goes to
+  `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is not
+  its own instead of throwing.
+- **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
+  `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
+  implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
+  parser reads which section, so the change comes with parser cases for the item kinds it affects.
+- **`Parser.ts` is 2269 lines** (2026-10-18, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+  a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
+
+**Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
+[dataparser.md](dataparser.md). The parser also reads the config: `AppConfig().language` in `Parser.ts` and
+`magic-name.ts`, and the price check's `savedAugments` in `augment-builder.ts` ([config.md](config.md)). It
+imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loader reads the trade site lists
+through the proxy ([renderer-price-check.md](renderer-price-check.md)).
+
+**Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. The parser suites are
+`renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
+text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
+[specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces
+`@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` answers the trade site's
+`data/stats` and `data/items` requests from `specs/data/stats.json` and `specs/data/items.json`, so no test
+reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
+and makes `fetch` read files from `renderer/public/`.
+A parser fix adds the copied item text as a case (AGENTS.md, rule 5).

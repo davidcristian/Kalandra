@@ -1,0 +1,118 @@
+# Refinements
+
+This folder holds deferred work that anyone can pick up: a bug or an inconsistency in the code or
+the docs, a missing test or feature, or a decision the maintainer has to make. Each task is one file
+in [tasks/](tasks/). A task keeps its file after it closes, because its Status and History record
+what the work became.
+
+**Checks that need Path of Exile 2 running on Windows are in [host/](../host/index.md)** instead. A
+refinement needs no game: an agent or a contributor with the repo can work it, although some wait
+for the maintainer's decision or go-ahead first. A host task is a check that only the maintainer
+can run. When a host check finds a bug, the bug is filed here.
+
+Rule 8 of [AGENTS.md](../../../AGENTS.md#what-every-change-must-pass) says work deliberately left
+for later gets a task file here. [ADR-0008](../adr/ADR-0008-developer-docs-layout.md) gives the
+layout and its reasons.
+
+## How to work a task
+
+1. **Pick** a task from the list below. The list gives no status, so open the file:
+   `**Status:** open` means it is still to do.
+2. **Check the task's claim against the code before you start.** The `**Verified:**` line is the
+   day someone last did that. The code moves, so search for the files and symbols the task names,
+   since a task never gives line numbers. If the tree no longer matches, update the file, or close
+   it with a History line that says what changed. Write the day you checked on the Verified line.
+3. **Work it** under [AGENTS.md](../../../AGENTS.md): tests, docs and one logical change per
+   commit. A task that names a decision for the maintainer waits for that decision, and the
+   decision goes into its History.
+4. **Close it in its own file.** Change the Status line to `done <date>` or `declined <date>` and
+   add a History line that says what the task became, such as the commit subject or the reason for
+   declining it. Do not write the status in this list, in a title or in another task
+   ([ADR-0008](../adr/ADR-0008-developer-docs-layout.md), decision 6).
+5. **File what the close opened.** A close often leaves narrower work. Give it a new file with the
+   next free number, and name it in the History of both tasks.
+6. **Add the new task to this list by hand**, with its number, title and link, in the same commit
+   as its file. Nothing generates or checks this list.
+
+## Statuses
+
+- `open`: still to do.
+- `done <date>`: finished on that date; the History says how.
+- `declined <date>`: decided against on that date; the History says why.
+
+## A task file
+
+```markdown
+# <What is wrong, as a statement>
+
+**Status:** open
+**Area:** <config, main, renderer, parser, trade, docs, data, dataparser, priceservice, ci, release, repo or rules>
+**Origin:** [<the file or doc it came from>](<relative link>)
+**Verified:** <date the claim was last checked against the code>
+
+<What is wrong, with the files and symbols that show it. What done looks like.>
+
+## History
+
+- <date>: <how it was found, or what happened to it>
+```
+
+## Tasks
+
+- 001: [A failed read of config.json can replace the saved config with defaults](tasks/001-failed-config-read-saves-defaults.md)
+- 002: [A config.json that is not valid JSON stops the renderer from starting](tasks/002-unparsable-config-stops-renderer.md)
+- 003: [Save in the Settings window does not write config.json at once](tasks/003-settings-save-writes-config-late.md)
+- 004: [An older Kalandra uses a config written by a newer version without a check](tasks/004-older-version-uses-newer-config.md)
+- 005: [No test covers upgradeConfig, defaultConfig or getConfigForHost](tasks/005-config-upgrade-tests.md)
+- 006: [The static file and /uploads routes serve files outside their folders](tasks/006-server-files-outside-folders.md)
+- 007: [The /events WebSocket accepts a connection from any origin](tasks/007-events-websocket-origin.md)
+- 008: [--listen without = stops the local server from starting](tasks/008-listen-option-without-value.md)
+- 009: [macOS reports updates as not supported but still downloads them](tasks/009-macos-updater-auto-download.md)
+- 010: [OCR errors are dropped by empty catch blocks](tasks/010-ocr-errors-dropped.md)
+- 011: [client-log.ndjson drops its first entry and can mix up its lines](tasks/011-client-log-file-writer.md)
+- 012: [The test registration of the copy keys never runs](tasks/012-copy-key-test-registration.md)
+- 013: [Renderer errors such as a missing price file do not reach Settings, Debug](tasks/013-renderer-errors-not-in-debug.md)
+- 014: [The Map check remove button also clears the marks of later profiles](tasks/014-map-check-remove-clears-profiles.md)
+- 015: [Three default Map check marks are not in the game data](tasks/015-default-map-marks-outdated.md)
+- 016: [Augments saved for martial weapons are never applied](tasks/016-martial-weapon-augments.md)
+- 017: [The complex query hint names a setting that does not exist](tasks/017-complex-query-hint.md)
+- 018: [Decide what happens to the poeprices price prediction setting](tasks/018-price-prediction-setting.md)
+- 019: [UI text that is not in the English app_i18n.json](tasks/019-ui-text-not-in-app-i18n.md)
+- 020: [The About page subreddit label does not match its link](tasks/020-about-page-subreddit-label.md)
+- 021: [The XP button does not follow the Client.txt setting until a Save](tasks/021-xp-button-and-client-log-setting.md)
+- 022: [Category checks for item kinds the Path of Exile 2 data does not have](tasks/022-category-checks-for-missing-item-kinds.md)
+- 023: [The OCR handler throws when no gem name has a close length](tasks/023-ocr-handler-no-close-match.md)
+- 024: [The player-death charName starts with a colon and a space](tasks/024-player-death-char-name.md)
+- 025: [The bulk search Browser button does not always open the built-in browser](tasks/025-bulk-search-browser-button.md)
+- 026: [The wrong language message can name English for an item in another language](tasks/026-wrong-language-message.md)
+- 027: [Map check and Item info are two hotkey rows for one setting](tasks/027-map-check-item-info-hotkey.md)
+- 028: [A TradeData.ts comment gives the wrong interest window](tasks/028-trade-data-interest-comment.md)
+- 029: [remnants.json and two dataParser output files are unused](tasks/029-unused-data-files.md)
+- 030: [The rate limiter and the league code have no tests](tasks/030-rate-limiter-and-league-tests.md)
+- 031: [Decide whether the Path of Exile 1 features stay](tasks/031-path-of-exile-1-features.md)
+- 032: [The README's graph image is on imgur](tasks/032-readme-imgur-graph.md)
+- 033: [Take current screenshots of the Settings window and the add widget menu](tasks/033-app-screenshots.md)
+- 034: [Check the cv-ocr.zip file list and decide where the archive comes from](tasks/034-cv-ocr-archive.md)
+- 035: [crowdin.yml maps translations while AGENTS.md says no service is connected](tasks/035-crowdin-config.md)
+- 036: [The issue chooser links GitHub Discussions, which is off](tasks/036-discussions-links.md)
+- 037: [The type check hooks do not run for a change only in ipc/](tasks/037-type-check-hooks-skip-ipc.md)
+- 038: [Which pushes to master run the Build workflow](tasks/038-build-workflow-paths.md)
+- 039: [The Build workflow does not set the token permissions a release upload needs](tasks/039-build-workflow-permissions.md)
+- 040: [testUpdate.sh runs npm install instead of npm ci](tasks/040-test-update-script-npm-ci.md)
+- 041: [Choose the first Kalandra version above the inherited tags](tasks/041-first-release-version.md)
+- 042: [origin holds Exiled Exchange 2's branches, including dev](tasks/042-inherited-branches-on-origin.md)
+- 043: [The league, stat and item list requests use no rate limiter](tasks/043-trade-list-requests-without-limiter.md)
+- 044: [Adding a widget needs a cast that AGENTS.md rule 7 forbids](tasks/044-widget-registry-cast.md)
+- 045: [main recognizes copied item text with string literals](tasks/045-item-text-literals-in-main.md)
+- 046: [Record why Kalandra is under the AGPL v3](tasks/046-agpl-reason.md)
+- 047: [The source and version of the game export command are not recorded](tasks/047-dataparser-export-command.md)
+- 048: [dataParser declares none of its Python dependencies](tasks/048-dataparser-dependencies.md)
+- 049: [dataParser has no data/json/fr folder, so a French pull fails](tasks/049-dataparser-french-folder.md)
+- 050: [dataParser's inputs and image cache are neither committed nor ignored](tasks/050-dataparser-untracked-inputs.md)
+- 051: [dataParser tests need files the repo does not have, and CI does not run them](tasks/051-dataparser-tests-and-ci.md)
+- 052: [This copy of dataParser produces older data than the app ships](tasks/052-dataparser-older-than-committed-data.md)
+- 053: [The image lookup searches a fixed league](tasks/053-dataparser-image-league.md)
+- 054: [create-styles.py copies to a folder the repo does not have](tasks/054-dataparser-create-styles.md)
+- 055: [dataParser uses a different Korean trade host from the app](tasks/055-dataparser-korean-host.md)
+- 056: [A null list in a poe.ninja response stops the price service](tasks/056-price-service-null-lists.md)
+- 057: [Check the GitHub, Cloudflare and Docker behaviors the runbooks describe](tasks/057-outside-service-behaviors.md)
