@@ -1,0 +1,8 @@
+# The coverage floor of the price service's tests, which CI checks. Raise fail_under when the tests cover more.
+[run]
+branch = True
+source = price_service
+
+[report]
+precision = 1
+fail_under = 86.4

@@ -2,17 +2,18 @@
 
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
 [AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
-`prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py`
-check the developer docs, and `commitlint.py` checks a commit message. The scripts are Python, use only the
-standard library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
+`prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py` check
+the developer docs, and `commitlint.py` checks a commit message. The scripts are Python, use only the standard
+library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
 ## Public contract
 
 ### check.py
 
 `python scripts/check.py` runs each `Step` in `STEPS`, in this order: the pre-commit hooks, the renderer's index
-files, lint, tests and build, main's tests and build, the price service's tests, the scripts' tests and the docs
-build. A `Step` is a name, a repo folder and a command run in that folder.
+files, lint, tests with coverage and build, main's tests with coverage and build, the price service's and the
+scripts' tests and coverage reports, and the docs build. A `Step` is a name, a repo folder and a command run in that
+folder.
 
 - It runs every step, even after one fails, then prints `check: <n> of <m> steps failed: <names>` and exits with 1,
   or prints `check: all <m> steps passed` and exits with 0.
@@ -86,6 +87,7 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
-`pyrightconfig.json` at the repo root covers both folders.
+`pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
+floor in `scripts/.coveragerc`, 91.0% of lines and branches on 18 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

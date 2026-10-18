@@ -8,7 +8,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./specs/vitest.setup.ts"],
     coverage: {
+      include: ["src/**/*.ts"],
       exclude: ["*.vue"],
+      reporter: ["text-summary"],
+      // The floor CI checks with --coverage; raise a number when the tests cover more
+      thresholds: {
+        statements: 38.8,
+        branches: 30.7,
+        functions: 40.2,
+        lines: 38.9,
+      },
     },
   },
   define: {

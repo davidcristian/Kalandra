@@ -26,12 +26,18 @@ STEPS = (
     Step("pre-commit hooks", ".", ("pre-commit", "run", "--all-files")),
     Step("renderer index files", "renderer", ("npm", "run", "make-index-files")),
     Step("renderer lint", "renderer", ("npm", "run", "lint")),
-    Step("renderer tests", "renderer", ("npx", "vitest", "run")),
+    Step("renderer tests", "renderer", ("npx", "vitest", "run", "--coverage")),
     Step("renderer build", "renderer", ("npm", "run", "build")),
-    Step("main tests", "main", ("npm", "test")),
+    Step("main tests", "main", ("npm", "test", "--", "--coverage")),
     Step("main build", "main", ("npm", "run", "build")),
-    Step("price service tests", "priceService", (PYTHON, "-m", "unittest", "discover", "-s", "tests")),
-    Step("script tests", "scripts", (PYTHON, "-m", "unittest", "discover", "-s", "tests")),
+    Step(
+        "price service tests",
+        "priceService",
+        (PYTHON, "-m", "coverage", "run", "-m", "unittest", "discover", "-s", "tests"),
+    ),
+    Step("price service coverage", "priceService", (PYTHON, "-m", "coverage", "report")),
+    Step("script tests", "scripts", (PYTHON, "-m", "coverage", "run", "-m", "unittest", "discover", "-s", "tests")),
+    Step("script coverage", "scripts", (PYTHON, "-m", "coverage", "report")),
     Step("docs build", "docs", ("npm", "run", "build")),
 )
 

@@ -11,9 +11,10 @@ describes the parts of the app and how they talk to each other.
 - **Python 3.12 or newer.** `priceService/` uses only the standard library, and CI tests it on
   3.12. `dataParser/` imports `typing.override`, which Python added in 3.12, and the packages in
   [dataparser.md](docs/dev/modules/dataparser.md#tests), which no requirements file lists.
-- **pre-commit**, for example `pip install pre-commit`. Run `pre-commit install` once in the repo, and
-  again after `default_install_hook_types` in `.pre-commit-config.yaml` changes. It installs the
-  pre-commit hooks and the commit-msg hooks, which check each commit's message.
+- **pre-commit and coverage**, for example `pip install pre-commit coverage`. Run
+  `pre-commit install` once in the repo, and again after `default_install_hook_types` in
+  `.pre-commit-config.yaml` changes. It installs the pre-commit hooks and the commit-msg hooks,
+  which check each commit's message.
 - **Windows with Path of Exile 2** to see the overlay over the game. The app also builds and runs on
   Linux and macOS, and CI packages it on all three.
 
@@ -79,22 +80,27 @@ part alone:
 | Part | Commands |
 | --- | --- |
 | Pre-commit hooks | `pre-commit run --all-files` in the repo root |
-| Renderer | `npm run make-index-files`, `npm run lint`, `npx vitest run` and `npm run build` in `renderer/` |
-| Main process | `npm test` and `npm run build` in `main/` |
-| Price service | `python -m unittest discover -s tests` in `priceService/` |
-| Scripts | `python -m unittest discover -s tests` in `scripts/` |
+| Renderer | `npm run make-index-files`, `npm run lint`, `npx vitest run --coverage` and `npm run build` in `renderer/` |
+| Main process | `npm test -- --coverage` and `npm run build` in `main/` |
+| Price service | `python -m coverage run -m unittest discover -s tests`, then `python -m coverage report`, in `priceService/` |
+| Scripts | the same two commands in `scripts/` |
 | Docs site | `npm run build` in `docs/` |
 | Data tool | `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml`, in `dataParser/` |
 
-- `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use `npx vitest run` there.
+- `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use
+  `npx vitest run` there.
 - `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle.
+- `--coverage` and `coverage report` fail when a suite covers less than the floor in its config:
+  `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
+  `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
+  uncovered.
 - `check.py` leaves out the data tool, whose tests need files the repo does not have
   ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
 
 [docs/dev/architecture.md](docs/dev/architecture.md#ci) lists what each CI workflow runs and on
 which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pull request, and
-`check.py` does, so run it before opening one. Behavior inside the game is checked by hand on Windows,
-following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
+`check.py` does, so run it before opening one. Behavior inside the game is checked by hand on
+Windows, following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
 
 `npm run format` in `main/` or `renderer/` runs Prettier alone, which the pre-commit hooks also run.
 

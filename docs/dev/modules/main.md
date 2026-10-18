@@ -166,7 +166,8 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 `../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned
 universal dmg on macOS, and publishes to GitHub releases.
 
-**Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it too.
+**Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (7.6% of the lines of `src/` on 18 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check and
 `request-origin.test.ts` the header check. `server.test.ts` starts the server and sends `..` paths, foreign origins
 and host names to the HTTP routes and to `/events`. A test of a module that imports Electron replaces it with

@@ -1,0 +1,9 @@
+# The coverage floor of the scripts' tests, which CI checks. Raise fail_under when the tests cover more.
+[run]
+branch = True
+source = .
+omit = tests/*
+
+[report]
+precision = 1
+fail_under = 91.0

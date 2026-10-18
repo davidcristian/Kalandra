@@ -109,8 +109,8 @@ gives each step's own command. CI runs the same steps on Node 24.
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. A test checks behavior, including the error and edge paths,
    through fakes (working stand-ins such as `FakeGet` in `priceService/tests/support.py`) rather than mocks that
-   assert calls, and a test written only to run a line is a defect. There is no coverage threshold, but a change must
-   not lower the coverage of the files it touches (`npx vitest run --coverage`).
+   assert calls, and a test written only to run a line is a defect. CI fails when a suite's coverage drops below the
+   floor in its `vitest.config.ts` or `.coveragerc`: raise a floor when tests cover more, and never lower one.
 6. **File size.** A source file is at most 300 lines and a markdown file at most 250, as `scripts/linecap.py` checks.
    The files already over 300 lines are in `scripts/long-files.txt` with their exact counts: put new, separable code
    in a new module rather than growing one, and lower its count when it shrinks. Splitting an existing file is its

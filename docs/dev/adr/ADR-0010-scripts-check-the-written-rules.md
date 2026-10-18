@@ -57,6 +57,12 @@ the title and one status the index defines. `scripts/linkcheck.py` checks that e
 docs and in the markdown outside `docs/` names a file in the repo, and a heading that file has. Reason: the indexes
 are kept by hand ([ADR-0008](ADR-0008-developer-docs-layout.md)), and VitePress checks only the user pages.
 
+**9. Each test suite has a coverage floor that CI checks.** The renderer and main set it in `vitest.config.ts`, over
+every file under `src/`, and the price service and the scripts in `.coveragerc`, over lines and branches. Each floor
+is the suite's coverage on 18 Oct 2026, and a change that raises coverage raises its floor. Reason: AGENTS.md asks
+that no change lower coverage, and a floor turns that into a check. Counting every source file, rather than only the
+files a test loads, keeps a deleted test from raising the number.
+
 ## Consequences
 
 - A contributor runs `pre-commit install` once, and every commit then runs these checks. A clone that ran it before

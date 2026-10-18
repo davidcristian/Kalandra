@@ -31,4 +31,5 @@ docs/.vitepress/cache
 
 # Python
 __pycache__/
+.coverage
 priceService/.env
