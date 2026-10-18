@@ -353,9 +353,7 @@ export default defineComponent({
     );
 
     const leagues = useLeagues();
-    const title = computed(
-      () => leagues.selectedId.value || "Kalandra",
-    );
+    const title = computed(() => leagues.selectedId.value || "Kalandra");
     const stableOrbCost = computed(() =>
       xchgRate.value ? Math.round(xchgRate.value) : null,
     );
