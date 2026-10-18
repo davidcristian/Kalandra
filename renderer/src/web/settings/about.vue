@@ -2,18 +2,18 @@
   <div class="p-2 flex flex-col h-full items-center">
     <div class="flex flex-col items-center p-2 mb-4">
       <img class="w-12 h-12" src="/images/jeweler.png" />
-      <p class="text-base">Exiled Exchange 2</p>
+      <p class="text-base">Kalandra</p>
       <p class="">{{ t("app.version", [version]) }}</p>
       <div class="flex gap-2">
         <a
           class="border-b"
-          href="https://github.com/Kvan7/exiled-exchange-2/releases"
+          href="https://github.com/davidcristian/Kalandra/releases"
           target="_blank"
           >{{ t("app.release_notes") }}</a
         >
         <a
           class="border-b"
-          href="https://github.com/Kvan7/exiled-exchange-2/issues"
+          href="https://github.com/davidcristian/Kalandra/issues"
           target="_blank"
           >{{ t("app.report_bug") }}</a
         >
@@ -29,12 +29,6 @@
       </button>
     </div>
     <div class="text-center mt-auto py-8">
-      <p>
-        {{ t("app.contact_me") }} <br /><span
-          class="font-sans text-gray-500 select-all"
-          >&lt;@340233612064718851&gt;</span
-        >
-      </p>
       <ul class="flex gap-4">
         <li>
           <img class="rounded inline" src="/images/dc_reddit.png" />
@@ -73,7 +67,7 @@ function checkForUpdates() {
 }
 
 function openDownloadPage() {
-  window.open("https://github.com/Kvan7/exiled-exchange-2/releases");
+  window.open("https://github.com/davidcristian/Kalandra/releases");
 }
 
 function quitAndInstall() {

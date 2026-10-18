@@ -14,7 +14,7 @@ KOREAN: LANG = "ko"
 RUSSIAN: LANG = "ru"
 PORTUGUESE: LANG = "pt"
 FRENCH: LANG = "fr"
-# Extra that are in game, but not used by EE2
+# Extra that are in game, but not used by Kalandra
 THAI: ALL_LANG = "th"
 SIMPLIFIED_CHINESE: ALL_LANG = "zh-Hans"
 

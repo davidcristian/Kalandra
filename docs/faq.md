@@ -67,10 +67,10 @@ title: FAQ
 
 - **Why does a sound play when I price check an item?**
 
-  Discord :( Change the default key for saving clips. By default it is `Alt + c` which is pressed by EE2 every time a price check happens.
+  Discord :( Change the default key for saving clips. By default it is `Alt + c` which is pressed by Kalandra every time a price check happens.
 
-- **Is exiledexchange2.com an official website?**
+- **Which websites are official?**
 
-  No, the only official website is <https://kvan7.github.io/Exiled-Exchange-2/> and the official github repo is <https://github.com/Kvan7/Exiled-Exchange-2>. Any other mirrors are not known to the developer, downloading from them may be unsafe or malicious.
+  The only official website is <https://davidcristian.github.io/Kalandra/> and the official github repo is <https://github.com/davidcristian/Kalandra>. Any other mirrors are not known to the developer, downloading from them may be unsafe or malicious.
 
 - [Index Page](/index-page.md)

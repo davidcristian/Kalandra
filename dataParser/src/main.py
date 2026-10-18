@@ -27,7 +27,7 @@ def main(**kwargs: dict[str, bool | str]):
     pull: bool = kwargs.get("pull", False)  # pyright: ignore[reportAssignmentType]
     image_mode: MODE = kwargs.get("image_mode", "noLookup")  # pyright: ignore[reportAssignmentType]
     push: bool = kwargs.get("push", False)  # pyright: ignore[reportAssignmentType]
-    main_repo_path: str = kwargs.get("main_repo_path", "../exiled-exchange-2")  # pyright: ignore[reportAssignmentType]
+    main_repo_path: str = kwargs.get("main_repo_path", "..")  # pyright: ignore[reportAssignmentType]
 
     if pull:
         GameDataProvider().run_export()
@@ -82,9 +82,9 @@ def main(**kwargs: dict[str, bool | str]):
                 print(client_strings_js)
                 raise
 
-        # Copy files to EE2 repo
+        # Copy files into the app's data folder
         if push:
-            logger.info("Copying files to EE2 repo")
+            logger.info("Copying files to renderer/public/data")
             _ = shutil.copy(
                 f"output/{lang}/stats.ndjson",
                 f"{main_repo_path}/renderer/public/data/{lang}/stats.ndjson",
@@ -114,12 +114,12 @@ if __name__ == "__main__":
     _ = parser.add_argument(
         "--push",
         action="store_true",
-        help="Push to EE2 repo",
+        help="Copy output to renderer/public/data",
     )
     _ = parser.add_argument(
         "--main-repo-path",
-        default="../exiled-exchange-2",
-        help="Path to main repo",
+        default="..",
+        help="Path to the repo root",
     )
 
     args = parser.parse_args()

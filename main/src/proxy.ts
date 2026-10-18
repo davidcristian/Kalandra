@@ -14,7 +14,7 @@ const PROXY_HOSTS = [
   { host: "fr.pathofexile.com", official: true },
   { host: "poe.ninja", official: false },
   { host: "www.poeprices.info", official: false },
-  // me :)
+  // Exiled Exchange 2 price data server, run by Kvan7
   { host: "api.exiledexchange2.dev", official: false },
 ];
 

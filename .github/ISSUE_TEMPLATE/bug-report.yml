@@ -10,25 +10,25 @@ body:
     id: faq
     attributes:
       label: FAQ
-      description: Please check the [FAQ](https://kvan7.github.io/Exiled-Exchange-2/faq) before submitting an issue
+      description: Please check the [FAQ](https://davidcristian.github.io/Kalandra/faq) before submitting an issue
       options:
-        - label: I have checked the [FAQ](https://kvan7.github.io/Exiled-Exchange-2/faq) and my problem was not there
+        - label: I have checked the [FAQ](https://davidcristian.github.io/Kalandra/faq) and my problem was not there
           required: true
   - type: checkboxes
     id: common-issues
     attributes:
       label: Common Issues
-      description: Please check the [Common Issues Page](https://kvan7.github.io/Exiled-Exchange-2/issues) before submitting an issue
+      description: Please check the [Common Issues Page](https://davidcristian.github.io/Kalandra/issues) before submitting an issue
       options:
-        - label: I have checked the [Common Issues Page](https://kvan7.github.io/Exiled-Exchange-2/issues) and my problem was not there
+        - label: I have checked the [Common Issues Page](https://davidcristian.github.io/Kalandra/issues) and my problem was not there
           required: true
   - type: checkboxes
     id: existing-issues
     attributes:
       label: Existing Issues
-      description: Please check the [pinned issues and existing issues](https://github.com/Kvan7/Exiled-Exchange-2/issues?q=is%3Aissue) before submitting an issue
+      description: Please check the [pinned issues and existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue) before submitting an issue
       options:
-        - label: I have checked the [pinned issues and existing issues](https://github.com/Kvan7/Exiled-Exchange-2/issues?q=is%3Aissue) and my problem was not there
+        - label: I have checked the [pinned issues and existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue) and my problem was not there
           required: true
   - type: dropdown
     id: common-bug
@@ -56,7 +56,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of EE2 are you running? You can see this in Settings -> About
+      description: What version of Kalandra are you running? You can see this in Settings -> About
       options:
         - 0.16.3
         - 0.16.2

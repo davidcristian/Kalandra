@@ -1,5 +1,5 @@
 {
-  "name": "exiled-exchange-2",
+  "name": "kalandra",
   "version": "0.16.3",
   "private": true,
   "license": "AGPL-3.0-only",
@@ -13,11 +13,11 @@
     "format": "prettier . --write "
   },
   "author": {
-    "name": "Garrett Parker"
+    "name": "davidcristian"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Kvan7/exiled-exchange-2.git"
+    "url": "https://github.com/davidcristian/Kalandra.git"
   },
   "main": "dist/main.js",
   "dependencies": {

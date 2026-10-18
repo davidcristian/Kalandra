@@ -41,11 +41,11 @@ export class HostClipboard {
         clipboard.writeText("");
       } else {
         // workaround KDE's "Prevent empty clipboard" feature
-        // see https://github.com/SnosMe/awakened-poe-trade/issues/1790#issuecomment-4062830614 (please don't comment on, add issue in EE2 if discussion is requested)
+        // see https://github.com/SnosMe/awakened-poe-trade/issues/1790#issuecomment-4062830614 (please don't comment on, add issue in Kalandra if discussion is requested)
         clipboard.writeText(`__EE2_FORCE_EMPTY_${Date.now()}`);
       }
     } else if (process.platform === "linux") {
-      // workaround bug in Proton 10+ https://github.com/SnosMe/awakened-poe-trade/issues/1846 (please don't comment on, add issue in EE2 if discussion is requested)
+      // workaround bug in Proton 10+ https://github.com/SnosMe/awakened-poe-trade/issues/1846 (please don't comment on, add issue in Kalandra if discussion is requested)
       clipboard.writeText(`__EE2_FORCE_EMPTY_${Date.now()}`);
     }
 

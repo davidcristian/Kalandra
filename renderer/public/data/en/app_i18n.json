@@ -14,7 +14,6 @@
     "leagues_failed_help_alt": "Price check an Item, and follow the instructions in the error description there.",
     "thanks_3rd_party": "This tool relies on {0}, consider supporting them!",
     "toggle_browser_hint": "Press {0} to switch between browser and game.",
-    "contact_me": "Contact me on one of the PoE Discords,",
     "version": "Version {0}",
     "release_notes": "Release notes",
     "report_bug": "Report a bug on GitHub",
@@ -122,8 +121,8 @@
     "victorious": "Victorious",
     "cowardly": "Cowardly",
     "deadly": "Deadly",
-    "wrong_language": "POE2 language doesn't match EE2",
-    "wrong_language_help": "POE2 is set to {0} but EE2 is currently set to {1}",
+    "wrong_language": "POE2 language doesn't match Kalandra",
+    "wrong_language_help": "POE2 is set to {0} but Kalandra is currently set to {1}",
     "duplicates": "Duplicates: {0}"
   },
   "item_category": {
@@ -351,7 +350,7 @@
     "added_augments": "Added Augment Cost:"
   },
   "settings": {
-    "title": "Settings - Exiled Exchange 2",
+    "title": "Settings - Kalandra",
     "language": "Language",
     "private_league": "or Private League",
     "account_name": "Account name",

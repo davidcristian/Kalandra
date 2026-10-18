@@ -11,10 +11,10 @@ title: Common issues
 
 3. Are you playing with Vulkan renderer? Update GPU drivers.
 
-    If EE2 works for you with DirectX11/12 renderer,
+    If Kalandra works for you with DirectX11/12 renderer,
     then problem is old Vulkan drivers for sure.
 
-4. Delete `%appdata%\exiled-exchange-2`
+4. Delete `%appdata%\kalandra`
 
     If needed, backup `apt-data` folder with your configuration inside.
 
@@ -22,7 +22,7 @@ title: Common issues
 
     Launch them later one at a time to identify **conflict**.
 
-6. Restart Exiled Exchange 2.
+6. Restart Kalandra.
 
     *(don't forget to quit first, otherwise launching second instance will do nothing).*
 

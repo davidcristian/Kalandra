@@ -1,6 +1,7 @@
 publish:
   - "github"
-productName: "Exiled Exchange 2"
+appId: "io.github.davidcristian.kalandra"
+productName: "Kalandra"
 npmRebuild: false
 files:
   - "package.json"

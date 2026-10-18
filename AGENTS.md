@@ -1,4 +1,4 @@
-# Exiled Exchange 2 engineering rules
+# Kalandra engineering rules
 
 Every agent and every person working in this repo follows these rules. A change that breaks one of them is **not
 done**, even when it works. This file is the contract. How to build and release is in [DEVELOPING.md](DEVELOPING.md),
@@ -9,10 +9,10 @@ change means a boundary is missing: say so rather than reading everything.
 
 ## What this is
 
-A Path of Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more. It is
-a fork of [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade), and this checkout is itself a fork:
-`origin` is `davidcristian/Exiled-Exchange-2` and `upstream` is `Kvan7/Exiled-Exchange-2`. One Electron app in three
-parts, plus a data tool and a docs site:
+A Path of Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more.
+Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2), which is a fork of
+[Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade). `origin` is `davidcristian/Kalandra`. One Electron
+app in three parts, plus a data tool and a docs site:
 
 - `main/`: the Electron main process (TypeScript, bundled by esbuild). Global hotkeys (`uiohook-napi`), the overlay
   window over the game (`electron-overlay-window`), clipboard, the game config and client log files, the HTTP proxy
@@ -22,14 +22,15 @@ parts, plus a data tool and a docs site:
   `src/assets/data/` loads the game data.
 - `ipc/`: types shared by both processes: `HostConfig`, `ShortcutAction` and the `IpcEvent` union.
 - `dataParser/`: a Python tool that builds the per-language game data in `renderer/public/data/<lang>/` from game
-  and trade exports. Upstream develops it in a separate private repo and copies it here, so this copy can be older
-  than the data it produced.
+  and trade exports. This copy is the only source of the data: a new game patch needs a new run of it
+  ([dataParser/README.md](dataParser/README.md)). Exiled Exchange 2 developed it in a private repo, so the data
+  committed here can be newer than this copy of the tool.
 - `docs/`: the VitePress user docs, published to GitHub Pages when `docs/**` changes on `master`.
 
 ## The one hard rule
 
 **A user's saved config must survive every update.** Users install new versions over old ones and keep
-`%APPDATA%\exiled-exchange-2\apt-data\config.json`, which `main/src/host-files/ConfigStore.ts` stores and
+`%APPDATA%\kalandra\apt-data\config.json`, which `main/src/host-files/ConfigStore.ts` stores and
 `renderer/src/web/Config.ts` defines. A change to the `Config` type or to a widget's config type
 (`renderer/src/web/overlay/widgets.ts`) does all of this in the same commit:
 
@@ -54,7 +55,9 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
   `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a deliberate change to that
   list. The official trade site rate limits and bans clients that exceed its limits, so every trade request goes
-  through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`.
+  through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`. Price data comes from
+  `api.exiledexchange2.dev` (`renderer/src/web/background/Prices.ts`), the Exiled Exchange 2 server that Kvan7 runs
+  and this project does not control.
 - **Widgets register in one place.** A widget is a Vue component with a static `widget: WidgetSpec`, added by one
   `registry.widgets.push` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
   `renderer/src/web/overlay/widgets.ts`, and its defaults follow the hard rule above.
@@ -66,9 +69,9 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
   `renderer/public/data/<lang>/` are `dataParser` output: fix the generator or its inputs and run it again. If the
   copy here cannot produce the fix, stop and ask. The `*.index.bin` files are written by `npm run make-index-files`
   and ignored by git.
-- **UI text is translated outside this repo.** A new UI string goes into `renderer/public/data/en/app_i18n.json`
-  only. Translators fill the other languages through the translation service the README links, and a missing key
-  falls back to English.
+- **English is the source of UI text.** A new UI string goes into `renderer/public/data/en/app_i18n.json`. No
+  translation service is connected to this project, so other languages get the string only when someone who speaks
+  them adds it, and until then a missing key falls back to English. The product name is not translated.
 - **One version, five places.** `versionCheck.py` fails unless `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml`,
   `docs/.vitepress/config.js`, `main/package.json` and `main/package-lock.json` agree. Releasing follows
   DEVELOPING.md and is the maintainer's job.
@@ -94,9 +97,9 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower
    the coverage of the files it touches (`npx vitest run --coverage`).
-6. **File size.** A new source file is at most 300 lines. Many upstream files are far over that (`Parser.ts`,
+6. **File size.** A new source file is at most 300 lines. Many existing files are far over that (`Parser.ts`,
    `pathofexile-trade.ts`): put new, separable code in a new module and call it, rather than growing them. Splitting
-   an upstream file is its own commit, never a side effect of another change.
+   an existing file is its own commit, never a side effect of another change.
 7. **Types and quality.** TypeScript is `strict` in both processes. New code adds no `any`, no `as unknown as` cast
    and no `@ts-ignore`, `@ts-expect-error` or `eslint-disable` without its reason on the same line. Errors are
    handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, no `eval` and no
@@ -145,8 +148,8 @@ script checks these rules in this repo, so read your own diff for them.
 
 ## Commits
 
-[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). No hook enforces it here and the upstream
-history does not follow it, but every new commit in this fork does.
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). No hook enforces it here and the history
+inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 
 - **Format:** `type(scope)?: subject`, imperative mood, lowercase subject, no trailing period, at most 72 characters.
   Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, `chore`, `revert`. Scopes are optional
@@ -161,22 +164,24 @@ history does not follow it, but every new commit in this fork does.
 - **No banned word and no dash as punctuation**, as in [Prose](#prose).
 - One logical change per commit. A version bump and a data update are each their own commit.
 
-## Working in a fork
+## Exiled Exchange 2
 
-- **Keep the diff against upstream small.** This fork takes upstream changes by merging `upstream/master`. Every
-  unrelated reformat, rename or file move in an upstream file becomes a conflict at the next merge, so change only
-  what the task needs.
-- **Upstream integrates on `dev`** and merges `dev` into `master` for a release.
-- **Agent work stays in this fork.** Upstream's contribution policy allows AI help only as end of line completion
-  and rejects agent-written code. Never open an issue or PR against `Kvan7/Exiled-Exchange-2`; a PR an agent opens
-  targets `origin`.
-- Never force-push a published branch.
+- **Kalandra does not merge Exiled Exchange 2.** The `upstream` remote, where it exists, points at
+  `Kvan7/Exiled-Exchange-2` and is only read. A fix from there comes in by cherry-pick, one commit at a time, with its
+  original author kept.
+- **Agent work never goes there.** Its contribution policy allows AI help only as end of line completion and rejects
+  agent-written code. Never open an issue or PR against `Kvan7/Exiled-Exchange-2`; a PR an agent opens targets
+  `origin`.
+- **Credit stays.** Kalandra is under the AGPL v3 (`LICENSE`). The code inherited from Awakened PoE Trade and
+  Exiled Exchange 2 is under the MIT License, whose notice must stay with it in `LICENSES/MIT.txt`; a fix
+  cherry-picked from there is under the same notice. The README credits both projects, and the Patreon links to
+  Awakened PoE Trade's author stay.
 
 ## Safety
 
 - **Ask before anything outward-facing.** Pushing, opening a PR, tagging and releasing need the user's go-ahead. A
   push to `master` runs the Build workflow, which packages the app on three platforms and uploads it to the draft
-  GitHub release for the current version if one exists.
+  GitHub release for the current version if one exists. Never force-push a published branch.
 - **No secrets and no user files in the repo.** Never commit a `config.json`, a client log or anything from
   `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides.
 - **External input is untrusted.** Clipboard item text, client log lines and trade responses can be malformed or

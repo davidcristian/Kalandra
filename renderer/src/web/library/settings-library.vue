@@ -9,7 +9,7 @@
       <input
         v-model.trim="outputFolder"
         class="rounded bg-gray-900 px-1 block w-full font-sans"
-        placeholder="...?/AppData/Roaming/exiled-exchange-2/apt-data/csv-data"
+        placeholder="...?/AppData/Roaming/kalandra/apt-data/csv-data"
       />
     </div>
     <profile-settings selected-profile="chaos" :profiles="profiles" />

@@ -10,7 +10,7 @@ This widget tracks and compares your current level to the current area's monster
 
 This feature requires reading the game's log file (`Client.txt`) to detect when the player character levels up and when they enter a new area (+ the monster level for that area)
 
-`Client.txt` contains debugging information and chat, for this we use the chat portion since it shows in chat "player is not level XX" and "Entering zone XXX". No portion of the log file is saved via EE2, just reads line by line and discards the line after updating the overlay.
+`Client.txt` contains debugging information and chat, for this we use the chat portion since it shows in chat "player is not level XX" and "Entering zone XXX". No portion of the log file is saved via Kalandra, just reads line by line and discards the line after updating the overlay.
 
 ## Background
 
@@ -29,7 +29,7 @@ SafeZone = \begin{cases}
 \end{cases}
 ```
 
-When the player is outside of the "safe zone" the experience gained is reduced by a percentage based on some formula. EE2 follows a formula somewhat similar to PoE1 but that models [data](https://discord.com/channels/1327009865008152576/1327009867902357576/1415958443172565115) gathered by [CrimsonCasts](https://www.youtube.com/@CrimsonCasts) a bit closer than the PoE1 formula. Levels over 70 may be inaccurate since those start having special XP multipliers in PoE1 and since they haven't been testing in PoE2 yet, they haven't been implemented.
+When the player is outside of the "safe zone" the experience gained is reduced by a percentage based on some formula. Kalandra follows a formula somewhat similar to PoE1 but that models [data](https://discord.com/channels/1327009865008152576/1327009867902357576/1415958443172565115) gathered by [CrimsonCasts](https://www.youtube.com/@CrimsonCasts) a bit closer than the PoE1 formula. Levels over 70 may be inaccurate since those start having special XP multipliers in PoE1 and since they haven't been testing in PoE2 yet, they haven't been implemented.
 
 ## Settings
 

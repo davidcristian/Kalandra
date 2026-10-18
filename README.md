@@ -1,33 +1,45 @@
-# ![Perfect Jewelers Orb](./renderer/public/images/jeweler.png) Exiled Exchange 2
+# ![Perfect Jewelers Orb](./renderer/public/images/jeweler.png) Kalandra
 
-[![GitHub Downloads (specific asset, latest release)](https://img.shields.io/github/downloads/kvan7/exiled-exchange-2/latest/Exiled-Exchange-2-Setup-0.16.3.exe?style=plastic&link=https%3A%2F%2Ftooomm.github.io%2Fgithub-release-stats%2F%3Fusername%3Dkvan7%26repository%3DExiled-Exchange-2)](https://tooomm.github.io/github-release-stats/?username=kvan7&repository=Exiled-Exchange-2)
-[![GitHub Tag](https://img.shields.io/github/v/tag/kvan7/exiled-exchange-2?style=plastic&label=latest%20version)](https://github.com/Kvan7/Exiled-Exchange-2/releases/latest)
-[![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/kvan7/exiled-exchange-2/latest/dev?style=plastic)](https://github.com/Kvan7/Exiled-Exchange-2/commits/dev/)
-[![Translation status](https://translate.codeberg.org/widget/exiled-exchange-2/svg-badge.svg)](https://translate.codeberg.org/engage/exiled-exchange-2/)
+[![GitHub Downloads (specific asset, latest release)](https://img.shields.io/github/downloads/davidcristian/Kalandra/latest/Kalandra-Setup-0.16.3.exe?style=plastic)](https://tooomm.github.io/github-release-stats/?username=davidcristian&repository=Kalandra)
+[![GitHub Tag](https://img.shields.io/github/v/tag/davidcristian/Kalandra?style=plastic&label=latest%20version)](https://github.com/davidcristian/Kalandra/releases/latest)
+[![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/davidcristian/Kalandra/latest/master?style=plastic)](https://github.com/davidcristian/Kalandra/commits/master/)
+[![license: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-3b82f6)](LICENSE)
 
 Path of Exile 2 overlay program for price checking items, among many other loved features.
 
-Fork of [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade).
+Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) by Kvan7, which is a fork of
+[Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) by SnosMe.
 
-The ONLY official download sites are <https://kvan7.github.io/Exiled-Exchange-2/download> or <https://github.com/Kvan7/Exiled-Exchange-2/releases>, any other locations are not official and may be malicious.
+The only official download sites are <https://davidcristian.github.io/Kalandra/download> and
+<https://github.com/davidcristian/Kalandra/releases>. Any other location is not official and may be malicious.
+
+## Moving from Exiled Exchange 2
+
+Kalandra installs beside Exiled Exchange 2 and keeps its settings in its own folder.
+
+1. Download the latest release from [releases](https://github.com/davidcristian/Kalandra/releases) and run the installer
+2. Run Kalandra once, then quit it
+3. Quit Exiled Exchange 2
+4. Copy `apt-data` from `%APPDATA%\exiled-exchange-2` to `%APPDATA%\kalandra`, replacing the one there
+5. Start Kalandra
 
 ## Moving from POE1/Awakened PoE Trade
 
-1. Download latest release from [releases](https://github.com/Kvan7/exiled-exchange-2/releases)
+1. Download latest release from [releases](https://github.com/davidcristian/Kalandra/releases)
 2. Run installer
-3. Run Exiled Exchange 2
+3. Run Kalandra
 4. Launch PoE2 to generate correct files
-5. Quit PoE2 and EE2 after seeing the banner popup that EE2 loaded
-6. Copy `apt-data` from `%APPDATA%\awakened-poe-trade` to `%APPDATA%\exiled-exchange-2` to copy your previous settings
+5. Quit PoE2 and Kalandra after seeing the banner popup that Kalandra loaded
+6. Copy `apt-data` from `%APPDATA%\awakened-poe-trade` to `%APPDATA%\kalandra` to copy your previous settings
   - Resulting directory structure should look like this:
-  - `%APPDATA%\exiled-exchange-2\apt-data\`
+  - `%APPDATA%\kalandra\apt-data\`
     - `config.json`
 7. Edit `config.json` and change the value of "windowTitle": "Path of Exile" to instead be "Path of Exile 2", otherwise it will open only for poe1
-8. Start Exiled Exchange 2 and PoE2
+8. Start Kalandra and PoE2
 
 ## FAQ
 
-<https://kvan7.github.io/Exiled-Exchange-2/faq>
+<https://davidcristian.github.io/Kalandra/faq>
 
 ## Tool showcase
 
@@ -37,10 +49,11 @@ The ONLY official download sites are <https://kvan7.github.io/Exiled-Exchange-2/
 
 ### Development
 
-See [DEVELOPING.md](./DEVELOPING.md)
+See [DEVELOPING.md](./DEVELOPING.md). The rules every change follows are in [AGENTS.md](./AGENTS.md).
 
 ### Acknowledgments
 
+- [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2)
 - [awakened-poe-trade](https://github.com/SnosMe/awakened-poe-trade)
 - [libuiohook](https://github.com/kwhat/libuiohook)
 - [RePoE](https://github.com/brather1ng/RePoE)
@@ -51,5 +64,5 @@ See [DEVELOPING.md](./DEVELOPING.md)
 
 ## License
 
-This project is licensed under the [GNU Affero General Public License v3.0](LICENSE). It contains code from
-Awakened PoE Trade and Exiled Exchange 2 under the [MIT License](LICENSES/MIT.txt).
+Kalandra is licensed under the [GNU Affero General Public License v3.0](LICENSE). It contains code from Awakened
+PoE Trade and Exiled Exchange 2 under the [MIT License](LICENSES/MIT.txt).

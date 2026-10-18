@@ -108,4 +108,4 @@ Precursor Tablet,80,Rare,0,"[{'name':'Collector\'s','tier':1,'roll':[25],'ref':[
 Precursor Tablet,80,Rare,0,"[{'name':'Collector\'s','tier':1,'roll':[25],'ref':['#% increased Rarity of Items found in your Maps'],'type':'explicit'}]","[]","[]"
 ```
 
-A larger scale sample(1k) can be found in [LargeDemo.csv](https://raw.githubusercontent.com/Kvan7/Exiled-Exchange-2/refs/heads/master/docs/.vitepress/LargeDemo.csv)
+A larger scale sample(1k) can be found in [LargeDemo.csv](https://raw.githubusercontent.com/davidcristian/Kalandra/refs/heads/master/docs/.vitepress/LargeDemo.csv)

@@ -1,5 +1,5 @@
 ---
-title: Exiled Exchange 2
+title: Kalandra
 ---
 
 ![splash](https://imgur.com/uH9xs4R.png){:.rounded}

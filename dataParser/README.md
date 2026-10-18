@@ -8,8 +8,8 @@ python ./src/main.py
 
 You can use `--help` to see all options. Running with images will take forever so keep that in mind.
 
-## Developing
+## Updating the app's data
 
-I do development in a different private repo with this folder, if it doesn't look up to date let me know and I will try to push changes up to this repo.
-
-If running the whole thing and pushing, you will need to change the `--main-repo-path` option since that has a default for when I run it from the other repo.
+`--push` copies the generated `stats.ndjson`, `items.ndjson` and `client_strings.js` for each language into
+`renderer/public/data/`. `--main-repo-path` sets the repo root and defaults to `..`, the parent of this folder.
+After a push, run `npm run make-index-files` in `renderer/` to rebuild the index files.

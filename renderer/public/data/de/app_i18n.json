@@ -14,7 +14,6 @@
     "leagues_failed_help_alt": "Führe eine Preisüberprüfung durch und folge den Anweisungen in der Fehlerbeschreibung.",
     "thanks_3rd_party": "Dieses Tool basiert auf {0} und {1}. Bitte unterstütze diese ebenfalls",
     "toggle_browser_hint": "Drücke {0}, um zwischen Browser und Spiel zu wechseln.",
-    "contact_me": "Kontaktiere mich auf einem der PoE-Discords,",
     "version": "Version {0}",
     "release_notes": "Release Notes",
     "report_bug": "Einen Fehler auf GitHub melden",
@@ -341,7 +340,7 @@
     "highest_volume": "Höchstes Volumen:"
   },
   "settings": {
-    "title": "Einstellungen - Exiled Exchange 2",
+    "title": "Einstellungen - Kalandra",
     "language": "Sprache",
     "private_league": "oder Private Liga",
     "account_name": "Account-Name",

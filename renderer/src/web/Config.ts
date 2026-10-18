@@ -78,9 +78,9 @@ export async function initConfig() {
 
     // TODO
     // dialog.showErrorBox(
-    //   'Exiled Exchange 2 - Incompatible configuration',
+    //   'Kalandra - Incompatible configuration',
     //   // ----------------------
-    //   'You are trying to use an older version of Exiled Exchange 2 with a newer incompatible configuration file.\n' +
+    //   'You are trying to use an older version of Kalandra with a newer incompatible configuration file.\n' +
     //   'You need to install the latest version to continue using it.'
     // )
   }

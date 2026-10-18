@@ -7,7 +7,7 @@ import re
 def extract_version_from_readme():
     with open("README.md", "r") as file:
         content = file.read()
-    match = re.search(r"Exiled-Exchange-2-Setup-(\d+\.\d+\.\d+)", content)
+    match = re.search(r"Kalandra-Setup-(\d+\.\d+\.\d+)", content)
     if match:
         return match.group(1)
     return None
