@@ -48,3 +48,8 @@ See [DEVELOPING.md](./DEVELOPING.md)
 - [poe.ninja](https://poe.ninja/)
 
 ![graph](https://i.imgur.com/MATqhv7.png)
+
+## License
+
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE). It contains code from
+Awakened PoE Trade and Exiled Exchange 2 under the [MIT License](LICENSES/MIT.txt).

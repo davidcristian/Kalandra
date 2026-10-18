@@ -2,6 +2,7 @@
   "name": "exiled-exchange-2",
   "version": "0.16.3",
   "private": true,
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "node build/script.mjs",
     "build": "tsc --noEmit && node build/script.mjs --prod",
