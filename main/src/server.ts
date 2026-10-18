@@ -8,6 +8,7 @@ import { app } from "electron";
 import { IpcEvent, IpcEventPayload, HostState } from "../../ipc/types";
 import { ConfigStore } from "./host-files/ConfigStore";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
+import { readListenOption } from "./listen-option";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
 
@@ -128,15 +129,14 @@ export async function startServer(
     }
   });
 
-  let port = process.env.VITE_DEV_SERVER_URL ? 8584 : 0;
-  let host = "127.0.0.1";
-  // --listen=[host][:port]
-  const listenOpt = process.argv.find((arg) => arg.startsWith("--listen"));
-  if (listenOpt) {
-    const [hostArg, portArg] = listenOpt.split("=")[1].split(":");
-    if (hostArg) host = hostArg;
-    if (portArg) port = parseInt(portArg, 10);
+  const listen = readListenOption(process.argv, {
+    host: "127.0.0.1",
+    port: process.env.VITE_DEV_SERVER_URL ? 8584 : 0,
+  });
+  if (listen.error) {
+    logger.write(`error [server] ${listen.error}, using the default address`);
   }
+  const { host, port } = listen.address;
 
   return await new Promise((resolve, reject) => {
     server

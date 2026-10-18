@@ -30,8 +30,9 @@ it forwards the app's requests to the sites it uses, such as the trade site. By 
 `127.0.0.1`, the loopback address that only this computer can reach, on a random free port that changes on each
 start.
 
-The host and the port are both optional. Write the value after `=` with no space. With `--listen` alone, or a space
-in place of `=`, the server does not start.
+The host and the port are both optional. Write the value after `=` with no space. With `--listen` alone, a space in
+place of `=`, or a value Kalandra cannot read, Kalandra writes an error to its log (Settings, **Debug** page) and uses
+the default address. Write an IPv6 host in brackets, such as `--listen=[::1]:9001`.
 
 - `--listen=:9001` keeps the loopback address and sets port 9001. The page then always opens at
   `http://localhost:9001`, so you can bookmark it.

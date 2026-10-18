@@ -104,8 +104,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
 2. **The renderer**, in `renderer/`: `npm ci`, `npm run make-index-files`, `npm run lint`, `npx vitest run`,
    `npm run build`. The index files must exist before the tests, `npm run dev` or a build, and must be written again
    after any data change. `npm test` starts Vitest in watch mode in an interactive terminal, so use `npx vitest run`.
-3. **The main process**, in `main/`: `npm ci`, `npm run build` (`tsc --noEmit`, then the esbuild bundle). CI packages
-   it on Windows, Linux and macOS, so a platform-specific path or API needs a `process.platform` check.
+3. **The main process**, in `main/`: `npm ci`, `npm test` (Vitest), `npm run build` (`tsc --noEmit`, then the esbuild
+   bundle). CI packages it on Windows, Linux and macOS, so platform-specific code needs a `process.platform` check.
 4. **The data tool**, only when `dataParser/` changes: `python -m pytest` in `dataParser/`, plus Ruff, Bandit and the
    other hooks in `dataParser/.pre-commit-config.yaml`.
    **The price service**, when `priceService/`, `namespaceMap.json`, `Prices.ts` or `price-source.ts` changes:

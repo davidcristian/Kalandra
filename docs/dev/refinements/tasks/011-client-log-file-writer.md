@@ -26,9 +26,9 @@ With Item Data Collection on, `FileWriter` in `main/src/host-files/FileWriter.ts
 behavior: the folder in its Turn it on section, and the other two in How Kalandra writes the file.
 
 Done looks like: one awaited open at a time, writes in order, the folder created before the open, a
-test for each defect, and the page updated in the same commit. main has no test script, and
-`FileWriter` imports `app` from Electron, so the tests need a stub for `app` and the test setup that
-[008](008-listen-option-without-value.md) decides on for main.
+test for each defect, and the page updated in the same commit. `FileWriter` imports `app` from
+Electron, so its tests in `main/specs/` replace Electron with `vi.mock`, as the main module doc
+describes; `npm test` in `main/` runs them.
 
 ## History
 

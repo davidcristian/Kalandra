@@ -1,6 +1,6 @@
 # --listen without = stops the local server from starting
 
-**Status:** open
+**Status:** done 2026-10-18
 **Area:** main
 **Origin:** [main/src/server.ts](../../../../main/src/server.ts)
 **Verified:** 2026-10-18
@@ -30,3 +30,7 @@ that test runs. The sentence in docs/cmd-flags.md changes in the same commit.
 - 2026-10-18: Found while docs/cmd-flags.md was rewritten, by reading `startServer()` and the start
   sequence in `main.ts`. The parsing expression, run in Node 24, throws `TypeError` for
   `--listen` and for `--listen 0.0.0.0`, and reads host `x` from `--listener=x`.
+- 2026-10-18: Closed. `readListenOption()` in `main/src/listen-option.ts` parses the option without
+  throwing, and `startServer()` logs an unreadable value and uses the default address. main's tests
+  now run with Vitest (`npm test` in `main/`, also in the Tests job of `test.yml`), and
+  `main/specs/listen-option.test.ts` covers the cases above. docs/cmd-flags.md says what happens.

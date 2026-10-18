@@ -26,6 +26,9 @@ The entry, the server and the app services, in `main/src/`:
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
   client. A new client receives the log history. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
+- `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
+  brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
+  defaults and an `error` text, which `startServer()` writes to the log.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
   sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and
   `kalandra.ashoal.com`. It drops the `sec-*`, `host`, `origin` and `content-length` request headers, sends the
@@ -155,7 +158,9 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 `../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned
 universal dmg on macOS, and publishes to GitHub releases.
 
-**Tests.** main has no tests. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and
+**Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it too.
+`listen-option.test.ts` covers the `--listen` parsing. A test of a module that imports Electron replaces it with
+`vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and
 `npm run lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus,
 clipboard capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to
 check them, [host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it

@@ -39,6 +39,8 @@ jobs:
       working-directory: ./renderer
     - run: npm run test
       working-directory: ./renderer
+    - run: npm test
+      working-directory: ./main
   price-service:
     name: Price service
     runs-on: ubuntu-latest
