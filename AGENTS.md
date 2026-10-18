@@ -110,7 +110,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    the coverage of the files it touches (`npx vitest run --coverage`).
 6. **File size.** A new source file is at most 300 lines. Many existing files are far over that (`Parser.ts`,
    `pathofexile-trade.ts`): put new, separable code in a new module and call it, rather than growing them. Splitting
-   an existing file is its own commit, never a side effect of another change.
+   an existing file is its own commit, never a side effect of another change. A markdown file is at most 250 lines,
+   so a longer one is split by subject.
 7. **Types and quality.** TypeScript is `strict` in both processes. New code adds no `any`, no `as unknown as` cast
    and no `@ts-ignore`, `@ts-expect-error` or `eslint-disable` without its reason on the same line. Errors are
    handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, no `eval` and no
@@ -136,8 +137,9 @@ script checks these rules in this repo, so read your own diff for them.
   decisions. Cut the story of how the code got here, repeated explanations (link to the one place instead) and
   hedging.
 - **Plain words.** Short sentences, one idea each, with the literal verb: "checks", "fails", "returns", "stores",
-  "sends". Code does not know, want, refuse or decide anything, so say what it does. No metaphors, idioms or invented
-  terms. Game terms are exempt, and so is anything in backticks.
+  "sends". Code does not know, want, refuse or decide anything, so say what it does. Define a technical term once,
+  where it first appears. No metaphors, idioms or invented terms. Game terms are exempt (a spell, the Delve grid), and
+  so is anything in backticks.
 - **No dash as punctuation.** No em dash, en dash or spaced `--` in anything written here: restructure the sentence
   rather than swapping in another mark. Hyphenated words and CLI flags are fine. Text the app matches or parses from
   the game or a trade site keeps its characters exactly as written there, and so do fixtures copied from it.
@@ -146,16 +148,26 @@ script checks these rules in this repo, so read your own diff for them.
 
 | Do not write | Write instead |
 | --- | --- |
-| gate, gates, gated, gating | check, must pass, enforced by |
-| land, lands, landed, landing | commit, merge, add |
-| carry, carries, carried, carrying | contain, include, pass |
+| gate, gates, gated, gating, ungated | check, must pass, enforced by |
+| land, lands, landed, landing | commit, merge, add, end up |
+| carry, carries, carried, carrying | contain, include, keep, pass |
+| pin, pins, pinned, pinning | fix, lock, set exactly, assert |
+| spell, spells, spelled, spelling, respell | write, name, define |
+| arm, arms, armed, arming | variant, branch, set, enable |
 | seam, seams | boundary, interface |
+| sweep, sweeps, sitting, sittings | review, pass, run |
+| heal, heals, healed, healing | fix, repair |
+| bite, bites, earn, earns, earned | name the event that makes it matter, say why it is justified |
+| ride, rides, riding, standing, in force | is sent with, current, in effect |
+| needle, needles, knob, knobs, lever, levers | search text, setting, option |
 | honest, honestly | accurate, correct, real |
 | verdict, verdicts | result |
-| load-bearing, crucial, critically, fundamentally | required, (state the fact) |
-| robust, seamless, comprehensive | (state the specific fact) |
-| leverage, utilize, worth noting | use, (state the fact) |
-| footgun, tripwire, backstop, under the hood, boils down | describe the mechanism, say it literally |
+| re-derive, re-derived, rederive | recompute, check again |
+| load-bearing, crucial, crucially, critically, fundamentally | required, (state the fact) |
+| robust, seamless, seamlessly, comprehensive | (state the specific fact) |
+| leverage, leverages, delve, utilize, worth noting | use, look at, (state the fact) |
+| footgun, tripwire, backstop, ratchet, chokepoint | describe the mechanism |
+| under the hood, boils down, low-hanging, rabbit hole, north star, belt and braces, silver bullet | say it literally |
 
 ## Commits
 
