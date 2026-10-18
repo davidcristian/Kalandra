@@ -35,7 +35,8 @@ behavior. [ADR-0008](../adr/ADR-0008-developer-docs-layout.md) gives the layout.
 5. **File what the run opened.** A bug the run found becomes a refinement with the log lines it
    produced, named in this task's History. A new check gets a file here with the next free number.
 6. **Add a new task to this list by hand**, with its number, title and link, in the same commit as
-   its file. Nothing generates or checks this list.
+   its file. `scripts/backlogcheck.py` checks that the list and the task files match: each file
+   listed once, in number order, with its heading as the title and one status from the list below.
 
 ## Statuses
 
@@ -83,7 +84,7 @@ A check is not a design, so it has more outcomes than a refinement:
 - 010: [Whether OCR and the Delve grid match anything Path of Exile 2 shows](tasks/010-ocr-and-delve-grid.md)
 - 011: [The XP tracker follows the game's Client.txt](tasks/011-xp-tracker.md)
 - 012: [What the client log events mean in the game](tasks/012-client-log-events.md)
-- 013: [Map check opens for map items and marks their modifiers](tasks/013-map-check.md)
+- 013: [The item check key opens Map check or Item info, and Map check marks modifiers](tasks/013-map-check.md)
 - 014: [Item data collection writes rows, and new CSV samples for its page](tasks/014-item-data-collection.md)
 - 015: [Item text and log lines from a game client in another language](tasks/015-other-game-languages.md)
 - 016: [Install, update and moving settings on Windows](tasks/016-install-and-migration.md)

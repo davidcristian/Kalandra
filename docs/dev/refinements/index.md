@@ -32,7 +32,8 @@ layout and its reasons.
 5. **File what the close opened.** A close often leaves narrower work. Give it a new file with the
    next free number, and name it in the History of both tasks.
 6. **Add the new task to this list by hand**, with its number, title and link, in the same commit
-   as its file. Nothing generates or checks this list.
+   as its file. `scripts/backlogcheck.py` checks that the list and the task files match: each file
+   listed once, in number order, with its heading as the title and one status from the list below.
 
 ## Statuses
 
@@ -94,9 +95,9 @@ layout and its reasons.
 - 033: [Take current screenshots of the Settings window and the add widget menu](tasks/033-app-screenshots.md)
 - 034: [Check the cv-ocr.zip file list and decide where the archive comes from](tasks/034-cv-ocr-archive.md)
 - 035: [crowdin.yml maps translations while AGENTS.md says no service is connected](tasks/035-crowdin-config.md)
-- 036: [The issue chooser links GitHub Discussions, which is off](tasks/036-discussions-links.md)
+- 036: [Issues and Discussions are off on the GitHub repo that the app and the docs link](tasks/036-discussions-links.md)
 - 037: [The type check hooks do not run for a change only in ipc/](tasks/037-type-check-hooks-skip-ipc.md)
-- 038: [Which pushes to master run the Build workflow](tasks/038-build-workflow-paths.md)
+- 038: [The Build workflow runs for pushes that change no file of the app](tasks/038-build-workflow-paths.md)
 - 039: [The Build workflow does not set the token permissions a release upload needs](tasks/039-build-workflow-permissions.md)
 - 040: [testUpdate.sh runs npm install instead of npm ci](tasks/040-test-update-script-npm-ci.md)
 - 041: [Choose the first Kalandra version above the inherited tags](tasks/041-first-release-version.md)

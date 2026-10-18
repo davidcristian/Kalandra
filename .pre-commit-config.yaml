@@ -92,6 +92,18 @@ repos:
         language: python
         pass_filenames: false
         always_run: true
+    -   id: linkcheck
+        name: Links in the developer docs
+        entry: python scripts/linkcheck.py
+        language: python
+        pass_filenames: false
+        always_run: true
+    -   id: backlogcheck
+        name: Backlog indexes
+        entry: python scripts/backlogcheck.py
+        language: python
+        pass_filenames: false
+        always_run: true
     -   id: commitlint
         name: Commit message rules
         entry: python scripts/commitlint.py

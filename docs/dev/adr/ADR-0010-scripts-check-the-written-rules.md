@@ -51,6 +51,12 @@ banned-word rules skip. Merge and fixup messages are not checked. Reason: a mess
 the check runs before the commit exists. CI does not check messages, because the history inherited from Exiled
 Exchange 2 does not follow these rules.
 
+**8. The backlog indexes and the links the docs build does not read are checked.** `scripts/backlogcheck.py`
+compares each index in `docs/dev/` with its task files: every file listed once, in number order, with its heading as
+the title and one status the index defines. `scripts/linkcheck.py` checks that every relative link in the developer
+docs and in the markdown outside `docs/` names a file in the repo, and a heading that file has. Reason: the indexes
+are kept by hand ([ADR-0008](ADR-0008-developer-docs-layout.md)), and VitePress checks only the user pages.
+
 ## Consequences
 
 - A contributor runs `pre-commit install` once, and every commit then runs these checks. A clone that ran it before

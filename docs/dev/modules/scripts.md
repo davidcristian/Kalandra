@@ -2,8 +2,8 @@
 
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
 [AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
-`prosecheck.py` check the line limits, the dash rule and the banned words, and `commitlint.py` checks a commit
-message. The scripts are Python, use only the
+`prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py`
+check the developer docs, and `commitlint.py` checks a commit message. The scripts are Python, use only the
 standard library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
 ## Public contract
@@ -24,11 +24,12 @@ build. A `Step` is a name, a repo folder and a command run in that folder.
 - The pre-commit hooks rewrite files (ESLint `--fix`, Prettier `--write`, Ruff `--fix`), so a run of `check.py`
   can leave changes in the working tree.
 
-### The three checks
+### The file checks
 
-Each one reads the files that `git ls-files --cached --others --exclude-standard` lists (`repofiles.py`), prints one
-line per problem as `<path>:<line>: <problem>`, and exits with 1 when it finds one, 0 when it finds none, and 2 when
-it cannot read what it needs or reads nothing. `--root <folder>` checks another copy of the repo.
+Each one prints one line per problem, starting with the file's path, and exits with 1 when it finds a problem, 0
+when it finds none, and 2 when it cannot read what it needs or reads nothing. All but `backlogcheck.py` read the
+files that `git ls-files --cached --others --exclude-standard` lists (`repofiles.py`). `--root <folder>` checks
+another copy of the repo.
 
 - **`linecap.py`** counts the lines of every source file (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.vue`, `.py`) that
   is not a test or game data, and of every markdown file. A source file over 300 lines fails unless
@@ -45,6 +46,13 @@ it cannot read what it needs or reads nothing. `--root <folder>` checks another 
   `bannedwords.py` reads the words from the table in AGENTS.md, skips code spans, link targets and URLs, finds a
   phrase across one line break, and skips the `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's
   capitals. The rows of the table itself are not checked.
+- **`linkcheck.py`** reads every markdown file outside `docs/`, and those in `docs/dev/`, since VitePress checks the
+  user pages. Each relative link outside code (`markdownlinks.py`) must name a file or folder in the repo, and an
+  `#anchor` in a markdown file must match one of its headings as GitHub makes them: lowercase, punctuation removed,
+  each space a hyphen, and `-1`, `-2` added to a repeated heading. A link to another site is not followed.
+- **`backlogcheck.py`** reads `docs/dev/refinements/` and `docs/dev/host/`. Each line under `## Tasks` in the
+  `index.md` must be `- NNN: [title](tasks/NNN-slug.md)`, in number order, and every task file must be listed once,
+  with its first line `# <title>` and exactly one `**Status:**` line whose value the index defines.
 
 ### commitlint.py
 
@@ -69,12 +77,12 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
   ([dataparser.md](dataparser.md#tests)). A new check in AGENTS.md is a new `Step` or hook in the same commit.
 - Every step's folder exists, and no two steps have the same name; `test_check.py` checks both.
 - The banned words exist only in the table in AGENTS.md, which `prosecheck.py` reads on every run.
-- The pre-commit hooks run `linecap.py`, `dashcheck.py` and `prosecheck.py` on every commit, after the formatters,
-  so the counts they read are the formatted ones.
+- The pre-commit hooks run the five file checks on every commit, after the formatters, so the counts they read are
+  the formatted ones.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 39 tests on 18 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 47 tests on 18 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
