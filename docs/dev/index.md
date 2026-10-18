@@ -27,6 +27,7 @@ the rules for writing, numbering and editing one, including the row each new rec
 | [ADR-0007: Game text comes from generated game data](adr/ADR-0007-game-text-from-game-data.md) | The parser matches item text through `CLIENT_STRINGS` and `stats.ndjson`, never English literals; `dataParser` output is regenerated, never edited; the `*.index.bin` files are built, not committed. |
 | [ADR-0008: Developer docs live in docs/dev/ and are left out of the user site](adr/ADR-0008-developer-docs-layout.md) | `docs/dev/` is left out of the site by `srcExclude`, a user page links a developer doc by its GitHub URL, a user page has a frontmatter title and a developer doc an H1, 250 lines per file, one file per backlog task, and no readings directory. |
 | [ADR-0009: The local server accepts requests only from its own page](adr/ADR-0009-local-server-accepts-only-its-own-page.md) | Every HTTP route listens on `httpRoutes` behind one check: `Host` is `localhost` or an IP address, `Origin` matches `Host` (required on a WebSocket), and a file route serves only the files inside its folder. |
+| [ADR-0010: Scripts check the written rules](adr/ADR-0010-scripts-check-the-written-rules.md) | Standard library Python scripts in `scripts/` run as pre-commit hooks and in CI; `check.py` runs every check; 300 lines per source file with the longer inherited files at exact counts, 250 per markdown file; no em or en dash outside the listed game text; banned words read from the table in AGENTS.md. |
 
 ## Contracts
 
@@ -45,7 +46,7 @@ contract, its invariants, its dependencies and its tests:
 | [price-service.md](modules/price-service.md) | `priceService/`: the files each cycle writes, the price file format and why its key order is a format, `namespaceMap.json`, the environment variables, its requests to poe.ninja, and the app side |
 | [renderer-parser.md](modules/renderer-parser.md) | `renderer/src/parser/` and `renderer/src/assets/data/`: `parseClipboard()` and `ParsedItem`, the parser files, and how the game data and its index files are loaded and searched |
 | [renderer-price-check.md](modules/renderer-price-check.md) | `renderer/src/web/price-check/` with `Prices.ts`, `price-source.ts` and `Leagues.ts`: the window and its hotkeys, the filters, the trade queries and rate limiters, and the price estimates |
-| [scripts.md](modules/scripts.md) | `scripts/`: `check.py`, which runs every check in AGENTS.md that a machine can run, its steps and their order, and the tests of the scripts |
+| [scripts.md](modules/scripts.md) | `scripts/`: `check.py`, which runs every check in AGENTS.md that a machine can run, and the line, dash and prose checks: what each one reads, reports and skips, and their tests |
 | [renderer-widgets.md](modules/renderer-widgets.md) | `renderer/src/web/overlay/`: the `Widget` type and its flags, `WidgetSpec`, the registry, the window manager, every registered widget, and the steps to add one |
 
 ## Runbooks

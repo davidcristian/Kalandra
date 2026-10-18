@@ -302,7 +302,7 @@ export function createFilters(
 
   const forAdornedJewel =
     item.rarity === ItemRarity.Magic &&
-    // item.isCorrupted && -- let the buyer corrupt
+    // item.isCorrupted is left out, so the buyer can corrupt the jewel
     (item.category === ItemCategory.Jewel ||
       item.category === ItemCategory.AbyssJewel);
 

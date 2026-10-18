@@ -15,7 +15,7 @@
       :style="{ width: `${1.2 + Math.max(String(inputMin).length, 2)}ch` }"
     />
     <template v-if="'max' in filter">
-      <span>–</span>
+      <span><!-- dashcheck: allow, a range sign -->–</span>
       <input
         :class="$style.input"
         step="any"

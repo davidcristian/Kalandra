@@ -514,7 +514,7 @@ class NdBuilderService:
         data_without_saved_refs = in_df.loc[~in_df["ref"].isin(refs_set)].copy()
 
         def custom_fn(df):
-            """Add column to utilize custom groupings"""
+            """Add a column for the custom groupings"""
 
             def find_index(c):
                 for index, val in enumerate(refs_to_merge):

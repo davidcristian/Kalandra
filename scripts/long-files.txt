@@ -1,0 +1,36 @@
+# Source files that were over 300 lines when linecap.py was added, with their line counts.
+# Each file must have exactly the count written here. Lower a count when a file shrinks, and remove the
+# file once it is within the limit. Raising a count needs its reason in the commit body.
+380 dataParser/src/constants/client_string_data.py
+365 dataParser/src/constants/css_rules.py
+563 dataParser/src/services/nd_builder_service.py
+317 dataParser/src/stores/helpers/description.py
+348 ipc/types.ts
+368 main/src/shortcuts/Shortcuts.ts
+624 renderer/src/assets/data/index.ts
+351 renderer/src/assets/data/interfaces.ts
+2269 renderer/src/parser/Parser.ts
+380 renderer/src/parser/stat-translations.ts
+843 renderer/src/web/Config.ts
+575 renderer/src/web/background/Prices.ts
+308 renderer/src/web/client-log/client-log-parser.ts
+452 renderer/src/web/item-search/WidgetItemSearch.vue
+413 renderer/src/web/overlay/OverlayWindow.vue
+425 renderer/src/web/overlay/Widget.vue
+361 renderer/src/web/price-check/CheckedItem.vue
+449 renderer/src/web/price-check/PriceCheckWindow.vue
+607 renderer/src/web/price-check/filters/FilterModifier.vue
+517 renderer/src/web/price-check/filters/FiltersBlock.vue
+708 renderer/src/web/price-check/filters/create-item-filters.ts
+974 renderer/src/web/price-check/filters/create-stat-filters.ts
+640 renderer/src/web/price-check/filters/pseudo/index.ts
+723 renderer/src/web/price-check/filters/pseudo/item-property.ts
+336 renderer/src/web/price-check/item-editor/AugmentEditor.vue
+379 renderer/src/web/price-check/settings-price-check.vue
+419 renderer/src/web/price-check/trade/TooltipItem.vue
+301 renderer/src/web/price-check/trade/TradeBulk.vue
+353 renderer/src/web/price-check/trade/TradeListing.vue
+2103 renderer/src/web/price-check/trade/pathofexile-trade.ts
+307 renderer/src/web/price-check/trends/PriceTrend.vue
+347 renderer/src/web/price-check/trends/getDetailsId.ts
+541 renderer/src/web/settings/SettingsWindow.vue

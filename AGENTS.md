@@ -15,12 +15,10 @@ Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-
 [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade). `origin` is `davidcristian/Kalandra`. One Electron
 app in three parts, plus a data tool and a docs site:
 
-- `main/`: the Electron main process (TypeScript, bundled by esbuild). Global hotkeys (Electron's `globalShortcut`),
-  key presses and input events (`uiohook-napi`), the overlay window over the game (`electron-overlay-window`),
-  clipboard, the game config and client log files, the HTTP proxy to the trade sites, auto update and the tray.
-- `renderer/`: the Vue 3, Vite and Tailwind UI shown in the overlay. `src/parser/` turns copied item text into a
-  `ParsedItem`, `src/web/` holds the widgets, `src/web/price-check/trade/` builds trade queries and
-  `src/assets/data/` loads the game data.
+- `main/`: the Electron main process (TypeScript, bundled by esbuild): hotkeys, key presses, the overlay window, the
+  clipboard, the game's config and client log, the HTTP proxy to the trade sites, auto update and the tray.
+- `renderer/`: the Vue 3, Vite and Tailwind UI in the overlay. `src/parser/` turns copied item text into a
+  `ParsedItem`, `src/web/` holds the widgets and the trade queries, and `src/assets/data/` loads the game data.
 - `ipc/`: types shared by both processes: `HostConfig`, `ShortcutAction` and the `IpcEvent` union.
 - `dataParser/`: a Python tool that builds the per-language game data in `renderer/public/data/<lang>/` from game
   and trade exports, and the only source of that data ([dataParser/README.md](dataParser/README.md)). Exiled
@@ -97,10 +95,10 @@ it before calling a change done, after `npm ci` in `renderer/`, `main/` and `doc
 [DEVELOPING.md](DEVELOPING.md#checks) gives each step's own command, for running one part alone. CI runs the same
 steps on Node 24.
 
-1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, end of file, YAML, files over 2 MB and
-   `versionCheck.py`, then run ESLint with `--fix`, Prettier with `--write` and `tsc --noemit` on `main/` and
-   `renderer/`, and Ruff and strict Pyright on `priceService/` and `scripts/`. The fixers rewrite files, so stage the
-   result and run again until it passes. Never pass `--no-verify` unless the user asks.
+1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, `versionCheck.py`,
+   ESLint, Prettier and `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`,
+   and the line, dash and prose rules below. The fixers rewrite files, so stage the result and run again until it
+   passes. Never pass `--no-verify` unless the user asks.
 2. **The renderer**: lint, Vitest and the build, after `npm run make-index-files` writes the index files they need.
    Write them again after any data change.
 3. **The main process**: Vitest and the build. CI packages it on Windows, Linux and macOS, so platform-specific code
@@ -114,10 +112,10 @@ steps on Node 24.
    through fakes (working stand-ins such as `FakeGet` in `priceService/tests/support.py`) rather than mocks that
    assert calls, and a test written only to run a line is a defect. There is no coverage threshold, but a change must
    not lower the coverage of the files it touches (`npx vitest run --coverage`).
-6. **File size.** A new source file is at most 300 lines. Many existing files are far over that (`Parser.ts`,
-   `pathofexile-trade.ts`): put new, separable code in a new module and call it, rather than growing them. Splitting
-   an existing file is its own commit, never a side effect of another change. A markdown file is at most 250 lines,
-   so a longer one is split by subject.
+6. **File size.** A source file is at most 300 lines and a markdown file at most 250, as `scripts/linecap.py` checks.
+   The files already over 300 lines are in `scripts/long-files.txt` with their exact counts: put new, separable code
+   in a new module rather than growing one, and lower its count when it shrinks. Splitting an existing file is its
+   own commit, never a side effect of another change.
 7. **Types and quality.** TypeScript is `strict` in both processes. New code adds no `any`, no `as unknown as` cast
    and no `@ts-ignore`, `@ts-expect-error` or `eslint-disable` without its reason on the same line. Errors are
    handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, raises typed
@@ -136,7 +134,8 @@ steps on Node 24.
 ## Prose
 
 Write comments, docstrings, docs, commit messages and the text of log and error messages in plain English that a
-new reader understands on the first read. No script checks these rules in this repo, so read your own diff for them.
+new reader understands on the first read. `scripts/prosecheck.py` and `scripts/dashcheck.py` check the dash and
+banned-word rules; read your own diff for the rest.
 
 - **Comments.** None unless strictly necessary: why a workaround exists, a constraint that is not visible (an
   ordering, a game or API quirk with its link, a measured number), or a directive a tool reads
@@ -152,7 +151,8 @@ new reader understands on the first read. No script checks these rules in this r
   invented terms. Game terms are exempt (Spell Damage, the Delve grid), and so is anything in backticks.
 - **No dash as punctuation.** No em dash, en dash or spaced `--` in anything written here: restructure the sentence
   rather than swapping in another mark. Hyphenated words and CLI flags are fine. Text the app matches or parses from
-  the game or a trade site keeps its characters exactly as written there, and so do fixtures copied from it.
+  the game or a trade site keeps its characters exactly as written there, and so do fixtures copied from it. Any
+  other dash that stays, such as a symbol in the UI, has `dashcheck: allow` and a reason on its line.
 - **Banned words.** Do not write the words on the left, in any capitalization. The list is a minimum: rewrite any
   other figurative word the same way.
 

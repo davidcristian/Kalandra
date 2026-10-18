@@ -1,9 +1,9 @@
 # scripts/: the repo checks
 
-**Purpose.** `scripts/` holds the command line tools that check the repo itself. `check.py` runs every check in
-[AGENTS.md, What every change must pass](../../../AGENTS.md#what-every-change-must-pass) that a machine can run, so
-one command tells a contributor whether a change is done. The scripts are Python, use only the standard library, and
-run from the repo root.
+**Purpose.** `scripts/` holds the command line tools that check the repo itself against
+[AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, and `linecap.py`, `dashcheck.py`
+and `prosecheck.py` check the line limits, the dash rule and the banned words. The scripts are Python, use only the
+standard library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
 ## Public contract
 
@@ -23,17 +23,43 @@ build. A `Step` is a name, a repo folder and a command run in that folder.
 - The pre-commit hooks rewrite files (ESLint `--fix`, Prettier `--write`, Ruff `--fix`), so a run of `check.py`
   can leave changes in the working tree.
 
+### The three checks
+
+Each one reads the files that `git ls-files --cached --others --exclude-standard` lists (`repofiles.py`), prints one
+line per problem as `<path>:<line>: <problem>`, and exits with 1 when it finds one, 0 when it finds none, and 2 when
+it cannot read what it needs or reads nothing. `--root <folder>` checks another copy of the repo.
+
+- **`linecap.py`** counts the lines of every source file (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.vue`, `.py`) that
+  is not a test or game data, and of every markdown file. A source file over 300 lines fails unless
+  `long-files.txt` lists it, and a listed file fails unless it has exactly its listed count. The message says which
+  way to change the count. A markdown file over 250 lines fails.
+- **`dashcheck.py`** reports every line with an em dash or an en dash, in every text file. In markdown it skips code
+  spans and fenced code. `EXEMPTIONS` names the folders and files of game text (the game data, the copied item text
+  and client log lines in `renderer/specs/`, and one comment that quotes item text), each with its reason. An
+  exemption that covers no dash fails. A line that contains `dashcheck: allow` is skipped.
+- **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. `prosesources.py` finds the prose:
+  markdown outside fenced code; the comments of TypeScript, JavaScript, Vue, YAML, TOML and shell files; the
+  docstrings and comments of Python; and the strings passed to `console.*`, `logger.write`, `new ...Error` and
+  `throw new` calls, or in Python to `print`, a logging method, a `raise`, or a variable named `msg`.
+  `bannedwords.py` reads the words from the table in AGENTS.md, skips code spans, link targets and URLs, finds a
+  phrase across one line break, and skips the `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's
+  capitals. The rows of the table itself are not checked.
+
 ## Invariants
 
 - `STEPS` holds every check AGENTS.md names except the data tool's, whose tests need files the repo does not have
-  ([dataparser.md](dataparser.md#tests)). A new check in AGENTS.md is a new `Step` in the same commit.
+  ([dataparser.md](dataparser.md#tests)). A new check in AGENTS.md is a new `Step` or hook in the same commit.
 - Every step's folder exists, and no two steps have the same name; `test_check.py` checks both.
+- The banned words exist only in the table in AGENTS.md, which `prosecheck.py` reads on every run.
+- The pre-commit hooks run `linecap.py`, `dashcheck.py` and `prosecheck.py` on every commit, after the formatters,
+  so the counts they read are the formatted ones.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 6 tests on 18 Oct 2026. They run steps that start the current
-Python with `-c`, so they need no Node and no network. The pre-commit hooks run Ruff and Pyright in strict mode on
-`scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and `pyrightconfig.json` at the
-repo root covers both folders.
+`python -m unittest discover -s tests` in `scripts/`, 31 tests on 18 Oct 2026. `tests/support.py` builds a temporary
+git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
+Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
+strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
+`pyrightconfig.json` at the repo root covers both folders.
 
-**Dependencies.** Python 3.12 or newer. `check.py` starts `pre-commit`, `npm` and `npx`, and the Python it runs on.
+**Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

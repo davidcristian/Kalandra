@@ -70,3 +70,23 @@ repos:
     -   id: pyright
         files: ^(priceService/|scripts/|pyrightconfig\.json$)
         pass_filenames: false
+-   repo: local
+    hooks:
+    -   id: linecap
+        name: Line limits
+        entry: python scripts/linecap.py
+        language: python
+        pass_filenames: false
+        always_run: true
+    -   id: dashcheck
+        name: No em dash or en dash
+        entry: python scripts/dashcheck.py
+        language: python
+        pass_filenames: false
+        always_run: true
+    -   id: prosecheck
+        name: Prose rules
+        entry: python scripts/prosecheck.py
+        language: python
+        pass_filenames: false
+        always_run: true

@@ -210,7 +210,7 @@ renderer/          the Vue 3 page: Vite, Tailwind, Vitest
 ipc/               types.ts and KeyToCode.ts, imported by both processes
 dataParser/        the Python game data generator, run by hand; output/ holds its last output
 priceService/      the Python price file service, deployed outside the app
-scripts/           check.py, which runs every check AGENTS.md names, and the tests of the scripts
+scripts/           check.py, which runs every check AGENTS.md names, the line, dash and prose checks, and their tests
 docs/              the VitePress user site; dev/ holds the developer docs, left out of the site
 .github/           test.yml, main.yml, pages.yml, the issue templates and FUNDING.yml
 versionCheck.py    fails unless the five files AGENTS.md names have the same version
