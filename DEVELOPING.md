@@ -11,8 +11,9 @@ describes the parts of the app and how they talk to each other.
 - **Python 3.12 or newer.** `priceService/` uses only the standard library, and CI tests it on
   3.12. `dataParser/` imports `typing.override`, which Python added in 3.12, and the packages in
   [dataparser.md](docs/dev/modules/dataparser.md#tests), which no requirements file lists.
-- **pre-commit**, for example `pip install pre-commit`. Run `pre-commit install` once in the repo so
-  the hooks run on every `git commit`.
+- **pre-commit**, for example `pip install pre-commit`. Run `pre-commit install` once in the repo, and
+  again after `default_install_hook_types` in `.pre-commit-config.yaml` changes. It installs the
+  pre-commit hooks and the commit-msg hooks, which check each commit's message.
 - **Windows with Path of Exile 2** to see the overlay over the game. The app also builds and runs on
   Linux and macOS, and CI packages it on all three.
 

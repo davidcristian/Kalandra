@@ -90,10 +90,9 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 
 ## What every change must pass
 
-`python scripts/check.py` runs every step below but the data tool's, in order, and names each one that failed. Run
-it before calling a change done, after `npm ci` in `renderer/`, `main/` and `docs/`.
-[DEVELOPING.md](DEVELOPING.md#checks) gives each step's own command, for running one part alone. CI runs the same
-steps on Node 24.
+`python scripts/check.py` runs every step below but the data tool's and names each one that failed: run it, after
+`npm ci` in `renderer/`, `main/` and `docs/`, before calling a change done. [DEVELOPING.md](DEVELOPING.md#checks)
+gives each step's own command. CI runs the same steps on Node 24.
 
 1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, `versionCheck.py`,
    ESLint, Prettier and `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`,
@@ -180,8 +179,8 @@ banned-word rules; read your own diff for the rest.
 
 ## Commits
 
-[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). No hook enforces it here and the history
-inherited from Exiled Exchange 2 does not follow it, but every new commit does.
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), which conventional-pre-commit and
+`scripts/commitlint.py` check as commit-msg hooks. The history inherited from Exiled Exchange 2 does not follow it.
 
 - **Format:** `type(scope)?: subject`, imperative mood, lowercase subject, no trailing period, at most 72 characters.
   Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, `chore`, `revert`. Scopes are optional
@@ -190,7 +189,8 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **The subject says what changed; the body says why.** Start with a verb of change (`add`, `fix`, `remove`,
   `split`, `rename`) and write a subject that reads correctly to someone who has not seen the diff. The body is two
   or three sentences and at most 50 words outside a code fence, the problem first and then what the change does
-  about it, wrapped at 72.
+  about it, wrapped at 72. A code fence, or a line that starts with a `$ ` prompt, is pasted text, which the width,
+  word count, dash and banned-word rules skip.
   Write no body when the subject says everything.
 - **Self-contained.** No issue or PR numbers, commit hashes, or pointers into documents that change. Name the
   behavior instead. Link an issue in the PR description, where the link can be edited.

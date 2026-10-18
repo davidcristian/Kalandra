@@ -42,9 +42,20 @@ and the check cannot disagree, and the capitals tell a game term from the same w
 table or the long-file list, exits with 2. Reason: a check that reads nothing cannot fail, which AGENTS.md calls a
 defect.
 
+**7. Two commit-msg hooks check each commit message.** conventional-pre-commit checks the type and form against the
+ten types in AGENTS.md. `scripts/commitlint.py` checks the rest that a machine can read: the subject's length, case
+and last character, a scope that repeats the type, the blank second line, the body's width and its 50 words, dashes,
+banned words, and pointers into documents that change, such as a decision record or issue number, or a hash that
+names a commit. A code fence or a line that starts with `$ ` holds pasted text, which the width, word, dash and
+banned-word rules skip. Merge and fixup messages are not checked. Reason: a message cannot change after a push, so
+the check runs before the commit exists. CI does not check messages, because the history inherited from Exiled
+Exchange 2 does not follow these rules.
+
 ## Consequences
 
-- A contributor runs `pre-commit install` once, and every commit then runs these checks.
+- A contributor runs `pre-commit install` once, and every commit then runs these checks. A clone that ran it before
+  the commit-msg hooks were added runs it again.
+- Imperative mood in a subject is the one commit rule that no hook checks.
 - The comment rules that need judgment, such as a comment that repeats the code, are still checked only by reading
   the diff.
 - A dash in inherited code, such as an item text example in a comment, needs an exemption or an allow comment.

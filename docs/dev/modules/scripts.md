@@ -1,8 +1,9 @@
 # scripts/: the repo checks
 
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
-[AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, and `linecap.py`, `dashcheck.py`
-and `prosecheck.py` check the line limits, the dash rule and the banned words. The scripts are Python, use only the
+[AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
+`prosecheck.py` check the line limits, the dash rule and the banned words, and `commitlint.py` checks a commit
+message. The scripts are Python, use only the
 standard library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
 ## Public contract
@@ -45,6 +46,23 @@ it cannot read what it needs or reads nothing. `--root <folder>` checks another 
   phrase across one line break, and skips the `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's
   capitals. The rows of the table itself are not checked.
 
+### commitlint.py
+
+The commit-msg hook runs `python scripts/commitlint.py <message file>`, after conventional-pre-commit has checked
+the type and form. It drops the lines that start with `#`, which git leaves out of the message, then prints
+`commitlint: <problem>` for each rule the message breaks and exits with 1, or exits with 0.
+
+- The first line: at most 72 characters, a lowercase first letter, no period at the end, and no scope that repeats
+  the type (`docs(docs)`).
+- The body: a blank second line, at most 72 characters a line unless the line is one long word, and at most 50
+  words.
+- No em dash, en dash or spaced `--`, and no banned word from the table in AGENTS.md.
+- No pointer into a document that changes: `#12`, `PR 12`, `ADR-0009`, `rule 9`, `task 056`, `decision 3`, or a
+  hexadecimal word that `git cat-file` finds as a commit.
+- A code fence, or a line that starts with `$ `, is pasted text: the width, word, dash and banned-word rules skip it,
+  and a fence that nothing closes is a problem. A message that starts with `Merge `, `fixup! `, `squash! ` or
+  `amend! ` is not checked.
+
 ## Invariants
 
 - `STEPS` holds every check AGENTS.md names except the data tool's, whose tests need files the repo does not have
@@ -56,7 +74,7 @@ it cannot read what it needs or reads nothing. `--root <folder>` checks another 
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 31 tests on 18 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 39 tests on 18 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
