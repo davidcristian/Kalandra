@@ -1,10 +1,9 @@
 # Kalandra engineering rules
 
 Every agent and every person working in this repo follows these rules. A change that breaks one of them is **not
-done**, even when it works. This file is the contract; the detail lives in `docs/dev/`: the index
-[docs/dev/index.md](docs/dev/index.md), the map [docs/dev/architecture.md](docs/dev/architecture.md) and the decisions
-`docs/dev/adr/`. The development loop is in [DEVELOPING.md](DEVELOPING.md), and the user documentation is the
-VitePress site in [docs/](docs/index.md), which leaves out `docs/dev/`.
+done**, even when it works. This file is the contract. The detail is in `docs/dev/`, starting at
+[docs/dev/index.md](docs/dev/index.md), with the map [docs/dev/architecture.md](docs/dev/architecture.md) and the
+decisions in `docs/dev/adr/`. The development loop is in [DEVELOPING.md](DEVELOPING.md); the user docs are in `docs/`.
 
 Read this file, then the module doc in `docs/dev/modules/` and the files of the part you are changing. Needing the
 whole codebase in view to make one change means a boundary is missing: say so rather than reading everything.
@@ -24,9 +23,8 @@ app in three parts, plus a data tool and a docs site:
   `src/assets/data/` loads the game data.
 - `ipc/`: types shared by both processes: `HostConfig`, `ShortcutAction` and the `IpcEvent` union.
 - `dataParser/`: a Python tool that builds the per-language game data in `renderer/public/data/<lang>/` from game
-  and trade exports. This copy is the only source of the data: a new game patch needs a new run of it
-  ([dataParser/README.md](dataParser/README.md)). Exiled Exchange 2 developed it in a private repo, so the data
-  committed here can be newer than this copy of the tool.
+  and trade exports, and the only source of that data ([dataParser/README.md](dataParser/README.md)). Exiled
+  Exchange 2 developed it in a private repo, so the data committed here can be newer than this copy of the tool.
 - `priceService/`: a Python service, standard library only, that builds the hourly price files from poe.ninja and
   serves them at `kalandra.ashoal.com` through a Cloudflare Tunnel ([priceService/README.md](priceService/README.md)).
 - `docs/`: the VitePress user docs, published to GitHub Pages when `docs/` outside `docs/dev/` changes on `master`,
@@ -112,8 +110,10 @@ steps on Node 24.
    `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml` there.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
-   `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower
-   the coverage of the files it touches (`npx vitest run --coverage`).
+   `renderer/specs/docs/`, and never call a live site. A test checks behavior, including the error and edge paths,
+   through fakes (working stand-ins such as `FakeGet` in `priceService/tests/support.py`) rather than mocks that
+   assert calls, and a test written only to run a line is a defect. There is no coverage threshold, but a change must
+   not lower the coverage of the files it touches (`npx vitest run --coverage`).
 6. **File size.** A new source file is at most 300 lines. Many existing files are far over that (`Parser.ts`,
    `pathofexile-trade.ts`): put new, separable code in a new module and call it, rather than growing them. Splitting
    an existing file is its own commit, never a side effect of another change. A markdown file is at most 250 lines,
@@ -135,13 +135,14 @@ steps on Node 24.
 
 ## Prose
 
-Write comments, docs and commit messages in plain English that a new reader understands on the first read. No
-script checks these rules in this repo, so read your own diff for them.
+Write comments, docstrings, docs, commit messages and the text of log and error messages in plain English that a
+new reader understands on the first read. No script checks these rules in this repo, so read your own diff for them.
 
 - **Comments.** None unless strictly necessary: why a workaround exists, a constraint that is not visible (an
   ordering, a game or API quirk with its link, a measured number), or a directive a tool reads
   (`eslint-disable-next-line` with its reason). Delete a comment that repeats the code, tells history ("was X, now
   Y") or explains what a better name would say. One or two lines, three at most.
+- **Docstrings.** One line saying what the module, class or function does, three at most, and none on a test.
 - **Docs.** Say what a thing is and does, then why, when the why is not obvious. Keep facts, commands, paths and
   decisions. Cut the story of how the code got here, repeated explanations (link to the one place instead) and
   hedging.
@@ -172,8 +173,7 @@ script checks these rules in this repo, so read your own diff for them.
 | honest, honestly | accurate, correct, real |
 | verdict, verdicts | result |
 | re-derive, re-derived, rederive | recompute, check again |
-| load-bearing, crucial, crucially, critically, fundamentally | required, (state the fact) |
-| robust, seamless, seamlessly, comprehensive | (state the specific fact) |
+| load-bearing, crucial, crucially, critically, fundamentally, robust, seamless, seamlessly, comprehensive | required, (state the specific fact) |
 | leverage, leverages, delve, utilize, worth noting | use, look at, (state the fact) |
 | footgun, tripwire, backstop, ratchet, chokepoint | describe the mechanism |
 | under the hood, boils down, low-hanging, rabbit hole, north star, belt and braces, silver bullet | say it literally |
@@ -189,7 +189,8 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
   the type as the scope (`docs(docs)`). A breaking change adds `!` and a `BREAKING CHANGE:` footer.
 - **The subject says what changed; the body says why.** Start with a verb of change (`add`, `fix`, `remove`,
   `split`, `rename`) and write a subject that reads correctly to someone who has not seen the diff. The body is two
-  or three sentences and at most 50 words, the problem first and then what the change does about it, wrapped at 72.
+  or three sentences and at most 50 words outside a code fence, the problem first and then what the change does
+  about it, wrapped at 72.
   Write no body when the subject says everything.
 - **Self-contained.** No issue or PR numbers, commit hashes, or pointers into documents that change. Name the
   behavior instead. Link an issue in the PR description, where the link can be edited.
@@ -216,8 +217,9 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
   push to `master` that changes a file outside `docs/` and the root `README.md` runs the Build workflow, which
   packages the app on three platforms and uploads it to the draft GitHub release for the current version if one
   exists. Never force-push a published branch.
-- **No secrets and no user files in the repo.** Never commit a `config.json`, a client log or anything from
-  `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides.
+- **No secrets and no user files in the repo or the logs.** Never commit a `config.json`, a client log or anything
+  from `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides. No log line contains a cookie, a token or
+  a session ID.
 - **External input is untrusted.** Clipboard item text, client log lines and trade responses can be malformed or
   come from a game patch the data does not know yet. Parse them without throwing and log what failed.
 - **Be polite to other services.** No loops or tests against the live trade site, poe.ninja or poeprices. A
@@ -233,7 +235,8 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **Claims come with evidence.** Never report a check as passing without having run it in this session; show the
   command and its output. Label an unverified statement as an assumption.
 - **Prove a check can fail.** After writing or changing a test or a check, break the thing it checks and watch it
-  fail before trusting it. A check that cannot fail is a defect.
+  fail before trusting it. A check that cannot fail is a defect. Write that proof in the body of the commit that
+  makes the change, as a table in a code fence: each break, the test suite run against it, and what failed.
 - **Report faithfully.** Report a failing test with its output and name every step you skipped. Report a task as
   done only when it is: an inaccurate "done" costs more to undo than an accurate "not yet".
 - **Stop when surprised.** When output contradicts your model of the system, work it out again from the evidence.
