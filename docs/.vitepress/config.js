@@ -4,7 +4,7 @@ const BASE = '/Kalandra/'
 
 export default defineConfig({
   title: 'Kalandra',
-  description: 'App for price-checking items in Path of Exile 2',
+  description: 'A Path of Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more.',
   base: BASE,
   mpa: true,
   head: [
@@ -18,7 +18,6 @@ export default defineConfig({
     }
   },
   themeConfig: {
-    // logo: 'TODO', https://github.com/vuejs/vitepress/issues/1401
     appVersion: '0.16.3',
     github: {
       releasesUrl: 'https://github.com/davidcristian/Kalandra/releases'
@@ -32,32 +31,53 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        items: [{
-          text: 'Download',
-          link: '/download'
-        }, {
-          text: 'Quick Start',
-          link: '/quick-start'
-        }
+        text: 'Get started',
+        items: [
+          { text: 'Download', link: '/download' },
+          { text: 'Quick start', link: '/quick-start' },
+          { text: 'Features', link: '/features' }
         ]
       },
       {
-        items: [{
-          text: 'Chat commands',
-          link: '/chat-commands'
-        }, {
-          text: 'OCR Guide',
-          link: '/ocr-guide'
-        }]
+        text: 'Price check',
+        items: [
+          { text: 'Price check', link: '/price-check' },
+          { text: 'Item info', link: '/item-info' },
+          { text: 'Map check', link: '/map-check' },
+          { text: 'Private leagues', link: '/private-leagues' }
+        ]
       },
       {
-        items: [{
-          text: 'Common issues',
-          link: '/issues'
-        }, {
-          text: 'FAQ',
-          link: '/faq'
-        }]
+        text: 'Widgets',
+        items: [
+          { text: 'Widgets', link: '/widgets' },
+          { text: 'Stash search', link: '/stash-search' },
+          { text: 'XP tracker', link: '/xp-tracker' },
+          { text: 'Extra widgets', link: '/extra-widgets' },
+          { text: 'Chat commands', link: '/chat-commands' },
+          { text: 'OCR guide', link: '/ocr-guide' },
+          { text: 'Item data', link: '/item-data' },
+          { text: 'Client log file', link: '/client-log-parser' }
+        ]
+      },
+      {
+        text: 'Settings',
+        items: [
+          { text: 'Settings', link: '/settings' },
+          { text: 'Command-line options', link: '/cmd-flags' }
+        ]
+      },
+      {
+        text: 'Problems',
+        items: [
+          { text: 'Common issues', link: '/issues' },
+          { text: 'FAQ', link: '/faq' },
+          { text: 'Nothing happens', link: '/nothing-happens' },
+          { text: 'No stats to select', link: '/no-item-mods' },
+          { text: 'Query is too complex', link: '/complex-query' },
+          { text: 'Failed to load leagues', link: '/failed-load-leagues' },
+          { text: 'Invalid JSON', link: '/invalid-json' }
+        ]
       }
     ]
   }

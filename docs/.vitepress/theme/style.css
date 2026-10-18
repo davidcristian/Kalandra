@@ -1,6 +1,6 @@
 .markdown-body {
   p, blockquote, hr,
-  ul, ol, dl,
+  ul, ol,
   table,
   pre,
   details,
@@ -74,7 +74,7 @@
   }
 
   li {
-    word-wrap: break-all;
+    overflow-wrap: anywhere;
   }
 
   li > p {
@@ -84,23 +84,6 @@
   li + li {
     margin-top: 0.25rem;
   }
-
-  dl {
-    padding: 0;
-
-    dt {
-      padding: 0;
-      margin-top: 1rem;
-      font-size: 1rem;
-      font-style: italic;
-      font-weight: bold;
-    }
-
-    dd {
-      padding: 0 1rem;
-      margin-bottom: 1rem;
-    }
-  }
 }
 
 .markdown-body {
@@ -109,6 +92,10 @@
     margin-bottom: 1rem;
     font-weight: 600;
     line-height: 1.25;
+  }
+
+  h2 {
+    font-size: 1.5rem;
   }
 
   h3 {
@@ -139,8 +126,7 @@
 }
 
 .markdown-body {
-  code,
-  tt {
+  code {
     padding: 0.2em 0.4em;
     margin: 0;
     font-size: 0.85em;
@@ -148,8 +134,6 @@
     border-radius: 0.25em;
     color: #4a5568;
   }
-
-  del code { text-decoration: inherit; }
 
   [class^="language-"] {
     .copy, .lang { display: none; }

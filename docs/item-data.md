@@ -1,66 +1,108 @@
 ---
-title: Item Data
+title: Item data
 ---
 
-Helps to collect data on crafting results of items.
+Item Data Collection is an experimental feature that adds the Library widget. While a session runs, each press of the
+**Log item to csv** key copies the item under the cursor and writes one row about it to a CSV (comma-separated
+values) file. Use it to record what each use of a crafting currency changed on an item. The feature is off by
+default.
 
-![Single Item Rolling UI](/reference-images/SingleItemRollingUI.png)
+While Item Data Collection is on and **Allow reading of Client.txt file** is checked, Kalandra also writes the
+entries it reads from the game log to `client-log.ndjson`, in the same folder as the CSV files.
+[Client log file](/client-log-parser) describes that file.
 
-The name shown will be the csv file name, above it would be `mySession.csv`. Pressing the play button will start the session, creating the file, if it doesn't exist yet. Data will be written to the file for each roll, stopping the "session" doesn't really do much. The count of rolls is shown along with the latest modifiers name.
+## Turn it on
 
-## Activation
+1. Press `Shift + Space`, the default overlay key, to open the overlay. Click the cog icon to open the settings.
+2. On the **General** page, check **Enable experimental features**, then check **Item Data Collection** below it.
 
-To enable, Experimental features must be enabled in the "General" tab of the settings then enable "Item Data Collection"
+   ![The Enable experimental features checkbox on the General settings page](/reference-images/expFeatures.png)
 
-![Experimental features](/reference-images/expFeatures.png)
+3. Click **Save**.
 
-The widget will then appear on the main overlay UI as a book icon. Clicking it will open the widget.
+A book icon then appears in the main button bar, the row of icons that starts with the cog icon. Click it to show the
+Library widget. Turning Item Data Collection off ends a running session.
 
-![widget icon](/reference-images/libraryWidgetIcon.png)
+![The main button bar with the book icon of the Library widget circled](/reference-images/libraryWidgetIcon.png)
 
 ## Settings
 
-Settings can be accessed via clicking edit on the side of the widget
+Hover the Library widget and click **edit** to open its settings page, named **Library**. Click **Save** after a
+change.
 
-![edit widget](/reference-images/editWidget.png)
+![The hide, edit and move buttons that show when you hover a widget](/reference-images/editWidget.png)
 
-![Single Item Rolling Settings](/reference-images/LibrarySettings.png)
+- **Log item to csv**: the key that logs the item under the cursor. It has no default.
+- **Output Folder**: the folder for the CSV files. When it is empty, Kalandra uses the `apt-data\csv-data` folder of
+  its data folder, which is `%APPDATA%\kalandra\apt-data\csv-data` on Windows. Kalandra creates the folder when a
+  session starts.
+- **Recording settings**: the checkboxes **keep explicit mods**, **keep implicit mods**, **keep enchant mods** and
+  **keep augment mods** choose which kinds of modifiers the modifier columns include. Only **keep explicit mods** is
+  checked by default. It keeps prefixes, suffixes, and mutated, fractured, desecrated and crafted modifiers.
 
-The key used to log the item is configurable & the folder the csv files are saved to.
+Choose a log key that includes `Shift`. Kalandra does not release `Shift` while it copies the item, so you can keep
+holding `Shift` and apply the same currency again.
 
-**Note:** It is recommended to use a keybind that includes the `Shift` key to allow continuous use of crafting currency.
+## Record a session
 
-## CSV Format
+![Library widget with the session name mySession, the play button, Session Rolls 0 and None added](/reference-images/SingleItemRollingUI.png)
 
-The csv file is a comma separated file with the following columns:
+1. Type a session name in the text box. The name is also the file name: the default name `mySession` writes
+   `mySession.csv`. You can change the name only while no session runs.
+2. Click the play button to start a session. Kalandra creates the file with a header row, or adds rows to the end of
+   the file if it already exists. While a session runs, the widget stays on screen when you close the overlay.
+3. Hover the item in the game and press the **Log item to csv** key. Kalandra copies the item and writes one row.
+   Press the key again after each use of a currency on the item.
+4. Click the stop button to end the session. Kalandra closes the file and resets the count. The key writes nothing
+   until you start a session again.
 
-| Column Name   | Description                                             |
-| ------------- | ------------------------------------------------------- |
-| `base`        | Item base type                                          |
-| `ilvl`        | Item level                                              |
-| `rarity`      | Item rarity                                             |
-| `sockets`     | Sockets on the item                                     |
-| `mods`        | List of all modifiers on the item                       |
-| `addedMods`   | List of modifiers added from the previous item stored   |
-| `removedMods` | List of modifiers removed from the previous item stored |
+**Session Rolls** counts the items logged in this session. Below it, the widget lists the names of the prefixes and
+suffixes that the last logged item gained, or None added. When Kalandra cannot read the copied item, the widget shows
+the error in an orange box and writes no row.
 
-### Modifier JSON Format
+## CSV format
 
-Lists of modifiers will all be lists of json objects of the following interface:
+Each file starts with this header row, and each logged item adds one row:
 
-```ts
-interface Mod {
-  name: string;
-  tier: number;
-  roll: number[];
-  ref: string[];
-  type: string;
-}
+```csv
+base,ilvl,rarity,sockets,mods,addedMods,removedMods
 ```
 
-## Example Data
+| Column | Content |
+| --- | --- |
+| `base` | English name of the item from Kalandra's game data: the base type, or the unique name of an identified unique item |
+| `ilvl` | Item level, empty when the item has none |
+| `rarity` | `Normal`, `Magic`, `Rare` or `Unique`, empty when the item has none |
+| `sockets` | Number of augment sockets on the item, `0` when it has none |
+| `mods` | The modifiers on the item, of the kinds checked in the Recording settings |
+| `addedMods` | The prefixes and suffixes this item has that the item in the previous row did not. In the first row of a session, and in the row after an item Kalandra could not read, all of them |
+| `removedMods` | The prefixes and suffixes the item in the previous row had that this item does not. Empty in the first row of a session and in the row after an item Kalandra could not read |
 
-Below is a sample of possible data:
+`addedMods` and `removedMods` also include only the kinds of modifiers checked in the Recording settings.
+
+### Modifier cells
+
+Each modifier column holds a JSON array of modifier objects, written with single quotes: Kalandra replaces each `"`
+with `'` and writes each apostrophe in a value as `\'`. To read a cell as JSON, replace each `'` that has no
+backslash before it with `"`, then replace each `\'` with `'`.
+
+Each object has these keys, in this order. A key with no value for the modifier is left out.
+
+| Key | Type | Content |
+| --- | --- | --- |
+| `name` | string | Modifier name from the copied item text, in the game language, such as `Collector's` |
+| `tier` | number | Modifier tier from the copied item text |
+| `roll` | number array | One rolled value per stat of the modifier, `-999` for a stat with no rolled value |
+| `ref` | string array | English text of each stat, with `#` in place of each value |
+| `type` | string | Kind of modifier, such as `explicit`, `implicit`, `crafted`, `fractured`, `desecrated`, `enchant` or `rune` (an augment) |
+| `generation` | string | `prefix`, `suffix`, `mutated`, `corrupted` or `eldritch` |
+
+## Example data
+
+The rows in these samples have no `generation` key. A row that Kalandra writes has it after `type`, such as
+`'type':'explicit','generation':'prefix'`.
+
+This sample has eleven rows from one session on a Precursor Tablet:
 
 ```csv
 base,ilvl,rarity,sockets,mods,addedMods,removedMods
@@ -77,7 +119,8 @@ Precursor Tablet,80,Rare,0,"[{'name':'Bountiful','tier':1,'roll':[35],'ref':['#%
 Precursor Tablet,80,Rare,0,"[{'name':'Brimming','tier':1,'roll':[40],'ref':['#% increased number of Rare Monsters'],'type':'explicit'}]","[{'name':'Brimming','tier':1,'roll':[40],'ref':['#% increased number of Rare Monsters'],'type':'explicit'}]","[{'name':'Bountiful','tier':1,'roll':[35],'ref':['#% increased Gold found in your Maps'],'type':'explicit'}]"
 ```
 
-Below is a sample of data that has some edge cases, like no mods, multiple mods removed, multiple mods added, many mods changed in one turn, etc. This is not comprehensive, for all edge cases, like changing the item itself.
+This sample includes a row with no modifiers, rows where several modifiers changed at once, and an item logged again
+with no change. It has no row where the logged item changes to a different item.
 
 ```csv
 base,ilvl,rarity,sockets,mods,addedMods,removedMods
@@ -108,4 +151,5 @@ Precursor Tablet,80,Rare,0,"[{'name':'Collector\'s','tier':1,'roll':[25],'ref':[
 Precursor Tablet,80,Rare,0,"[{'name':'Collector\'s','tier':1,'roll':[25],'ref':['#% increased Rarity of Items found in your Maps'],'type':'explicit'}]","[]","[]"
 ```
 
-A larger scale sample(1k) can be found in [LargeDemo.csv](https://raw.githubusercontent.com/davidcristian/Kalandra/refs/heads/master/docs/.vitepress/LargeDemo.csv)
+[LargeDemo.csv](/LargeDemo.csv) has a header row and 1,000 rows on Precursor Tablets in the same format, also without
+the `generation` key.

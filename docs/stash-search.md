@@ -1,47 +1,86 @@
 ---
-title: Stash Search
+title: Stash search
 ---
 
-Save text to use for searching in the stash or vendors. You can also bind keybinds to these. While not affiliated, [poe2.re](https://poe2.re/waystone) is extremely useful for generating regexes for various things you want to search for. Check out the [PoE Wiki](https://www.poewiki.net/wiki/Guide:Regex) for more information on PoE's version of Regex.
+The Stash search widget is a list of saved searches. Clicking a search types its text into the search box of the
+open stash or vendor window in the game, and the game highlights the items that match. A search can be plain text or
+a regex, a pattern that matches many texts at once. [poe2.re](https://poe2.re/waystone), a site not connected to
+Kalandra, builds regexes for Path of Exile 2 items. The
+[regex guide on the Path of Exile 1 wiki](https://www.poewiki.net/wiki/Guide:Regex) explains the syntax.
 
-To open the widget, press `Shift + Space` and then click either "Dump sorting" or "Map rolling" in the overlay. These are two Preset widgets but they can be customized to your liking. You can add as many of these widgets as you want, so do not feel limited by the presets.
+## Open a widget
 
-![Add search](/reference-images/StashSearchAdd.png)
+Kalandra includes two Stash search widgets, `Map rolling` and `Dump sorting`. Open the overlay (`Shift + Space` by
+default) and click one of them in the main button bar to show it. [Widgets](/widgets) explains the overlay and the
+`hide`, `edit`, `move` and `delete` buttons.
 
-## Map Rolling
+To add another Stash search widget, hover over the three dots in the main button bar and click `Stash search`. A new
+widget has no title, shows `Untitled`, and starts with one search, `Currency`. You can add as many as you want.
 
-Map(waystone) rolling is a preset widget that helps to match maps with certain mods on them.
+![The add widget menu with Stash search circled](/reference-images/StashSearchAdd.png)
 
-![Map rolling](/reference-images/StashSearchMapRolling.png)
+## How a search runs
 
-Clicking any of these buttons will paste the text into the search bar in the stash or vendor window. For example, clicking "Burning Ground" will paste the text `"Burning Ground"` in the stash search bar. This will then highlight any map(waystone) that has that mod on it.
+When you click a search, Kalandra switches to the game, presses `Ctrl + F` to select the search box, pastes the
+text with `Ctrl + V` (`Cmd + V` on macOS) and presses `Enter`.
 
-![Stash Search burning ground](/reference-images/MapRollingBurning.png)
+The text goes through the clipboard, so after a search the clipboard holds the search text. To get your previous
+clipboard text back after each search, check `Restore clipboard` in Settings, `General`. Kalandra skips a search
+that comes less than 120 ms after the previous search or [chat command](/chat-commands).
 
-Here is what this looks like in settings for the widget.
+## Map rolling
 
-![Stash Search settings](/reference-images/StashSearchRollingSettings.png)
+In Path of Exile 2, maps are items called Waystones. The `Map rolling` widget searches for four Waystone modifiers:
+`"Increased Pack Size"`, `"Additional Packs"`, `"Burning Ground"` and `"Less Recovery Rate"`. The quotes make the
+game match the words as one phrase.
 
-## Dump Sorting
+![The Map rolling widget with its four searches](/reference-images/StashSearchMapRolling.png)
 
-Dump sorting is a preset widget that helps to highlight certain items, particularly useful when going through a dump tab after mapping.
+For example, clicking `"Burning Ground"` types `"Burning Ground"` into the search box, and the game highlights every
+Waystone that has that modifier.
 
-![Dump sorting](/reference-images/DumpSortWidget.png)
+![A stash tab of Waystones, some of them highlighted after a search for "Burning Ground"](/reference-images/MapRollingBurning.png)
 
-Clicking any of these buttons will paste the text into the search bar in the stash or vendor window. Example of searching for currency in a dump tab. This will then highlight any item that contains "currency" in it's description.
+## Dump sorting
 
-![Dump search currency](/reference-images/DumpSortCurrency.png)
+A dump tab is a stash tab where you put all your loot to sort later. The `Dump sorting` widget has six searches:
+`Currency`, `"Martial Weapon"`, `Jewel`, `"Waystone Tier"`, `"Rarity: Normal"` and `Trials:`.
 
-## Aliases and Hotkeys
+![The Dump sorting widget with its six searches](/reference-images/DumpSortWidget.png)
 
-The bottom one ("Default") has been assigned a hotkey for convenience, `F2`. When in the stash, just pressing `F2` will automatically perform that search without even opening the overlay. The hotkey is also visible in the overlay when it is opened, and can toggle all the hotkeys for the widget on and off with the switch in the top right of the widget.
+The screenshot below shows a search for `Currency`, which highlights every item whose text contains that word.
 
-![Stash search example hotkey](/reference-images/RollingMain.png)
+![A stash tab with the currency items highlighted after a search for Currency](/reference-images/DumpSortCurrency.jpg)
 
-In these settings, the actual regex is shown. It is quite unreadable and thus all of these use "Friendly Names", basically flavor text that is displayed in place of the actual used text.
+## Change the searches
 
-![Stash search example settings](/reference-images/StashSearchSettings2.png)
+Hover over the widget and click `edit` to open its page in the Settings window. There you can:
 
-## Settings
+- Type the widget title in the top field, which shows `widget title` when it is empty.
+- Drag the handle on the left of a search to change the order.
+- Edit the search in the `search text or regex` field. The field turns red when the text is longer than 250
+  characters.
+- Remove a search with the cross on its right.
+- Give a search a `friendly name` and a hotkey, as the next section explains.
+- Click `Add` to add an empty search.
 
-Inside the settings of the widget, each saved search can be edited, deleted, moved around, be given an alias, and have hotkeys assigned to them.
+Click `Save` to apply the changes.
+
+![The Map rolling page in the Settings window with four searches](/reference-images/StashSearchMapRollingEditor.png)
+
+## Friendly names and hotkeys
+
+A regex is hard to read, so a search can have a friendly name. The widget button shows the friendly name in place of
+the search text.
+
+A search with a hotkey runs when you press that hotkey in the game, without opening the overlay. Kalandra presses the
+same keys as for a click. The presets have no hotkeys. When at least one search has a hotkey, the widget shows a
+`Keys` switch next to its title. The switch turns all hotkeys of that widget on or off, and while it is on, the
+widget shows each hotkey next to its search. Hotkeys follow the rules in [Settings](/settings#hotkeys).
+
+The screenshots below show a custom `Map rolling` widget with four regex searches. Each has a friendly name, and the
+search named `Default` has the hotkey `F2`.
+
+![A custom Map rolling widget with the Keys switch on and F2 shown next to Default](/reference-images/RollingMain.png)
+
+![The settings of that widget with a regex and a friendly name for each search](/reference-images/StashSearchFriendlyNames.png)

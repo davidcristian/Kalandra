@@ -2,80 +2,147 @@
 title: Features
 ---
 
-### Price check{:.!mb-1}
+Each section says what one feature does and how to open it, and links the page with the details. The terms used here,
+such as overlay and widget, are defined in [Quick start](/quick-start). [Widgets](/widgets) explains the main button
+bar of the overlay and how to move, edit, hide and delete widgets.
 
-*Full Page: [Price Check](/price-check)*{:.text-sm}
+## Price check
 
-#### Rare Item
+Hover an item in the game and press `Ctrl + D`. Kalandra builds a search for the official trade site from the item's
+stats and lists the matching items with their prices. For a rare item, it waits until you tick the stats that matter
+and press **Search**. For currency it lists bulk offers with their stock.
 
-![Rare Item](/reference-images/RareCheck.png)
+For items in its price file, such as currency and uniques, the window also shows an estimated price and, when the file
+has one, its trend over the last 7 days. Kalandra reads that price from its own price service at
+`kalandra.ashoal.com`, which builds the price files from poe.ninja once an hour. Kalandra does not request prices from
+poe.ninja itself.
 
-#### Unique Item
+To price check item text copied anywhere else, paste it into the **Price check (Ctrl + V)** box in the main button
+bar.
 
-![Unique Item](/reference-images/UniqueCheck.png)
+Details: [Price check](/price-check). For a private league, see [Private leagues](/private-leagues).
 
-#### Currency Item
+![Price check of a unique helmet, with a bar under each stat that shows its roll range](/reference-images/UniqueCheck.png)
 
-![Currency Item](/reference-images/CurrencyCheck.png)
+![Price check of a currency item, with the bulk offers and their stock](/reference-images/CurrencyCheck.png)
 
-#### Gem Item
+![Price check of a skill gem, with the level, sockets and quality of each listing](/reference-images/GemCheck.png)
 
-![Gem Item](/reference-images/GemCheck.png)
+## Item info
 
-### Chat Commands{:.!mb-1}
+Shows a summary of the item under the cursor, such as weapon DPS, with buttons that open the item on the wiki, PoEDB or
+Craft of Exile, or search your stash for its base type. It has no default hotkey: set one in Settings, Hotkeys,
+**Item info**. Each button can also have its own hotkey in Settings, Item info.
 
-*Full Page: [Chat Commands](/chat-commands)*{:.text-sm}
+Details: [Item info](/item-info).
 
-![Chat Macros](/reference-images/ChatMacros.png)
+![Item info for a crossbow, with its DPS and the wiki, PoEDB, Craft of Exile and Find in Stash buttons](/reference-images/ItemInfo.png)
 
-### Map check{:.!mb-1}
+## Map check
 
-*Full Page: [Map Check](/map-check)*{:.text-sm}
+For a waystone, the Item info hotkey opens Map check instead. Map check lists the waystone's mods and shows the mark
+of each mod: dangerous, warning, good or none. Click a mod to change its mark. Three profiles keep three separate sets of
+marks. Settings, Map check lists every waystone mod with its mark, and its **Only selected** toggle shows only the
+marked mods.
 
-![Map Check](/reference-images/MapCheck.png)
+Details: [Map check](/map-check).
 
-![Map Check Settings](/reference-images/MapCheckSettings.png)
+![Map check of a waystone, with one mod marked good, one dangerous and one warning](/reference-images/MapCheck.png)
 
-### Item info{:.!mb-1}
+## Stash search
 
-*Full Page: [Item Info](/item-info)*{:.text-sm}
+A Stash search widget holds saved search texts and regular expressions (patterns that match text) for the game's
+search box. When you click an entry or press its hotkey, Kalandra presses `Ctrl + F` in the game, pastes the text and
+presses `Enter`. Entry hotkeys have no default, and they work only while the widget's **Keys** toggle is on. Kalandra
+starts with two Stash search widgets, Map rolling and Dump sorting: click either name in the main button bar to show
+it.
 
-![Item Info](/reference-images/ItemInfo.png)
+Details: [Stash search](/stash-search).
 
-![Item Info Settings](/reference-images/ItemInfoSettings.png)
+![The Dump sorting widget with its saved searches](/reference-images/DumpSortWidget.png)
 
-### Stash search{:.!mb-1}
+## Chat commands
 
-*Full Page: [Stash Search](/stash-search)*{:.text-sm}
+A chat command sends a line of text to the game chat with one key. By default `F5` sends `/hideout` and `F9` sends
+`/exit`. Four more commands, such as `/invite @last`, have no hotkey until you set one. Add, change and remove commands
+in Settings, Chat.
 
-Save Regex's or specific strings to use to search in the stash. Also keybindable.
+Details: [Chat commands](/chat-commands).
 
-#### Dump sorting
+## XP tracker
 
-![Stash Search](/reference-images/DumpSortWidget.png)
+Shows your character's level, your experience multiplier, and how many levels you are over the bottom of the level
+range that gives full experience in the current area (**Over**). It reads the game's log file, `Client.txt`, which
+Kalandra does not read until you turn on **Allow reading of Client.txt file** in Settings, General. Click **XP** in the
+main button bar to show it.
 
-![Stash Search Currency](/reference-images/DumpSortCurrency.png)
+Details: [XP tracker](/xp-tracker).
 
-![Stash Search Settings](/reference-images/DumpSortSettings.png)
+![The XP tracker at level 14, with Exp 100.0% and Over 3](/reference-images/XpWidget.png)
 
-#### Map rolling
+## Item search
 
-![Stash Search 3](/reference-images/MapRollingBurning.png)
+Finds an item by name, without holding it, and shows its estimated price from the price file. Click the magnifier icon
+in the main button bar, choose **Skill Gems**, **Uniques** or **Base Items** and type a name. **Select** adds a result
+to a row at the top of the widget, and a click on an item in that row opens its price check. An optional OCR hotkey,
+on Windows only, reads the text between two lock icons on one line of the screen as the name of a Heist gem. Heist is
+a Path of Exile 1 feature. The [OCR guide](/ocr-guide) sets it up.
 
-![Stash Search Settings 2](/reference-images/StashSearchRollingSettings.png)
+Details: [Extra widgets](/extra-widgets).
 
-### Extra Widgets{:.!mb-1}
+## Image strip
 
-*Full Page: [Extra Widgets](/extra-widgets)*{:.text-sm}
+Shows your own images on the overlay, such as cheat sheets. Kalandra starts with one image strip named Cheat sheets:
+click **Cheat sheets** in the main button bar to show it. Use its **edit** button to add, order and remove images.
 
-#### Image Strip (Cheat Sheets)
+Details: [Extra widgets](/extra-widgets).
 
-![Image Strip](/reference-images/minCheatSheet.png)
+![The Cheat sheets image strip with five images](/reference-images/minCheatSheet.png)
 
-![Image Strip Synd](/reference-images/cheatSheetSynd.png)
+## Stopwatch
 
-#### Stopwatch
+A timer on the overlay, with start, pause and reset buttons. To add one, hover over the three dots in the main button
+bar, then click **Stopwatch**. Its **Start and Pause** and **Reset** hotkeys have no default; set them with its
+**edit** button.
 
-![Stopwatch](/reference-images/Stopwatch.png)
+Details: [Extra widgets](/extra-widgets).
 
-![Stopwatch Settings](/reference-images/StopwatchSettings.png)
+![A stopwatch on the overlay showing 00:00:12](/reference-images/Stopwatch.png)
+
+## Notepad
+
+A text note on the overlay. To add one, hover over the three dots in the main button bar, then click **Notepad**.
+Kalandra saves the text with its settings. Use the **edit** button to rename the note or change its width.
+
+Details: [Extra widgets](/extra-widgets).
+
+## Delve grid
+
+Draws a grid of 11 columns and 9 rows over the game, sized for the Delve chart of Path of Exile 1. It has no default
+hotkey: set one in Settings, Hotkeys, **Grid for Delve Chart**. The hotkey shows or hides the grid.
+
+Details: [Extra widgets](/extra-widgets).
+
+## Item data
+
+Item Data Collection is an experimental feature that adds the Library widget, which collects crafting results. Start
+a session in the widget, and each press of its **Log item to csv** hotkey adds the item under the cursor to the
+session's CSV file. The feature is off until you turn on **Enable experimental features** and then
+**Item Data Collection** in Settings, General. A book icon in the main button bar then shows the widget. While the
+feature is on and Kalandra reads `Client.txt`, Kalandra also writes the entries it reads from that log to
+`client-log.ndjson` in the same folder.
+
+Details: [Item data](/item-data) and [Client log file](/client-log-parser).
+
+## Stash tab scrolling
+
+Hold `Ctrl` and turn the mouse wheel, with the cursor not over the stash, to switch to the next or previous stash tab.
+
+Details: [Settings](/settings#hotkeys).
+
+## Settings
+
+Press `Shift + Space` and click the cog icon in the main button bar to open the Settings window. Right-click the
+Kalandra icon in the system tray for its menu, which also opens the config folder and quits Kalandra.
+
+Details: [Settings](/settings) and [Command-line options](/cmd-flags).

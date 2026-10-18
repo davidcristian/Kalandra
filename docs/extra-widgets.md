@@ -1,55 +1,119 @@
 ---
-title: Extra Widgets
+title: Extra widgets
 ---
 
-## Image Strip (Cheat Sheets){:.!mb-1}
+This page covers five smaller widgets: the image strip, the stopwatch, the notepad, item search and the Delve grid.
+[Widgets](/widgets) explains how to open the overlay and how the `hide`, `edit`, `move` and `delete` buttons work.
 
-*See also: [Widgets](/widgets)*{:.text-sm}
+## Image strip
 
-The Image Strip widget can be used to display an image in PoE2. This is most useful for quickly referencing a cheat sheet or other image. For best results, the image should be large and have a high resolution.
+The Image strip widget shows a row of images over the game, such as cheat sheets. Hover over an image to show it at
+full size in the center of the screen, up to the screen height. A large, high resolution image is the easiest to
+read.
 
-To enable the widget, open the overlay (`shift + space`), then hover over the 3 dots and click `Image Strip`.
+Kalandra includes one image strip, named `Cheat sheets`. It starts with a cheat sheet for the Betrayal syndicate of
+Path of Exile 1. Click `Cheat sheets` in the main button bar to show it.
 
-![Add Image Strip](/reference-images/AddImageStrip.png)
+To add another strip, open the overlay (`Shift + Space` by default), hover over the three dots and click
+`Image strip`. A new strip has no title, shows `Untitled`, and starts with the same cheat sheet.
 
-![New Image Strip](/reference-images/ImageStripNew.png)
+![The add widget menu with Image strip circled](/reference-images/AddImageStrip.png)
 
-When hovering over an image in the Image Strip, the image will enlarge and display in the center of the screen.
+![A new image strip named Untitled with one image](/reference-images/ImageStripNew.png)
 
-![Image Strip](/reference-images/HoverImageStrip.png)
+![An image shown at full size over the game while the mouse is over it](/reference-images/HoverImageStrip.jpg)
 
-When Editing the Image Strip, you can change the title(1), reposition the images(2), remove images(3), and add images(4).
+Click `edit` on the strip to change it:
 
-![Image Strip](/reference-images/EditImageStrip.png)
+1. Type a title in the `widget title` field.
+2. Drag the arrows button in the middle of an image to change the order of the images.
+3. Click the red cross on an image to remove it.
+4. Click `Choose File` to add an image.
 
-After adding another image, both will be displayed in the Image Strip.
+Click `edit` again to finish.
 
-![Image Strip](/reference-images/SecondImageStripWidget.png)
+![The image strip in edit mode, with the title, move, remove and Choose File controls numbered 1 to 4](/reference-images/EditImageStrip.png)
 
-![Image Strip 2 hover](/reference-images/SecondImageStrip.png)
+Kalandra copies each added image into the `apt-data\files` folder of its data folder (`%APPDATA%\kalandra` on
+Windows), so you can move or delete the original file. It does not add an image larger than about 16 MB.
 
-## Stopwatch{:.!mb-1}
+![An image strip titled Some Title with two images](/reference-images/SecondImageStripWidget.png)
 
-*See also: [Widgets](/widgets)*{:.text-sm}
+![The first of the two images shown at full size over the game](/reference-images/SecondImageStrip.jpg)
 
-The stopwatch is a widget that can be placed anywhere on the screen. When the overlay is closed the stopwatch will remain on the screen. It can be started and stopped by either pressing Start, Stop, Reset button on the widget when the overlay is open. Or by binding the Start/Stop and Reset keybinds in settings.
+## Stopwatch
 
-To enable the widget, open the overlay (`shift + space`), then hover over the 3 dots and click `Stopwatch`.
+The stopwatch counts hours, minutes and seconds. To add one, open the overlay, hover over the three dots and click
+`Stopwatch`. You can add more than one, and each has its own hotkeys. A new stopwatch appears near the center of the
+screen and shows `paused`.
 
-![Add Stopwatch](/reference-images/StopWatchAdd.png)
+![The add widget menu with Stopwatch circled](/reference-images/StopWatchAdd.png)
 
-This will then show up in the overlay window.
+![A new stopwatch at 00:00:00 with the paused label](/reference-images/StopwatchPaused0.png)
 
-![Stopwatch](/reference-images/StopwatchPaused0.png)
+Hover over the stopwatch to show its buttons. The play button starts it, the pause button stops it, and the circular
+arrow resets the time.
 
-You can start the stopwatch by clicking the `Start` button.
+![A stopwatch with the mouse over the play button](/reference-images/StopwatchHover.png)
 
-![Stopwatch](/reference-images/StopwatchHover.png)
+![A running stopwatch with the mouse over the pause button](/reference-images/StopwatchPause.png)
 
-You can pause the stopwatch by clicking the `Pause` button.
+To control the stopwatch while you play, click `edit` on it. Its page in the Settings window has two hotkeys,
+`Start and Pause` and `Reset`, which start as `Not Set`. Set them and click `Save`. The hotkeys work while the game
+window is active, without opening the overlay.
 
-![Stopwatch](/reference-images/StopwatchPause.png)
+![The Stopwatch settings page with the Start and Pause and Reset hotkeys](/reference-images/StopwatchHotkeys.png)
 
-To use this more realistically, you can bind the keybinds to your own keys. You can do this in the settings by hitting `Edit`. Remember to hit `Save` after changing the keybinds.
+A running stopwatch stays on screen after you close the overlay, and so does a paused one that holds one second or
+more. A new or reset stopwatch closes with the overlay. The stopwatch has no `hide` button: delete it to remove it.
 
-![Stopwatch](/reference-images/StopwatchSettings.png)
+Kalandra does not save the time. When Kalandra starts again, every stopwatch starts at zero.
+
+## Notepad
+
+The Notepad widget is a text box for your own notes. To add one, open the overlay, hover over the three dots and click
+`Notepad`. You can add more than one. A new notepad is named `Notepad` and shows `Type your notes here…` until you
+type in it.
+
+Kalandra saves the text in its config file when you close the overlay, so the notes are still there after a
+restart.
+
+Click `edit` on the notepad to change it:
+
+- Type a new title in the field at the top.
+- Click the minus and plus buttons next to `Width:` to switch between three widths: small, medium and large. A new
+  notepad is medium.
+
+Click `edit` again to finish.
+
+## Item search
+
+The Item search widget finds the price of an item by its name, so you can check an item that you cannot copy in the
+game. Click the magnifier in the main button bar to show it.
+
+1. Choose the kind of item after `Type of Item:`: `Skill Gems`, `Uniques` or `Base Items`. `Base Items` is
+   selected when Kalandra starts.
+2. Type the name in `Search by name…`. The widget lists the matches when there are five or fewer. Until you type
+   three characters, and while more than five items match, it shows this message:
+   `Too many items found, enter the name more precisely.`
+3. Click `Select` on a match. Kalandra adds the item to the row at the top of the widget, with its price from
+   Kalandra's price service when the price file has one.
+4. Click an item in the row to open the price check for it. A skill gem is checked at gem level 1.
+
+The row holds five items, sorted from the highest price to the lowest. Selecting a sixth item starts a new row with
+it, and selecting an item that is already in the row does nothing. `Reset items` clears the row.
+
+Item search has no `delete` button. Its `edit` button opens its page in the Settings window, which has one hotkey,
+`Perform an OCR for a Skill Gem`. OCR reads text from a screenshot. This hotkey reads the text between two lock icons
+on one line of the screen as a gem name, and adds the gems it finds to the row. When you opened Item search and did
+not hide it, it then stays on screen over the game for 4 seconds. The OCR hotkey works only on Windows and needs the
+files from the [OCR guide](/ocr-guide).
+
+## Delve grid
+
+The Delve grid draws a grid of 11 columns and 9 rows in the top center of the screen, sized for the Delve chart of
+Path of Exile 1. Its size follows the height of the game window.
+
+The grid has no hotkey by default. Set one at `Grid for Delve Chart` in Settings, `Hotkeys`, and click `Save`. The
+hotkey shows or hides the grid over the game. The grid hides when you open the overlay, and it has no button in the
+main button bar.

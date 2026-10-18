@@ -1,66 +1,108 @@
 ---
-title: XP Tracker
+title: XP tracker
 ---
 
-*Idea for widget mostly taken from [PoE-Leveling-Guide](https://github.com/JusKillmeQik/PoE-Leveling-Guide/?tab=readme-ov-file#experience-tracker) (Didn't see a poe2 version, and my computer struggles with ahk for some reason)*
+The XP tracker is a widget that shows your character level, your experience multiplier in the current area, and how
+far you are from the level penalty. The experience multiplier is the share of each monster's experience that you
+get, from 1% to 100%. The widget is based on the experience tracker in
+[PoE-Leveling-Guide](https://github.com/JusKillmeQik/PoE-Leveling-Guide/?tab=readme-ov-file#experience-tracker).
 
-This widget tracks and compares your current level to the current area's monsters level to track what experience multiplier you have.
+![The XP tracker at level 14 in a level 14 area: Exp 100.0% and Over 3](/reference-images/XpWidget.png)
 
-## Requirements
+## Turn it on
 
-This feature requires reading the game's log file (`Client.txt`) to detect when the player character levels up and when they enter a new area (+ the monster level for that area)
+The widget reads the game's log file, `Client.txt`, which the game writes while it runs. Reading it is off by
+default.
 
-`Client.txt` contains debugging information and chat, for this we use the chat portion since it shows in chat "player is not level XX" and "Entering zone XXX". No portion of the log file is saved via Kalandra, just reads line by line and discards the line after updating the overlay.
+1. Open the overlay, click the cog icon in the main button bar to open the Settings window, and go to `Leveling`.
+2. Check `Allow reading of Client.txt file` and click `Save`.
+3. Open the overlay and click `XP` in the main button bar.
 
-## Background
+![The PoE log file field and the Allow reading of Client.txt file checkbox](/reference-images/LevelingSettings1.png)
 
-> *Specific numbers related to XP are based on data gathered by the speedrunner [CrimsonCasts](https://www.youtube.com/@CrimsonCasts)([twitch](https://www.twitch.tv/crimsoncasts))*
+The same checkbox and the `PoE log file` field are also on the `General` page. A click on `Save` while
+`Allow reading of Client.txt file` is unchecked hides the widget and removes the `XP` button. Checking it and
+clicking `Save` adds the button back.
 
-In PoE2 you gain experience by killing monsters. The experience gained is based on how much experience the monster grants as a base times a multiplier based on a formula which factors in the player's level and the monster's level.
+### Find the log file
 
-The player gains 100% of the experience for killing a monster given they have close enough player level to the monster's level. This area can be considered the "safe zone". The safe zone formula is the same [as in PoE1](https://www.poewiki.net/wiki/Experience#Experience_penalties), but it is set to 0 if the player level is greater than the monster's level.
+When `PoE log file` is empty, Kalandra looks for `Client.txt` in the default game folders, which
+[Settings](/settings#general) lists for each operating system.
 
-![Safe Zone Formula](/reference-images/safeZoneFormula.svg)
+If the widget does not update, open the Settings window and go to `Debug`:
 
-```tex
-SafeZone = \begin{cases}
-  \lfloor 3 + \frac{PlayerLevel}{16}\rfloor & PlayerLevel \leq MonsterLevel \\
-  0 & PlayerLevel > MonsterLevel
-\end{cases}
+- `No log file found` means that `Client.txt` is in none of these folders.
+- `Found 2 log files, please enter one into settings:` means that both the standalone and the Steam file exist.
+- `Failed to watch file.` means that Kalandra could not open the log file.
+
+In each case, enter the full path of your `Client.txt` in `PoE log file` and click `Save`.
+
+### What Kalandra reads
+
+Kalandra reads new lines as the game writes them, starting at the end of the file. When Kalandra starts, the widget
+uses level 1 for you and for the area. You can type your level into it, and two kinds of log lines update it:
+
+- `<character> (<class>) is now level <N>` sets your level.
+- `Generating level <N> area "<area>" with seed <N>` sets the area level. Towns and hideouts do not change it.
+  Entering `G1_1`, the first area of the campaign, also sets your level to 1, because a new character starts there.
+
+Kalandra does not store the log. If you also turn on the experimental `Item Data Collection` feature, Kalandra writes
+the events it reads, such as level ups, area changes and deaths, to `client-log.ndjson` in the output folder of that
+feature. By default this is the `apt-data\csv-data` folder of Kalandra's data folder (`%APPDATA%\kalandra` on
+Windows). [Client log file](/client-log-parser) describes the file.
+
+## Read the widget
+
+- The number on the left is your level. It updates on each level up. To set it yourself, click it, then type your
+  level or turn the mouse wheel over it.
+- `Exp` is your experience multiplier in this area: green at 100%, red below. It shows while
+  `Show experience gain percentage` is checked on the `Leveling` page, which is the default. `Exp *` marks a value
+  the formula has no test data for, as [The formula](#the-formula) explains.
+- `Over` is how many levels you are above the lowest level that still gets full experience in this area. It is green
+  at 0 or 1, and red below 0, where the area is too far above your level and you lose experience.
+
+![The Show experience gain percentage checkbox](/reference-images/LevelingSettings2.png)
+
+The widget first opens near the bottom of the screen, right of center. Use its `move` button to place it elsewhere.
+It stays on screen after you close the overlay. Hide it with its `hide` button. The `edit` button opens the Settings
+window, where the XP tracker settings are on the `Leveling` page. The widget has no `delete` button. See
+[Widgets](/widgets) for the buttons.
+
+## The formula
+
+The XP numbers come from data gathered by the speedrunner CrimsonCasts
+([YouTube](https://www.youtube.com/@CrimsonCasts), [Twitch](https://www.twitch.tv/crimsoncasts)).
+
+The experience you get from a monster is its base experience times the multiplier. The multiplier depends on your
+level, `P`, and the area level, `A`.
+
+The safe zone is the number of levels an area can be above yours while you still get 100%. Its formula is the same
+as [in Path of Exile 1](https://www.poewiki.net/wiki/Experience#Experience_penalties), except that the safe zone is 0
+when your level is higher than the area level. Any area below your level reduces your experience.
+
+![SafeZone is floor(3 + PlayerLevel / 16) when the player level is at most the monster level, and 0 otherwise](/reference-images/safeZoneFormula.svg)
+
+Outside the safe zone, `D` is how many levels the area is outside it, and the widget computes the multiplier from it:
+
+```txt
+D          = max(|A - P| - SafeZone, 0)
+multiplier = max(1%, ((P + 5) / (P + 5 + D^2.5))^1.3)
+Over       = floor(P / 16) + 3 - (A - P)
 ```
 
-When the player is outside of the "safe zone" the experience gained is reduced by a percentage based on some formula. Kalandra follows a formula somewhat similar to PoE1 but that models [data](https://discord.com/channels/1327009865008152576/1327009867902357576/1415958443172565115) gathered by [CrimsonCasts](https://www.youtube.com/@CrimsonCasts) a bit closer than the PoE1 formula. Levels over 70 may be inaccurate since those start having special XP multipliers in PoE1 and since they haven't been testing in PoE2 yet, they haven't been implemented.
+Path of Exile 1 uses the same multiplier formula with the power 1.5. The power 1.3 matches the data from
+CrimsonCasts more closely.
 
-## Settings
+The data has no test results for areas above level 70 or for characters at level 95 and higher, and the formula
+leaves out the extra multipliers that Path of Exile 1 uses there. In those cases the widget shows `Exp *`.
 
-To use this widget you must allow reading of the game log file, as mentioned above. This is in the settings tab labeled "Leveling":
+## Use it while leveling
 
-![Leveling Settings](/reference-images/LevelingSettings1.png)
+To get full experience, keep `Exp` at 100%, which means staying in the safe zone.
 
-If the widget doesn't automatically start working after changing this setting, check the "Debug" section in settings for any errors. The most common problem will be not finding the log file, in which case the log path may need to be manually set.
+For the most experience per kill, keep `Over` at 0 or 1. The monsters are then the highest level you can fight
+without losing experience, and higher level monsters give more experience. For example, at level 14 in a level
+14 area, `Over` is 3. In a level 17 area, `Over` is 0, and you still get 100% of each monster's experience. The cost
+is that the area is harder.
 
-The other setting will hide the XP multiplier if that is too much information.
-
-![Leveling Settings 2](/reference-images/LevelingSettings2.png)
-
-## Usage
-
-To open, click the "XP" button on the main overlay window.
-
-![Main Overlay](/reference-images/mainWidget.png)
-
-This will open the widget at the bottom of the screen, next to the abilities panel in the PoE2 UI. This widget is pinned, so it will stay visible even when the main overlay is closed, just like the [stopwatch widget](/extra-widgets.html#stopwatch).
-
-![XP Widget](/reference-images/XpWidget.png)
-
-- Left most number is the current player level
-  - This will auto update when leveling up
-  - It can be manually set by selecting and typing in the current player level
-    - Or by clicking and using scroll wheel, like all other number input fields
-- The middle item "Exp" is the current experience multiplier
-- The right most number is the number of levels over the "ideal" player level for this zone
-  - Ideal player level is basically the lowest player level vs the current monster level without getting any XP penalties
-
-The overall goal would be to keep the "Exp" multiplier at 100% to not lose out on any XP. This boils down to just always staying in the safe zone.
-
-To take it a step further, try to stay where "Over" is always at 0 or 1. This means the player gains the most possible XP for the current player level, without losing any via the XP penalty. The example would be, the player is at level 14 in a level 14 zone, and a monster killed gives them 100 XP, this is "Over" of 3. If that same level 14 player were in a level 17 zone, "Over" of 0, the player would still be getting 100% of the XP, but each monster kill would give maybe 160 XP instead of 100 (fake numbers here). This ensures getting the most XP possible, while not losing out on any, with the only downside being always underleveled so the content is generally more difficult.
+![The XP tracker at level 14 in a level 17 area: Exp 100.0% and Over 0](/reference-images/XpWidget2.png)

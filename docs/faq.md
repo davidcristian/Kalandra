@@ -2,75 +2,123 @@
 title: FAQ
 ---
 
-- **Where can I change settings, league?**
+## Settings and logs
 
-  Open Path of Exile 2 and press overlay key `Shift + Space`. Click on the button with cog icon there.
-  ![overlay](/reference-images/overlay-keybind.png)
+### Where can I change the settings and the league?
 
-- **Where can I find the logs?**
+In Path of Exile 2, press the overlay key (`Shift + Space` by default) and click the cog icon. The league is on the
+**Price check** page. A click on the title bar of the price check window opens that page directly.
+[Settings](/settings) describes every page.
 
-  In the settings under the "Debug" tab.
-  ![logs](/reference-images/logs.png)
+![The main button bar of the overlay, with the cog icon at its left end](/reference-images/overlay-keybind.png)
 
-- **Is this app approved by GGG? Can I get banned for using it?**
+### Where can I find the logs?
 
-  There are no approved apps created by community. If app complies with the [game ToS](https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy), does one server action per button press
-  and doesn't interact with the game client itself (injecting into the process, changing the process memory aka cheats)
-  it can be considered safe.
+On the **Debug** page of the settings. Kalandra keeps the log in memory only, so the log starts empty each time
+Kalandra starts. Reproduce the problem, then copy the log before you quit Kalandra. Turn on **Record all key presses**
+on the same page to log every key press Kalandra receives and the action each hotkey starts.
+[Settings](/settings#debug) describes the **Debug** page.
 
-  If you get banned, the first action is to [Contact Support](https://www.pathofexile.com/support)
+### Where is the settings file?
 
-- **I want to `Ctrl + Scroll` stash tabs without zooming my character.**
+On Windows it is `%APPDATA%\kalandra\apt-data\config.json`. The tray menu item **Open config folder** opens its
+folder. [Where Kalandra keeps your settings](/download#where-kalandra-keeps-your-settings) describes this folder and
+the other files in it.
 
-  You can disable "Mousewheel Zoom" in PoE settings (Options -> UI -> 3-rd check mark starting from the bottom)
-  ![mousewheel zoom](/reference-images/mousewheel-zoom.png)
+## Safety and sources
 
-  Don't worry, you still can use keys
-  ![zoom keybinds](/reference-images/zoom-keybinds.png)
+### Is Kalandra approved by Grinding Gear Games? Can I get banned for using it?
 
-- **Do Private Leagues work?**
+Grinding Gear Games, the developer of Path of Exile 2, does not approve community tools. Kalandra does not read or
+change the game's memory and does not change the game's files. It reads the item text that the game copies to the
+clipboard. With **Allow reading of Client.txt file** on, it also reads the game's log file. When you press the
+[OCR](/ocr-guide) key, it reads a screenshot of the game window.
 
-  Yes, but you will need to sign in via the builtin browser. See [here](/private-leagues) for more info
+Kalandra sends key presses to the game only after you press a key, click or turn the mouse wheel. For example, it
+presses `Ctrl + Alt + C` to copy an item when you press the price check hotkey, and an arrow key for each mouse wheel
+step when stash tab scrolling is on. Read the [terms of use](https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy)
+to decide.
 
-- **Will my language be supported?**
+If your account is banned, contact [Path of Exile support](https://www.pathofexile.com/support).
 
-  Maybe, would need the app_i18n file to be translated to your language
+### Which websites are official?
 
-- **I downloaded a zip with a bunch of files, but no .exe inside?**
+The official site is <https://davidcristian.github.io/Kalandra/> and the official repository is
+<https://github.com/davidcristian/Kalandra>. Download Kalandra only from the [Download](/download) page or the
+[releases page on GitHub](https://github.com/davidcristian/Kalandra/releases). A copy from anywhere else can contain
+harmful code.
 
-  You have downloaded the source code, download [here](/download)
+### Where do prices come from?
 
-- **I can't price check items in Divination Card stash tab.**\
-  **I can't price check rewards in Curio Display room (Heist Blueprints).**\
-  **I can't check modifiers of the maps proposed by Kirac.**
+The price estimate comes from Kalandra's own price service at `kalandra.ashoal.com`. Once an hour, the service reads
+poe.ninja's economy data and builds one price file per league. Kalandra downloads that file and never contacts
+poe.ninja itself, so an estimate can be more than an hour old. The price check shows "Getting price from poe.ninja …"
+before the estimate appears, because the numbers are poe.ninja's. [Price check](/price-check) describes the estimate
+and lists when none shows.
 
-  Yes, you can't. The game doesn't copy anything to clipboard when pressing `Ctrl + C` in these places.
-  And as mentioned in the [Quick Start](/quick-start), the whole thing how
-  app works based on text of item in clipboard.
+## Price check
 
-  Regarding Divination Card stash tab, you can use another 3rd-party apps that
-  price check your stash tabs (e.g. [poestack](https://poestack.com/))
+### Do private leagues work?
 
-- **What does the orange/red circle (next to the item's listed time) mean?**
+Yes. Type the league's name into the **or Private League** field on the **Price check** settings page, in the form
+the trade site uses, such as `My League (PL12345)`. Then sign in to the trade site in the built-in browser, as
+[Private leagues](/private-leagues) shows. A private league has trade results but no price estimate.
 
-  It shows player's status: AFK/Offline respectively.
+### What does the colored dot next to the listing time mean?
 
-- **What does question mark (next to the item's price) mean?**
+It shows the seller's status: pink is online, orange is away and red is offline.
+[Price check](/price-check#trade-results) lists every mark in the results.
 
-  It's shown when item is priced using stash tab name instead of being individually priced.
+### What does the question mark next to the price mean?
 
-  The intention here is to make you aware that price is likely not real and is only so high because the item has been thrown in dump tab.
+The price comes from the name of the seller's stash tab, not from a note on this item.
+[Price check](/price-check#trade-results) lists every mark in the results.
 
-- **How do I disable auto-updates?**
+### Why can Kalandra not check an item in some places of the game?
 
-  This is possible by using the [command line flag](/cmd-flags).
+Kalandra reads only the item text that the game copies to the clipboard, as [Quick start](/quick-start#how-it-works)
+describes. When the game copies no text for an item, Kalandra has nothing to check. To test whether the game copies
+the item, follow [No item text found](/nothing-happens#no-item-text-found).
 
-- **Why does a sound play when I price check an item?**
+### Why does a sound play when I price check an item?
 
-  Discord :( Change the default key for saving clips. By default it is `Alt + c` which is pressed by Kalandra every time a price check happens.
+Discord's clip shortcut reacts to the keys Kalandra presses to copy an item: `Ctrl`, the game's advanced item
+descriptions key (`Alt` by default) and `C`. In Discord, change the clip shortcut to keys that do not include
+`Alt + C`.
 
-- **Which websites are official?**
+## Game and language
 
-  The only official website is <https://davidcristian.github.io/Kalandra/> and the official github repo is <https://github.com/davidcristian/Kalandra>. Any other mirrors are not known to the developer, downloading from them may be unsafe or malicious.
+### Can I switch stash tabs with Ctrl and the mouse wheel without zooming the camera?
 
-- [Index Page](/index-page.md)
+Yes. Turn off **Mousewheel Zoom** in the game's options, in the **UI** tab. The **Stash tab scrolling** row in
+[Settings](/settings#hotkeys) describes how Kalandra switches stash tabs on `Ctrl + MouseWheel`.
+
+![The Mousewheel Zoom option in the game's options](/reference-images/mousewheel-zoom.png)
+
+The camera zoom key bindings still work:
+
+![The game's key bindings Zoom the camera in, Control and Page Up, and Zoom the camera out, Control and Page Down](/reference-images/zoom-keybinds.png)
+
+### Will my language be supported?
+
+Kalandra reads item text in the game languages listed in [Requirements](/download#requirements) on the Download
+page. Its **Language** setting must match the game's language. Another game language needs Kalandra's game data for
+that language before Kalandra can read its items. A translation of the interface alone is not enough.
+
+The interface text of each language is in
+[`renderer/public/data`](https://github.com/davidcristian/Kalandra/tree/master/renderer/public/data), one
+`app_i18n.json` per language. Text missing from a language shows in English.
+
+## Updates and downloads
+
+### How do I turn off automatic updates?
+
+Start Kalandra with the `--no-updates` flag ([Command-line options](/cmd-flags)). Kalandra then still checks for
+updates and shows when one is available, but does not download it. [Updates](/download#updates) describes how each
+version of Kalandra updates.
+
+### I downloaded a zip with many files but no .exe inside
+
+That zip is the source code. Download Kalandra from the [Download](/download) page instead.
+
+All pages of this site are listed on the [home page](/).

@@ -1,33 +1,55 @@
 ---
-title: Item Info
+title: Item info
 ---
 
-Shows brief information about items, and provides a few actions related to them.
+Item info is a small window with buttons that open the item on other sites or search for it in your stash. For a
+weapon it also shows the damage per second (DPS).
 
-![Item Info](/reference-images/ItemInfo2.png)
+## Open it
 
-For weapons, the DPS is shown.
+Set a key in Settings, **Hotkeys** page, **Item info**. It has no key by default. **Item info** and **Map check** on
+that page set the same key. Point at an item and press the key: the window opens next to the game's panel on the side
+of the item, and it closes when you return to the game.
 
-![Item Info](/reference-images/ItemInfo.png)
+For a Waystone that is not unique and for an Expedition Logbook, the same key opens [Map check](/map-check) instead.
+
+![Item info for a helmet](/reference-images/ItemInfo2.png)
 
 ## Buttons
 
-1. Wiki - Opens the item's wiki page in the default browser.
-2. PoeDB - Opens the item's PoeDB page in the default browser.
-3. Craft of Exile - Opens Craft of Exile with the current item selected.
-4. Find in stash - Searched for the current item's base type in stash.
+The top line shows the item's base type, or the unique's name for a unique. The buttons under it are:
 
-## Examples
+| Button | What it does |
+| --- | --- |
+| **wiki** | Opens the poe2wiki.net page of the item's base type, or of the unique, by its English name, in your default browser. |
+| **poedb** | Opens poe2db.tw in the app's language. A unique opens its own page. Another item opens the modifier calculator for its kind, for example `Helmets_str_int` for a helmet with armour and energy shield. An item kind with no calculator page opens the item's own page. |
+| **CoE** | Opens Craft of Exile with the full item text imported. It shows only for an item you can still modify: not corrupted, mirrored or sanctified. |
+| **Find in Stash** | Switches to the game and types the item's name, in quotes, into the stash search. The name is the base type for a normal, magic or rare item, and the unique's name for a unique. |
+| dollar sign | Shows only when the item has a price note, the `Note:` line in its text. It searches the stash for the same note in quotes. |
 
-Links for the above 2 items' buttons.
+With **Filter by** set to **Price and Item**, the dollar sign button also adds the item's name to the stash search,
+when the note and the name together, with their quotes, are at most 50 characters.
 
-| Item Name                 | Wiki                                                          | PoeDB                                                              | Craft of Exile                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "Expert Heavy Crown"      | [Wiki](https://www.poe2wiki.net/wiki/Expert_Heavy_Crown)      | [PoeDB](https://poe2db.tw/us/search?q=Expert%20Heavy%20Crown)      | [Craft of Exile](https://www.craftofexile.com/?game=poe2&eimport=Item%20Class%3A%20Helmets%0D%0ARarity%3A%20Rare%0D%0AGrim%20Crest%0D%0AExpert%20Heavy%20Crown%0D%0A--------%0D%0AArmour%3A%20243%20(augmented)%0D%0AEnergy%20Shield%3A%2084%20(augmented)%0D%0A--------%0D%0ARequires%3A%20Level%2075%2C%2076%20Str%2C%2076%20Int%0D%0A--------%0D%0ASockets%3A%20S%20%0D%0A--------%0D%0AItem%20Level%3A%2081%0D%0A--------%0D%0A20%25%20increased%20Armour%2C%20Evasion%20and%20Energy%20Shield%20(rune)%0D%0A--------%0D%0A%7B%20Prefix%20Modifier%20%22Virile%22%20(Tier%3A%208)%20%E2%80%94%20Life%20%7D%0A%2B116(100-119)%20to%20maximum%20Life%0D%0A%7B%20Prefix%20Modifier%20%22Pirate's%22%20(Tier%3A%204)%20%7D%0A23(23-27)%25%20increased%20Rarity%20of%20Items%20found%0D%0A%7B%20Prefix%20Modifier%20%22Dolphin's%22%20(Tier%3A%204)%20%E2%80%94%20Mana%2C%20Defences%20%7D%0A32(27-32)%25%20increased%20Armour%20and%20Energy%20Shield%0A%2B25(21-26)%20to%20maximum%20Mana%0D%0A%7B%20Suffix%20Modifier%20%22of%20the%20Virtuoso%22%20(Tier%3A%208)%20%E2%80%94%20Attribute%20%7D%0A%2B31(31-33)%20to%20Intelligence%0D%0A%7B%20Suffix%20Modifier%20%22of%20the%20Tempest%22%20(Tier%3A%205)%20%E2%80%94%20Elemental%2C%20Lightning%2C%20Resistance%20%7D%0A%2B28(26-30)%25%20to%20Lightning%20Resistance%0D%0A%7B%20Suffix%20Modifier%20%22of%20Banishment%22%20(Tier%3A%202)%20%E2%80%94%20Chaos%2C%20Resistance%20%7D%0A%2B11(8-11)%25%20to%20Chaos%20Resistance%0D%0A--------%0D%0ANote%3A%20~price%20120%20exalted%0D%0A)                                                                                                                                                                                                                  |
-| "Expert Forlorn Crossbow" | [Wiki](https://www.poe2wiki.net/wiki/Expert_Forlorn_Crossbow) | [PoeDB](https://poe2db.tw/us/search?q=Expert%20Forlorn%20Crossbow) | [Craft of Exile](https://www.craftofexile.com/?game=poe2&eimport=Item%20Class%3A%20Crossbows%0D%0ARarity%3A%20Rare%0D%0AHonour%20Core%0D%0AExpert%20Forlorn%20Crossbow%0D%0A--------%0D%0AQuality%3A%20%2B20%25%20(augmented)%0D%0APhysical%20Damage%3A%20113-377%20(augmented)%0D%0ALightning%20Damage%3A%204-111%20(lightning)%0D%0ACritical%20Hit%20Chance%3A%207.59%25%20(augmented)%0D%0AAttacks%20per%20Second%3A%201.76%20(augmented)%0D%0AReload%20Time%3A%200.80%20(augmented)%0D%0A--------%0D%0ARequires%3A%20Level%2077%2C%20116%20(unmet)%20Str%2C%20116%20Dex%0D%0A--------%0D%0ASockets%3A%20S%20S%20%0D%0A--------%0D%0AItem%20Level%3A%2077%0D%0A--------%0D%0A%2B24%25%20to%20Critical%20Damage%20Bonus%20(rune)%0D%0A--------%0D%0A%7B%20Prefix%20Modifier%20%22Honed%22%20(Tier%3A%204)%20%E2%80%94%20Damage%2C%20Physical%2C%20Attack%20%7D%0AAdds%2012(8-12)%20to%2021(14-21)%20Physical%20Damage%0D%0A%7B%20Prefix%20Modifier%20%22Discharging%22%20(Tier%3A%208)%20%E2%80%94%20Damage%2C%20Elemental%2C%20Lightning%2C%20Attack%20%7D%0AAdds%204(1-7)%20to%20111(86-128)%20Lightning%20Damage%0D%0A%7B%20Prefix%20Modifier%20%22Cruel%22%20(Tier%3A%206)%20%E2%80%94%20Damage%2C%20Physical%2C%20Attack%20%7D%0A136(135-154)%25%20increased%20Physical%20Damage%0D%0A%7B%20Suffix%20Modifier%20%22of%20Enveloping%22%20(Tier%3A%204)%20%E2%80%94%20Mana%20%7D%0AGain%2010(10-14)%20Mana%20per%20Enemy%20Killed%0D%0A%7B%20Suffix%20Modifier%20%22of%20Disaster%22%20(Tier%3A%203)%20%E2%80%94%20Attack%2C%20Critical%20%7D%0A%2B2.59(2.11-2.7)%25%20to%20Critical%20Hit%20Chance%0D%0A%7B%20Suffix%20Modifier%20%22of%20Ease%22%20(Tier%3A%202)%20%E2%80%94%20Attack%2C%20Speed%20%7D%0A10(8-10)%25%20increased%20Attack%20Speed%0D%0A) |
+## Weapon DPS
+
+For a weapon the window also shows **Physical DPS:**, **Elemental DPS:** and **Total DPS:**. Each one is the weapon's
+attacks per second times its average damage of that type. **Total DPS:** is physical plus elemental, and chaos damage
+is not counted.
+
+![Item info for a crossbow](/reference-images/ItemInfo.png)
 
 ## Settings
 
-Each of the buttons on item info can be bound to a hotkey. These are unbound by default.
+Settings, **Item info** page, gives each button its own key. A key runs the button's action on the item under your
+cursor without opening the window. No key is set by default, and an unset key shows **Not Set**. Changes apply when
+you click **Save**.
 
-![Item Info Settings](/reference-images/ItemInfoSettings.png)
+| Setting | Default | What it does |
+| --- | --- | --- |
+| **Open item on wiki** | **Not Set** | Runs **wiki**. |
+| **Open item on PoEDB** | **Not Set** | Runs **poedb**. |
+| **Open base item on Craft of Exile** | **Not Set** | Runs **CoE**. This row shows only when the app language is English. |
+| **Find in Stash** | **Not Set** | Runs **Find in Stash**. |
+| **Filter by** | **Price and Item**, **Not Set** | The list sets what the dollar sign button searches for: **Price Only** or **Price and Item**. The key runs that search. |
+
+The key that opens the window is on the **Hotkeys** page. See [Settings](/settings).

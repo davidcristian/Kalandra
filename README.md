@@ -5,7 +5,7 @@
 [![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/davidcristian/Kalandra/latest/master?style=plastic)](https://github.com/davidcristian/Kalandra/commits/master/)
 [![license: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-3b82f6)](LICENSE)
 
-Path of Exile 2 overlay program for price checking items, among many other loved features.
+A Path of Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more.
 
 Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) by Kvan7, which is a fork of
 [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) by SnosMe.
@@ -13,29 +13,10 @@ Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-
 The only official download sites are <https://davidcristian.github.io/Kalandra/download> and
 <https://github.com/davidcristian/Kalandra/releases>. Any other location is not official and may be malicious.
 
-## Moving from Exiled Exchange 2
+## Moving from Exiled Exchange 2 or Awakened PoE Trade
 
-Kalandra installs beside Exiled Exchange 2 and keeps its settings in its own folder.
-
-1. Download the latest release from [releases](https://github.com/davidcristian/Kalandra/releases) and run the installer
-2. Run Kalandra once, then quit it
-3. Quit Exiled Exchange 2
-4. Copy `apt-data` from `%APPDATA%\exiled-exchange-2` to `%APPDATA%\kalandra`, replacing the one there
-5. Start Kalandra
-
-## Moving from POE1/Awakened PoE Trade
-
-1. Download latest release from [releases](https://github.com/davidcristian/Kalandra/releases)
-2. Run installer
-3. Run Kalandra
-4. Launch PoE2 to generate correct files
-5. Quit PoE2 and Kalandra after seeing the banner popup that Kalandra loaded
-6. Copy `apt-data` from `%APPDATA%\awakened-poe-trade` to `%APPDATA%\kalandra` to copy your previous settings
-  - Resulting directory structure should look like this:
-  - `%APPDATA%\kalandra\apt-data\`
-    - `config.json`
-7. Edit `config.json` and change the value of "windowTitle": "Path of Exile" to instead be "Path of Exile 2", otherwise it will open only for poe1
-8. Start Kalandra and PoE2
+Kalandra installs beside both and keeps its settings in its own folder. The
+[download page](https://davidcristian.github.io/Kalandra/download) has the steps to copy your settings over.
 
 ## FAQ
 
