@@ -100,6 +100,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    other hooks in `dataParser/.pre-commit-config.yaml`.
    **The price service**, when `priceService/`, `namespaceMap.json`, `Prices.ts` or `price-source.ts` changes:
    `python -m unittest discover -s tests` in `priceService/`, which CI also runs.
+   **The docs site**, when `docs/` changes: `npm ci` and `npm run build` in `docs/`, which fails on a dead link or
+   a missing image. CI also runs it.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower

@@ -49,3 +49,15 @@ jobs:
         python-version: '3.12'
     - run: python -m unittest discover -s tests -v
       working-directory: ./priceService
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24
+    - run: npm ci
+      working-directory: ./docs
+    - run: npm run build
+      working-directory: ./docs
