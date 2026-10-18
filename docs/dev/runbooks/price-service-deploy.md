@@ -90,10 +90,9 @@ first cycle.
   poe.ninja. The next cycle starts `PRICE_INTERVAL_MINUTES` after the failed one started. Do not restart the service
   to retry sooner.
 - A Python traceback, and `docker compose ps` shows `prices` restarting: the process ended on an error the service
-  does not catch, such as a failed disk write or a poe.ninja response with `null` where a list belongs. Every start
-  sends a new cycle of requests, so first stop it with `docker compose stop prices`, then read the traceback. `web`
-  keeps serving the last files while `prices` is stopped. Fix the cause in the code, with a test that replays the
-  response, and deploy again.
+  does not catch, such as a failed disk write. Every start sends a new cycle of requests, so first stop it with
+  `docker compose stop prices`, then read the traceback. `web` keeps serving the last files while `prices` is
+  stopped. Fix the cause in the code, with a test that replays the response, and deploy again.
 - `load_categories` or `SnapshotError: unsupported schemaVersion` in the traceback: the image's `namespaceMap.json`
   is not schema version 1, and the service stops at start, before any request
   ([price-service.md](../modules/price-service.md#namespacemapjson)).

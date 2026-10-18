@@ -53,6 +53,7 @@ One line of compact JSON, UTF-8 with non-ASCII names kept, with the keys in this
   `items`, or whose value is not a number, is left out.
 - A stash line (`stash_lines`) has `name`, `variant`, `primaryValue`, `detailsId` and `sparkline`. `variant` is
   poe.ninja's `variant`, or its `baseType` when there is none, and is left out when neither is a string.
+- An `items` or `lines` value that is not a list, such as `null`, is read as an empty list and logged as a warning.
 - A missing sparkline is written as `{"totalChange":0,"data":[]}`.
 
 `primaryValue` and `volumePrimaryValue` are in divines, which the app expects. poe.ninja reports some leagues in
@@ -167,7 +168,7 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 33 tests on 18 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 35 tests on 18 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it ([architecture.md](../architecture.md#ci)). The app side is
 `renderer/specs/web/prices.test.ts`, run by `npx vitest run` in `renderer/`.
 

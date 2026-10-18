@@ -53,6 +53,14 @@ class ExchangeTest(unittest.TestCase):
         )
         self.assertEqual(lines[1]["detailsId"], "exalted-orb")
 
+    def test_reads_a_null_items_or_lines_as_empty(self) -> None:
+        for key in ("items", "lines"):
+            response = json.loads(fixture("exchange_currency.json"))
+            response[key] = None
+            with self.assertLogs("price_service.transform", "WARNING") as logs:
+                self.assertEqual(exchange_lines(response), [])
+            self.assertIn(f"{key} is NoneType", logs.output[0])
+
     def test_skips_lines_without_an_item_or_a_numeric_value(self) -> None:
         self.response["lines"].append({"id": "unknown", "primaryValue": 1})
         self.response["lines"].append({"id": "alch", "primaryValue": True})
@@ -110,6 +118,10 @@ class StashTest(unittest.TestCase):
     def test_prefers_the_variant_field_when_there_is_one(self) -> None:
         lines = stash_lines(json.loads(fixture("stash_precursor_tablets.json")))
         self.assertEqual([line["variant"] for line in lines], ["Normal", "Magic"])
+
+    def test_reads_null_lines_as_empty(self) -> None:
+        with self.assertLogs("price_service.transform", "WARNING"):
+            self.assertEqual(stash_lines({"core": {"primary": "divine"}, "lines": None}), [])
 
     def test_omits_a_missing_variant_and_fills_a_missing_sparkline(self) -> None:
         response = {"core": {"primary": "divine"}, "lines": [{"name": "Rune", "primaryValue": 2, "detailsId": "rune"}]}

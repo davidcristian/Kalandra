@@ -1,6 +1,6 @@
 # A null list in a poe.ninja response stops the price service
 
-**Status:** open
+**Status:** done 2026-10-18
 **Area:** priceservice
 **Origin:** [priceService/price_service/transform.py](../../../../priceService/price_service/transform.py)
 **Verified:** 2026-10-18
@@ -34,3 +34,6 @@ longer names a `null` list as a cause.
 - 2026-10-18: Found while the price service module doc was written. On 2026-10-18 the command
   above printed `TypeError: 'NoneType' object is not iterable`, and so did `exchange_lines()` with
   `None` for `items` and for `lines`.
+- 2026-10-18: Closed. `_array()` in `transform.py` reads a value that is not a list as empty and
+  logs a warning. `test_transform.py` sends `null` for `items` and `lines` to `exchange_lines()` and
+  for `lines` to `stash_lines()`; without the fix both tests failed with the `TypeError` above.

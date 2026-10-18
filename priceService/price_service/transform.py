@@ -1,6 +1,7 @@
 """Turns poe.ninja overview responses into the price file the app reads."""
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -8,6 +9,8 @@ from typing import Any
 Json = dict[str, Any]
 
 EMPTY_SPARKLINE: Json = {"totalChange": 0, "data": []}
+
+log = logging.getLogger(__name__)
 
 
 class SnapshotError(ValueError):
@@ -44,6 +47,14 @@ def _is_number(value: object) -> bool:
 
 def _sparkline(value: object) -> Json:
     return value if isinstance(value, dict) else EMPTY_SPARKLINE
+
+
+def _array(response: Json, key: str) -> list[Any]:
+    value = response.get(key, [])
+    if isinstance(value, list):
+        return value
+    log.warning("%s is %s, not a list, so it is read as empty", key, type(value).__name__)
+    return []
 
 
 def divine_factor(response: Json) -> float | None:
@@ -85,9 +96,9 @@ def exchange_lines(response: Json) -> list[Json]:
     factor = divine_factor(response)
     if factor is None:
         return []
-    items = {item.get("id"): item for item in response.get("items", []) if isinstance(item, dict)}
+    items = {item.get("id"): item for item in _array(response, "items") if isinstance(item, dict)}
     lines: list[Json] = []
-    for line in response.get("lines", []):
+    for line in _array(response, "lines"):
         if not isinstance(line, dict):
             continue
         item = items.get(line.get("id"))
@@ -114,7 +125,7 @@ def stash_lines(response: Json) -> list[Json]:
     if factor is None:
         return []
     lines: list[Json] = []
-    for line in response.get("lines", []):
+    for line in _array(response, "lines"):
         if not isinstance(line, dict):
             continue
         if not isinstance(line.get("name"), str) or not _is_number(line.get("primaryValue")):
