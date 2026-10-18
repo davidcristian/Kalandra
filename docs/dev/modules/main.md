@@ -109,6 +109,9 @@ The entry, the server and the app services, in `main/src/`:
 - `ConfigStore.ts`: `ConfigStore` reads and writes `apt-data/config.json` ([config.md](config.md)).
 - `file-uploads.ts`: `addFileUploadRoutes(server)` adds the `/uploads/` routes, which store files in
   `apt-data/files/`.
+- `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
+  answers 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
+  one with `..` segments, which Node passes on in `req.url` as sent.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on
@@ -159,9 +162,10 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it too.
-`listen-option.test.ts` covers the `--listen` parsing. A test of a module that imports Electron replaces it with
-`vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and
-`npm run lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus,
-clipboard capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to
-check them, [host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it
+`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check, and `server.test.ts`
+starts the server and sends `..` paths to the static and uploads routes. A test of a module that imports Electron
+replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production
+bundle, and `npm run lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay
+focus, clipboard capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how
+to check them, [host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it
 still has to run.

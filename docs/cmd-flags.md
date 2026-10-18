@@ -45,9 +45,8 @@ network address and the port. The overlay always opens the page at `localhost`, 
 loopback address. With a single network address as the host, the overlay cannot load its page.
 
 **The server has no password.** When it listens on any address other than the loopback address, any device that
-reaches it can read and change your Kalandra settings and read files on this computer. It can also send requests to
-the trade site with the sign-in of the [built-in browser](/price-check#built-in-browser). Use such a host only on a
-network you trust.
+reaches it can read and change your Kalandra settings. It can also send requests to the trade site with the sign-in of
+the [built-in browser](/price-check#built-in-browser). Use such a host only on a network you trust.
 
 ## `--no-updates`
 

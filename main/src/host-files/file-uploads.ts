@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs";
 import { app } from "electron";
 import type { Server } from "http";
+import { sendFile } from "../served-file";
 
 export function addFileUploadRoutes(server: Server) {
   const uploadsPath = path.join(app.getPath("userData"), "apt-data", "files");
@@ -10,9 +11,7 @@ export function addFileUploadRoutes(server: Server) {
   server.addListener("request", (req, res) => {
     if (req.method !== "GET" || !req.url?.startsWith("/uploads/")) return;
 
-    fs.createReadStream(
-      path.join(uploadsPath, req.url.slice("/uploads/".length)),
-    ).pipe(res);
+    sendFile(res, uploadsPath, req.url.slice("/uploads/".length));
   });
 
   server.addListener("request", (req, res) => {

@@ -77,9 +77,9 @@ and `--listen=[host][:port]` sets either part. In development, main listens on p
 | --- | --- | --- |
 | `/events` | A WebSocket that sends every `IpcEvent` as JSON text, in both directions. An upgrade request for any other path is destroyed. | `Host` in `renderer/src/web/background/IPC.ts` |
 | `GET /config` | Returns `HostState`: the app version, the updater state and the text of `config.json`, or `null` when there is none. | `Host.getConfig()` |
-| `/uploads/<name>` | `POST` stores the request body, at most 16,000,000 bytes, in `apt-data/files/` under its MD5 hash and extension, and returns `{ name }`. `GET` returns a stored file. The image strip widget stores imported images this way. | `Host.importFile()` |
+| `/uploads/<name>` | `POST` stores the request body, at most 16,000,000 bytes, in `apt-data/files/` under its MD5 hash and extension, and returns `{ name }`. `GET` returns a stored file, or 404 for a missing file or a path outside the folder. The image strip widget stores imported images this way. | `Host.importFile()` |
 | `/proxy/<host>/<path>` | Forwards the request to `https://<host>/<path>` when `<host>` is in `PROXY_HOSTS` in `main/src/proxy.ts`, and destroys it otherwise. | `Host.proxy()` |
-| any other path | Returns the built renderer file from the folder that holds the bundled `main.js`, where electron-builder puts `renderer/dist`. In development, Vite serves these instead. | |
+| any other path | Returns the built renderer file from the folder that holds the bundled `main.js`, where electron-builder puts `renderer/dist`, or 404 for a missing file or a path outside that folder. In development, Vite serves these instead. | |
 
 A *client* is a page connected to `/events`: the overlay window, or a browser tab. Each event name starts with
 its direction:

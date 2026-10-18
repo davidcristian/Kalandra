@@ -2,13 +2,13 @@ import { WebSocketServer, type WebSocket } from "ws";
 import { type AddressInfo } from "net";
 import { createServer } from "http";
 import { EventEmitter } from "events";
-import * as fs from "fs";
 import * as path from "path";
 import { app } from "electron";
 import { IpcEvent, IpcEventPayload, HostState } from "../../ipc/types";
 import { ConfigStore } from "./host-files/ConfigStore";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { readListenOption } from "./listen-option";
+import { sendFile } from "./served-file";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
 
@@ -43,7 +43,7 @@ if (!process.env.VITE_DEV_SERVER_URL) {
         break;
     }
 
-    fs.createReadStream(path.join(__dirname, filePath)).pipe(res);
+    sendFile(res, __dirname, filePath);
   });
 }
 

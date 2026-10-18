@@ -1,6 +1,6 @@
 # The static file and /uploads routes serve files outside their folders
 
-**Status:** open
+**Status:** done 2026-10-18
 **Area:** main
 **Origin:** [main/src/server.ts](../../../../main/src/server.ts)
 **Verified:** 2026-10-18
@@ -28,3 +28,7 @@ read files on this computer" from the warning in docs/cmd-flags.md.
   handlers. A copy of the `GET /uploads/` handler in a scratch Node 24 script received
   `/uploads/../../secret.txt` unchanged and returned that file from two folders up. Not sent to a
   running app.
+- 2026-10-18: Closed. Both routes call `sendFile()` in `main/src/served-file.ts`, which answers 404
+  for a path outside the folder and for a missing file, where the old code left the request open.
+  `main/specs/server.test.ts` sends `/uploads/../../secret.txt` and `/../package.json` to the real
+  routes; with the old uploads handler the first one returned the file.
