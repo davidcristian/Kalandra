@@ -103,6 +103,9 @@ which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pu
 Windows, following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
 
 `npm run format` in `main/` or `renderer/` runs Prettier alone, which the pre-commit hooks also run.
+It keeps the line endings it finds (`"endOfLine": "auto"` in each `.prettierrc`). Git for Windows
+checks files out with CRLF (`core.autocrlf=true`) and counts a file rewritten with LF as modified,
+even when `git diff` shows nothing.
 
 ## Package locally
 
