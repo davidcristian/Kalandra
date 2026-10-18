@@ -92,7 +92,7 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 
 `python scripts/check.py` runs every step below but the data tool's and names each one that failed: run it, after
 `npm ci` in `renderer/`, `main/` and `docs/`, before calling a change done. [DEVELOPING.md](DEVELOPING.md#checks)
-gives each step's own command. CI runs the same steps on Node 24.
+gives each step's own command. CI runs the same steps on Node 24, each job only for a change that can affect it.
 
 1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, `versionCheck.py`,
    ESLint, Prettier and `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`,

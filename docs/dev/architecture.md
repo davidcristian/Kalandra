@@ -177,7 +177,7 @@ Every job runs on `ubuntu-latest` unless the table names other runners, and ever
 
 | Workflow | Runs on | Jobs |
 | --- | --- | --- |
-| `.github/workflows/test.yml` | every push to `master` or `dev`, and every pull request to them | **Lint & Format**: `npm ci` in `renderer/` and `main/`, then every hook in `.pre-commit-config.yaml` over all files. **Tests**: `npm ci` in `renderer/` and `main/`, `npm run make-index-files`, then `npx vitest run --coverage` in `renderer/` and `npm test -- --coverage` in `main/`, which fail below the coverage floor in each `vitest.config.ts`. **Price service**: `pip install coverage`, then `python -m coverage run -m unittest discover -s tests -v` and `python -m coverage report` in `priceService/` on Python 3.12, which fails below the floor in `.coveragerc`. **Scripts**: the same commands in `scripts/` on Python 3.12. **Docs**: `npm ci` and `npm run build` in `docs/`, which fails on a dead internal link in a user page. |
+| `.github/workflows/test.yml` | every push to `master` or `dev`, and every pull request to them; each job but Lint & Format only when `scripts/ci_paths.py` finds a changed path that affects it ([ADR-0011](adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)) | **Changed paths**: `git diff --name-only` from the merge base or the push's `before` commit, read by `scripts/ci_paths.py`. **Lint & Format**: `npm ci` in `renderer/` and `main/`, then every hook in `.pre-commit-config.yaml` over all files. **Tests**: `npm ci` in `renderer/` and `main/`, `npm run make-index-files`, then `npx vitest run --coverage` in `renderer/` and `npm test -- --coverage` in `main/`, which fail below the coverage floor in each `vitest.config.ts`. **Price service**: `pip install coverage`, then `python -m coverage run -m unittest discover -s tests -v` and `python -m coverage report` in `priceService/` on Python 3.12, which fails below the floor in `.coveragerc`. **Scripts**: the same commands in `scripts/` on Python 3.12. **Docs**: `npm ci` and `npm run build` in `docs/`, which fails on a dead internal link in a user page. |
 | `.github/workflows/main.yml` (Build) | a push to `master`, unless every changed file is under `docs/` or is the root `README.md`; never a tag push (`tags-ignore: '**'`) | **renderer**: `npm ci`, `npm run make-index-files`, `npm run lint` and `npm run build` in `renderer/`, then keeps `renderer/dist` as the workflow artifact `renderer-dist` for one day. **package**, after it, on `windows-2025`, `ubuntu-22.04` and `macos-14`: downloads `renderer-dist`, runs `npm ci` and `npm run build` in `main/`, then packages the app with electron-builder (`npm run package "--" -p onTagOrDraft`), which uploads the packages only into a draft GitHub release for the current version. |
 | `.github/workflows/pages.yml` (Docs) | a push to `master` that changes a file under `docs/` outside `docs/dev/`, never a tag push; or by hand: Actions, Docs, Run workflow, with `master` as the branch (`workflow_dispatch`) | **deploy**: `npm ci` and `npm run build` in `docs/`, then `actions/configure-pages`, `actions/upload-pages-artifact` with `docs/.vitepress/dist`, and `actions/deploy-pages` into the `github-pages` environment. |
 
@@ -186,6 +186,8 @@ Every job runs on `ubuntu-latest` unless the table names other runners, and ever
 - A push that changes only files under `docs/` never packages the app. A push that changes only files under
   `docs/dev/` also deploys nothing.
 - No workflow runs the `dataParser/` tests.
+- A push that changes only `docs/dev/` or a markdown file at the repo root runs only Changed paths and Lint & Format
+  in `test.yml`.
 
 The package job's upload outcomes and the release steps are in [runbooks/release.md](runbooks/release.md), and
 working on the docs site in [runbooks/docs-site.md](runbooks/docs-site.md).
@@ -210,7 +212,7 @@ renderer/          the Vue 3 page: Vite, Tailwind, Vitest
 ipc/               types.ts and KeyToCode.ts, imported by both processes
 dataParser/        the Python game data generator, run by hand; output/ holds its last output
 priceService/      the Python price file service, deployed outside the app
-scripts/           check.py, which runs every check AGENTS.md names, the line, dash, prose and commit message checks
+scripts/           check.py, which runs every check AGENTS.md names, the repo and commit checks, and ci_paths.py
 docs/              the VitePress user site; dev/ holds the developer docs, left out of the site
 .github/           test.yml, main.yml, pages.yml, the issue templates and FUNDING.yml
 versionCheck.py    fails unless the five files AGENTS.md names have the same version

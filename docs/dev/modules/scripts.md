@@ -3,8 +3,9 @@
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
 [AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
 `prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py` check
-the developer docs, and `commitlint.py` checks a commit message. The scripts are Python, use only the standard
-library, and run from the repo root. The decision is [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
+the developer docs, `commitlint.py` checks a commit message, and `ci_paths.py` picks the CI jobs a change affects.
+The scripts are Python, use only the standard library, and run from the repo root. The decision is
+[ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
 ## Public contract
 
@@ -55,6 +56,14 @@ another copy of the repo.
   `index.md` must be `- NNN: [title](tasks/NNN-slug.md)`, in number order, and every task file must be listed once,
   with its first line `# <title>` and exactly one `**Status:**` line whose value the index defines.
 
+### ci_paths.py
+
+The Changed paths job of `.github/workflows/test.yml` passes the changed paths on stdin to
+`python3 scripts/ci_paths.py`, which prints `renderer=`, `main=`, `price_service=`, `scripts=` and `docs=` with
+`true` or `false` for `GITHUB_OUTPUT`. `RULES` maps a file, or a folder ending in `/`, to the jobs it affects, and
+the first rule that matches applies. A markdown file at the repo root affects no job, and any other path that no
+rule matches affects every job ([ADR-0011](../adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)).
+
 ### commitlint.py
 
 The commit-msg hook runs `python scripts/commitlint.py <message file>`, after conventional-pre-commit has checked
@@ -83,7 +92,7 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 47 tests on 18 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 51 tests on 18 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

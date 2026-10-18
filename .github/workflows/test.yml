@@ -1,3 +1,5 @@
+# Lint & Format runs on every push. scripts/ci_paths.py picks the other jobs from the changed paths, and every job
+# runs when there is no diff to read or a path no rule there names.
 on:
   push:
     branches:
@@ -9,6 +11,41 @@ on:
     - dev
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      renderer: ${{ steps.paths.outputs.renderer }}
+      main: ${{ steps.paths.outputs.main }}
+      price_service: ${{ steps.paths.outputs.price_service }}
+      scripts: ${{ steps.paths.outputs.scripts }}
+      docs: ${{ steps.paths.outputs.docs }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - id: paths
+      name: Pick the jobs the changed paths affect
+      env:
+        EVENT: ${{ github.event_name }}
+        BASE_REF: ${{ github.base_ref }}
+        BEFORE: ${{ github.event.before }}
+      run: |
+        set -euo pipefail
+        range=""
+        if [ "$EVENT" = "pull_request" ]; then
+          range="origin/$BASE_REF...HEAD"
+        elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+          && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+          range="$BEFORE..HEAD"
+        fi
+        if [ -n "$range" ] && git diff --name-only "$range" > changed.txt; then
+          cat changed.txt
+          python3 scripts/ci_paths.py < changed.txt | tee -a "$GITHUB_OUTPUT"
+        else
+          echo "No diff range to read, so every job runs"
+          printf 'renderer=true\nmain=true\nprice_service=true\nscripts=true\ndocs=true\n' >> "$GITHUB_OUTPUT"
+        fi
   lint-and-format:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -25,6 +62,8 @@ jobs:
     - uses: pre-commit/action@v3.0.1
   test:
     name: Tests
+    needs: changes
+    if: needs.changes.outputs.renderer == 'true' || needs.changes.outputs.main == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -32,17 +71,24 @@ jobs:
       with:
         node-version: 24
     - run: npm ci
+      if: needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
-    - run: npm ci
-      working-directory: ./main
     - run: npm run make-index-files
+      if: needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
     - run: npx vitest run --coverage
+      if: needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
+    - run: npm ci
+      if: needs.changes.outputs.main == 'true'
+      working-directory: ./main
     - run: npm test -- --coverage
+      if: needs.changes.outputs.main == 'true'
       working-directory: ./main
   price-service:
     name: Price service
+    needs: changes
+    if: needs.changes.outputs.price_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -56,6 +102,8 @@ jobs:
       working-directory: ./priceService
   scripts:
     name: Scripts
+    needs: changes
+    if: needs.changes.outputs.scripts == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -69,6 +117,8 @@ jobs:
       working-directory: ./scripts
   docs:
     name: Docs
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
