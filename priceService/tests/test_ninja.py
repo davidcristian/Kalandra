@@ -3,9 +3,10 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from support import FakeGet, fixture, ok
+
 from price_service.ninja import MAX_LEAGUES, NinjaClient, NinjaError, Reply, urllib_get
 from price_service.transform import Category
-from support import FakeGet, fixture, ok
 
 CURRENCY = Category("Currency", exchange=True)
 WEAPONS = Category("UniqueWeapons", exchange=False)
@@ -101,7 +102,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def log_message(self, format: str, *args: object) -> None:
+    def log_message(self, format: str, *args: object) -> None:  # noqa: A002 the name BaseHTTPRequestHandler uses
         pass
 
 

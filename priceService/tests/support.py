@@ -17,7 +17,7 @@ class FakeGet:
         self.routes = routes
         self.calls: list[tuple[str, dict[str, str]]] = []
 
-    def __call__(self, url: str, headers: dict[str, str], timeout: float) -> Reply:
+    def __call__(self, url: str, headers: dict[str, str], _timeout: float, /) -> Reply:
         self.calls.append((url, headers))
         for fragment, replies in self.routes.items():
             if fragment in url:

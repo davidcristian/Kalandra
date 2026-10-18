@@ -2,13 +2,21 @@
 
 import json
 import logging
-import os
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
 from .ninja import NinjaClient, NinjaError
-from .transform import Category, Json, SnapshotError, exchange_core, exchange_lines, league_file_name, price_file, stash_lines
+from .transform import (
+    Category,
+    Json,
+    SnapshotError,
+    exchange_core,
+    exchange_lines,
+    league_file_name,
+    price_file,
+    stash_lines,
+)
 
 CORE_CATEGORY = "Currency"
 
@@ -28,7 +36,8 @@ def build_league(client: NinjaClient, categories: list[Category], league: str) -
         else:
             overviews.append((category.type, stash_lines(response)))
     if core is None:
-        raise SnapshotError(f"no {CORE_CATEGORY} category to take exchange rates from")
+        msg = f"no {CORE_CATEGORY} category to take exchange rates from"
+        raise SnapshotError(msg)
     return price_file(core, overviews)
 
 
@@ -36,7 +45,7 @@ def write_atomic(directory: Path, name: str, text: str) -> None:
     """Writes a file next to its target and renames it, so readers never see half a file."""
     temporary = directory / f".{name}.tmp"
     temporary.write_text(text, encoding="utf-8")
-    os.replace(temporary, directory / name)
+    temporary.replace(directory / name)
 
 
 def run_cycle(
@@ -57,7 +66,7 @@ def run_cycle(
             failed.append(league)
             continue
         written.append({"id": league, "file": name})
-    index = {"generatedAt": now().isoformat(timespec="seconds"), "leagues": written, "failed": failed}
+    index: Json = {"generatedAt": now().isoformat(timespec="seconds"), "leagues": written, "failed": failed}
     write_atomic(output, "index.json", json.dumps(index, ensure_ascii=False, indent=2))
     log.info("wrote %d leagues, %d failed", len(written), len(failed))
     return index

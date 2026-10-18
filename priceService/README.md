@@ -21,7 +21,8 @@ python -m unittest discover -s tests -v
 ```
 
 The tests replay saved poe.ninja responses from `tests/fixtures/ninja/` and send no request to poe.ninja. CI runs
-them in the `price-service` job of `.github/workflows/test.yml`. `renderer/specs/web/prices.test.ts` reads
+them in the `price-service` job of `.github/workflows/test.yml`. Ruff (`ruff.toml`) and strict Pyright
+(`../pyrightconfig.json`) run in the pre-commit hooks. `renderer/specs/web/prices.test.ts` reads
 `tests/fixtures/price_file.json` and `tests/fixtures/league_files.json` too, so after a change to the file format, also
 run `npx vitest run` in `renderer/`.
 

@@ -169,7 +169,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 ## Tests
 
 `python -m unittest discover -s tests -v` in `priceService/`, 35 tests on 18 Oct 2026. The `price-service` job in
-`.github/workflows/test.yml` runs it ([architecture.md](../architecture.md#ci)). The app side is
+`.github/workflows/test.yml` runs it ([architecture.md](../architecture.md#ci)). The pre-commit hooks run Ruff with
+every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
+`pyrightconfig.json` at the repo root. The app side is
 `renderer/specs/web/prices.test.ts`, run by `npx vitest run` in `renderer/`.
 
 **Dependencies.** The Python standard library and poe.ninja's PoE 2 economy API. The deployment uses Docker

@@ -56,3 +56,17 @@ repos:
         language: system
         pass_filenames: false
         files: ^renderer/.*\.(ts|js|jsx|tsx|vue|json|md)$
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.1
+    hooks:
+    -   id: ruff-check
+        args: [--fix]
+        files: ^priceService/
+    -   id: ruff-format
+        files: ^priceService/
+-   repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.414
+    hooks:
+    -   id: pyright
+        files: ^(priceService/|pyrightconfig\.json$)
+        pass_filenames: false

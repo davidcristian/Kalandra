@@ -9,9 +9,10 @@ import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import Protocol
 
-from .transform import Category, Json
+from .transform import Category, Json, as_array, as_object
 
 BASE_URL = "https://poe.ninja/poe2/api/economy"
 MAX_LEAGUES = 12
@@ -33,14 +34,14 @@ class Reply:
 
 
 class HttpGet(Protocol):
-    def __call__(self, url: str, headers: dict[str, str], timeout: float) -> Reply: ...
+    def __call__(self, url: str, headers: dict[str, str], timeout: float, /) -> Reply: ...
 
 
 def urllib_get(url: str, headers: dict[str, str], timeout: float) -> Reply:
     """Sends a GET with urllib and returns a 304 as a reply instead of raising it."""
-    request = urllib.request.Request(url, headers=headers)
+    request = urllib.request.Request(url, headers=headers)  # noqa: S310 every URL starts with BASE_URL, an https address
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 the request above has BASE_URL
             body = response.read()
             if response.headers.get("Content-Encoding") == "gzip":
                 body = gzip.decompress(body)
@@ -48,7 +49,7 @@ def urllib_get(url: str, headers: dict[str, str], timeout: float) -> Reply:
     except urllib.error.HTTPError as error:
         etag = error.headers.get("ETag")
         error.close()
-        return Reply(304, b"", etag) if error.code == 304 else Reply(error.code, b"", None)
+        return Reply(error.code, b"", etag if error.code == HTTPStatus.NOT_MODIFIED else None)
 
 
 class NinjaClient:
@@ -58,34 +59,39 @@ class NinjaClient:
         self,
         get: HttpGet,
         user_agent: str,
+        *,
         delay_seconds: float = 1.0,
         timeout_seconds: float = 30.0,
         sleep: Callable[[float], None] = time.sleep,
-        base_url: str = BASE_URL,
     ) -> None:
         self._get = get
         self._headers = {"User-Agent": user_agent, "Accept": "application/json", "Accept-Encoding": "gzip"}
         self._delay = delay_seconds
         self._timeout = timeout_seconds
         self._sleep = sleep
-        self._base = base_url
         self._cache: dict[str, tuple[str | None, object]] = {}
 
     def leagues(self) -> list[str]:
         """Returns the ids of the leagues poe.ninja lists, at most MAX_LEAGUES of them."""
-        data = self._get_json(f"{self._base}/leagues")
-        if not isinstance(data, list):
-            raise NinjaError("league list is not a list")
-        ids = [entry["id"] for entry in data if isinstance(entry, dict) and isinstance(entry.get("id"), str)]
+        entries = as_array(self._get_json(f"{BASE_URL}/leagues"))
+        if entries is None:
+            msg = "league list is not a list"
+            raise NinjaError(msg)
+        ids: list[str] = []
+        for entry in entries:
+            league_id = (as_object(entry) or {}).get("id")
+            if isinstance(league_id, str):
+                ids.append(league_id)
         return ids[:MAX_LEAGUES]
 
     def overview(self, league: str, category: Category) -> Json:
         """Returns one category's overview for a league."""
         kind = "exchange/current/overview" if category.exchange else "stash/current/item/overview"
         query = urllib.parse.urlencode({"league": league, "type": category.type}, quote_via=urllib.parse.quote)
-        data = self._get_json(f"{self._base}/{kind}?{query}")
-        if not isinstance(data, dict):
-            raise NinjaError(f"{category.type} overview is not an object")
+        data = as_object(self._get_json(f"{BASE_URL}/{kind}?{query}"))
+        if data is None:
+            msg = f"{category.type} overview is not an object"
+            raise NinjaError(msg)
         return data
 
     def _get_json(self, url: str) -> object:
@@ -98,10 +104,10 @@ class NinjaClient:
         except OSError as error:
             failure = f"{type(error).__name__}: {error}"
         else:
-            if reply.status == 304 and cached:
+            if reply.status == HTTPStatus.NOT_MODIFIED and cached:
                 return cached[1]
             failure = f"HTTP {reply.status}"
-            if reply.status == 200:
+            if reply.status == HTTPStatus.OK:
                 try:
                     data = json.loads(reply.body)
                 except ValueError as error:
@@ -114,4 +120,5 @@ class NinjaClient:
         if cached:
             log.warning("using the last good copy of %s (%s)", url, failure)
             return cached[1]
-        raise NinjaError(f"{url}: {failure}")
+        msg = f"{url}: {failure}"
+        raise NinjaError(msg)

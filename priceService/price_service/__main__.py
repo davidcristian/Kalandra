@@ -20,7 +20,9 @@ def main() -> None:
 
     logging.basicConfig(level=os.environ.get("PRICE_LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(message)s")
     output = Path(os.environ.get("PRICE_OUTPUT_DIR", "/srv/prices"))
-    categories = load_categories(Path(os.environ.get("PRICE_NAMESPACE_MAP", "/app/namespaceMap.json")).read_text("utf-8"))
+    categories = load_categories(
+        Path(os.environ.get("PRICE_NAMESPACE_MAP", "/app/namespaceMap.json")).read_text("utf-8")
+    )
     interval = float(os.environ.get("PRICE_INTERVAL_MINUTES", "60")) * 60
     contact = os.environ.get("PRICE_CONTACT", DEFAULT_CONTACT)
     client = NinjaClient(
@@ -35,7 +37,7 @@ def main() -> None:
         try:
             run_cycle(client, categories, output)
         except NinjaError as error:
-            logging.getLogger(__name__).error("cycle failed: %s", error)
+            logging.getLogger(__name__).error("cycle failed: %s", error)  # noqa: TRY400 a failed request needs no traceback
         if args.once:
             return
         time.sleep(max(0.0, interval - (time.monotonic() - started)))

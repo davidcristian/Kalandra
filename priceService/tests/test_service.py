@@ -4,10 +4,11 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
+from support import FIXTURES, FakeGet, league_routes, ok
+
 from price_service.ninja import NinjaClient, Reply
 from price_service.service import build_league, run_cycle, write_atomic
 from price_service.transform import Category, SnapshotError
-from support import FIXTURES, FakeGet, league_routes, ok
 
 CATEGORIES = [
     Category("Currency", exchange=True),
@@ -43,10 +44,13 @@ class RunCycleTest(unittest.TestCase):
         routes = league_routes()
         routes["/leagues"] = [ok([{"id": "Runes of Aldur"}, {"id": "Standard"}])]
         index = run_cycle(client(routes), CATEGORIES, self.output, now=lambda: NOW)
-        self.assertEqual(sorted(path.name for path in self.output.iterdir()), ["index.json", "runesofaldur.json", "standard.json"])
+        self.assertEqual(
+            sorted(path.name for path in self.output.iterdir()), ["index.json", "runesofaldur.json", "standard.json"]
+        )
         self.assertEqual(json.loads((self.output / "index.json").read_text("utf-8")), index)
         self.assertEqual(index["generatedAt"], "2026-10-18T12:00:00+00:00")
-        self.assertEqual(index["leagues"][1], {"id": "Standard", "file": "standard.json"})
+        leagues = [{"id": "Runes of Aldur", "file": "runesofaldur.json"}, {"id": "Standard", "file": "standard.json"}]
+        self.assertEqual(index["leagues"], leagues)
 
     def test_keeps_the_old_file_of_a_league_that_fails(self) -> None:
         (self.output / "standard.json").write_text("old", encoding="utf-8")

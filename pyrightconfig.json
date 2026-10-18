@@ -1,0 +1,6 @@
+{
+  "include": ["priceService"],
+  "typeCheckingMode": "strict",
+  "pythonVersion": "3.12",
+  "executionEnvironments": [{ "root": "priceService", "extraPaths": ["priceService/tests"] }]
+}

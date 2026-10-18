@@ -99,9 +99,9 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
 
 1. **The pre-commit hooks**, from the repo root after `npm ci` in `main/` and `renderer/`:
    `pre-commit run --all-files`. They check whitespace, end of file, YAML, files over 2 MB and `versionCheck.py`,
-   then run ESLint with `--fix`, Prettier with `--write` and `tsc --noemit` on `main/` and `renderer/`. The fixers
-   rewrite files, so stage the result and run again until it passes. CI runs the same hooks. Never pass
-   `--no-verify` unless the user asks.
+   then run ESLint with `--fix`, Prettier with `--write` and `tsc --noemit` on `main/` and `renderer/`, and Ruff and
+   strict Pyright on `priceService/`. The fixers rewrite files, so stage the result and run again until it passes. CI
+   runs the same hooks. Never pass `--no-verify` unless the user asks.
 2. **The renderer**, in `renderer/`: `npm ci`, `npm run make-index-files`, `npm run lint`, `npx vitest run`,
    `npm run build`. The index files must exist before the tests, `npm run dev` or a build, and must be written again
    after any data change. `npm test` starts Vitest in watch mode in an interactive terminal, so use `npx vitest run`.
@@ -123,8 +123,8 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    so a longer one is split by subject.
 7. **Types and quality.** TypeScript is `strict` in both processes. New code adds no `any`, no `as unknown as` cast
    and no `@ts-ignore`, `@ts-expect-error` or `eslint-disable` without its reason on the same line. Errors are
-   handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, no `eval` and no
-   blanket `noqa`.
+   handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, raises typed
+   exceptions, never uses a bare `except` or `eval`, and names the rule and its reason in every `noqa`.
 8. **Documentation is part of done.** A change users can see updates its page in `docs/` (features, widgets, price
    check, FAQ). A change to a module's contract updates its doc in `docs/dev/modules/`, a change to a procedure
    updates its runbook in `docs/dev/runbooks/` or DEVELOPING.md, and work deliberately left for later gets a task

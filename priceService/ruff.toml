@@ -1,0 +1,19 @@
+# Lint and format settings for priceService/. Each ignored rule has its reason.
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = ["ALL"]
+ignore = [
+  "D",      # docstring layout: the docstring rule in AGENTS.md applies instead
+  "COM812", # conflicts with the Ruff formatter
+  "ISC001", # conflicts with the Ruff formatter
+  "CPY001", # the license is in LICENSE, not in a header in each file
+  "PT",     # the tests use unittest from the standard library, not pytest
+]
+
+[lint.per-file-ignores]
+"tests/**" = [
+  "INP001",  # `unittest discover -s tests` imports the test files as top-level modules
+  "PLR2004", # a test compares results with literal values
+]

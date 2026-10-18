@@ -1,8 +1,11 @@
 import json
 import unittest
 
+from support import FIXTURES, NAMESPACE_MAP, fixture
+
 from price_service.transform import (
     EMPTY_SPARKLINE,
+    Json,
     SnapshotError,
     exchange_core,
     exchange_lines,
@@ -11,7 +14,6 @@ from price_service.transform import (
     price_file,
     stash_lines,
 )
-from support import FIXTURES, NAMESPACE_MAP, fixture
 
 
 class LoadCategoriesTest(unittest.TestCase):
@@ -49,7 +51,16 @@ class ExchangeTest(unittest.TestCase):
         self.assertEqual([line["name"] for line in lines], ["Orb of Alchemy", "Exalted Orb", "Chaos Orb"])
         self.assertEqual(
             list(lines[0]),
-            ["name", "primaryValue", "detailsId", "id", "volumePrimaryValue", "maxVolumeCurrency", "maxVolumeRate", "sparkline"],
+            [
+                "name",
+                "primaryValue",
+                "detailsId",
+                "id",
+                "volumePrimaryValue",
+                "maxVolumeCurrency",
+                "maxVolumeRate",
+                "sparkline",
+            ],
         )
         self.assertEqual(lines[1]["detailsId"], "exalted-orb")
 
@@ -73,11 +84,12 @@ class ExchangeTest(unittest.TestCase):
         self.assertEqual(core["primary"], "divine")
 
     def test_core_requires_rates_and_currencies(self) -> None:
-        for response in (
+        responses: list[Json] = [
             {},
             {"core": {"rates": {}, "primary": None, "secondary": "chaos"}},
             {"core": {"rates": {"chaos": 3}, "primary": "exalted", "secondary": "chaos"}},
-        ):
+        ]
+        for response in responses:
             with self.assertRaises(SnapshotError):
                 exchange_core(response)
 
@@ -89,23 +101,34 @@ class DivineConversionTest(unittest.TestCase):
     def test_core_in_exalted_becomes_rates_per_divine(self) -> None:
         self.assertEqual(
             exchange_core(self.response),
-            {"rates": {"chaos": 39.99759990399616, "exalted": 120.00480019200768}, "primary": "divine", "secondary": "exalted"},
+            {
+                "rates": {"chaos": 39.99759990399616, "exalted": 120.00480019200768},
+                "primary": "divine",
+                "secondary": "exalted",
+            },
         )
 
     def test_exchange_values_in_exalted_become_divines(self) -> None:
-        values = {line["name"]: (line["primaryValue"], line["volumePrimaryValue"]) for line in exchange_lines(self.response)}
+        values = {
+            line["name"]: (line["primaryValue"], line["volumePrimaryValue"]) for line in exchange_lines(self.response)
+        }
         self.assertEqual(values["Exalted Orb"], (0.008333, 0.16666))
         self.assertEqual(values["Chaos Orb"], (0.024999, 0.0124995))
         self.assertEqual(values["Orb of Alchemy"], (0.04049838, 0.6958055))
 
     def test_stash_values_follow_their_own_core(self) -> None:
-        response = {"core": {"rates": {"divine": 0.5}, "primary": "chaos"}, "lines": [{"name": "Rune", "primaryValue": 4}]}
+        response: Json = {
+            "core": {"rates": {"divine": 0.5}, "primary": "chaos"},
+            "lines": [{"name": "Rune", "primaryValue": 4}],
+        }
         self.assertEqual(stash_lines(response)[0]["primaryValue"], 2.0)
 
     def test_drops_lines_it_cannot_convert(self) -> None:
         self.response["core"]["rates"].pop("divine")
         self.assertEqual(exchange_lines(self.response), [])
-        self.assertEqual(stash_lines({"core": {"primary": "chaos", "rates": {}}, "lines": [{"name": "Rune", "primaryValue": 4}]}), [])
+        self.assertEqual(
+            stash_lines({"core": {"primary": "chaos", "rates": {}}, "lines": [{"name": "Rune", "primaryValue": 4}]}), []
+        )
 
 
 class StashTest(unittest.TestCase):
@@ -124,9 +147,14 @@ class StashTest(unittest.TestCase):
             self.assertEqual(stash_lines({"core": {"primary": "divine"}, "lines": None}), [])
 
     def test_omits_a_missing_variant_and_fills_a_missing_sparkline(self) -> None:
-        response = {"core": {"primary": "divine"}, "lines": [{"name": "Rune", "primaryValue": 2, "detailsId": "rune"}]}
+        response: Json = {
+            "core": {"primary": "divine"},
+            "lines": [{"name": "Rune", "primaryValue": 2, "detailsId": "rune"}],
+        }
         lines = stash_lines(response)
-        self.assertEqual(lines, [{"name": "Rune", "primaryValue": 2, "detailsId": "rune", "sparkline": EMPTY_SPARKLINE}])
+        self.assertEqual(
+            lines, [{"name": "Rune", "primaryValue": 2, "detailsId": "rune", "sparkline": EMPTY_SPARKLINE}]
+        )
 
 
 class PriceFileTest(unittest.TestCase):
