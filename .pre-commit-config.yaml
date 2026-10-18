@@ -61,12 +61,12 @@ repos:
     hooks:
     -   id: ruff-check
         args: [--fix]
-        files: ^priceService/
+        files: ^(priceService|scripts)/
     -   id: ruff-format
-        files: ^priceService/
+        files: ^(priceService|scripts)/
 -   repo: https://github.com/RobertCraigie/pyright-python
     rev: v1.1.414
     hooks:
     -   id: pyright
-        files: ^(priceService/|pyrightconfig\.json$)
+        files: ^(priceService/|scripts/|pyrightconfig\.json$)
         pass_filenames: false

@@ -1,0 +1,11 @@
+# The settings in priceService/ruff.toml, plus the exceptions these command line tools need.
+extend = "../priceService/ruff.toml"
+
+[lint.extend-per-file-ignores]
+"*.py" = [
+  "T201", # a command line tool reports with print
+]
+"tests/**" = [
+  "INP001",  # `unittest discover -s tests` imports the test files as top-level modules
+  "PLR2004", # a test compares results with literal values
+]

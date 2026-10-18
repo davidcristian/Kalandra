@@ -94,25 +94,22 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 
 ## What every change must pass
 
-CI uses Node 24. No single command runs everything: run each step a change can affect, and all of them for a change
-to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
+`python scripts/check.py` runs every step below but the data tool's, in order, and names each one that failed. Run
+it before calling a change done, after `npm ci` in `renderer/`, `main/` and `docs/`.
+[DEVELOPING.md](DEVELOPING.md#checks) gives each step's own command, for running one part alone. CI runs the same
+steps on Node 24.
 
-1. **The pre-commit hooks**, from the repo root after `npm ci` in `main/` and `renderer/`:
-   `pre-commit run --all-files`. They check whitespace, end of file, YAML, files over 2 MB and `versionCheck.py`,
-   then run ESLint with `--fix`, Prettier with `--write` and `tsc --noemit` on `main/` and `renderer/`, and Ruff and
-   strict Pyright on `priceService/`. The fixers rewrite files, so stage the result and run again until it passes. CI
-   runs the same hooks. Never pass `--no-verify` unless the user asks.
-2. **The renderer**, in `renderer/`: `npm ci`, `npm run make-index-files`, `npm run lint`, `npx vitest run`,
-   `npm run build`. The index files must exist before the tests, `npm run dev` or a build, and must be written again
-   after any data change. `npm test` starts Vitest in watch mode in an interactive terminal, so use `npx vitest run`.
-3. **The main process**, in `main/`: `npm ci`, `npm test` (Vitest), `npm run build` (`tsc --noEmit`, then the esbuild
-   bundle). CI packages it on Windows, Linux and macOS, so platform-specific code needs a `process.platform` check.
-4. **The data tool**, only when `dataParser/` changes: `python -m pytest` in `dataParser/`, plus Ruff, Bandit and the
-   other hooks in `dataParser/.pre-commit-config.yaml`.
-   **The price service**, when `priceService/`, `namespaceMap.json`, `Prices.ts` or `price-source.ts` changes:
-   `python -m unittest discover -s tests` in `priceService/`, which CI also runs.
-   **The docs site**, when `docs/` outside `docs/dev/` changes: `npm ci` and `npm run build` in `docs/`, which
-   fails on a dead link or a missing image. CI also runs it.
+1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, end of file, YAML, files over 2 MB and
+   `versionCheck.py`, then run ESLint with `--fix`, Prettier with `--write` and `tsc --noemit` on `main/` and
+   `renderer/`, and Ruff and strict Pyright on `priceService/` and `scripts/`. The fixers rewrite files, so stage the
+   result and run again until it passes. Never pass `--no-verify` unless the user asks.
+2. **The renderer**: lint, Vitest and the build, after `npm run make-index-files` writes the index files they need.
+   Write them again after any data change.
+3. **The main process**: Vitest and the build. CI packages it on Windows, Linux and macOS, so platform-specific code
+   needs a `process.platform` check.
+4. **The price service, the scripts and the docs site**: both unit test suites, and the site build, which fails on a
+   dead link or a missing image. **The data tool** is outside `check.py`: when `dataParser/` changes, run
+   `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml` there.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. There is no coverage threshold, but a change must not lower

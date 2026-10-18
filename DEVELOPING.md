@@ -69,11 +69,30 @@ options.
 
 ## Checks
 
-The checks a change must pass, and which one applies to which part, are in
-[AGENTS.md, What every change must pass](AGENTS.md#what-every-change-must-pass).
+`python scripts/check.py` runs every check in
+[AGENTS.md, What every change must pass](AGENTS.md#what-every-change-must-pass) that it can, one
+after another, and ends with the names of the steps that failed. `python scripts/check.py --list`
+prints the steps and runs none. Run `npm ci` in `renderer/`, `main/` and `docs/` first. To run one
+part alone:
+
+| Part | Commands |
+| --- | --- |
+| Pre-commit hooks | `pre-commit run --all-files` in the repo root |
+| Renderer | `npm run make-index-files`, `npm run lint`, `npx vitest run` and `npm run build` in `renderer/` |
+| Main process | `npm test` and `npm run build` in `main/` |
+| Price service | `python -m unittest discover -s tests` in `priceService/` |
+| Scripts | `python -m unittest discover -s tests` in `scripts/` |
+| Docs site | `npm run build` in `docs/` |
+| Data tool | `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml`, in `dataParser/` |
+
+- `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use `npx vitest run` there.
+- `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle.
+- `check.py` leaves out the data tool, whose tests need files the repo does not have
+  ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
+
 [docs/dev/architecture.md](docs/dev/architecture.md#ci) lists what each CI workflow runs and on
-which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pull request, so run
-both yourself before opening one. Behavior inside the game is checked by hand on Windows,
+which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pull request, and
+`check.py` does, so run it before opening one. Behavior inside the game is checked by hand on Windows,
 following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
 
 `npm run format` in `main/` or `renderer/` runs Prettier alone, which the pre-commit hooks also run.
