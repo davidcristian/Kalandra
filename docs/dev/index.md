@@ -26,6 +26,7 @@ the rules for writing, numbering and editing one, including the row each new rec
 | [ADR-0006: Prices come from Kalandra's own price service](adr/ADR-0006-own-price-service.md) | `priceService/` builds one price file per league each hour, in divines, at `kalandra.ashoal.com/prices/`; the app never calls poe.ninja; the file's key order is a format with one shared fixture. |
 | [ADR-0007: Game text comes from generated game data](adr/ADR-0007-game-text-from-game-data.md) | The parser matches item text through `CLIENT_STRINGS` and `stats.ndjson`, never English literals; `dataParser` output is regenerated, never edited; the `*.index.bin` files are built, not committed. |
 | [ADR-0008: Developer docs live in docs/dev/ and are left out of the user site](adr/ADR-0008-developer-docs-layout.md) | `docs/dev/` is left out of the site by `srcExclude`, a user page links a developer doc by its GitHub URL, a user page has a frontmatter title and a developer doc an H1, 250 lines per file, one file per backlog task, and no readings directory. |
+| [ADR-0009: The local server answers only its own page](adr/ADR-0009-local-server-answers-its-own-page.md) | Every HTTP route listens on `httpRoutes` behind one check: `Host` is `localhost` or an IP address, `Origin` matches `Host` (required on a WebSocket), and a file route answers only inside its folder. |
 
 ## Contracts
 

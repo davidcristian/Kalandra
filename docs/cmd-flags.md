@@ -40,9 +40,11 @@ the default address. Write an IPv6 host in brackets, such as `--listen=[::1]:900
   blocks connections to `127.0.0.1`.
 - `--listen=0.0.0.0:9001` does both.
 
-A host other than the loopback address lets other devices on your network open Kalandra's page at this computer's
-network address and the port. The overlay always opens the page at `localhost`, so use `0.0.0.0`, which includes the
-loopback address. With a single network address as the host, the overlay cannot load its page.
+A host other than the loopback address lets other devices on your network open Kalandra's page at this computer's IP
+address and the port, such as `http://192.168.1.20:9001`. Kalandra refuses a request that names this computer by a
+host name, such as `computer.local`, because a web page can make a name like that point at this computer. The overlay
+always opens the page at `localhost`, so use `0.0.0.0`, which includes the loopback address. With a single network
+address as the host, the overlay cannot load its page.
 
 **The server has no password.** When it listens on any address other than the loopback address, any device that
 reaches it can read and change your Kalandra settings. It can also send requests to the trade site with the sign-in of

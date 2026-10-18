@@ -2,19 +2,19 @@ import path from "path";
 import crypto from "crypto";
 import fs from "fs";
 import { app } from "electron";
-import type { Server } from "http";
+import type { HttpRoutes } from "../server";
 import { sendFile } from "../served-file";
 
-export function addFileUploadRoutes(server: Server) {
+export function addFileUploadRoutes(routes: HttpRoutes) {
   const uploadsPath = path.join(app.getPath("userData"), "apt-data", "files");
 
-  server.addListener("request", (req, res) => {
+  routes.addListener("request", (req, res) => {
     if (req.method !== "GET" || !req.url?.startsWith("/uploads/")) return;
 
     sendFile(res, uploadsPath, req.url.slice("/uploads/".length));
   });
 
-  server.addListener("request", (req, res) => {
+  routes.addListener("request", (req, res) => {
     if (req.method !== "POST" || !req.url?.startsWith("/uploads/")) return;
 
     let contents = Buffer.alloc(0);

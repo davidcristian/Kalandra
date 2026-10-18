@@ -1,4 +1,5 @@
 import * as http from "http";
+import WebSocket from "ws";
 
 export interface Reply {
   status: number;
@@ -27,5 +28,29 @@ export async function get(
     );
     req.on("error", reject);
     req.end();
+  });
+}
+
+// Resolves 101 when the upgrade succeeds, or the status code the server answered instead
+export async function openSocket(
+  port: number,
+  headers: { host?: string; origin?: string },
+): Promise<number> {
+  return await new Promise((resolve) => {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
+      ...(headers.origin ? { origin: headers.origin } : {}),
+      headers: headers.host ? { host: headers.host } : {},
+    });
+    socket.on("open", () => {
+      socket.close();
+      resolve(101);
+    });
+    socket.on("unexpected-response", (req, res) => {
+      resolve(res.statusCode ?? 0);
+      req.destroy();
+    });
+    socket.on("error", () => {
+      resolve(0);
+    });
   });
 }

@@ -57,10 +57,11 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
   and network access to other hosts live in `main`. The renderer is a page that `main` serves over HTTP, without
   Node integration, and it never gets Node APIs.
 - **The boundary is [ipc/types.ts](ipc/types.ts).** The two processes talk only through `IpcEvent` messages on the
-  `/events` WebSocket and the `/config`, `/uploads` and `/proxy` HTTP routes that `main/src/server.ts` serves. An
-  event name states its direction (`CLIENT->MAIN::save-config`, `MAIN->CLIENT::item-text`). A new message starts as
-  a new member of the `IpcEvent` union, then gets its sender and its handler
-  ([ADR-0004](docs/dev/adr/ADR-0004-process-boundary.md)).
+  `/events` WebSocket and the `/config`, `/uploads` and `/proxy` HTTP routes of `main/src/server.ts`. A route listens
+  on `httpRoutes`, behind its Host and Origin check
+  ([ADR-0009](docs/dev/adr/ADR-0009-local-server-answers-its-own-page.md)). An event name states its direction
+  (`CLIENT->MAIN::save-config`). A new message starts as a new member of the `IpcEvent` union, then gets its sender
+  and its handler ([ADR-0004](docs/dev/adr/ADR-0004-process-boundary.md)).
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
   `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a deliberate change to that
   list. The official trade site rate limits and bans clients that exceed its limits, so every search, fetch and
@@ -133,8 +134,7 @@ to shared code (`ipc/`, `Config.ts`, the parser) before calling it done.
    focus, clipboard capture and OCR inside the game need the maintainer on Windows. Check everything else yourself:
    parser cases with real item text, unit tests and both builds. In the summary, name each in-game behavior left to
    check and mark it unverified. [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md) says how
-   to check each one, and [docs/dev/host/](docs/dev/host/index.md) lists every host check, with its status in its
-   own file.
+   to check each one, and [docs/dev/host/](docs/dev/host/index.md) lists every host check.
 
 ## Prose
 

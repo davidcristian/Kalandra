@@ -1,4 +1,4 @@
-import type { Server } from "http";
+import type { HttpRoutes } from "./server";
 import { app, net, session } from "electron";
 import type { Logger } from "./RemoteLogger";
 
@@ -19,8 +19,8 @@ const PROXY_HOSTS = [
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class HttpProxy {
-  constructor(server: Server, logger: Logger) {
-    server.addListener("request", (req, res) => {
+  constructor(routes: HttpRoutes, logger: Logger) {
+    routes.addListener("request", (req, res) => {
       if (!req.url?.startsWith("/proxy/")) return;
       const host = req.url.split("/", 3)[2];
 

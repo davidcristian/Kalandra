@@ -19,13 +19,18 @@ The entry, the server and the app services, in `main/src/`:
   and 0 elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that
   uses it. It then starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue
   Devtools.
-- `server.ts` exports `server` (the `http.Server`), `startServer(appUpdater, logger)`, which adds the `/config`
-  route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the `ServerEvents`
-  pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles messages
-  takes `ServerEvents` in its constructor rather than importing `server.ts`; `HttpProxy` takes the `http.Server`.
+- `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds
+  the `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
+  `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
+  messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
+  `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
+  answers 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
   client. A new client receives the log history. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
+- `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
+  address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
+  leave it out ([ADR-0009](../adr/ADR-0009-local-server-answers-its-own-page.md)).
 - `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
   brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
   defaults and an `error` text, which `startServer()` writes to the log.
@@ -162,10 +167,11 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it too.
-`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check, and `server.test.ts`
-starts the server and sends `..` paths to the static and uploads routes. A test of a module that imports Electron
-replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production
-bundle, and `npm run lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay
-focus, clipboard capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how
-to check them, [host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it
-still has to run.
+`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check and
+`request-origin.test.ts` the header check. `server.test.ts` starts the server and sends `..` paths, foreign origins
+and host names to the HTTP routes and to `/events`. A test of a module that imports Electron replaces it with
+`vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run
+lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
+capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,
+[host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it still has to
+run.

@@ -1,6 +1,6 @@
 # The /events WebSocket accepts a connection from any origin
 
-**Status:** open
+**Status:** done 2026-10-18
 **Area:** main
 **Origin:** [main/src/server.ts](../../../../main/src/server.ts)
 **Verified:** 2026-10-18
@@ -33,3 +33,8 @@ decides them too or files a task for them.
   `connection` handlers. A copy of the `upgrade` handler in a scratch Node 24 script with `ws`
   8.18.0 accepted an upgrade sent with `Origin: https://evil.example`. Not tried against a running
   app or a browser.
+- 2026-10-18: Closed, the HTTP routes included. `isAllowedRequest()` in
+  `main/src/request-origin.ts` accepts a `Host` that is `localhost` or an IP address and an
+  `Origin` that matches it, required on a WebSocket. Every route now listens on `httpRoutes`
+  behind that check ([ADR-0009](../../adr/ADR-0009-local-server-answers-its-own-page.md)).
+  `main/specs/server.test.ts` sends foreign origins and host names to the real server.

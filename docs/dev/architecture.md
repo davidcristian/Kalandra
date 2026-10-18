@@ -71,11 +71,13 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 
 `main/src/server.ts` runs one Node.js HTTP server. It listens on `127.0.0.1` on a port the operating system picks,
 and `--listen=[host][:port]` sets either part. In development, main listens on port 8584, and Vite's dev server on
-`localhost:5173` forwards these routes to it (`server.proxy` in `renderer/vite.config.mts`).
+`localhost:5173` forwards these routes to it (`server.proxy` in `renderer/vite.config.mts`). Every request passes
+one check first: its `Host` must be `localhost` or an IP address, and its `Origin`, which a WebSocket must send, must
+match `Host`. A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-answers-its-own-page.md)).
 
 | Route | What it does | Renderer side |
 | --- | --- | --- |
-| `/events` | A WebSocket that sends every `IpcEvent` as JSON text, in both directions. An upgrade request for any other path is destroyed. | `Host` in `renderer/src/web/background/IPC.ts` |
+| `/events` | A WebSocket that sends every `IpcEvent` as JSON text, in both directions. An upgrade request for any other path is destroyed, and one that fails the check gets 403. | `Host` in `renderer/src/web/background/IPC.ts` |
 | `GET /config` | Returns `HostState`: the app version, the updater state and the text of `config.json`, or `null` when there is none. | `Host.getConfig()` |
 | `/uploads/<name>` | `POST` stores the request body, at most 16,000,000 bytes, in `apt-data/files/` under its MD5 hash and extension, and returns `{ name }`. `GET` returns a stored file, or 404 for a missing file or a path outside the folder. The image strip widget stores imported images this way. | `Host.importFile()` |
 | `/proxy/<host>/<path>` | Forwards the request to `https://<host>/<path>` when `<host>` is in `PROXY_HOSTS` in `main/src/proxy.ts`, and destroys it otherwise. | `Host.proxy()` |

@@ -1,6 +1,6 @@
 import { WebSocketServer, type WebSocket } from "ws";
 import { type AddressInfo } from "net";
-import { createServer } from "http";
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { EventEmitter } from "events";
 import * as path from "path";
 import { app } from "electron";
@@ -9,17 +9,33 @@ import { ConfigStore } from "./host-files/ConfigStore";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { readListenOption } from "./listen-option";
 import { sendFile } from "./served-file";
+import { isAllowedRequest } from "./request-origin";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
 
-export const server = createServer();
+interface HttpRouteEvents {
+  request: [IncomingMessage, ServerResponse];
+}
+export type HttpRoutes = EventEmitter<HttpRouteEvents>;
+
+// Every route listens here, so no route runs for a request the check refuses
+export const httpRoutes: HttpRoutes = new EventEmitter<HttpRouteEvents>();
+
+export const server = createServer((req, res) => {
+  if (!isAllowedRequest(req.headers, false)) {
+    res.statusCode = 403;
+    res.end();
+    return;
+  }
+  httpRoutes.emit("request", req, res);
+});
 const websocketServer = new WebSocketServer({ noServer: true });
 let lastActiveClient: WebSocket;
 
-addFileUploadRoutes(server);
+addFileUploadRoutes(httpRoutes);
 
 if (!process.env.VITE_DEV_SERVER_URL) {
-  server.addListener("request", (req, res) => {
+  httpRoutes.addListener("request", (req, res) => {
     if (
       req.url?.startsWith("/config") ||
       req.url?.startsWith("/uploads") ||
@@ -83,6 +99,10 @@ server.on("upgrade", (req, socket, head) => {
   if (req.url !== "/events") {
     return req.destroy();
   }
+  if (!isAllowedRequest(req.headers, true)) {
+    socket.end("HTTP/1.1 403 Forbidden\r\n\r\n");
+    return;
+  }
   websocketServer.handleUpgrade(req, socket, head, (ws) => {
     websocketServer.emit("connection", ws, req);
   });
@@ -117,7 +137,7 @@ export async function startServer(
     });
   });
 
-  server.addListener("request", async (req, res) => {
+  httpRoutes.addListener("request", async (req, res) => {
     if (req.url === "/config") {
       res.setHeader("content-type", "application/json");
       const resBody: HostState = {

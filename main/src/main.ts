@@ -3,7 +3,7 @@
 import { app, systemPreferences } from "electron";
 import { uIOhook } from "uiohook-napi";
 import os from "node:os";
-import { startServer, eventPipe, server } from "./server";
+import { startServer, eventPipe, httpRoutes } from "./server";
 import { Logger } from "./RemoteLogger";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
@@ -69,7 +69,7 @@ let tray: AppTray;
     const poeWindow = new GameWindow();
     const appUpdater = new AppUpdater(eventPipe);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _httpProxy = new HttpProxy(server, logger);
+    const _httpProxy = new HttpProxy(httpRoutes, logger);
     const fileWriter = new FileWriter(eventPipe, logger);
     const gameLogWatcher = new GameLogWatcher(eventPipe, logger, fileWriter);
 

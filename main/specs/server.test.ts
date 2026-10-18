@@ -4,7 +4,7 @@ import type { AddressInfo } from "net";
 import { app } from "electron";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { server } from "../src/server";
-import { get } from "./request";
+import { get, openSocket } from "./request";
 
 vi.mock("electron", async () => {
   const fs = await import("node:fs");
@@ -62,5 +62,49 @@ describe("the static file route", () => {
     const reply = await get(port, "/../package.json");
     expect(reply.status).toBe(404);
     expect(reply.body).not.toContain("kalandra");
+  });
+});
+
+describe("the request check", () => {
+  it("answers 403 to a request for a host name", async () => {
+    const reply = await get(port, "/uploads/image.png", {
+      host: `evil.example:${port}`,
+    });
+    expect(reply.status).toBe(403);
+  });
+
+  it("answers 403 to a request from another origin", async () => {
+    const reply = await get(port, "/uploads/image.png", {
+      origin: "http://evil.example",
+    });
+    expect(reply.status).toBe(403);
+  });
+
+  it("serves a request from the page's own origin", async () => {
+    const reply = await get(port, "/uploads/image.png", {
+      host: `localhost:${port}`,
+      origin: `http://localhost:${port}`,
+    });
+    expect(reply.status).toBe(200);
+  });
+});
+
+describe("the /events WebSocket", () => {
+  it("accepts the page's own origin", async () => {
+    const status = await openSocket(port, {
+      host: `localhost:${port}`,
+      origin: `http://localhost:${port}`,
+    });
+    expect(status).toBe(101);
+  });
+
+  it("refuses another origin, no origin and a host name", async () => {
+    expect(await openSocket(port, { origin: "http://evil.example" })).toBe(403);
+    expect(await openSocket(port, {})).toBe(403);
+    const rebound = await openSocket(port, {
+      host: `evil.example:${port}`,
+      origin: `http://evil.example:${port}`,
+    });
+    expect(rebound).toBe(403);
   });
 });
