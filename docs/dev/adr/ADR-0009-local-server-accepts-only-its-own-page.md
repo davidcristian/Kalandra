@@ -1,4 +1,4 @@
-# ADR-0009: The local server answers only its own page
+# ADR-0009: The local server accepts requests only from its own page
 
 **Status:** Accepted (2026-10-18)
 
@@ -19,19 +19,19 @@ the browser treats the server as part of that site and sends the site's name in 
 
 **1. Every HTTP route is a listener on `httpRoutes`, never on the server.** `server` in `main/src/server.ts` passes
 a request to `httpRoutes` only after `isAllowedRequest()` in `main/src/request-origin.ts` accepts its headers, and
-answers 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. Reason: one check in front of
+returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. Reason: one check in front of
 every route, so a new route cannot be added without it.
 
 **2. The `Host` header must be `localhost` or an IP address.** Reason: a rebound host name always arrives as a
 name, while the overlay opens `http://localhost:<port>` and a device on the network opens the computer's IP address.
 
-**3. The `Origin` header must match `Host`, with the `http:` scheme.** A WebSocket upgrade without `Origin` is
-refused with 403; a plain HTTP request without it passes. Reason: a browser sends `Origin` with every WebSocket, but
+**3. The `Origin` header must match `Host`, with the `http:` scheme.** A WebSocket upgrade without `Origin` gets
+403; a plain HTTP request without it passes. Reason: a browser sends `Origin` with every WebSocket, but
 not with a navigation or an image, and the page's own `GET` requests need not send it. A request that does send a
 foreign origin comes from another site.
 
-**4. A file route answers only inside its folder.** `sendFile()` in `main/src/served-file.ts` serves the static
-files and `GET /uploads/`, and answers 404 for a missing file and for a path that `resolveInside()` finds outside
+**4. A file route serves only the files inside its folder.** `sendFile()` in `main/src/served-file.ts` serves the
+static files and `GET /uploads/`, and returns 404 for a missing file and for a path that `resolveInside()` finds outside
 the folder. Reason: Node passes `req.url` on as sent, so `..` segments from a program other than a browser reach
 the route.
 

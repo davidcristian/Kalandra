@@ -18,7 +18,7 @@ interface HttpRouteEvents {
 }
 export type HttpRoutes = EventEmitter<HttpRouteEvents>;
 
-// Every route listens here, so no route runs for a request the check refuses
+// Every route listens here, so no route runs for a request that fails the check
 export const httpRoutes: HttpRoutes = new EventEmitter<HttpRouteEvents>();
 
 export const server = createServer((req, res) => {

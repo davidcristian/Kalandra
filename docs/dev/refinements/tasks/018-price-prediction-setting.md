@@ -15,7 +15,7 @@ which nothing renders, and `www.poeprices.info` is still in `PROXY_HOSTS` in `ma
 
 This is a decision for the maintainer, with two outcomes:
 
-- Restore the component, after checking that poeprices answers for Path of Exile 2 items. The
+- Restore the component, after checking that poeprices returns prices for Path of Exile 2 items. The
   request goes to a live site, so it needs the maintainer's go-ahead
   ([AGENTS.md](../../../../AGENTS.md#safety)), and the user page then documents the setting.
 - Remove the checkbox, the `price-prediction/` folder, the import in `CheckedItem.vue` and the

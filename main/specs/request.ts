@@ -31,7 +31,7 @@ export async function get(
   });
 }
 
-// Resolves 101 when the upgrade succeeds, or the status code the server answered instead
+// Resolves 101 when the upgrade succeeds, or the status code the server returned instead
 export async function openSocket(
   port: number,
   headers: { host?: string; origin?: string },

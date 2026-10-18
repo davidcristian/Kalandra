@@ -47,7 +47,7 @@ run for that version replaces its files.
 
 ## The five version places
 
-`versionCheck.py` fails unless these agree. It prints `Version mismatch detected:` and the version
+`versionCheck.py` fails unless these have the same version. It prints `Version mismatch detected:` and the version
 it read from each place, or `Version check passed. All versions are consistent.`
 
 | File | What `versionCheck.py` reads |

@@ -95,7 +95,7 @@ ex:
     #% increased Attribute Requirements, negative better -> so it is in BETTER_LOOKUP
     #% increased Charges per Use      , negative better -> so it is in BETTER_LOOKUP
     #% reduced Charm Charges Used     , positive better -> so it is in FLIPPED_NEGATE
-                                    Trade site shows the negated version, and wants positive numbers
+                                    Trade site shows the negated version, and takes positive numbers
 """
 TRADE_INVERTED: set[int] = {
     FLASK_CHARGES_USED,

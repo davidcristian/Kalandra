@@ -20,7 +20,7 @@ them:
   form for a fork can offer the parent repo as the base.
 - [runbooks/price-service-deploy.md](../../runbooks/price-service-deploy.md): Cloudflare caches the
   JSON files only with a cache rule; `cf-cache-status` reads `HIT`, `MISS` or `DYNAMIC`; Cloudflare
-  answers `502` or `530` when its tunnel or the `web` container is down; Docker shows a container's
+  returns `502` or `530` when its tunnel or the `web` container is down; Docker shows a container's
   health as `starting`, then `healthy`, and as `unhealthy` after three failed checks.
 
 The maintainer can check each one the next time its step runs: the first release, the next docs

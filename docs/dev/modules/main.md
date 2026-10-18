@@ -24,13 +24,13 @@ The entry, the server and the app services, in `main/src/`:
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
-  answers 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
+  returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
   client. A new client receives the log history. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
   address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
-  leave it out ([ADR-0009](../adr/ADR-0009-local-server-answers-its-own-page.md)).
+  leave it out ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
 - `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
   brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
   defaults and an `error` text, which `startServer()` writes to the log.
@@ -115,7 +115,7 @@ The entry, the server and the app services, in `main/src/`:
 - `file-uploads.ts`: `addFileUploadRoutes(server)` adds the `/uploads/` routes, which store files in
   `apt-data/files/`.
 - `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
-  answers 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
+  returns 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
   one with `..` segments, which Node passes on in `req.url` as sent.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:

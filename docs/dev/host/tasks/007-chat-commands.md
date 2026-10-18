@@ -5,8 +5,8 @@
 **Origin:** [docs/chat-commands.md](../../../chat-commands.md)
 **Verified:** 2026-10-18
 
-**Claims.** `typeInChat` in `main/src/shortcuts/text-box.ts` only presses keys and pastes text. The
-game decides what happens. [docs/chat-commands.md](../../../chat-commands.md),
+**Claims.** `typeInChat` in `main/src/shortcuts/text-box.ts` only presses keys and pastes text. What
+happens next is the game's behavior. [docs/chat-commands.md](../../../chat-commands.md),
 [docs/quick-start.md](../../../quick-start.md) and [modules/main.md](../../modules/main.md) say:
 
 - F5 sends `/hideout`, which takes the character to the hideout, and F9 sends `/exit`, which goes

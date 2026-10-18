@@ -73,7 +73,7 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 and `--listen=[host][:port]` sets either part. In development, main listens on port 8584, and Vite's dev server on
 `localhost:5173` forwards these routes to it (`server.proxy` in `renderer/vite.config.mts`). Every request passes
 one check first: its `Host` must be `localhost` or an IP address, and its `Origin`, which a WebSocket must send, must
-match `Host`. A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-answers-its-own-page.md)).
+match `Host`. A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
 
 | Route | What it does | Renderer side |
 | --- | --- | --- |
@@ -212,6 +212,6 @@ dataParser/        the Python game data generator, run by hand; output/ holds it
 priceService/      the Python price file service, deployed outside the app
 docs/              the VitePress user site; dev/ holds the developer docs, left out of the site
 .github/           test.yml, main.yml, pages.yml, the issue templates and FUNDING.yml
-versionCheck.py    fails unless the version agrees in the five files AGENTS.md names
+versionCheck.py    fails unless the five files AGENTS.md names have the same version
 testUpdate.sh      builds the renderer and main and packages the app on the local machine
 ```

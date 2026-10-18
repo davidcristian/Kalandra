@@ -71,7 +71,7 @@ A check is not a design, so it has more outcomes than a refinement:
 
 ## Tasks
 
-- 001: [A price check in the game agrees with the price files at kalandra.ashoal.com](tasks/001-price-check-against-price-service.md)
+- 001: [A price check in the game matches the price files at kalandra.ashoal.com](tasks/001-price-check-against-price-service.md)
 - 002: [The overlay attaches to the game window in each display mode](tasks/002-overlay-attaches-to-game.md)
 - 003: [The overlay key, focus and hiding behave as the pages say](tasks/003-overlay-key-and-focus.md)
 - 004: [The game copies item text with the advanced item descriptions key](tasks/004-copy-with-advanced-descriptions.md)

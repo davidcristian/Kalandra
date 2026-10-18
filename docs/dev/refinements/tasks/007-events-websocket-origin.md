@@ -21,7 +21,7 @@ the log history. The events main sends to the last active client, such as
 Done looks like: the upgrade handler accepts only an `Origin` whose host and port match the
 request's `Host` header, which covers the overlay at `localhost` and a browser on another device
 with `--listen=0.0.0.0`. A match alone does not stop DNS rebinding, where a page's own host name
-resolves to `127.0.0.1` and its `Origin` and `Host` agree, so the handler also accepts only a
+resolves to `127.0.0.1` and its `Origin` and `Host` match, so the handler also accepts only a
 `Host` that is `localhost` or an IP address. A test covers an accepted and a rejected origin.
 `main/` has no test runner yet, and [008](008-listen-option-without-value.md) decides where its
 tests run. The HTTP routes (`/config`, `/uploads`, `/proxy`) have the same question, and this task
@@ -36,5 +36,5 @@ decides them too or files a task for them.
 - 2026-10-18: Closed, the HTTP routes included. `isAllowedRequest()` in
   `main/src/request-origin.ts` accepts a `Host` that is `localhost` or an IP address and an
   `Origin` that matches it, required on a WebSocket. Every route now listens on `httpRoutes`
-  behind that check ([ADR-0009](../../adr/ADR-0009-local-server-answers-its-own-page.md)).
+  behind that check ([ADR-0009](../../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
   `main/specs/server.test.ts` sends foreign origins and host names to the real server.

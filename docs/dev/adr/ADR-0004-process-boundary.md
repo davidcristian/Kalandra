@@ -1,4 +1,4 @@
-# ADR-0004: The main process owns the operating system and the renderer is a web page
+# ADR-0004: Only the main process reaches the operating system, and the renderer is a web page
 
 **Status:** Accepted (2026-10-18)
 
@@ -11,12 +11,12 @@ responses. The layout below comes from Awakened PoE Trade.
 
 ## Decision
 
-**1. `main` owns the operating system.** It holds the global hotkeys (Electron's `globalShortcut`) and the key presses
-and input events (`uiohook-napi`), both in `main/src/shortcuts/`, the overlay window (`electron-overlay-window`,
-`main/src/windowing/`), the clipboard (`main/src/shortcuts/HostClipboard.ts`), the files in `apt-data`, the game
-config and the client log (`main/src/host-files/`), network access to other hosts (`main/src/proxy.ts`), auto update
-(`main/src/AppUpdater.ts`), the tray (`main/src/AppTray.ts`) and the OCR worker (`main/src/vision/`). Reason: decision
-2 keeps Node.js and Electron APIs out of the page, so the main process is the only place that can reach the operating
+**1. Only `main` reaches the operating system.** It holds the global hotkeys (Electron's `globalShortcut`) and the key
+presses and input events (`uiohook-napi`), both in `main/src/shortcuts/`, the overlay window (`electron-overlay-window`,
+`main/src/windowing/`), the clipboard (`main/src/shortcuts/HostClipboard.ts`), the files in `apt-data`, the game config
+and the client log (`main/src/host-files/`), network access to other hosts (`main/src/proxy.ts`), auto update
+(`main/src/AppUpdater.ts`), the tray (`main/src/AppTray.ts`) and the OCR worker (`main/src/vision/`). Reason: decision 2
+keeps Node.js and Electron APIs out of the page, so the main process is the only place that can reach the operating
 system. Code that differs per platform checks `process.platform` there.
 
 **2. The renderer is a web page that `main` serves over HTTP.** The HTTP server in `main/src/server.ts` serves the

@@ -1,4 +1,4 @@
-# A price check in the game agrees with the price files at kalandra.ashoal.com
+# A price check in the game matches the price files at kalandra.ashoal.com
 
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows

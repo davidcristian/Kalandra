@@ -11,7 +11,7 @@ The error box is titled **Trade site request failed** and shows the line
 `Error: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`. It can appear on an item search and on a bulk
 search, such as a currency price check.
 
-JSON is the data format of the trade site's answers. The error means that the trade site sent a web page where
+JSON is the data format of the trade site's responses. The error means that the trade site sent a web page where
 Kalandra expected JSON: a web page starts with `<!DOCTYPE`, and its first character `<` is the unexpected token. The
 trade site sends a web page when it is down or under maintenance, or when it shows a bot check: a page that tells
 people from automated programs.

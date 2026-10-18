@@ -134,8 +134,8 @@ through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces
-`@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` answers the trade site's
-`data/stats` and `data/items` requests from `specs/data/stats.json` and `specs/data/items.json`, so no test
+`@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` returns the trade site's
+`data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no test
 reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
 and makes `fetch` read files from `renderer/public/`.
 A parser fix adds the copied item text as a case (AGENTS.md, rule 5).

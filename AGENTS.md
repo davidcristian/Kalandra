@@ -53,13 +53,13 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 
 ## Architecture rules
 
-- **`main` owns the operating system; `renderer` is web code.** Hotkeys, windows, the clipboard, files, game logs
-  and network access to other hosts live in `main`. The renderer is a page that `main` serves over HTTP, without
-  Node integration, and it never gets Node APIs.
+- **Only `main` reaches the operating system; `renderer` is web code.** Hotkeys, windows, the clipboard, files, game
+  logs and network access to other hosts live in `main`. The renderer is a page that `main` serves over HTTP,
+  without Node integration, and it never gets Node APIs.
 - **The boundary is [ipc/types.ts](ipc/types.ts).** The two processes talk only through `IpcEvent` messages on the
   `/events` WebSocket and the `/config`, `/uploads` and `/proxy` HTTP routes of `main/src/server.ts`. A route listens
   on `httpRoutes`, behind its Host and Origin check
-  ([ADR-0009](docs/dev/adr/ADR-0009-local-server-answers-its-own-page.md)). An event name states its direction
+  ([ADR-0009](docs/dev/adr/ADR-0009-local-server-accepts-only-its-own-page.md)). An event name states its direction
   (`CLIENT->MAIN::save-config`). A new message starts as a new member of the `IpcEvent` union, then gets its sender
   and its handler ([ADR-0004](docs/dev/adr/ADR-0004-process-boundary.md)).
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
@@ -89,8 +89,8 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
   translation service is connected to this project, so other languages get the string only when someone who speaks
   them adds it, and until then a missing key falls back to English. The product name is not translated.
 - **One version, five places.** `versionCheck.py` fails unless `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml`,
-  `docs/.vitepress/config.js`, `main/package.json` and `main/package-lock.json` agree. Releasing follows
-  [docs/dev/runbooks/release.md](docs/dev/runbooks/release.md) and is the maintainer's job.
+  `docs/.vitepress/config.js`, `main/package.json` and `main/package-lock.json` have the same version. Releasing
+  follows [docs/dev/runbooks/release.md](docs/dev/runbooks/release.md) and is the maintainer's job.
 
 ## What every change must pass
 
@@ -149,9 +149,9 @@ script checks these rules in this repo, so read your own diff for them.
   decisions. Cut the story of how the code got here, repeated explanations (link to the one place instead) and
   hedging.
 - **Plain words.** Short sentences, one idea each, with the literal verb: "checks", "fails", "returns", "stores",
-  "sends". Code does not know, want, refuse or decide anything, so say what it does. Define a technical term once,
-  where it first appears. No metaphors, idioms or invented terms. Game terms are exempt (a spell, the Delve grid), and
-  so is anything in backticks.
+  "sends". Code does not know, notice, want, refuse, decide, believe, agree, argue, answer, promise or own anything,
+  so say what it does. Define a technical term once, where it first appears. No metaphors, idioms, wordplay or
+  invented terms. Game terms are exempt (Spell Damage, the Delve grid), and so is anything in backticks.
 - **No dash as punctuation.** No em dash, en dash or spaced `--` in anything written here: restructure the sentence
   rather than swapping in another mark. Hyphenated words and CLI flags are fine. Text the app matches or parses from
   the game or a trade site keeps its characters exactly as written there, and so do fixtures copied from it.

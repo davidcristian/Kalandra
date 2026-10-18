@@ -41,14 +41,14 @@ describe("the uploads route", () => {
     });
   });
 
-  it("answers 404 for a path outside the uploads folder", async () => {
+  it("returns 404 for a path outside the uploads folder", async () => {
     expect(await get(port, "/uploads/../../secret.txt")).toEqual({
       status: 404,
       body: "",
     });
   });
 
-  it("answers 404 for a missing file", async () => {
+  it("returns 404 for a missing file", async () => {
     expect((await get(port, "/uploads/missing.png")).status).toBe(404);
   });
 });
@@ -58,7 +58,7 @@ describe("the static file route", () => {
     expect((await get(port, "/listen-option.ts")).status).toBe(200);
   });
 
-  it("answers 404 for a path outside that folder", async () => {
+  it("returns 404 for a path outside that folder", async () => {
     const reply = await get(port, "/../package.json");
     expect(reply.status).toBe(404);
     expect(reply.body).not.toContain("kalandra");
@@ -66,14 +66,14 @@ describe("the static file route", () => {
 });
 
 describe("the request check", () => {
-  it("answers 403 to a request for a host name", async () => {
+  it("returns 403 for a request to a host name", async () => {
     const reply = await get(port, "/uploads/image.png", {
       host: `evil.example:${port}`,
     });
     expect(reply.status).toBe(403);
   });
 
-  it("answers 403 to a request from another origin", async () => {
+  it("returns 403 for a request from another origin", async () => {
     const reply = await get(port, "/uploads/image.png", {
       origin: "http://evil.example",
     });
@@ -98,7 +98,7 @@ describe("the /events WebSocket", () => {
     expect(status).toBe(101);
   });
 
-  it("refuses another origin, no origin and a host name", async () => {
+  it("returns 403 for another origin, no origin and a host name", async () => {
     expect(await openSocket(port, { origin: "http://evil.example" })).toBe(403);
     expect(await openSocket(port, {})).toBe(403);
     const rebound = await openSocket(port, {
