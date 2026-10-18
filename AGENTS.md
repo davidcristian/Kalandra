@@ -14,9 +14,9 @@ Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-
 [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade). `origin` is `davidcristian/Kalandra`. One Electron
 app in three parts, plus a data tool and a docs site:
 
-- `main/`: the Electron main process (TypeScript, bundled by esbuild). Global hotkeys (`uiohook-napi`), the overlay
-  window over the game (`electron-overlay-window`), clipboard, the game config and client log files, the HTTP proxy
-  to the trade sites, auto update and the tray.
+- `main/`: the Electron main process (TypeScript, bundled by esbuild). Global hotkeys (Electron's `globalShortcut`),
+  key presses and input events (`uiohook-napi`), the overlay window over the game (`electron-overlay-window`),
+  clipboard, the game config and client log files, the HTTP proxy to the trade sites, auto update and the tray.
 - `renderer/`: the Vue 3, Vite and Tailwind UI shown in the overlay. `src/parser/` turns copied item text into a
   `ParsedItem`, `src/web/` holds the widgets, `src/web/price-check/trade/` builds trade queries and
   `src/assets/data/` loads the game data.
@@ -33,14 +33,15 @@ app in three parts, plus a data tool and a docs site:
 
 **A user's saved config must survive every update.** Users install new versions over old ones and keep
 `%APPDATA%\kalandra\apt-data\config.json`, which `main/src/host-files/ConfigStore.ts` stores and
-`renderer/src/web/Config.ts` defines. A change to the `Config` type or to a widget's config type
-(`renderer/src/web/overlay/widgets.ts`) does all of this in the same commit:
+`renderer/src/web/Config.ts` defines. A change to the `Config` type or to a widget's config type (in
+`renderer/src/web/overlay/widgets.ts` or the widget's own `widget.ts`) does all of this in the same commit:
 
 1. Add the field and its default to `defaultConfig()`.
 2. Increase `configVersion` in `defaultConfig()` by one, and append an `if (config.configVersion < N)` step to
    `upgradeConfig()` that sets the field on an existing config and ends with `config.configVersion = N`.
-3. Add the field to `defaultConfigMock` in `renderer/specs/vitest.setup.ts`, which the tests use in place of the
-   real config.
+3. Add a new top-level `Config` field to `defaultConfigMock` in `renderer/specs/vitest.setup.ts`, which the tests
+   use in place of the real config. Its `widgets` list holds only the price check widget, so add another widget there
+   only when a test reads its config.
 
 Never edit, reorder or delete an existing upgrade step: a user can skip any number of versions, and every step runs
 in order from theirs. A setting that `main` needs also goes through `getConfigForHost()` into `HostConfig`.
@@ -56,8 +57,8 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
   a new member of the `IpcEvent` union, then gets its sender and its handler.
 - **Other hosts are reached only through the proxy.** The renderer requests `/proxy/<host>/...`, and
   `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a deliberate change to that
-  list. The official trade site rate limits and bans clients that exceed its limits, so every trade request goes
-  through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`.
+  list. The official trade site rate limits and bans clients that exceed its limits, so every search, fetch and
+  exchange request goes through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`.
 - **Prices come from `priceService/`, never from poe.ninja directly.** poe.ninja asks apps to use their own backend,
   so `renderer/src/web/background/Prices.ts` reads `kalandra.ashoal.com/prices/<league>.json` and poe.ninja is not
   in `PROXY_HOSTS`. Both read the categories from `renderer/public/data/namespaceMap.json`. The app searches the
@@ -65,7 +66,8 @@ in order from theirs. A setting that `main` needs also goes through `getConfigFo
   test suites, and a format change updates the service, the app and that file in one commit.
 - **Widgets register in one place.** A widget is a Vue component with a static `widget: WidgetSpec`, added by one
   `registry.widgets.push` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
-  `renderer/src/web/overlay/widgets.ts`, and its defaults follow the hard rule above.
+  `renderer/src/web/overlay/widgets.ts` or in a `widget.ts` in its own folder, and its defaults follow the hard
+  rule above.
 - **Game text comes from the game data, never from string literals.** The app supports every language listed in
   `renderer/src/assets/make-index-files.mjs`. The parser matches item text through `CLIENT_STRINGS`, loaded from
   `client_strings.js`, and through the stat matchers in `stats.ndjson`, so matching new item text means a client
@@ -178,9 +180,9 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **Kalandra does not merge Exiled Exchange 2.** The `upstream` remote, where it exists, points at
   `Kvan7/Exiled-Exchange-2` and is only read. A fix from there comes in by cherry-pick, one commit at a time, with its
   original author kept.
-- **Agent work never goes there.** Its contribution policy allows AI help only as end of line completion and rejects
-  agent-written code. Never open an issue or PR against `Kvan7/Exiled-Exchange-2`; a PR an agent opens targets
-  `origin`.
+- **Agent work never goes there.** Its contribution policy allows AI help only as end of line completion and asks
+  contributors not to use agents. Never open an issue or PR against `Kvan7/Exiled-Exchange-2`; a PR an agent opens
+  targets `origin`.
 - **Credit stays.** Kalandra is under the AGPL v3 (`LICENSE`). The code inherited from Awakened PoE Trade and
   Exiled Exchange 2 is under the MIT License, whose notice must stay with it in `LICENSES/MIT.txt`; a fix
   cherry-picked from there is under the same notice. The README credits both projects, and the Patreon links to
@@ -189,8 +191,9 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 ## Safety
 
 - **Ask before anything outward-facing.** Pushing, opening a PR, tagging and releasing need the user's go-ahead. A
-  push to `master` runs the Build workflow, which packages the app on three platforms and uploads it to the draft
-  GitHub release for the current version if one exists. Never force-push a published branch.
+  push to `master` that changes a file outside `docs/` and the root `README.md` runs the Build workflow, which
+  packages the app on three platforms and uploads it to the draft GitHub release for the current version if one
+  exists. Never force-push a published branch.
 - **No secrets and no user files in the repo.** Never commit a `config.json`, a client log or anything from
   `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides.
 - **External input is untrusted.** Clipboard item text, client log lines and trade responses can be malformed or
@@ -198,7 +201,8 @@ inherited from Exiled Exchange 2 does not follow it, but every new commit does.
 - **Be polite to other services.** No loops or tests against the live trade site, poe.ninja or poeprices. A
   `dataParser` run that pulls trade data or downloads images is slow and network heavy, so ask first. Only
   `priceService/` calls poe.ninja's API: one request at a time, at most once an hour per category, with its
-  User-Agent. A live `python -m price_service --once` sends about 140 requests, so ask before running it.
+  User-Agent. A live `python -m price_service --once` sends up to 277 requests (139 on 18 Oct 2026), so ask before
+  running it.
 
 ## Working agreement
 
