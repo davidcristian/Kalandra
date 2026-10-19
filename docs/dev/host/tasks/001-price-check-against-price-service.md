@@ -21,7 +21,8 @@ contains `Ruthless`.
 
 1. In Settings, Price check, choose a league that
    `https://kalandra.ashoal.com/prices/index.json` lists under `leagues`.
-2. With Ctrl + D, price check a currency item, such as a Chaos Orb, and a unique
+2. With Ctrl + D, price check a currency item, such as a Chaos Orb, a unique, and a unique
+   flask, such as Olroth's Resolve
    ([section 4 of the runbook](../../runbooks/in-game-check.md#4-the-price-check-keys)).
 3. Open the league's file in a browser: the `file` next to the league's `id` in `index.json`. Find
    each item by `name`, and a unique also by `variant`.
@@ -48,3 +49,5 @@ whether Ctrl + Shift + I opens them in a packaged build. Settings, Debug shows
 
 - 2026-10-18: Filed when the user docs and the developer docs were written: the price service
   replaced poe.ninja as the app's price source, and no in-game check of it has run.
+- 2026-10-19: Added a unique flask to step 2. The price check finds a unique flask by its base
+  item, as it does every other unique.

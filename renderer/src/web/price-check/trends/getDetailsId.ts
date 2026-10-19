@@ -139,11 +139,9 @@ function forUniqueItem(item: ParsedItem) {
     name: item.info.refName,
     variant: variant([
       //   getUniqueVariant(item),
-      item.category === ItemCategory.Flask
-        ? null
-        : item.category === ItemCategory.SanctumRelic
-          ? "Relic"
-          : item.info.unique.base,
+      item.category === ItemCategory.SanctumRelic
+        ? "Relic"
+        : item.info.unique.base,
       //   item.gemSockets?.linked ? `${item.gemSockets.linked}L` : null,
     ]),
   };

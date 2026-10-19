@@ -52,7 +52,9 @@ One line of compact JSON, UTF-8 with non-ASCII names kept, with the keys in this
   `maxVolumeCurrency`, `maxVolumeRate` and `sparkline`. A line whose `id` has no named item in the response's
   `items`, or whose value is not a number, is left out.
 - A stash line (`stash_lines`) has `name`, `variant`, `primaryValue`, `detailsId` and `sparkline`. `variant` is
-  poe.ninja's `variant`, or its `baseType` when there is none, and is left out when neither is a string.
+  poe.ninja's `variant`, or its `baseType` when there is none, and is left out when neither is a string. The price
+  check finds a unique, flasks included, by its name and its base item as `variant` (`getDetailsId` in
+  `renderer/src/web/price-check/trends/getDetailsId.ts`).
 - An `items` or `lines` value that is not a list, such as `null`, is read as an empty list and logged as a warning.
 - A missing sparkline is written as `{"totalChange":0,"data":[]}`.
 
@@ -172,8 +174,8 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
 floor in `priceService/.coveragerc`, 86.4% of lines and branches on 18 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
-`pyrightconfig.json` at the repo root. The app side is
-`renderer/specs/web/prices.test.ts`, run by `npx vitest run` in `renderer/`.
+`pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
+`renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.
 
 **Dependencies.** The Python standard library and poe.ninja's PoE 2 economy API. The deployment uses Docker
 Compose, nginx and Cloudflare Tunnel ([price-service-deploy.md](../runbooks/price-service-deploy.md)).
