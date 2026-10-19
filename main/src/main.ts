@@ -16,6 +16,7 @@ import { GameLogWatcher } from "./host-files/GameLogWatcher";
 import { HttpProxy } from "./proxy";
 import { installExtension, VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import { FileWriter } from "./host-files/FileWriter";
+import { startWhenReady } from "./startup";
 
 if (!app.requestSingleInstanceLock()) {
   app.exit();
@@ -27,42 +28,36 @@ if (process.platform !== "darwin") {
 app.enableSandbox();
 let tray: AppTray;
 
-(async () => {
-  if (process.platform === "darwin") {
-    async function ensureAccessibilityPermission(): Promise<boolean> {
-      if (systemPreferences.isTrustedAccessibilityClient(false)) return true;
+async function ensureAccessibilityPermission(): Promise<boolean> {
+  if (systemPreferences.isTrustedAccessibilityClient(false)) return true;
 
-      // Trigger the system prompt
-      systemPreferences.isTrustedAccessibilityClient(true);
+  // Trigger the system prompt
+  systemPreferences.isTrustedAccessibilityClient(true);
 
-      const maxWaitTime = 15000; // 15 seconds
-      const startTime = Date.now();
+  const maxWaitTime = 15000; // 15 seconds
+  const startTime = Date.now();
 
-      return await new Promise((resolve) => {
-        const interval = setInterval(() => {
-          if (systemPreferences.isTrustedAccessibilityClient(false)) {
-            clearInterval(interval);
-            resolve(true);
-          }
+  return await new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (systemPreferences.isTrustedAccessibilityClient(false)) {
+        clearInterval(interval);
+        resolve(true);
+      }
 
-          // Stop waiting if time runs out
-          if (Date.now() - startTime > maxWaitTime) {
-            clearInterval(interval);
-            resolve(false);
-          }
-        }, 1000);
-      });
-    }
-    const hasPermission = await ensureAccessibilityPermission();
-    if (!hasPermission) {
-      console.warn("Accessibility permission not granted, exiting");
-      app.quit();
-      return;
-    }
-    console.log("Accessibility permission granted, starting app");
-  }
+      // Stop waiting if time runs out
+      if (Date.now() - startTime > maxWaitTime) {
+        clearInterval(interval);
+        resolve(false);
+      }
+    }, 1000);
+  });
+}
 
-  app.on("ready", async () => {
+startWhenReady(
+  app,
+  process.platform,
+  ensureAccessibilityPermission,
+  async () => {
     tray = new AppTray(eventPipe);
     const logger = new Logger(eventPipe);
     const gameConfig = new GameConfig(eventPipe, logger);
@@ -135,5 +130,5 @@ let tray: AppTray;
       // fixes(linux): window is black instead of transparent
       process.platform === "linux" ? 1000 : 0,
     );
-  });
-})();
+  },
+);

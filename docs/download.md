@@ -52,8 +52,9 @@ Some parts depend on the operating system:
 
 - **Windows.** OCR, which reads skill gem names from a screenshot ([OCR guide](/ocr-guide)), works only on Windows.
 - **macOS.** Kalandra needs the Accessibility permission to read hotkeys and send key presses. When it starts without
-  the permission, macOS asks you to grant it. Kalandra waits 15 seconds for the permission and quits if it is not
-  granted. Grant it in System Settings under Privacy & Security, Accessibility, then start Kalandra again.
+  the permission, macOS asks you to grant it. Kalandra waits 15 seconds for the permission and starts when you grant
+  it. If you do not grant it in that time, Kalandra quits: grant it in System Settings under Privacy & Security,
+  Accessibility, then start Kalandra again.
 - **Linux.** If Kalandra does not find the game's log file or config file, enter its path in Settings, General
   ([Settings](/settings) lists both).
 

@@ -12,13 +12,14 @@ of the whole app is [architecture.md](../architecture.md), the messages main exc
 The entry, the server and the app services, in `main/src/`:
 
 - `main.ts`, bundled into `dist/main.js`, takes Electron's single instance lock, turns off hardware acceleration
-  except on macOS and turns on Electron's sandbox. On macOS it waits up to 15 seconds for the accessibility
-  permission and quits without it. On `ready` it creates `AppTray`, `Logger`, `GameConfig`, `GameWindow`,
-  `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`. It creates `OverlayWindow`, `OverlayVisibility`
-  and `Shortcuts` after a timer: 1 second on Linux, because the window is black instead of transparent otherwise,
-  and 0 elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that
-  uses it. It then starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue
-  Devtools.
+  except on macOS and turns on Electron's sandbox. It passes the startup to `startWhenReady()` in `startup.ts`,
+  which on macOS waits up to 15 seconds for the accessibility permission and quits without it. It then awaits
+  `app.whenReady()`, which also resolves when Electron emitted `ready` during that wait, and runs the start
+  function, which creates `AppTray`, `Logger`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter`
+  and `GameLogWatcher`. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on
+  Linux, because the window is black instead of transparent otherwise, and 0 elsewhere. Its
+  `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses it. It then
+  starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue Devtools.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds
   the `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
@@ -168,9 +169,10 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (7.6% of the lines of `src/` on 18 Oct 2026).
-`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check and
-`request-origin.test.ts` the header check. `server.test.ts` starts the server and sends `..` paths, foreign origins
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (15.0% of the lines of `src/` on 19 Oct 2026).
+`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
+`request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
+`app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins
 and host names to the HTTP routes and to `/events`. A test of a module that imports Electron replaces it with
 `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run
 lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
