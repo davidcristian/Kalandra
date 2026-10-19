@@ -21,7 +21,7 @@ export function typeInChat(
   clipboard.restoreShortly((clipboard) => {
     const modifiers = process.platform === "darwin" ? [Key.Meta] : [Key.Ctrl];
 
-    if (text.startsWith(PLACEHOLDER_LAST)) {
+    if (text === PLACEHOLDER_LAST || text.startsWith(`${PLACEHOLDER_LAST} `)) {
       text = text.slice(`${PLACEHOLDER_LAST} `.length);
       clipboard.writeText(text);
       uIOhook.keyTap(Key.Enter, modifiers);

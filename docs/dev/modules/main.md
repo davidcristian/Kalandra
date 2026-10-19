@@ -81,11 +81,12 @@ The entry, the server and the app services, in `main/src/`:
   of copied item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
 - `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. It presses `Enter`, then
   `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
-  When the text starts with `@last`, it removes `@last ` and presses `Ctrl + Enter` in place of `Enter` and
-  `Ctrl + A`. When the text ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and
-  `Delete`, and then pastes. With `send` it presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring
-  back the last chat line. `stashSearch(text, clipboard, overlay)` focuses the game, presses `Ctrl + F`, pastes the
-  text and presses `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
+  When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
+  `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text
+  ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With
+  `send` it presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring back the last chat line.
+  `stashSearch(text, clipboard, overlay)` focuses the game, presses `Ctrl + F`, pastes the text and presses
+  `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
 
 `windowing/`:
 
@@ -177,11 +178,12 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (29.1% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (32.7% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
-`app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins and host
-names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
+`app` that emits `ready` once. `text-box.test.ts` types chat commands into the fake clipboard and chat box of
+`fake-chat.ts`, which applies each key press to the text in the box. `server.test.ts` starts the server and sends
+`..` paths, foreign origins and host names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
 `x-kalandra-proxy` header, through a fake `net.request` that answers with the request it was given.
 `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
 write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
