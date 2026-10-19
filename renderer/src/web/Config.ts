@@ -8,6 +8,7 @@ import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
+import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 
 const _config = shallowRef<Config | null>(null);
 let _lastSavedConfig: Config | null = null;
@@ -24,6 +25,7 @@ export function AppConfig(type?: string) {
 
 export function updateConfig(updates: Config) {
   _config.value = deepReactive(JSON.parse(JSON.stringify(updates)));
+  _config.value!.fontSize = validFontSize(_config.value!.fontSize);
   document.documentElement.style.fontSize = `${_config.value!.fontSize}px`;
 }
 
@@ -206,7 +208,7 @@ export const defaultConfig = (): Config => ({
   language: "en",
   preferredTradeSite: "default",
   realm: "pc-ggg",
-  fontSize: 16,
+  fontSize: DEFAULT_FONT_SIZE,
   widgets: widgetRegistry.widgets.reduce<widget.Widget[]>(
     (widgets, { widget }) => {
       const res: widget.Widget[] = [];

@@ -41,7 +41,8 @@ old one and keep that file, so a saved config must survive every update: this is
   current config, so the window's text switches at once and **Refresh** on its Price check page uses the new trade
   site. Closing the window without Save puts back the old values.
 - `updateConfig(config)` replaces the current config with a deep copy and sets the page's root font size from
-  `fontSize`.
+  `fontSize`. `validFontSize()` in `settings/font-size.ts` first limits `fontSize` to 10 to 40 px, and replaces a
+  value that is not a number, such as text an older Settings field saved, with 16.
 - `saveConfig(opts?)` sends `CLIENT->MAIN::save-config` with `JSON.stringify(AppConfig())` when the config differs
   from the last one sent or received, and does nothing while an exclusive widget is shown. `opts.isTemporary` makes
   main write `config.json.tmp`.

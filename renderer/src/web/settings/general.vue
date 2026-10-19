@@ -36,7 +36,11 @@
       <div class="flex-1 mb-1">{{ t(":font_size") }}</div>
       <div class="flex gap-1">
         <input
-          v-model.number="fontSize"
+          type="number"
+          :min="MIN_FONT_SIZE"
+          :max="MAX_FONT_SIZE"
+          :value="config.fontSize"
+          @change="setFontSize"
           class="rounded bg-gray-900 px-1 block w-16 font-poe text-center"
         />
         <span>px</span>
@@ -127,6 +131,7 @@ import { useI18nNs } from "@/web/i18n";
 import UiRadio from "@/web/ui/UiRadio.vue";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import { alphaModelValue, configModelValue, configProp } from "./utils";
+import { fontSizeFromInput, MAX_FONT_SIZE, MIN_FONT_SIZE } from "./font-size";
 import { settingsDraft } from "./draft";
 
 export default defineComponent({
@@ -138,7 +143,16 @@ export default defineComponent({
 
     return {
       t,
-      fontSize: configModelValue(() => props.config, "fontSize"),
+      MIN_FONT_SIZE,
+      MAX_FONT_SIZE,
+      setFontSize(e: Event) {
+        const input = e.target as HTMLInputElement;
+        props.config.fontSize = fontSizeFromInput(
+          input.value,
+          props.config.fontSize,
+        );
+        input.value = String(props.config.fontSize);
+      },
       overlayBackgroundClose: configModelValue(
         () => props.config,
         "overlayBackgroundClose",
