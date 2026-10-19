@@ -126,10 +126,11 @@ def exchange_lines(response: Json) -> list[Json]:
     factor = divine_factor(response)
     if factor is None:
         return []
-    items = {item.get("id"): item for item in _objects(response, "items")}
+    items = {item["id"]: item for item in _objects(response, "items") if isinstance(item.get("id"), str)}
     lines: list[Json] = []
     for line in _objects(response, "lines"):
-        item = items.get(line.get("id"))
+        line_id = line.get("id")
+        item = items.get(line_id) if isinstance(line_id, str) else None
         if item is None or not isinstance(item.get("name"), str) or not _is_number(line.get("primaryValue")):
             continue
         lines.append(
@@ -137,7 +138,7 @@ def exchange_lines(response: Json) -> list[Json]:
                 "name": item["name"],
                 "primaryValue": _in_divines(line["primaryValue"], factor),
                 "detailsId": item.get("detailsId"),
-                "id": line["id"],
+                "id": line_id,
                 "volumePrimaryValue": _in_divines(line.get("volumePrimaryValue"), factor),
                 "maxVolumeCurrency": line.get("maxVolumeCurrency"),
                 "maxVolumeRate": line.get("maxVolumeRate"),

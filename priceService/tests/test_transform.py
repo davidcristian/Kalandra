@@ -78,6 +78,21 @@ class ExchangeTest(unittest.TestCase):
         self.response["lines"].append("not a line")
         self.assertEqual(len(exchange_lines(self.response)), 3)
 
+    def test_skips_items_and_lines_without_a_string_id(self) -> None:
+        pairs: list[tuple[Json, Json]] = [
+            ({"name": "No id"}, {"primaryValue": 1}),
+            ({"id": None, "name": "Null id"}, {"id": None, "primaryValue": 1}),
+            ({"id": ["x"], "name": "List id"}, {"id": "x", "primaryValue": 1}),
+            ({"id": "x", "name": "Named"}, {"id": ["x"], "primaryValue": 1}),
+        ]
+        for item, line in pairs:
+            with self.subTest(item=item, line=line):
+                response = json.loads(fixture("exchange_currency.json"))
+                response["items"].append(item)
+                response["lines"].append(line)
+                names = [entry["name"] for entry in exchange_lines(response)]
+                self.assertEqual(names, ["Orb of Alchemy", "Exalted Orb", "Chaos Orb"])
+
     def test_core_drops_the_item_list(self) -> None:
         core = exchange_core(self.response)
         self.assertEqual(list(core), ["rates", "primary", "secondary"])

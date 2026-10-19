@@ -49,8 +49,9 @@ One line of compact JSON, UTF-8 with non-ASCII names kept, with the keys in this
   exchange category with the type `Currency`, every league fails.
 - `itemOverviews` has one entry per category in `namespaceMap.json`, in its order: `type`, then `lines`.
 - An exchange line (`exchange_lines`) has `name`, `primaryValue`, `detailsId`, `id`, `volumePrimaryValue`,
-  `maxVolumeCurrency`, `maxVolumeRate` and `sparkline`. A line whose `id` has no named item in the response's
-  `items`, or whose value is not a number, is left out.
+  `maxVolumeCurrency`, `maxVolumeRate` and `sparkline`. A line whose `id` is not a string or has no named item in
+  the response's `items`, or whose value is not a number, is left out. An item whose `id` is not a string is
+  ignored.
 - A stash line (`stash_lines`) has `name`, `variant`, `primaryValue`, `detailsId` and `sparkline`. `variant` is
   poe.ninja's `variant`, or its `baseType` when there is none, and is left out when neither is a string. The price
   check finds a unique, flasks included, by its name and its base item as `variant` (`getDetailsId` in
@@ -174,7 +175,7 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 37 tests on 19 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 38 tests on 19 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
 floor in `priceService/.coveragerc`, 86.7% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
