@@ -67,3 +67,27 @@ export async function openSocket(
     });
   });
 }
+
+// Resolves the first `count` messages a new /events client receives, or those that came within 2 seconds
+export async function firstMessages(
+  port: number,
+  count: number,
+): Promise<unknown[]> {
+  return await new Promise((resolve, reject) => {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
+      origin: `http://127.0.0.1:${port}`,
+    });
+    const messages: unknown[] = [];
+    const done = () => {
+      clearTimeout(timer);
+      socket.close();
+      resolve(messages);
+    };
+    const timer = setTimeout(done, 2000);
+    socket.on("message", (data) => {
+      messages.push(JSON.parse(String(data)));
+      if (messages.length === count) done();
+    });
+    socket.on("error", reject);
+  });
+}

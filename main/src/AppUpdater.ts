@@ -3,7 +3,6 @@ import type { ServerEvents } from "./server";
 import type { UpdateInfo } from "../../ipc/types";
 
 export class AppUpdater {
-  private _checkedAtStartup = false;
   private _info: UpdateInfo = { state: "initial" };
 
   public readonly noAutoUpdatesReason: Extract<
@@ -64,13 +63,9 @@ export class AppUpdater {
       this.info = { state: "update-downloaded", version: info.version };
     });
     // on('download-progress') https://github.com/electron-userland/electron-builder/issues/2521
-  }
 
-  checkAtStartup() {
-    if (!this._checkedAtStartup) {
-      this._checkedAtStartup = true;
-      this.check();
-    }
+    // After autoDownload is set above, so the first check follows --no-updates
+    this.check();
   }
 
   private check = async () => {

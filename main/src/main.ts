@@ -116,7 +116,6 @@ startWhenReady(
             shortcuts.updateDelay(cfg.initialDelay);
             gameLogWatcher.restart(cfg.clientLog ?? "", cfg.readClientLog);
             gameConfig.readConfig(cfg.gameConfig ?? "");
-            appUpdater.checkAtStartup();
             tray.overlayKey = cfg.overlayKey;
             fileWriter.restart(cfg.libraryAlpha, cfg.libraryOutputPath);
           },

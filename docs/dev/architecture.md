@@ -142,7 +142,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
 3. When the overlay mounts, `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with the `HostConfig` that
    `getConfigForHost()` builds: every hotkey as a `ShortcutAction`, and the settings main reads. The handler in
    `main/src/main.ts` passes them to the overlay window, the shortcuts, the clipboard, the log watcher, the game
-   config reader, the tray and the file writer, and starts the updater's first check.
+   config reader, the tray and the file writer. The updater's first check does not wait for this: `AppUpdater`
+   starts it when main creates it.
 4. `saveConfig()` sends `CLIENT->MAIN::save-config` with the whole config as JSON when it differs from the last
    one sent or received, and never while an exclusive widget is shown. It runs when the overlay window loses
    focus and after an exclusive widget other than the settings window closes. Save in the settings window applies

@@ -105,7 +105,7 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 export async function startServer(
-  appUpdater: AppUpdater,
+  appUpdater: Pick<AppUpdater, "info">,
   logger: Logger,
 ): Promise<number> {
   const configStore = new ConfigStore(eventPipe);
@@ -130,6 +130,11 @@ export async function startServer(
     sendEventTo("last-active", {
       name: "MAIN->CLIENT::log-entry",
       payload: { message: logger.history },
+    });
+    // The first update check starts before the page loads, so the state can change after GET /config
+    sendEventTo("last-active", {
+      name: "MAIN->CLIENT::updater-state",
+      payload: appUpdater.info,
     });
   });
 

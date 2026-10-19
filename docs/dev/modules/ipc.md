@@ -35,7 +35,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
 | `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history to a new client | `Host` (`Host.logs`) |
-| `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater` | `Host` (`Host.updateInfo`) |
+| `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
 | `MAIN->OVERLAY::focus-change` | `game`, `overlay`, `usingHotkey` | `OverlayWindow` | `OverlayWindow.vue` |

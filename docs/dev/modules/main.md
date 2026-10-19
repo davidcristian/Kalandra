@@ -28,7 +28,8 @@ The entry, the server and the app services, in `main/src/`:
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
   returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
-  client. A new client receives the log history. The routes are in
+  client. A new client receives the log history and the current updater state, which the first update check can
+  change after the page reads `GET /config`. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
   address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
@@ -52,10 +53,11 @@ The entry, the server and the app services, in `main/src/`:
   `MAIN->CLIENT::log-entry`. Callers start each message with its level (`info`, `warn`, `error` or `debug`), and
   most add a `[Component]` tag after it. The Debug settings page shows the log.
 - `AppUpdater.ts`: `AppUpdater` wraps electron-updater. Setting `info` broadcasts `MAIN->CLIENT::updater-state`. It
-  checks every 16 hours and once through `checkAtStartup()`, and handles the `check-for-update` and
-  `update-and-restart` user actions. Automatic download is off for the Windows portable build
-  (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with `--no-updates`. `noAutoUpdatesReason` is
-  `not-supported` for the portable build and on macOS, and `disabled-by-flag` for the flag.
+  checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not
+  wait for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is
+  off for the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with
+  `--no-updates`. `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and
+  `disabled-by-flag` for the flag.
 - `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a
   message box that says to press the overlay key; Open in Browser; Open config folder (`apt-data`); and Quit.
 
@@ -184,10 +186,13 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (35.2% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (39.2% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
+`AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version, and
+`start-server.test.ts` calls `startServer()` with a fake updater and reads `GET /config` and the first `/events`
+messages.
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
 key press to the text in the box. `server.test.ts` starts the server and sends `..` paths, foreign origins and host
 names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
