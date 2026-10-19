@@ -212,7 +212,7 @@ renderer/          the Vue 3 page: Vite, Tailwind, Vitest
   src/assets/      the game data loader and make-index-files.mjs
   public/data/     the game data per language, app_i18n.json per language, namespaceMap.json
   specs/           Vitest tests, parser cases with real item text, saved trade responses
-ipc/               types.ts and KeyToCode.ts, imported by both processes
+ipc/               types.ts, KeyToCode.ts and library.ts, imported by both processes
 dataParser/        the Python game data generator, run by hand; output/ holds its last output
 priceService/      the Python price file service, deployed outside the app
 scripts/           check.py, which runs every check AGENTS.md names, the repo and commit checks, and ci_paths.py

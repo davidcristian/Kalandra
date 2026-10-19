@@ -95,6 +95,7 @@ export type IpcEvent =
   | IpcConfigChanged
   | IpcUserAction
   | IpcWriteToFile
+  | import("./library").IpcLibrarySession
   | IpcReparseLog;
 
 export type IpcEventPayload<

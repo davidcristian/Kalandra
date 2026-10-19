@@ -156,8 +156,11 @@ The entry, the server and the app services, in `main/src/`:
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection
   on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`
-  between a `session` start and stop. It writes `client-log-event` lines to `client-log.ndjson`, which it
-  overwrites at its first write in a run and at the first write after a log re-parse. The folder is the library
+  between a `session` start and stop. It answers each start with `MAIN->CLIENT::library-session`: `started` once
+  the file is open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path
+  separator, and `failed` while it is off or when the folder or file cannot be created, with the reason in the
+  log. It writes `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run
+  and at the first write after a log re-parse. The folder is the library
   output path, or `apt-data/csv-data` by default. A restart that turns it off closes both files. One that changes
   the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file
   open in the folder it started in until the session stops.

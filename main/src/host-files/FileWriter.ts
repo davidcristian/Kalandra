@@ -3,10 +3,25 @@ import { app } from "electron";
 import { ServerEvents } from "../server";
 import { promises as fs, existsSync } from "fs";
 import { Logger } from "../RemoteLogger";
+import type { IpcLibrarySession } from "../../../ipc/library";
 
 enum FileChannel {
   Item = "item",
   ClientLog = "client-log",
+}
+
+// Windows allows none of these in a file name, and a separator would leave the output folder
+const RESERVED_CHARACTERS = '<>:"/\\|?*';
+const DEVICE_NAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+
+function isValidFileName(name: string): boolean {
+  return (
+    name.trim() !== "" &&
+    !DEVICE_NAMES.test(name.trim()) &&
+    ![...name].some(
+      (char) => RESERVED_CHARACTERS.includes(char) || char.charCodeAt(0) < 32,
+    )
+  );
 }
 
 export class FileWriter {
@@ -33,6 +48,10 @@ export class FileWriter {
     private logger: Logger,
   ) {
     this.server.onEventAnyClient("CLIENT->MAIN::write-data", async (e) => {
+      if (e.action === "session" && e.start) {
+        await this.startSession(e.name ?? "", e.header ?? "");
+        return;
+      }
       if (!this._enabled) return;
       if (
         e.action !== "log-item" &&
@@ -62,17 +81,8 @@ export class FileWriter {
         this.writeLine(e.text, FileChannel.Item);
         return;
       }
-      // e.action === "session"
-      if (e.start) {
-        if (!e.name || !e.header) {
-          this.logger.write("error [FileWriter] Invalid session start event.");
-          return;
-        }
-
-        await this.writeSessionStart(e.name, e.header);
-      } else {
-        await this.closeChannel(FileChannel.Item);
-      }
+      // e.action === "session", a stop
+      await this.closeChannel(FileChannel.Item);
     });
   }
 
@@ -101,7 +111,34 @@ export class FileWriter {
     }
   }
 
-  private async writeSessionStart(name: string, header: string) {
+  private async startSession(name: string, header: string) {
+    const result = await this.openSessionFile(name, header);
+    this.server.sendEventTo("broadcast", {
+      name: "MAIN->CLIENT::library-session",
+      payload: { sessionName: name, result },
+    });
+  }
+
+  private async openSessionFile(
+    name: string,
+    header: string,
+  ): Promise<IpcLibrarySession["payload"]["result"]> {
+    if (!this._enabled) {
+      this.logger.write(
+        "error [FileWriter] Item Data Collection is off, so no session starts.",
+      );
+      return "failed";
+    }
+    if (!isValidFileName(name)) {
+      this.logger.write(
+        `error [FileWriter] Session name "${name}" is not a valid file name.`,
+      );
+      return "invalid-name";
+    }
+    if (!header) {
+      this.logger.write("error [FileWriter] Invalid session start event.");
+      return "failed";
+    }
     try {
       if (!existsSync(this.uploadsPath)) {
         await fs.mkdir(this.uploadsPath, { recursive: true });
@@ -110,8 +147,12 @@ export class FileWriter {
       if (await this.openChannel(filePath, FileChannel.Item)) {
         this.writeLine(header, FileChannel.Item);
       }
-    } catch {
-      this.logger.write("error [FileWriter] Failed to create session file.");
+      return "started";
+    } catch (err) {
+      this.logger.write(
+        `error [FileWriter] Failed to create session file: ${(err as Error).message}`,
+      );
+      return "failed";
     }
   }
 

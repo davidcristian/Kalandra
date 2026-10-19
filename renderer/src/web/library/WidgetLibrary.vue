@@ -20,7 +20,12 @@
           class="leading-4 rounded text-gray-100 p-1 bg-gray-700 w-full mb-1"
           v-model="sessionName"
         />
-        <button v-if="!inSession" @click="startSession" :class="$style.button">
+        <button
+          v-if="!inSession"
+          @click="startSession"
+          :disabled="starting"
+          :class="$style.button"
+        >
           <i class="fas fa-play"></i>
         </button>
         <button v-else @click="endSession" :class="$style.button">
@@ -50,6 +55,7 @@
 import {
   computed,
   defineComponent,
+  onBeforeUnmount,
   PropType,
   ref,
   shallowRef,
@@ -59,31 +65,10 @@ import {
 import Widget from "@/web/overlay/Widget.vue";
 import { WidgetSpec } from "@/web/overlay/interfaces";
 import { ColumnOpts, getHeader, LibraryWidget } from "./widget";
-import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
 import { useI18nNs } from "@/web/i18n";
 import SingleItemSession from "./SingleItemSession.vue";
-
-function startSessionHost(name: string, header: string) {
-  Host.sendEvent({
-    name: "CLIENT->MAIN::write-data",
-    payload: {
-      action: "session",
-      start: true,
-      name,
-      header,
-    },
-  });
-}
-function endSessionHost() {
-  Host.sendEvent({
-    name: "CLIENT->MAIN::write-data",
-    payload: {
-      action: "session",
-      start: false,
-    },
-  });
-}
+import { createLibrarySession } from "./session";
 
 export default defineComponent({
   widget: {
@@ -141,11 +126,14 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const { t } = useI18nNs("library");
     const libEnabled = computed(
       () => AppConfig().enableAlphas && AppConfig().alphas.includes("library"),
     );
 
-    const inSession = shallowRef<boolean>(false);
+    const session = createLibrarySession();
+    const inSession = computed(() => session.state.value === "active");
+    const starting = computed(() => session.state.value === "starting");
 
     const sessionName = shallowRef<string>("mySession");
     const sessionType = shallowRef<string>(props.config.selectedProfile);
@@ -154,8 +142,21 @@ export default defineComponent({
 
     watch(libEnabled, (curr) => {
       if (!curr) {
-        endSessionHost();
-        inSession.value = false;
+        session.stop();
+      }
+    });
+    watch(inSession, (curr) => {
+      if (curr) {
+        props.config.wmFlags = props.config.wmFlags.filter(
+          (f) => f !== "invisible-on-blur",
+        );
+      }
+    });
+    watch(session.failure, (curr) => {
+      if (curr === "invalid-name") {
+        errMessage.value = t(":invalid_session_name");
+      } else if (curr === "failed") {
+        errMessage.value = t(":session_failed");
       }
     });
 
@@ -178,24 +179,24 @@ export default defineComponent({
         errMessage.value = header.error;
         return;
       }
-      startSessionHost(sessionName.value, header.value);
-      inSession.value = true;
-      props.config.wmFlags = props.config.wmFlags.filter(
-        (f) => f !== "invisible-on-blur",
-      );
+      errMessage.value = null;
+      session.start(sessionName.value, header.value);
     }
     function endSession() {
-      endSessionHost();
-      inSession.value = false;
+      session.stop();
       if (!props.config.wmFlags.includes("invisible-on-blur")) {
         props.config.wmFlags.push("invisible-on-blur");
       }
     }
 
-    const { t } = useI18nNs("library");
+    onBeforeUnmount(() => {
+      session.stop();
+      session.dispose();
+    });
 
     return {
       t,
+      starting,
       startSession,
       endSession,
       libEnabled,
@@ -205,9 +206,6 @@ export default defineComponent({
       currentOpts,
       errMessage,
     };
-  },
-  beforeUnmount() {
-    endSessionHost();
   },
 });
 </script>

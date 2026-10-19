@@ -5,7 +5,7 @@
 365 dataParser/src/constants/css_rules.py
 563 dataParser/src/services/nd_builder_service.py
 317 dataParser/src/stores/helpers/description.py
-348 ipc/types.ts
+349 ipc/types.ts
 330 main/src/shortcuts/Shortcuts.ts
 624 renderer/src/assets/data/index.ts
 351 renderer/src/assets/data/interfaces.ts

@@ -52,6 +52,9 @@ holding `Shift` and apply the same currency again.
    `mySession.csv`. You can change the name only while no session runs.
 2. Click the play button to start a session. Kalandra creates the file with a header row, or adds rows to the end of
    the file if it already exists. While a session runs, the widget stays on screen when you close the overlay.
+   When the name is not a valid file name, or Kalandra cannot create the file, the widget shows the error in an
+   orange box and the session does not start. A name cannot contain `< > : " / \ | ? *` or be a device name such
+   as `CON` or `NUL`. The **Debug** settings page shows why a file could not be created.
 3. Hover the item in the game and press the **Log item to csv** key. Kalandra copies the item and writes one row.
    Press the key again after each use of a currency on the item.
 4. Click the stop button to end the session. Kalandra closes the file and resets the count. The key writes nothing

@@ -37,6 +37,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history to a new client | `Host` (`Host.logs`) |
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
+| `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |
 | `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
 | `MAIN->OVERLAY::focus-change` | `game`, `overlay`, `usingHotkey` | `OverlayWindow` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::visibility` | `isVisible` | `OverlayVisibility` | `OverlayWindow.vue` |
@@ -97,6 +98,11 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   `isModKey(key)` is true for `Ctrl`, `Shift` and `Alt`. `HotkeyInput.vue` in the renderer records a hotkey with
   `KeyToCode` and `hotkeyToString()`.
 
+`library.ts`:
+
+- `IpcLibrarySession` is the `MAIN->CLIENT::library-session` member of `IpcEvent`, kept out of `types.ts` because
+  that file is over the line limit. `LibrarySessionFailure` is its `result` when no session starts.
+
 ## Invariants
 
 - Every message is a member of `IpcEvent`. The send and listen functions on both ends take only its names and
@@ -119,9 +125,9 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates
   [client-log-parser.md](../../client-log-parser.md) in the same commit.
 
-**Dependencies.** None: `types.ts` and `KeyToCode.ts` import nothing. main imports them in `server.ts`,
-`AppUpdater.ts`, `Shortcuts.ts` and `GameConfig.ts`; the renderer in `IPC.ts`, `Config.ts`, `client-log/` and
-`HotkeyInput.vue`.
+**Dependencies.** None: `KeyToCode.ts` and `library.ts` import nothing, and `types.ts` imports only `library.ts`.
+main imports them in `server.ts`, `AppUpdater.ts`, `Shortcuts.ts`, `GameConfig.ts` and `FileWriter.ts`; the
+renderer in `IPC.ts`, `Config.ts`, `client-log/`, `HotkeyInput.vue` and `library/session.ts`.
 
 **Tests.** `ipc/` has no tests of its own; `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent`
 values the parser makes. The type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`.

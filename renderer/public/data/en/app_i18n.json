@@ -501,7 +501,9 @@
     "output_file": "Output csv path",
     "output_folder": "Output Folder",
     "output_file_help": "Some info text",
-    "record_count": "Session Rolls:"
+    "record_count": "Session Rolls:",
+    "invalid_session_name": "The session name is not a valid file name",
+    "session_failed": "The session file could not be created"
   },
   "item_editor": {
     "save_type": "Save for: ",

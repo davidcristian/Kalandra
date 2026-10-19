@@ -129,3 +129,77 @@ describe("FileWriter.restart", () => {
     );
   });
 });
+
+function sessionReplies() {
+  return server.sent.flatMap((event) =>
+    event.name === "MAIN->CLIENT::library-session" ? [event.payload] : [],
+  );
+}
+
+function sendSessionStart(name: string) {
+  server.emit("CLIENT->MAIN::write-data", {
+    action: "session",
+    start: true,
+    name,
+    header: "a header",
+  });
+}
+
+describe("a Library session start", () => {
+  it("replies that the session started after it writes the header", async () => {
+    await writer.restart(true, folder);
+    sendSessionStart("rolls");
+
+    await vi.waitFor(() =>
+      expect(sessionReplies()).toEqual([
+        { sessionName: "rolls", result: "started" },
+      ]),
+    );
+    await vi.waitFor(async () =>
+      expect(await readText(path.join(folder, "rolls.csv"))).toContain(
+        "a header",
+      ),
+    );
+  });
+
+  it.each(["a:b", "../outside", "what?", "a|b", "CON", "lpt1", " ", "a\tb"])(
+    "replies that %j is not a valid file name and creates no file",
+    async (name) => {
+      await writer.restart(true, path.join(folder, "csv"));
+      sendSessionStart(name);
+
+      await vi.waitFor(() =>
+        expect(sessionReplies()).toEqual([
+          { sessionName: name, result: "invalid-name" },
+        ]),
+      );
+      expect(await fs.readdir(folder)).toEqual([]);
+    },
+  );
+
+  it("replies that it failed when the output folder cannot be created", async () => {
+    const blocker = path.join(folder, "a file");
+    await fs.writeFile(blocker, "");
+    await writer.restart(true, path.join(blocker, "csv"));
+    sendSessionStart("rolls");
+
+    await vi.waitFor(() =>
+      expect(sessionReplies()).toEqual([
+        { sessionName: "rolls", result: "failed" },
+      ]),
+    );
+    expect(logger.history).toContain("Failed to create session file: ");
+  });
+
+  it("replies that it failed while Item Data Collection is off", async () => {
+    await writer.restart(false, folder);
+    sendSessionStart("rolls");
+
+    await vi.waitFor(() =>
+      expect(sessionReplies()).toEqual([
+        { sessionName: "rolls", result: "failed" },
+      ]),
+    );
+    expect(await fs.readdir(folder)).toEqual([]);
+  });
+});
