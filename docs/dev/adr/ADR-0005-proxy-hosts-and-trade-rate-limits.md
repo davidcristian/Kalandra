@@ -1,6 +1,6 @@
 # ADR-0005: Other hosts only through the proxy list, trade searches through the rate limiters
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-19)
 
 ## Context
 
@@ -21,8 +21,8 @@ although `CheckedItem.vue` has the prediction component commented out) and the p
 network access to other hosts belongs to the main process ([ADR-0004](ADR-0004-process-boundary.md)).
 
 **2. `HttpProxy` forwards only to the hosts in `PROXY_HOSTS`.** A request for any other host is closed with no
-response. Before forwarding, it removes the `sec-*`, `host`, `origin` and `content-length` request headers and sends
-Electron's `app.userAgentFallback` as the User-Agent. Each entry also marks whether the host is an official trade
+response. Before forwarding, it removes the `sec-*`, `host`, `origin`, `content-length` and `x-kalandra-proxy`
+request headers and sends Electron's `app.userAgentFallback` as the User-Agent. Each entry also marks whether the host is an official trade
 site. `HttpProxy` reads the list only to check that the host is in it. Reason: the list in one file is the full set
 of hosts the renderer can reach, so a new host appears in the diff. The auto updater is separate: `electron-updater`
 in `main` checks the GitHub releases itself.

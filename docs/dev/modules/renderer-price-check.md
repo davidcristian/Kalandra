@@ -6,7 +6,8 @@ the Path of Exile trade website on one of the official hosts in `PROXY_HOSTS` (`
 under `/api/trade2/`. The price file is the hourly JSON file that `priceService/` builds from poe.ninja for each
 league ([price-service.md](price-service.md)). This doc also covers the background modules the window reads:
 `web/background/Prices.ts`, `price-source.ts` and `Leagues.ts`. Every request below to another host goes through
-`Host.proxy("<host>/<path>")`, which fetches `/proxy/<host>/<path>` from main ([main.md](main.md)).
+`Host.proxy("<host>/<path>")`, which fetches `/proxy/<host>/<path>` from main with the `x-kalandra-proxy` header
+that the route needs ([main.md](main.md)).
 
 ## Public contract
 
@@ -155,5 +156,6 @@ neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 covers item filters, stat filters, the missing fractured rules and the pseudo stats.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
-`specs/web/prices.test.ts` reads the price service's fixtures. No test calls a live site. `RateLimiter.ts`,
+`specs/web/prices.test.ts` reads the price service's fixtures. `specs/web/host-proxy.test.ts` checks the URL and
+the header that `Host.proxy` sends. No test calls a live site. `RateLimiter.ts`,
 `common.ts`, `Leagues.ts`, `TradeData.ts` and `poeprices.ts` have no test file of their own.

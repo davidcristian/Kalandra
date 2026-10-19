@@ -37,7 +37,9 @@ The entry, the server and the app services, in `main/src/`:
   defaults and an `error` text, which `startServer()` writes to the log.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
   sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and
-  `kalandra.ashoal.com`. It drops the `sec-*`, `host`, `origin` and `content-length` request headers, sends the
+  `kalandra.ashoal.com`. It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()`
+  sends and a page on another site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
+  It drops the `sec-*`, `host`, `origin`, `content-length` and `x-kalandra-proxy` request headers, sends the
   request through `net.request` with the session's cookies and `app.userAgentFallback` as the User-Agent, and
   drops `content-encoding` from the response.
   It removes the `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it
@@ -169,11 +171,12 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (15.0% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (17.3% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
 `app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins
-and host names to the HTTP routes and to `/events`. A test of a module that imports Electron replaces it with
+and host names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
+`x-kalandra-proxy` header, through a fake `net.request` that answers with the request it was given. A test of a module that imports Electron replaces it with
 `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run
 lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
 capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,

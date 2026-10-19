@@ -17,11 +17,20 @@ const PROXY_HOSTS = [
   { host: "kalandra.ashoal.com", official: false },
 ];
 
+// A page on another site cannot send this header: a fetch that sets it needs a
+// CORS preflight, which the Origin check rejects, and an image, a script or a link sends none
+const PROXY_HEADER = "x-kalandra-proxy";
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class HttpProxy {
   constructor(routes: HttpRoutes, logger: Logger) {
     routes.addListener("request", (req, res) => {
       if (!req.url?.startsWith("/proxy/")) return;
+      if (req.headers[PROXY_HEADER] === undefined) {
+        res.statusCode = 403;
+        res.end();
+        return;
+      }
       const host = req.url.split("/", 3)[2];
 
       const official = PROXY_HOSTS.find(
@@ -34,7 +43,8 @@ export class HttpProxy {
           key.startsWith("sec-") ||
           key === "host" ||
           key === "origin" ||
-          key === "content-length"
+          key === "content-length" ||
+          key === PROXY_HEADER
         ) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete req.headers[key];
