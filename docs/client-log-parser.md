@@ -30,9 +30,7 @@ the file in **PoE log file** to fix this.
 - Kalandra empties the file when the first entry arrives after Kalandra starts, after Item Data Collection is turned
   on again, or after a new **Output Folder** is saved, which starts the file in that folder. So the file holds the
   entries since the latest of these.
-- Kalandra does not write the entries that arrive while it opens the file. This always includes the first entry
-  after each of these.
-- Lines can be out of order. Sort the entries by `ts`, then by `ms`, when you need them in order.
+- The entries are in the order of their lines in `Client.txt`.
 - Kalandra matches the `level-up` line in the language of the **Language** setting, and the lines of every other
   type in English.
 

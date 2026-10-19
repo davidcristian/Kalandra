@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** main
 **Origin:** [main/src/host-files/FileWriter.ts](../../../../main/src/host-files/FileWriter.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-19
 
 With Item Data Collection on, `FileWriter` in `main/src/host-files/FileWriter.ts` writes each
 `client-log-event` to `client-log.ndjson` in the Library output folder. It has three defects:
@@ -34,3 +34,5 @@ describes; `npm test` in `main/` runs them.
 
 - 2026-10-18: Found while docs/client-log-parser.md was rewritten, by reading `FileWriter`. Not
   reproduced in a running app.
+- 2026-10-19: The first two defects are fixed by fix(main): write client log entries in
+  order after the file opens. The output folder is still to do.

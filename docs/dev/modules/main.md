@@ -163,7 +163,9 @@ The entry, the server and the app services, in `main/src/`:
   and at the first write after a log re-parse. The folder is the library
   output path, or `apt-data/csv-data` by default. A restart that turns it off closes both files. One that changes
   the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file
-  open in the folder it started in until the session stops.
+  open in the folder it started in until the session stops. Each event, `restart` and `flushClientLogFile` starts
+  after the one before it ends, so an entry that comes while its file opens is written once the file is open, and
+  lines keep the order of their events. A failed open or write is logged, and the next event still runs.
 - `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
   or `undefined` when none is.
 
@@ -216,7 +218,9 @@ images and other files to the `/uploads/` routes, and an image while a file hold
 `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
 write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
 `FileWriter.test.ts` read and write real files in a temporary folder and send client events through the fake server
-in `fake-server.ts`. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
+in `fake-server.ts`, whose `emit` settles when the promises the handlers return settle. `FileWriter.test.ts` also
+delays the first file write to check that lines keep their order.
+A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
 `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
 workflow packages main on all three platforms.
 Hotkeys, overlay focus, clipboard capture and OCR need the game:

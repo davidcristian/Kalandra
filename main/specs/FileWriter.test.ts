@@ -25,6 +25,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await writer.restart(false, null);
+  vi.restoreAllMocks();
   await fs.rm(folder, { recursive: true, force: true });
 });
 
@@ -38,34 +39,52 @@ async function readText(file: string): Promise<string> {
 }
 
 function sendEntry(ts: number) {
-  server.emit("CLIENT->MAIN::write-data", {
+  return server.emit("CLIENT->MAIN::write-data", {
     action: "client-log-event",
     data: { ts, ms: 0, type: "log" },
     close: false,
   });
 }
 
-// The first entry opens client-log.ndjson without waiting for the open, so it can be lost
-async function writeEntries(dir: string, opening: number, written: number) {
-  const file = path.join(dir, "client-log.ndjson");
-  sendEntry(opening);
-  await vi.waitFor(() => fs.access(file));
-  sendEntry(written);
-  await vi.waitFor(async () =>
-    expect(await readText(file)).toContain(`"ts":${written}`),
+function entryLines(...stamps: number[]): string {
+  return stamps
+    .map((ts) => JSON.stringify({ ts, ms: 0, type: "log" }) + "\n")
+    .join("");
+}
+
+// Sends every entry before main has opened client-log.ndjson, then checks that each one is written
+async function writeEntries(dir: string, ...stamps: number[]) {
+  await Promise.all(stamps.map((ts) => sendEntry(ts)));
+  expect(await readText(path.join(dir, "client-log.ndjson"))).toBe(
+    entryLines(...stamps),
   );
 }
 
-async function startSession(dir: string) {
-  server.emit("CLIENT->MAIN::write-data", {
+function sendSessionStart(name: string) {
+  return server.emit("CLIENT->MAIN::write-data", {
     action: "session",
     start: true,
-    name: "session",
+    name,
     header: "a header",
   });
-  await vi.waitFor(async () =>
-    expect(await readText(path.join(dir, "session.csv"))).toContain("a header"),
-  );
+}
+
+// Delays the first FileHandle write, so a write that main does not wait for ends up last
+async function delayFirstWrite() {
+  const probe = await fs.open(path.join(folder, "probe"), "w");
+  const prototype = Object.getPrototypeOf(probe) as fs.FileHandle;
+  await probe.close();
+  await fs.rm(path.join(folder, "probe"));
+  const write = prototype.write;
+  let calls = 0;
+  vi.spyOn(prototype, "write").mockImplementation(async function (
+    this: fs.FileHandle,
+    ...args: Parameters<fs.FileHandle["write"]>
+  ) {
+    calls += 1;
+    if (calls === 1) await new Promise((resolve) => setTimeout(resolve, 50));
+    return await write.apply(this, args);
+  });
 }
 
 describe("FileWriter.restart", () => {
@@ -80,29 +99,59 @@ describe("FileWriter.restart", () => {
     await writer.restart(true, second);
     await writeEntries(second, 3, 4);
 
-    const old = await readText(path.join(first, "client-log.ndjson"));
-    expect(old).toContain('"ts":2');
-    expect(old).not.toContain('"ts":3');
-    expect(old).not.toContain('"ts":4');
+    expect(await readText(path.join(first, "client-log.ndjson"))).toBe(
+      entryLines(1, 2),
+    );
+  });
+
+  it("writes an entry to the folder that was set when it was sent", async () => {
+    const first = path.join(folder, "first");
+    const second = path.join(folder, "second");
+    await fs.mkdir(first);
+    await fs.mkdir(second);
+
+    await writer.restart(true, first);
+    const opening = sendEntry(1);
+    await writer.restart(true, second);
+    await sendEntry(2);
+    await opening;
+
+    expect(await readText(path.join(first, "client-log.ndjson"))).toBe(
+      entryLines(1),
+    );
+    expect(await readText(path.join(second, "client-log.ndjson"))).toBe(
+      entryLines(2),
+    );
   });
 
   it("keeps the client log file open when a restart changes nothing", async () => {
-    const file = path.join(folder, "client-log.ndjson");
     await writer.restart(true, folder);
     await writeEntries(folder, 1, 2);
 
     await writer.restart(true, folder);
-    sendEntry(3);
+    await sendEntry(3);
 
-    await vi.waitFor(async () =>
-      expect(await readText(file)).toContain('"ts":3'),
+    expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
+      entryLines(1, 2, 3),
     );
-    expect(await readText(file)).toContain('"ts":2');
+  });
+
+  it("starts the client log file again at the first entry after a flush", async () => {
+    await writer.restart(true, folder);
+    const written = sendEntry(1);
+    const flushed = writer.flushClientLogFile();
+    await sendEntry(2);
+    await Promise.all([written, flushed]);
+
+    expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
+      entryLines(2),
+    );
+    expect(logger.history).toContain("Channel client-log closed.");
   });
 
   it("closes the session and client log files when the feature is turned off", async () => {
     await writer.restart(true, folder);
-    await startSession(folder);
+    await sendSessionStart("session");
     await writeEntries(folder, 1, 2);
 
     await writer.restart(false, folder);
@@ -114,18 +163,30 @@ describe("FileWriter.restart", () => {
   it("keeps the session file in its folder until the session stops", async () => {
     const second = path.join(folder, "second");
     await writer.restart(true, folder);
-    await startSession(folder);
+    await sendSessionStart("session");
 
     await writer.restart(true, second);
-    server.emit("CLIENT->MAIN::write-data", {
+    await server.emit("CLIENT->MAIN::write-data", {
       action: "log-item",
       text: "a row after the folder change",
     });
 
-    await vi.waitFor(async () =>
-      expect(await readText(path.join(folder, "session.csv"))).toContain(
-        "a row after the folder change",
-      ),
+    expect(await readText(path.join(folder, "session.csv"))).toBe(
+      "a header\na row after the folder change\n",
+    );
+  });
+
+  it("logs a client log file that cannot be opened and handles the next event", async () => {
+    await writer.restart(true, path.join(folder, "missing"));
+    await sendEntry(1);
+    await writer.restart(true, folder);
+    await sendEntry(2);
+
+    expect(logger.history).toContain(
+      "error [FileWriter] A file operation failed: ENOENT",
+    );
+    expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
+      entryLines(2),
     );
   });
 });
@@ -136,43 +197,26 @@ function sessionReplies() {
   );
 }
 
-function sendSessionStart(name: string) {
-  server.emit("CLIENT->MAIN::write-data", {
-    action: "session",
-    start: true,
-    name,
-    header: "a header",
-  });
-}
-
 describe("a Library session start", () => {
   it("replies that the session started after it writes the header", async () => {
     await writer.restart(true, folder);
-    sendSessionStart("rolls");
+    await sendSessionStart("rolls");
 
-    await vi.waitFor(() =>
-      expect(sessionReplies()).toEqual([
-        { sessionName: "rolls", result: "started" },
-      ]),
-    );
-    await vi.waitFor(async () =>
-      expect(await readText(path.join(folder, "rolls.csv"))).toContain(
-        "a header",
-      ),
-    );
+    expect(sessionReplies()).toEqual([
+      { sessionName: "rolls", result: "started" },
+    ]);
+    expect(await readText(path.join(folder, "rolls.csv"))).toBe("a header\n");
   });
 
   it.each(["a:b", "../outside", "what?", "a|b", "CON", "lpt1", " ", "a\tb"])(
     "replies that %j is not a valid file name and creates no file",
     async (name) => {
       await writer.restart(true, path.join(folder, "csv"));
-      sendSessionStart(name);
+      await sendSessionStart(name);
 
-      await vi.waitFor(() =>
-        expect(sessionReplies()).toEqual([
-          { sessionName: name, result: "invalid-name" },
-        ]),
-      );
+      expect(sessionReplies()).toEqual([
+        { sessionName: name, result: "invalid-name" },
+      ]);
       expect(await fs.readdir(folder)).toEqual([]);
     },
   );
@@ -181,25 +225,46 @@ describe("a Library session start", () => {
     const blocker = path.join(folder, "a file");
     await fs.writeFile(blocker, "");
     await writer.restart(true, path.join(blocker, "csv"));
-    sendSessionStart("rolls");
+    await sendSessionStart("rolls");
 
-    await vi.waitFor(() =>
-      expect(sessionReplies()).toEqual([
-        { sessionName: "rolls", result: "failed" },
-      ]),
-    );
+    expect(sessionReplies()).toEqual([
+      { sessionName: "rolls", result: "failed" },
+    ]);
     expect(logger.history).toContain("Failed to create session file: ");
   });
 
   it("replies that it failed while Item Data Collection is off", async () => {
     await writer.restart(false, folder);
-    sendSessionStart("rolls");
+    await sendSessionStart("rolls");
 
-    await vi.waitFor(() =>
-      expect(sessionReplies()).toEqual([
-        { sessionName: "rolls", result: "failed" },
-      ]),
-    );
+    expect(sessionReplies()).toEqual([
+      { sessionName: "rolls", result: "failed" },
+    ]);
     expect(await fs.readdir(folder)).toEqual([]);
+  });
+});
+
+describe("FileWriter writes", () => {
+  it("writes client log entries in the order they come when a write is slow", async () => {
+    await writer.restart(true, folder);
+    await delayFirstWrite();
+
+    await writeEntries(folder, 1, 2);
+  });
+
+  it("writes a session row after the header when the header write is slow", async () => {
+    await writer.restart(true, folder);
+    await delayFirstWrite();
+
+    const started = sendSessionStart("rolls");
+    await server.emit("CLIENT->MAIN::write-data", {
+      action: "log-item",
+      text: "a row",
+    });
+    await started;
+
+    expect(await readText(path.join(folder, "rolls.csv"))).toBe(
+      "a header\na row\n",
+    );
   });
 });

@@ -4,6 +4,7 @@ import { ServerEvents } from "../server";
 import { promises as fs, existsSync } from "fs";
 import { Logger } from "../RemoteLogger";
 import type { IpcLibrarySession } from "../../../ipc/library";
+import type { IpcEventPayload } from "../../../ipc/types";
 
 enum FileChannel {
   Item = "item",
@@ -43,72 +44,97 @@ export class FileWriter {
 
   private _currentDateTime = 0;
 
+  private queue: Promise<void> = Promise.resolve();
+
   constructor(
     private server: ServerEvents,
     private logger: Logger,
   ) {
     this.server.onEventAnyClient("CLIENT->MAIN::write-data", async (e) => {
-      if (e.action === "session" && e.start) {
-        await this.startSession(e.name ?? "", e.header ?? "");
-        return;
-      }
-      if (!this._enabled) return;
-      if (
-        e.action !== "log-item" &&
-        e.action !== "session" &&
-        e.action !== "client-log-event"
-      )
-        return;
-      if (e.action === "client-log-event") {
-        if (!this._state.clientLogFile) {
-          const filePath = path.join(this.uploadsPath, "client-log.ndjson");
-          this.openChannel(filePath, FileChannel.ClientLog, true);
-        }
-        if (e.data.ts < this._currentDateTime) {
-          this.logger.write(
-            `warn [FileWriter] time just went backwards: ${e.data.ts} < ${this._currentDateTime}`,
-          );
-        }
-        this._currentDateTime = e.data.ts;
-        this.writeLine(JSON.stringify(e.data), FileChannel.ClientLog);
-        if (e.close) {
-          await this.closeChannel(FileChannel.ClientLog);
-        }
-        return;
-      }
-
-      if (e.action === "log-item") {
-        this.writeLine(e.text, FileChannel.Item);
-        return;
-      }
-      // e.action === "session", a stop
-      await this.closeChannel(FileChannel.Item);
+      await this.inOrder(async () => {
+        await this.handleWriteData(e);
+      });
     });
   }
 
-  async restart(enabled: boolean, outputPath: string | null) {
-    const uploadsPath = outputPath?.length
-      ? outputPath
-      : this.defaultUploadsPath;
-    const folderChanged = uploadsPath !== this.uploadsPath;
-    this._enabled = enabled;
-    this.uploadsPath = uploadsPath;
+  async restart(enabled: boolean, outputPath: string | null): Promise<void> {
+    await this.inOrder(async () => {
+      const uploadsPath = outputPath?.length
+        ? outputPath
+        : this.defaultUploadsPath;
+      const folderChanged = uploadsPath !== this.uploadsPath;
+      this._enabled = enabled;
+      this.uploadsPath = uploadsPath;
 
-    // The handler ignores a session stop while the feature is off, so nothing else would close it
-    if (!enabled && this._state.itemFile) {
-      await this.closeChannel(FileChannel.Item);
-    }
-    // The next entry opens client-log.ndjson again, in the new folder. A session file stays in
-    // the folder it started in until the session stops.
-    if ((!enabled || folderChanged) && this._state.clientLogFile) {
-      await this.closeChannel(FileChannel.ClientLog);
-    }
+      // The handler ignores a session stop while the feature is off, so nothing else would close it
+      if (!enabled && this._state.itemFile) {
+        await this.closeChannel(FileChannel.Item);
+      }
+      // The next entry opens client-log.ndjson again, in the new folder. A session file stays in
+      // the folder it started in until the session stops.
+      if ((!enabled || folderChanged) && this._state.clientLogFile) {
+        await this.closeChannel(FileChannel.ClientLog);
+      }
+    });
   }
 
-  public async flushClientLogFile() {
-    if (this._state?.clientLogFile) {
-      await this.closeChannel(FileChannel.ClientLog);
+  public async flushClientLogFile(): Promise<void> {
+    await this.inOrder(async () => {
+      if (this._state.clientLogFile) {
+        await this.closeChannel(FileChannel.ClientLog);
+      }
+    });
+  }
+
+  // Each event, restart and flush starts after the one before it ends. Otherwise an entry that
+  // comes while client-log.ndjson opens finds no file, and Node does not order parallel writes.
+  private async inOrder(task: () => Promise<void>): Promise<void> {
+    this.queue = this.queue.then(task).catch((err: unknown) => {
+      this.logger.write(
+        `error [FileWriter] A file operation failed: ${(err as Error).message}`,
+      );
+    });
+    await this.queue;
+  }
+
+  private async handleWriteData(
+    e: IpcEventPayload<"CLIENT->MAIN::write-data">,
+  ) {
+    if (e.action === "session" && e.start) {
+      await this.startSession(e.name ?? "", e.header ?? "");
+      return;
     }
+    if (!this._enabled) return;
+    if (
+      e.action !== "log-item" &&
+      e.action !== "session" &&
+      e.action !== "client-log-event"
+    )
+      return;
+    if (e.action === "client-log-event") {
+      if (!this._state.clientLogFile) {
+        const filePath = path.join(this.uploadsPath, "client-log.ndjson");
+        await this.openChannel(filePath, FileChannel.ClientLog, true);
+      }
+      if (e.data.ts < this._currentDateTime) {
+        this.logger.write(
+          `warn [FileWriter] time just went backwards: ${e.data.ts} < ${this._currentDateTime}`,
+        );
+      }
+      this._currentDateTime = e.data.ts;
+      await this.writeLine(JSON.stringify(e.data), FileChannel.ClientLog);
+      if (e.close) {
+        await this.closeChannel(FileChannel.ClientLog);
+      }
+      return;
+    }
+
+    if (e.action === "log-item") {
+      await this.writeLine(e.text, FileChannel.Item);
+      return;
+    }
+    // e.action === "session", a stop
+    await this.closeChannel(FileChannel.Item);
   }
 
   private async startSession(name: string, header: string) {
@@ -145,7 +171,7 @@ export class FileWriter {
       }
       const filePath = path.join(this.uploadsPath, name + ".csv");
       if (await this.openChannel(filePath, FileChannel.Item)) {
-        this.writeLine(header, FileChannel.Item);
+        await this.writeLine(header, FileChannel.Item);
       }
       return "started";
     } catch (err) {
@@ -189,7 +215,7 @@ export class FileWriter {
     }
   }
 
-  private writeLine(line: string, channel: FileChannel) {
+  private async writeLine(line: string, channel: FileChannel) {
     switch (channel) {
       case FileChannel.Item:
         if (!this._state.itemFile) {
@@ -198,7 +224,7 @@ export class FileWriter {
           );
           return;
         }
-        this._state.itemFile.write(line + "\n");
+        await this._state.itemFile.write(line + "\n");
         break;
       case FileChannel.ClientLog:
         if (!this._state.clientLogFile) {
@@ -207,7 +233,7 @@ export class FileWriter {
           );
           return;
         }
-        this._state.clientLogFile.write(line + "\n");
+        await this._state.clientLogFile.write(line + "\n");
         break;
 
       default:
