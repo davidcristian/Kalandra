@@ -1,15 +1,31 @@
 import gzip
 import threading
 import unittest
+import zlib
+from http.client import IncompleteRead
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from support import FakeGet, fixture, ok
 
-from price_service.ninja import MAX_LEAGUES, NinjaClient, NinjaError, Reply, urllib_get
+from price_service.ninja import MAX_LEAGUES, HttpGet, NinjaClient, NinjaError, Reply, urllib_get
 from price_service.transform import Category
 
 CURRENCY = Category("Currency", exchange=True)
 WEAPONS = Category("UniqueWeapons", exchange=False)
+FAILURES: list[Reply | BaseException] = [
+    Reply(503, b"", None),
+    OSError("connection reset"),
+    IncompleteRead(b'{"lines"'),
+    EOFError("Compressed file ended before the end-of-stream marker was reached"),
+    zlib.error("Error -3 while decompressing data: invalid block type"),
+    ok(b"not json"),
+    ok(b'{"lines": [NaN]}'),
+    ok(b'{"lines": [-Infinity]}'),
+    ok(b'{"lines": [1e999]}'),
+    ok(b'{"lines": ["\\ud800"]}'),
+    ok(b"[" * 100_000),
+]
+GZIP_BODY = gzip.compress(b'{"ok": true}')
 
 
 def client_for(get: FakeGet, sleeps: list[float] | None = None) -> NinjaClient:
@@ -52,18 +68,20 @@ class OverviewTest(unittest.TestCase):
         self.assertEqual(second, first)
 
     def test_falls_back_to_the_last_good_copy_when_a_request_fails(self) -> None:
-        for failure in (Reply(503, b"", None), OSError("connection reset"), Reply(200, b"not json", None)):
-            get = FakeGet({"type=Currency": [ok({"lines": [1]}), failure]})
-            client = client_for(get)
-            client.overview("Standard", CURRENCY)
-            with self.assertLogs("price_service.ninja", "WARNING"):
-                self.assertEqual(client.overview("Standard", CURRENCY), {"lines": [1]})
+        for failure in FAILURES:
+            with self.subTest(failure=repr(failure)[:80]):
+                get = FakeGet({"type=Currency": [ok({"lines": [1]}), failure]})
+                client = client_for(get)
+                client.overview("Standard", CURRENCY)
+                with self.assertLogs("price_service.ninja", "WARNING"):
+                    self.assertEqual(client.overview("Standard", CURRENCY), {"lines": [1]})
 
     def test_raises_when_a_request_fails_and_nothing_is_cached(self) -> None:
-        for failure in (Reply(503, b"", None), OSError("connection reset"), Reply(200, b"not json", None), ok([1])):
-            client = client_for(FakeGet({"type=Currency": [failure]}))
-            with self.assertRaises(NinjaError):
-                client.overview("Standard", CURRENCY)
+        for failure in [*FAILURES, ok([1])]:
+            with self.subTest(failure=repr(failure)[:80]):
+                client = client_for(FakeGet({"type=Currency": [failure]}))
+                with self.assertRaises(NinjaError):
+                    client.overview("Standard", CURRENCY)
 
 
 class LeaguesTest(unittest.TestCase):
@@ -83,13 +101,21 @@ class LeaguesTest(unittest.TestCase):
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
+        length: int | None = None
         if self.path == "/gzip":
-            body = gzip.compress(b'{"ok": true}')
+            body = GZIP_BODY
             self.send_response(200)
             self.send_header("Content-Encoding", "gzip")
             self.send_header("ETag", '"abc"')
+        elif self.path in {"/gzip-cut", "/gzip-corrupt"}:
+            body = GZIP_BODY[:-4] if self.path == "/gzip-cut" else GZIP_BODY[:10] + b"\xff" * 8
+            self.send_response(200)
+            self.send_header("Content-Encoding", "gzip")
         elif self.path == "/plain":
             body = b'{"ok": true}'
+            self.send_response(200)
+        elif self.path == "/cut":
+            body, length = b'{"ok": tr', 12
             self.send_response(200)
         elif self.path == "/same" and self.headers.get("If-None-Match") == '"abc"':
             body = b""
@@ -98,7 +124,7 @@ class Handler(BaseHTTPRequestHandler):
         else:
             body = b""
             self.send_response(500)
-        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Length", str(len(body) if length is None else length))
         self.end_headers()
         self.wfile.write(body)
 
@@ -127,6 +153,19 @@ class UrllibGetTest(unittest.TestCase):
     def test_returns_304_and_errors_as_replies(self) -> None:
         self.assertEqual(urllib_get(f"{self.base}/same", {"If-None-Match": '"abc"'}, 5), Reply(304, b"", '"abc"'))
         self.assertEqual(urllib_get(f"{self.base}/missing", {}, 5).status, 500)
+
+    def test_a_body_cut_short_or_corrupt_is_a_failed_request(self) -> None:
+        for path, error in (("/cut", "IncompleteRead"), ("/gzip-cut", "EOFError"), ("/gzip-corrupt", "error")):
+            with self.subTest(path=path):
+                client = NinjaClient(self.get_from(path), user_agent="test", sleep=lambda _: None)
+                with self.assertRaisesRegex(NinjaError, f": {error}: "):
+                    client.overview("Standard", CURRENCY)
+
+    def get_from(self, path: str) -> HttpGet:
+        def get(_url: str, headers: dict[str, str], timeout: float, /) -> Reply:
+            return urllib_get(f"{self.base}{path}", headers, timeout)
+
+        return get
 
 
 if __name__ == "__main__":

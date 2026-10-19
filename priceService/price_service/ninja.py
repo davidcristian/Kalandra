@@ -1,12 +1,14 @@
 """Fetches poe.ninja's PoE 2 economy overviews, one request at a time."""
 
 import gzip
+import http.client
 import json
 import logging
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import zlib
 from collections.abc import Callable
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -16,6 +18,8 @@ from .transform import Category, Json, as_array, as_object
 
 BASE_URL = "https://poe.ninja/poe2/api/economy"
 MAX_LEAGUES = 12
+# A body cut short raises IncompleteRead or EOFError and a corrupt gzip body zlib.error, and none is an OSError
+REQUEST_ERRORS = (OSError, http.client.HTTPException, EOFError, zlib.error)
 
 log = logging.getLogger(__name__)
 
@@ -50,6 +54,14 @@ def urllib_get(url: str, headers: dict[str, str], timeout: float) -> Reply:
         etag = error.headers.get("ETag")
         error.close()
         return Reply(error.code, b"", etag if error.code == HTTPStatus.NOT_MODIFIED else None)
+
+
+def parse_json(body: bytes) -> object:
+    """Parses a response body and rejects a NaN, an infinity or a lone surrogate, which json.loads accepts."""
+    data = json.loads(body)
+    # Writing the data back as UTF-8 JSON raises ValueError on each of them, as the price file would
+    json.dumps(data, ensure_ascii=False, allow_nan=False).encode()
+    return data
 
 
 class NinjaClient:
@@ -101,7 +113,7 @@ class NinjaClient:
             headers["If-None-Match"] = cached[0]
         try:
             reply = self._get(url, headers, self._timeout)
-        except OSError as error:
+        except REQUEST_ERRORS as error:
             failure = f"{type(error).__name__}: {error}"
         else:
             if reply.status == HTTPStatus.NOT_MODIFIED and cached:
@@ -109,8 +121,8 @@ class NinjaClient:
             failure = f"HTTP {reply.status}"
             if reply.status == HTTPStatus.OK:
                 try:
-                    data = json.loads(reply.body)
-                except ValueError as error:
+                    data = parse_json(reply.body)
+                except (ValueError, RecursionError) as error:
                     failure = f"invalid JSON: {error}"
                 else:
                     self._cache[url] = (reply.etag, data)

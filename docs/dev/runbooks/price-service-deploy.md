@@ -109,6 +109,7 @@ that fails with no earlier copy skips the whole league.
 | `no Currency category to take exchange rates from` | the image's `namespaceMap.json` has no entry with the type `Currency` and `cx: true` | restore the entry and deploy with `--build` |
 | `exchange core in <currency> has no divine rate`, `exchange response has no core` or `exchange core needs rates, primary and secondary` | the league's `Currency` overview has no rates the service can convert | if it repeats in every cycle, poe.ninja's format changed: save the new response under `priceService/tests/fixtures/ninja/`, change `transform.py` and its tests, and deploy |
 | `<type> overview is not an object` | poe.ninja returned JSON that is not an object | the same as the row above |
+| `Out of range float values are not JSON compliant: inf` or `int too large to convert to float` | a value in one of the league's overviews becomes too large for a float in the conversion to divines | the same as the row above |
 | `league id has no letters or digits: '<id>'` | the id gives no file name | nothing; the app gets a 404 for that league |
 
 `WARNING using the last good copy of <url> (<reason>)` means a request failed and the service used the response from

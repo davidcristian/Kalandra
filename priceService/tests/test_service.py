@@ -4,7 +4,7 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
-from support import FIXTURES, FakeGet, league_routes, ok
+from support import FIXTURES, FakeGet, fixture, league_routes, ok
 
 from price_service.ninja import NinjaClient, Reply
 from price_service.service import build_league, run_cycle, write_atomic
@@ -62,6 +62,28 @@ class RunCycleTest(unittest.TestCase):
         self.assertEqual((self.output / "standard.json").read_text("utf-8"), "old")
         self.assertEqual(index["leagues"], [])
         self.assertEqual(index["failed"], ["Standard", "///"])
+
+    def test_skips_a_league_whose_values_the_file_cannot_hold(self) -> None:
+        nan, surrogate = (json.loads(fixture("exchange_currency.json")) for _ in range(2))
+        nan["lines"][0]["primaryValue"] = float("nan")
+        surrogate["items"][0]["name"] = "\ud800"
+        in_chaos = {"core": {"primary": "chaos", "rates": {"divine": 10}}}
+        cases = [
+            ("type=Currency", nan),
+            ("type=Currency", surrogate),
+            ("type=UniqueWeapons", {**in_chaos, "lines": [{"name": "Rune", "primaryValue": 1e308}]}),
+            ("type=UniqueWeapons", {**in_chaos, "lines": [{"name": "Rune", "primaryValue": 10**400}]}),
+        ]
+        for fragment, response in cases:
+            with self.subTest(fragment=fragment, response=str(response)[:60]), tempfile.TemporaryDirectory() as name:
+                output = Path(name)
+                routes: dict[str, list[Reply | BaseException]] = {f"league=Bad&{fragment}": [ok(response)]}
+                routes.update(league_routes())
+                routes["/leagues"] = [ok([{"id": "Bad"}, {"id": "Standard"}])]
+                with self.assertLogs("price_service.service", "WARNING"):
+                    index = run_cycle(client(routes), CATEGORIES, output, now=lambda: NOW)
+                self.assertEqual(index["failed"], ["Bad"])
+                self.assertEqual(sorted(path.name for path in output.iterdir()), ["index.json", "standard.json"])
 
 
 class WriteAtomicTest(unittest.TestCase):

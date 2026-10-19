@@ -127,10 +127,14 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
   `Accept-Encoding: gzip`.
 - An ETag is a version tag a server sends with a response. The service sends the last one back in `If-None-Match`,
   so unchanged data comes back as a 304 with no body and the service reuses its copy.
-- When a request fails (an error status, invalid JSON or a network error), the service uses the last good response
-  for that URL. The service keeps those copies in memory only, so the first cycle after a start has none.
-- An overview request that fails with no copy skips its whole league, which is logged and listed in `failed`. A
-  league list request that fails with no copy ends the cycle before any league, and no `index.json` is written.
+- When a request fails, the service uses the last good response for that URL. A request fails on an error status, a
+  network error, a body cut short, a corrupt gzip body, or a body that is not valid JSON. `parse_json` in `ninja.py`
+  also rejects `NaN`, `Infinity`, a number such as `1e999` that Python reads as an infinity, and a lone surrogate
+  escape such as `"\ud800"`. Python's JSON parser accepts them, and the price file cannot hold them. The service
+  keeps the copies in memory only, so the first cycle after a start has none.
+- An overview request that fails with no copy skips its whole league, which is logged and listed in `failed`. So
+  does a value that becomes too large for a float in the conversion to divines. A league list request that fails
+  with no copy ends the cycle before any league, and no `index.json` is written.
 
 ## App side
 
@@ -170,9 +174,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 35 tests on 18 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 37 tests on 19 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 86.4% of lines and branches on 18 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 86.7% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

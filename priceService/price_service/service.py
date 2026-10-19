@@ -61,7 +61,9 @@ def run_cycle(
         try:
             name = league_file_name(league)
             write_atomic(output, name, build_league(client, categories, league))
-        except (NinjaError, SnapshotError) as error:
+        # ValueError includes SnapshotError. A value that the conversion to divines makes too large for a float
+        # raises OverflowError, an ArithmeticError, or makes price_file raise ValueError
+        except (NinjaError, ValueError, ArithmeticError) as error:
             log.warning("league %r skipped: %s", league, error)
             failed.append(league)
             continue
