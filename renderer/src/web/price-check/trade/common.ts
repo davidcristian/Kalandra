@@ -56,53 +56,100 @@ export const RATE_LIMIT_RULES = {
   // HISTORY: shallowReactive(new Set([new RateLimiter(1, 5)])),
 };
 
+interface ServerLimit {
+  max: number;
+  window: number;
+  state: number;
+}
+
+// A rule name becomes part of a header name, and Headers.get throws on an invalid name
+const RULE_NAME = /^[\w-]+$/;
+
 export function adjustRateLimits(
   clientLimits: Set<RateLimiter>,
   headers: Headers,
 ): void {
-  if (!headers.has("x-rate-limit-rules")) return;
+  const rules = headers.get("x-rate-limit-rules");
+  if (rules == null) return;
 
-  const rules = headers.get("x-rate-limit-rules")!.split(",");
+  const extraWindow =
+    AppConfig<PriceCheckWidget>("price-check")!.apiLatencySeconds;
+  const serverLimits: ServerLimit[] = [];
+  let readAllRules = true;
+  for (const rule of rules.split(",")) {
+    const limits = readRule(headers, rule.trim(), extraWindow);
+    if (limits) {
+      serverLimits.push(...limits);
+    } else {
+      readAllRules = false;
+    }
+  }
 
-  _adjustRateLimits(
-    clientLimits,
-    rules.map((rule) => headers.get(`x-rate-limit-${rule}`)!).join(","),
-    rules.map((rule) => headers.get(`x-rate-limit-${rule}-state`)!).join(","),
-  );
+  _adjustRateLimits(clientLimits, serverLimits, readAllRules);
+}
+
+function readRule(
+  headers: Headers,
+  rule: string,
+  extraWindow: number,
+): ServerLimit[] | undefined {
+  const isValidName = RULE_NAME.test(rule);
+  const limitStr = isValidName ? headers.get(`x-rate-limit-${rule}`) : null;
+  const stateStr = isValidName
+    ? headers.get(`x-rate-limit-${rule}-state`)
+    : null;
+  const limits = limitStr?.split(",").map(readNumbers) ?? [];
+  const states = stateStr?.split(",").map(readNumbers) ?? [];
+
+  const isReadable =
+    limits.length > 0 &&
+    limits.length === states.length &&
+    limits.every(
+      ([max, window]) =>
+        isCount(max) && max > 0 && Number.isFinite(window) && window > 0,
+    ) &&
+    states.every(([hits]) => isCount(hits));
+  if (!isReadable) {
+    console.warn(
+      `Skipped rate limit rule "${rule}": limit header "${limitStr}", state header "${stateStr}"`,
+    );
+    return undefined;
+  }
+
+  return limits.map(([max, window], idx) => ({
+    max,
+    window: window + extraWindow,
+    state: states[idx][0],
+  }));
+}
+
+function readNumbers(entry: string): number[] {
+  return entry.split(":").map(Number);
+}
+
+function isCount(value: number): boolean {
+  return Number.isInteger(value) && value >= 0;
 }
 
 function _adjustRateLimits(
   clientLimits: Set<RateLimiter>,
-  limitStr: string,
-  stateStr: string,
+  limitRule: ServerLimit[],
+  removeOtherLimits: boolean,
 ): void {
   /* eslint-disable @typescript-eslint/no-unused-expressions */
   const DEBUG = false;
-  const DESYNC_FIX =
-    AppConfig<PriceCheckWidget>("price-check")!.apiLatencySeconds;
 
-  const limitRuleState = stateStr
-    .split(",")
-    .map((rule) => rule.split(":"))
-    .map((rule) => Number(rule[0]));
-  const limitRule = limitStr
-    .split(",")
-    .map((rule) => rule.split(":"))
-    .map((rule, idx) => ({
-      max: Number(rule[0]),
-      window: Number(rule[1]) + DESYNC_FIX,
-      state: limitRuleState[idx],
-    }));
-
-  // destroy
-  for (const limit of clientLimits) {
-    const isActive = limitRule.some((serverLimit) =>
-      limit.isEqualLimit(serverLimit),
-    );
-    if (!isActive) {
-      clientLimits.delete(limit);
-      limit.destroy();
-      DEBUG && console.log("Destroy", limit.toString());
+  // destroy, unless a rule was skipped: its limiter cannot be told apart from the old ones
+  if (removeOtherLimits) {
+    for (const limit of clientLimits) {
+      const isActive = limitRule.some((serverLimit) =>
+        limit.isEqualLimit(serverLimit),
+      );
+      if (!isActive) {
+        clientLimits.delete(limit);
+        limit.destroy();
+        DEBUG && console.log("Destroy", limit.toString());
+      }
     }
   }
 
@@ -110,7 +157,8 @@ function _adjustRateLimits(
   for (const limit of clientLimits) {
     const serverLimit = limitRule.find((serverLimit) =>
       limit.isEqualLimit(serverLimit),
-    )!;
+    );
+    if (!serverLimit) continue;
     const delta = serverLimit.state - limit.stack.length;
 
     if (delta === 0) {
@@ -141,7 +189,7 @@ function _adjustRateLimits(
     clientLimits.add(rl);
     DEBUG && console.log("Add", rl.toString());
 
-    for (let i = 0; i < serverLimit.state; ++i) {
+    for (let i = 0; i < Math.min(serverLimit.state, serverLimit.max); ++i) {
       rl.wait();
     }
   }

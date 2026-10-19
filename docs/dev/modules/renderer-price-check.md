@@ -126,7 +126,9 @@ is not private, `load()` selects the third league when the list has more than tw
   `RateLimiter.waitMulti(RATE_LIMIT_RULES.<SET>)` before it is sent and `adjustRateLimits(set, response.headers)`
   after. Each set starts as one request per 5 seconds; the headers `x-rate-limit-rules`, `x-rate-limit-<rule>` and
   `x-rate-limit-<rule>-state` replace it with the server's rules, each window longer by `apiLatencySeconds`
-  ("Extra time to prevent spurious Rate limiting", default 2). Before a search or an exchange request,
+  ("Extra time to prevent spurious Rate limiting", default 2). A rule whose two headers are missing, or that does
+  not give a limit above 0, a window and a hit count for each entry, is skipped with a `console.warn`. The set then
+  keeps its current limiters beside the rules it could read. Before a search or an exchange request,
   `preventQueueCreation` throws `Retry after <n> seconds` when the sets' current use would delay it by 1.5
   seconds or more. A new trade site request uses one of these sets or adds a new one.
 - **Three trade site requests do not use the sets**: the league list (`/api/trade2/data/leagues`), and the item
@@ -157,5 +159,6 @@ covers item filters, stat filters, the missing fractured rules and the pseudo st
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
 `specs/web/prices.test.ts` reads the price service's fixtures. `specs/web/host-proxy.test.ts` checks the URL and
-the header that `Host.proxy` sends. No test calls a live site. `RateLimiter.ts`,
-`common.ts`, `Leagues.ts`, `TradeData.ts` and `poeprices.ts` have no test file of their own.
+the header that `Host.proxy` sends. `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit
+headers into limiter sets with `adjustRateLimits`. No test calls a live site. `RateLimiter.ts`, `Leagues.ts`,
+`TradeData.ts` and `poeprices.ts` have no test file of their own.
