@@ -50,7 +50,7 @@ import { ItemCategory, ParsedItem } from "@/parser";
 import { ItemEditorType } from "@/parser/meta";
 import { EditorItem, itemIsModifiable } from "@/parser/ParsedItem";
 import { computed, defineComponent, PropType, shallowRef, watch } from "vue";
-import { applyCatalyst, getItemEditorType } from "./item-editor";
+import { applyCatalyst, catalystCost, getItemEditorType } from "./item-editor";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import { usePoeninja } from "@/web/background/Prices";
 import { AppConfig } from "@/web/Config";
@@ -166,19 +166,18 @@ export default defineComponent({
         if (!selectedCatalyst.value || !props.item) return;
         applyCatalyst(props.item, selectedCatalyst.value, selectedAmount.value);
 
-        const price = findPriceByQuery({
-          ns: "ITEM",
-          name: selectedCatalyst.value.name,
-        });
+        const cost = catalystCost(
+          selectedCatalyst.value,
+          selectedAmount.value,
+          findPriceByQuery,
+        );
 
-        if (!price) {
+        if (cost === undefined) {
           totalPrice.value = { min: 0, max: 0, currency: "ex" };
           return;
         }
 
-        const sumPrice = price.primaryValue * selectedAmount.value;
-        const currencyPrice = autoCurrency(sumPrice);
-        totalPrice.value = currencyPrice;
+        totalPrice.value = autoCurrency(cost);
       },
     );
 

@@ -3,6 +3,7 @@ import { ItemRarity, ParsedItem } from "@/parser";
 import { recalculateItemProperties } from "@/parser/calc-base";
 import { ARMOUR, ItemCategory, ItemEditorType, WEAPON } from "@/parser/meta";
 import { sumStatsByModType } from "@/parser/modifiers";
+import type { DbQuery } from "@/web/background/Prices";
 
 export function getItemEditorType(item: ParsedItem): ItemEditorType {
   if (!item.category) return ItemEditorType.None;
@@ -76,6 +77,19 @@ export function applyCatalyst(
 
   item.statsByType = sumStatsByModType(item.newMods);
   recalculateItemProperties(item, oldItem);
+}
+
+/**
+ * Returns the price in divines of `amount` catalysts, or undefined when the price file has none.
+ */
+export function catalystCost(
+  catalyst: BaseType,
+  amount: number,
+  findPrice: (query: DbQuery) => { primaryValue: number } | null,
+): number | undefined {
+  // The price file holds the English names from poe.ninja.
+  const price = findPrice({ ns: "ITEM", name: catalyst.refName });
+  return price ? price.primaryValue * amount : undefined;
 }
 
 export enum AugmentSaveType {

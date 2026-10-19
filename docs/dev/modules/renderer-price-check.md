@@ -81,6 +81,9 @@ league ([price-service.md](price-service.md)). This doc also covers the backgrou
   `autoCurrency`, `xchgRate`, `xchgRateCurrency`, `availableCoreCurrencies`, `initialLoading`, `ITEM_DROP` and
   the price arithmetic `addPrice`, `subtractPrice` and `comparePrice`. The module also exports
   `displayRounding`, which formats a value for display.
+- The price file holds poe.ninja's English names, so a caller passes an item's `refName` to `findPriceByQuery`,
+  never its `name`, which is in the app language. The item editor's catalyst price uses `catalystCost` in
+  `item-editor/item-editor.ts`.
 - `load()` fetches `data/namespaceMap.json` from the app's own files and the price file from
   `Host.proxy(priceFileUrl(league.id))`. It runs only for a selected league that is in the league list and not
   private, on realm `pc-ggg`. It loads the file again when the last successful load is over 31 minutes old
