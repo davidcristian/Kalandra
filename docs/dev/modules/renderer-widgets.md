@@ -117,6 +117,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 `vitest.config.ts` lists `*.vue` under `coverage.exclude`. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/client-log.test.ts` (the client log the XP tracker reads, with
-`FullCampaign.txt`) and `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
-image). Overlay focus, hiding on blur and the hotkeys need the game:
+`FullCampaign.txt`), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
+image) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
+browser tab). Overlay focus, hiding on blur and the hotkeys need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md).

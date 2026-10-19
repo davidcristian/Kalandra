@@ -102,10 +102,11 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - Every message is a member of `IpcEvent`. The send and listen functions on both ends take only its names and
   payloads, so `tsc` fails on an unknown name or a wrong payload. A new message starts as a new union member, then
   gets its sender and its handler ([AGENTS.md](../../../AGENTS.md#architecture-rules)).
-- The name states the direction. `Host.onEvent()` does not listen for a `MAIN->OVERLAY::` message in a page outside
-  Electron, so a browser tab never acts on focus, visibility or area tracking. `server.ts` ignores and logs an
-  `OVERLAY->MAIN::` message from a client whose WebSocket upgrade request has no `Electron` in its User-Agent, so a
-  browser tab cannot move the focus to the game or show the overlay window.
+- The name states the direction. In a page outside Electron, `Host.onEvent()` does not listen for a `MAIN->OVERLAY::`
+  message and `Host.sendEvent()` does not send an `OVERLAY->MAIN::` message, so a browser tab never acts on focus,
+  visibility or area tracking. `server.ts` also ignores and logs an `OVERLAY->MAIN::` message from a client whose
+  WebSocket upgrade request has no `Electron` in its User-Agent, so a browser tab cannot move the focus to the game
+  or show the overlay window.
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
 - Neither end validates a message: `server.ts` casts `JSON.parse()` to `IpcEvent`, and `IPC.ts` passes the

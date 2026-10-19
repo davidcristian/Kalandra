@@ -40,6 +40,9 @@ class HostTransport {
   }
 
   sendEvent(event: IpcEvent) {
+    if (!this.isElectron && event.name.startsWith("OVERLAY->MAIN")) {
+      return;
+    }
     this.socket.send(JSON.stringify(event));
   }
 
