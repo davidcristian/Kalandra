@@ -28,7 +28,10 @@
         </div>
         <!-- Items per hour -->
         <div
-          v-if="volumeSetting === 'item' || volumeSetting === 'both'"
+          v-if="
+            (volumeSetting === 'item' || volumeSetting === 'both') &&
+            priceData.volume.itemsPerHour !== undefined
+          "
           class="flex flex-row items-center"
         >
           {{ priceData.volume.itemsPerHour }}
@@ -138,12 +141,9 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, watch } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import {
-  CurrencyValue,
-  displayRounding,
-  usePoeninja,
-} from "@/web/background/Prices";
+import { CurrencyValue, usePoeninja } from "@/web/background/Prices";
 import { isValuableBasetype, getDetailsId } from "./getDetailsId";
+import { TradeVolume, tradeVolume } from "./trade-volume";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import VueApexcharts from "vue3-apexcharts";
 import { ParsedItem } from "@/parser";
@@ -206,12 +206,7 @@ export default defineComponent({
           text: string;
         } | null;
         url: string;
-        volume?: {
-          currency: string;
-          primaryVolumePerHour: string;
-          itemsPerHour: string;
-          highestVolumeCurrency: string;
-        };
+        volume?: TradeVolume;
       } = {
         price,
         change: entry.sparkline.data
@@ -221,18 +216,7 @@ export default defineComponent({
       };
 
       if ("volumePrimaryValue" in entry) {
-        const perHour = autoCurrency(entry.volumePrimaryValue);
-
-        const itemsPerHour =
-          perHour!.min /
-          (perHour!.currency === "div" ? entry.primaryValue : price.min);
-
-        data.volume = {
-          currency: perHour!.currency,
-          primaryVolumePerHour: displayRounding(perHour!.min),
-          itemsPerHour: displayRounding(itemsPerHour!, false, true),
-          highestVolumeCurrency: entry.maxVolumeCurrency,
-        };
+        data.volume = tradeVolume(entry, autoCurrency);
       }
 
       return data;

@@ -69,8 +69,10 @@ league ([price-service.md](price-service.md)). This doc also covers the backgrou
   `sendFeedback` posts to `/send_feedback`. The setting "Show price prediction" (`requestPricePrediction`,
   default `false`) exists, but the `<price-prediction>` element in `CheckedItem.vue` is commented out, so the
   window shows no prediction and sends no request to `www.poeprices.info`.
-- `trends/` (`PriceTrend.vue`, `getDetailsId.ts`), `related-items/`, `stack-value/`: the estimate, related items
-  and stack value read from the price file. `unidentified-resolver/` picks the unique for an unidentified item.
+- `trends/` (`PriceTrend.vue`, `getDetailsId.ts`, `trade-volume.ts`), `related-items/`, `stack-value/`: the
+  estimate, related items and stack value read from the price file. `tradeVolume` in `trade-volume.ts` formats the
+  currency exchange volume per hour, and divides the volume by the price, both in Divine Orbs, for items per hour.
+  `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again. `settings-price-check.vue` is the widget's settings page.
 
