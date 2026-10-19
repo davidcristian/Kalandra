@@ -109,10 +109,13 @@ deploy with `--build`. A `schemaVersion` other than 1 stops the service at start
 | --- | --- | --- |
 | `PRICE_OUTPUT_DIR` | `/srv/prices` | where the files are written; created when missing |
 | `PRICE_NAMESPACE_MAP` | `/app/namespaceMap.json` | the categories to fetch |
-| `PRICE_INTERVAL_MINUTES` | `60` | time between the starts of two cycles; a cycle longer than this starts the next at once |
-| `PRICE_REQUEST_DELAY_SECONDS` | `1` | pause after every request, a failed one included |
+| `PRICE_INTERVAL_MINUTES` | `60` | time between the starts of two cycles, above 0; a cycle longer than this starts the next at once |
+| `PRICE_REQUEST_DELAY_SECONDS` | `1` | pause after every request, a failed one included; 0 or more |
 | `PRICE_CONTACT` | `https://github.com/davidcristian/Kalandra/issues` | the contact sent in the User-Agent |
 | `PRICE_LOG_LEVEL` | `INFO` | the Python logging level |
+
+An interval or a delay that is not a finite number in its range stops the service at start, before its first
+request, with a `SettingsError` that names the variable.
 
 The Dockerfile sets `PRICE_OUTPUT_DIR` and `PRICE_NAMESPACE_MAP` to these defaults. Each request times out after 30
 seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
@@ -180,9 +183,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 46 tests on 19 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 48 tests on 19 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 96.4% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 96.5% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

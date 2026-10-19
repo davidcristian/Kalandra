@@ -95,8 +95,11 @@ first cycle.
   traceback. A full disk or a read-only volume needs no deploy: the next cycle writes the files once the volume is
   writable. For an error in the code, fix it with a test that replays the response, and deploy again.
 - A Python traceback without `cycle failed`, and `docker compose ps` shows `prices` restarting: the process ends at
-  start, before its first request, so the restarts send no requests. Read the traceback; the next case is the known
-  one.
+  start, before its first request, so the restarts send no requests. Read the traceback; the next two cases are the
+  known ones.
+- `SettingsError: PRICE_INTERVAL_MINUTES must be a number above 0` or `PRICE_REQUEST_DELAY_SECONDS must be a number
+  of 0 or more`: the variable has a value the service cannot run with. Correct it where `prices` gets it, then
+  deploy again ([Deploy or update](#deploy-or-update), [the variables](../modules/price-service.md#environment)).
 - `load_categories` or `SnapshotError: unsupported schemaVersion` in the traceback: the image's `namespaceMap.json`
   is not schema version 1, and the service stops at start, before any request
   ([price-service.md](../modules/price-service.md#namespacemapjson)).

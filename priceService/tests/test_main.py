@@ -6,7 +6,7 @@ from pathlib import Path
 
 from support import FakeGet, FakeSleep, StopScheduleError, league_routes
 
-from price_service.__main__ import Settings, main, read_settings
+from price_service.__main__ import Settings, SettingsError, main, read_settings
 
 NAMESPACE_MAP = {
     "schemaVersion": 1,
@@ -64,6 +64,27 @@ class ReadSettingsTest(unittest.TestCase):
             ),
         )
 
+    def test_a_number_the_schedule_cannot_use_raises_an_error_that_names_the_variable(self) -> None:
+        cases = [
+            ("PRICE_INTERVAL_MINUTES", "0", "a number above 0"),
+            ("PRICE_INTERVAL_MINUTES", "-60", "a number above 0"),
+            ("PRICE_INTERVAL_MINUTES", "nan", "a number above 0"),
+            ("PRICE_INTERVAL_MINUTES", "inf", "a number above 0"),
+            ("PRICE_INTERVAL_MINUTES", "an hour", "a number above 0"),
+            ("PRICE_REQUEST_DELAY_SECONDS", "-1", "a number of 0 or more"),
+            ("PRICE_REQUEST_DELAY_SECONDS", "nan", "a number of 0 or more"),
+            ("PRICE_REQUEST_DELAY_SECONDS", "inf", "a number of 0 or more"),
+            ("PRICE_REQUEST_DELAY_SECONDS", "", "a number of 0 or more"),
+        ]
+        for name, value, rule in cases:
+            with self.subTest(name=name, value=value):
+                with self.assertRaises(SettingsError) as raised:
+                    read_settings({name: value})
+                self.assertEqual(str(raised.exception), f"{name} must be {rule}, not {value!r}")
+
+    def test_accepts_no_pause_between_requests(self) -> None:
+        self.assertEqual(read_settings({"PRICE_REQUEST_DELAY_SECONDS": "0"}).delay_seconds, 0.0)
+
 
 class MainTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -109,14 +130,16 @@ class MainTest(unittest.TestCase):
 
     def test_a_bad_setting_stops_the_service_before_any_request(self) -> None:
         cases: list[tuple[str, str, type[Exception]]] = [
-            ("PRICE_INTERVAL_MINUTES", "an hour", ValueError),
-            ("PRICE_REQUEST_DELAY_SECONDS", "", ValueError),
+            ("PRICE_INTERVAL_MINUTES", "an hour", SettingsError),
+            ("PRICE_INTERVAL_MINUTES", "0", SettingsError),
+            ("PRICE_REQUEST_DELAY_SECONDS", "", SettingsError),
+            ("PRICE_REQUEST_DELAY_SECONDS", "-1", SettingsError),
             ("PRICE_LOG_LEVEL", "LOUD", ValueError),
             ("PRICE_NAMESPACE_MAP", str(self.output / "namespaceMap.json"), FileNotFoundError),
         ]
         for name, value, error in cases:
             logging.getLogger().handlers = []
-            with self.subTest(name=name), self.assertRaises(error):
+            with self.subTest(name=name, value=value), self.assertRaises(error):
                 main(["--once"], {**self.environ, name: value}, get=self.get, sleep=lambda _: None)
         self.assertEqual(self.get.calls, [])
         self.assertFalse(self.output.exists())
