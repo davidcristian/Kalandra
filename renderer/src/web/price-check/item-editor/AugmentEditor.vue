@@ -167,20 +167,13 @@
 </template>
 
 <script lang="ts">
-import { AugmentGroup, GROUPED_AUGMENTS, ITEM_BY_REF } from "@/assets/data";
+import { ITEM_BY_REF } from "@/assets/data";
 import { ItemCategory, ParsedItem } from "@/parser";
-import {
-  computed,
-  defineComponent,
-  PropType,
-  ref,
-  shallowRef,
-  watch,
-} from "vue";
+import { computed, defineComponent, PropType, shallowRef, watch } from "vue";
 import ItemSumPrice from "@/web/ui/ItemSumPrice.vue";
 import UiTabs from "@/web/ui/UiTabs.vue";
 import AugmentsList from "./AugmentsList.vue";
-import { useAugment, getCategoryGroups } from "./augment";
+import { useAugment, categoryAugments } from "./augment";
 import { AppConfig } from "@/web/Config";
 import { EditorItem } from "@/parser/ParsedItem";
 import { buildEditorItems } from "@/parser/augment-builder";
@@ -218,43 +211,10 @@ export default defineComponent({
     }
     resetSelectedAugment();
 
-    const augmentCache = new Map<ItemCategory, AugmentGroup<EditorItem>>();
-    const displayGroups = ref<AugmentGroup<EditorItem> | null>(null);
-
-    watch(
-      () => AppConfig().language,
-      (curr, prev) => {
-        if (curr === prev) return;
-        // clear cache
-        augmentCache.clear();
-        displayGroups.value = null;
-      },
-      { immediate: true },
+    const displayGroups = computed(() =>
+      props.item?.category ? categoryAugments(props.item.category) : null,
     );
-
-    watch(
-      () => props.item?.category,
-      (curr, prev) => {
-        if (curr === prev && displayGroups.value) return;
-        if (!curr) {
-          displayGroups.value = null;
-          return;
-        }
-
-        const augment = augmentCache.get(curr);
-        if (augment) {
-          displayGroups.value = augment;
-          return;
-        }
-
-        // have category, cache miss => load data
-        const augmentData = getCategoryGroups(GROUPED_AUGMENTS, curr);
-        augmentCache.set(curr, augmentData);
-        displayGroups.value = augmentData;
-        resetSelectedAugment();
-      },
-      { immediate: true },
-    );
+    watch(displayGroups, resetSelectedAugment);
     const savedConfig = computed(
       () => AppConfig<PriceCheckWidget>("price-check")!.savedAugments,
     );

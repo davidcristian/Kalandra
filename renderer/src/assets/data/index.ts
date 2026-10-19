@@ -12,6 +12,7 @@ import type {
 } from "./interfaces";
 import { loadClientStrings } from "../client-string-loader";
 import { lineStartsByHash } from "./hash-index";
+import { markItemDataLoaded } from "./loads";
 import { useTradeData } from "@/web/background/TradeData";
 import { GEM, ItemCategory } from "@/parser/meta";
 import { ItemRarity } from "@/parser/ParsedItem";
@@ -318,6 +319,7 @@ export async function loadForLang(lang: string) {
   await loadItems(lang);
   await loadStats(lang);
   loadUltraLateItems();
+  markItemDataLoaded();
   await loadTradeData();
 }
 

@@ -7,7 +7,7 @@
 317 dataParser/src/stores/helpers/description.py
 348 ipc/types.ts
 330 main/src/shortcuts/Shortcuts.ts
-622 renderer/src/assets/data/index.ts
+624 renderer/src/assets/data/index.ts
 351 renderer/src/assets/data/interfaces.ts
 2236 renderer/src/parser/Parser.ts
 380 renderer/src/parser/stat-translations.ts
@@ -25,7 +25,6 @@
 974 renderer/src/web/price-check/filters/create-stat-filters.ts
 640 renderer/src/web/price-check/filters/pseudo/index.ts
 723 renderer/src/web/price-check/filters/pseudo/item-property.ts
-336 renderer/src/web/price-check/item-editor/AugmentEditor.vue
 379 renderer/src/web/price-check/settings-price-check.vue
 419 renderer/src/web/price-check/trade/TooltipItem.vue
 301 renderer/src/web/price-check/trade/TradeBulk.vue

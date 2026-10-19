@@ -72,7 +72,9 @@ A module exports the internal functions its tests call as `__testExports` (`Pars
 - `loadForLang(lang)` loads `CLIENT_STRINGS` from `data/<lang>/client_strings.js` (through
   `client-string-loader.ts`), the items and the stats, builds the rune, soul core and catalyst lookups
   (`loadUltraLateItems`), and loads the trade site's item and stat lists through `useTradeData()` in
-  `web/background/TradeData.ts`.
+  `web/background/TradeData.ts`. After the lookups it calls `markItemDataLoaded()` from `loads.ts`. The module
+  variables are not reactive, so code that builds lists from them uses `cachePerDataLoad(build)` from `loads.ts`:
+  it builds each key's value once per load, and a computed that calls it runs again after the next load.
 - Lookups: `ITEM_BY_REF(namespace, refName)` and `ITEM_BY_TRANSLATED(namespace, name)` return `BaseType[]`, where
   the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns a
   `Stat`; `STAT_BY_MATCH_STR(text)` returns the `Stat` and the `StatMatcher` whose text is exactly `text`;

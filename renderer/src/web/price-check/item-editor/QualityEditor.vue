@@ -45,15 +45,19 @@
 </template>
 
 <script lang="ts">
-import { BaseType, CATALYST_TO_TAG, CATALYST_TYPES } from "@/assets/data";
+import { BaseType } from "@/assets/data";
 import { ItemCategory, ParsedItem } from "@/parser";
 import { ItemEditorType } from "@/parser/meta";
 import { EditorItem, itemIsModifiable } from "@/parser/ParsedItem";
 import { computed, defineComponent, PropType, shallowRef, watch } from "vue";
-import { applyCatalyst, catalystCost, getItemEditorType } from "./item-editor";
+import {
+  applyCatalyst,
+  catalystCost,
+  categoryCatalysts,
+  getItemEditorType,
+} from "./item-editor";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import { usePoeninja } from "@/web/background/Prices";
-import { AppConfig } from "@/web/Config";
 import ItemEditorItem from "./ItemEditorItem.vue";
 
 export default defineComponent({
@@ -84,46 +88,12 @@ export default defineComponent({
       currency: "ex",
     });
 
-    const catalystCache = new Map<ItemCategory, EditorItem[]>();
-
-    watch(
-      () => AppConfig().language,
-      () => {
-        catalystCache.clear();
-      },
+    const result = computed(() =>
+      props.item?.category &&
+      getItemEditorType(props.item) === ItemEditorType.Catalyst
+        ? categoryCatalysts(props.item.category)
+        : [],
     );
-
-    const result = computed(() => {
-      if (!props.item) return [];
-
-      const items: EditorItem[] = [];
-
-      const category = props.item.category;
-      if (!category) return [];
-      if (catalystCache.has(category)) {
-        return catalystCache.get(category)!;
-      }
-      if (getItemEditorType(props.item) === ItemEditorType.Catalyst) {
-        const catalysts =
-          props.item.category === ItemCategory.Jewel
-            ? CATALYST_TYPES.Refined
-            : CATALYST_TYPES.Normal;
-        for (const catalyst of catalysts) {
-          items.push({
-            name: catalyst.name,
-            refName: catalyst.refName,
-            icon: catalyst.icon,
-            displayString: CATALYST_TO_TAG[catalyst.tags[1]].join(", "),
-            stats: [],
-            baseItem: catalyst,
-          });
-        }
-      }
-
-      catalystCache.set(category, items);
-
-      return items;
-    });
 
     watch(
       () => props.item,

@@ -1,5 +1,7 @@
-import { BaseType, CATALYST_TO_TAG } from "@/assets/data";
+import { BaseType, CATALYST_TO_TAG, CATALYST_TYPES } from "@/assets/data";
+import { cachePerDataLoad } from "@/assets/data/loads";
 import { ItemRarity, ParsedItem } from "@/parser";
+import type { EditorItem } from "@/parser/ParsedItem";
 import { recalculateItemProperties } from "@/parser/calc-base";
 import { ARMOUR, ItemCategory, ItemEditorType, WEAPON } from "@/parser/meta";
 import { sumStatsByModType } from "@/parser/modifiers";
@@ -27,6 +29,22 @@ export function getItemEditorType(item: ParsedItem): ItemEditorType {
     return ItemEditorType.None;
   }
 }
+
+/** Returns the catalysts for an item of the category, built once for each load of the item data. */
+export const categoryCatalysts = cachePerDataLoad(
+  (category: ItemCategory): EditorItem[] =>
+    (category === ItemCategory.Jewel
+      ? CATALYST_TYPES.Refined
+      : CATALYST_TYPES.Normal
+    ).map((catalyst) => ({
+      name: catalyst.name,
+      refName: catalyst.refName,
+      icon: catalyst.icon,
+      displayString: CATALYST_TO_TAG[catalyst.tags[1]].join(", "),
+      stats: [],
+      baseItem: catalyst,
+    })),
+);
 
 export function applyCatalyst(
   item: ParsedItem,

@@ -50,7 +50,9 @@ that the route needs ([main.md](main.md)).
   stats, each the sum of several item stats, such as total fire resistance (`filterPseudo` and its
   `PSEUDO_RULES`), and the item property filters (`filterItemProp`). The types are in `filters/interfaces.ts`.
 - `fill-augments.ts` and `item-editor/` apply the item editor's rune, soul core, catalyst and quality changes to
-  the item and its filters, through `recalculateItemProperties` from the parser.
+  the item and its filters, through `recalculateItemProperties` from the parser. The editor's lists come from
+  `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
+  once per game data load, so they switch to the new language after a language change.
 
 ### Trade queries (`trade/`)
 

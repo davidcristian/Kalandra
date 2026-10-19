@@ -1,4 +1,5 @@
-import { AugmentGroup, BaseType } from "@/assets/data";
+import { AugmentGroup, BaseType, GROUPED_AUGMENTS } from "@/assets/data";
+import { cachePerDataLoad } from "@/assets/data/loads";
 import { ItemCategory, ParsedItem } from "@/parser";
 import { buildEditorItems } from "@/parser/augment-builder";
 import {
@@ -31,6 +32,11 @@ export function getCategoryGroups(
     Other: buildEditorItems(augments.Other, category),
   };
 }
+
+/** Returns the augments that fit the category, built once for each load of the item data. */
+export const categoryAugments = cachePerDataLoad((category: ItemCategory) =>
+  getCategoryGroups(GROUPED_AUGMENTS, category),
+);
 
 export function useAugment(
   item: ParsedItem,
