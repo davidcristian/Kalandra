@@ -48,8 +48,6 @@ you price checked an item in the last 20 minutes. Kalandra sends no request to p
 
 - The price is in your primary base currency (Exalted Orb by default), or in Divine Orbs when the item is worth about
   one Divine Orb or more.
-- For a normal, magic or rare weapon, armour piece, ring, amulet, belt or quiver, the estimate is the price of the
-  base item, and the line says **Base item**.
 - The small graph shows the price over the **Last 7 days**. An arrow marks a rising or falling price, and the
   percentage shows how much the price varied in that time.
 - For an item traded on the currency exchange, the line also shows how much currency and how many items trade per
@@ -66,7 +64,7 @@ No estimate shows when:
   `Ruthless` in its name,
 - the realm is **Hotcool**, which the General settings offer for Traditional Chinese,
 - the trade site does not list the league, or the price service has no file for it,
-- the price file has no entry for the item.
+- the price file has no entry for the item, such as a normal, magic or rare weapon, armour piece or accessory.
 
 ## Filters
 

@@ -121,3 +121,4 @@ layout and its reasons.
 - 059: [The parser cannot distinguish items that share a translated name and defences](tasks/059-shared-translated-item-names.md)
 - 060: [The clipboard restore after a chat command can come before the game pastes](tasks/060-clipboard-restore-before-paste.md)
 - 061: [The Carapace Catalyst matches no modifier tag that Path of Exile 2 copies](tasks/061-carapace-catalyst-defences-tag.md)
+- 062: [The price check looks up a base item price that the price file never has](tasks/062-base-item-estimate.md)

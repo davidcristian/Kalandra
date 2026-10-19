@@ -78,6 +78,9 @@ that the route needs ([main.md](main.md)).
 - `trends/` (`PriceTrend.vue`, `getDetailsId.ts`, `trade-volume.ts`), `related-items/`, `stack-value/`: the
   estimate, related items and stack value read from the price file. `getDetailsId` returns the item's query for the
   price file, with a unique's base item as `variant` ([price-service.md](price-service.md#the-price-file-format)).
+  For a normal, magic or rare weapon, armour piece, accessory or quiver it returns the base type
+  (`isValuableBasetype`, `forBasetype`), which no category in `namespaceMap.json` holds, so the window shows no
+  estimate for it ([refinement 062](../refinements/tasks/062-base-item-estimate.md)).
   `tradeVolume` in `trade-volume.ts` formats the currency exchange volume per hour, and divides the volume by the
   price, both in Divine Orbs, for items per hour.
   `buildRelatedItems` in `related-items/related-items.ts` lists the `item-drop.json` group that contains the
