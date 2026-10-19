@@ -60,6 +60,7 @@ interface ServerLimit {
   max: number;
   window: number;
   state: number;
+  restriction: number;
 }
 
 // A rule name becomes part of a header name, and Headers.get throws on an invalid name
@@ -70,8 +71,20 @@ export function adjustRateLimits(
   headers: Headers,
 ): void {
   const rules = headers.get("x-rate-limit-rules");
-  if (rules == null) return;
+  if (rules != null) {
+    const { serverLimits, readAllRules } = readRules(headers, rules);
+    _adjustRateLimits(clientLimits, serverLimits, readAllRules);
+  }
 
+  const retryAfter = readRetryAfter(headers.get("retry-after"));
+  if (retryAfter > 0) {
+    for (const limit of clientLimits) {
+      limit.restrict(retryAfter);
+    }
+  }
+}
+
+function readRules(headers: Headers, rules: string) {
   const extraWindow =
     AppConfig<PriceCheckWidget>("price-check")!.apiLatencySeconds;
   const serverLimits: ServerLimit[] = [];
@@ -84,8 +97,7 @@ export function adjustRateLimits(
       readAllRules = false;
     }
   }
-
-  _adjustRateLimits(clientLimits, serverLimits, readAllRules);
+  return { serverLimits, readAllRules };
 }
 
 function readRule(
@@ -108,7 +120,10 @@ function readRule(
       ([max, window]) =>
         isCount(max) && max > 0 && Number.isFinite(window) && window > 0,
     ) &&
-    states.every(([hits]) => isCount(hits));
+    states.every(
+      ([hits, , restriction = 0]) =>
+        isCount(hits) && Number.isFinite(restriction) && restriction >= 0,
+    );
   if (!isReadable) {
     console.warn(
       `Skipped rate limit rule "${rule}": limit header "${limitStr}", state header "${stateStr}"`,
@@ -116,11 +131,22 @@ function readRule(
     return undefined;
   }
 
-  return limits.map(([max, window], idx) => ({
-    max,
-    window: window + extraWindow,
-    state: states[idx][0],
-  }));
+  return limits.map(([max, window], idx) => {
+    const [hits, , restriction = 0] = states[idx];
+    return { max, window: window + extraWindow, state: hits, restriction };
+  });
+}
+
+function readRetryAfter(value: string | null): number {
+  if (value == null) return 0;
+
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds;
+
+  console.warn(
+    `Ignored Retry-After header "${value}": not a number of seconds`,
+  );
+  return 0;
 }
 
 function readNumbers(entry: string): number[] {
@@ -168,9 +194,7 @@ function _adjustRateLimits(
         console.error(
           `Rate limit state on Server is greater by ${Math.abs(delta)}. Bursting to prevent rate limiting.`,
         );
-      for (let i = 0; i < Math.min(delta, limit.available); ++i) {
-        limit.wait();
-      }
+      limit.addHits(delta);
     } else if (delta < 0) {
       DEBUG &&
         console.warn(
@@ -189,8 +213,17 @@ function _adjustRateLimits(
     clientLimits.add(rl);
     DEBUG && console.log("Add", rl.toString());
 
-    for (let i = 0; i < Math.min(serverLimit.state, serverLimit.max); ++i) {
-      rl.wait();
+    rl.addHits(serverLimit.state);
+  }
+
+  // The third field of a state entry is the seconds left of a restriction
+  // (https://www.pathofexile.com/developer/docs#ratelimits)
+  for (const serverLimit of limitRule) {
+    if (serverLimit.restriction === 0) continue;
+    for (const limit of clientLimits) {
+      if (limit.isEqualLimit(serverLimit)) {
+        limit.restrict(serverLimit.restriction);
+      }
     }
   }
 }

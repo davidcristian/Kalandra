@@ -89,7 +89,7 @@ layout and its reasons.
 - 027: [Map check and Item info are two hotkey rows for one setting](tasks/027-map-check-item-info-hotkey.md)
 - 028: [A TradeData.ts comment gives the wrong interest window](tasks/028-trade-data-interest-comment.md)
 - 029: [remnants.json and two dataParser output files are unused](tasks/029-unused-data-files.md)
-- 030: [The rate limiter and the league code have no tests](tasks/030-rate-limiter-and-league-tests.md)
+- 030: [The league, trade data and price prediction code have no tests](tasks/030-rate-limiter-and-league-tests.md)
 - 031: [Decide whether the Path of Exile 1 features stay](tasks/031-path-of-exile-1-features.md)
 - 032: [The README's graph image is on imgur](tasks/032-readme-imgur-graph.md)
 - 033: [Take current screenshots of the Settings window and the add widget menu](tasks/033-app-screenshots.md)

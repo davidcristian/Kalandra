@@ -84,6 +84,10 @@ describe("adjustRateLimits", () => {
     ["has a limit of 0 requests", { "x-rate-limit-ip": "0:10:60" }],
     ["has a state that is not a number", { "x-rate-limit-ip-state": "a:b:c" }],
     ["has fewer states than limits", { "x-rate-limit-ip-state": "1:10:0" }],
+    [
+      "has a restriction that is not a number",
+      { "x-rate-limit-ip-state": "1:10:x,1:60:0,1:300:0" },
+    ],
     ["is not a valid header name", { "x-rate-limit-rules": "Account,I p" }],
   ])(
     "keeps the current limits when a rule %s, and adds the readable rules",
@@ -145,4 +149,76 @@ describe("adjustRateLimits", () => {
     expect(account.stack.length).toBe(3);
     expect(account.queue.value).toBe(0);
   });
+
+  it("counts every hit the server reports beyond the client's own", () => {
+    const limits = new Set<RateLimiter>();
+    adjustRateLimits(limits, accountState("0:5:0"));
+
+    adjustRateLimits(limits, accountState("3:5:0"));
+
+    expect(describeLimits(limits)).toEqual([{ max: 3, window: 7, hits: 3 }]);
+  });
+
+  it("holds the set for the restriction time in the state header", async () => {
+    const limits = new Set([new RateLimiter(1, 5)]);
+
+    adjustRateLimits(
+      limits,
+      headersWith({ "x-rate-limit-account-state": "4:5:60" }),
+    );
+
+    expect(RateLimiter.estimateTime(1, limits)).toBe(60_000);
+    let sent = false;
+    void RateLimiter.waitMulti(limits).then(() => {
+      sent = true;
+    });
+    await vi.advanceTimersByTimeAsync(59_999);
+    expect(sent).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(sent).toBe(true);
+  });
+
+  it("counts the hits of a restricted set without waiting", () => {
+    const limits = new Set<RateLimiter>();
+    adjustRateLimits(limits, accountState("1:5:60"));
+
+    adjustRateLimits(limits, accountState("3:5:59"));
+
+    const [account] = limits;
+    expect(account.stack.length).toBe(3);
+    expect(account.queue.value).toBe(0);
+  });
+
+  it("holds every limiter in the set for the seconds in Retry-After", () => {
+    const starting = new Set([new RateLimiter(1, 5)]);
+    const replaced = new Set([new RateLimiter(1, 5)]);
+
+    adjustRateLimits(starting, new Headers({ "retry-after": "30" }));
+    adjustRateLimits(replaced, headersWith({ "retry-after": "45" }));
+
+    expect(RateLimiter.estimateTime(1, starting)).toBe(30_000);
+    expect(replaced.size).toBe(4);
+    for (const limit of replaced) {
+      expect(RateLimiter.estimateTime(1, [limit])).toBe(45_000);
+    }
+  });
+
+  it("ignores a Retry-After that is not a number of seconds", () => {
+    const limits = new Set([new RateLimiter(1, 5)]);
+    const date = "Wed, 21 Oct 2026 07:28:00 GMT";
+
+    adjustRateLimits(limits, new Headers({ "retry-after": date }));
+
+    expect(RateLimiter.estimateTime(1, limits)).toBe(0);
+    expect(warnings).toEqual([
+      `Ignored Retry-After header "${date}": not a number of seconds`,
+    ]);
+  });
 });
+
+function accountState(state: string): Headers {
+  return headersWith({
+    "x-rate-limit-rules": "Account",
+    "x-rate-limit-account-state": state,
+  });
+}

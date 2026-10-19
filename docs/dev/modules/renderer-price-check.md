@@ -58,7 +58,7 @@ that the route needs ([main.md](main.md)).
 | `trade-api.ts` | `useTradeApi()`: one search, then the listings 10 ids per request, the first two requests at once and the rest one by one until the grouped list has 10 rows (`MIN_GROUPED`) with 7 of them listed at most twice (`MIN_NOT_GROUPED`), or until 100 results or all of them are read |
 | `pathofexile-bulk.ts`, `bulk-api.ts` | `execBulkSearch` posts one exchange request to `/api/trade2/exchange/<league>` and keeps at most 8 offers per currency; `useBulkApi()` searches once with Divine, Exalted and Chaos Orbs as the payment currencies (without the item's own currency), and searches again for one currency when its tab is selected and the first response did not include it |
 | `common.ts` | `RATE_LIMIT_RULES`, `adjustRateLimits`, `preventQueueCreation`, `apiToSatisfySearch`, and `getTradeEndpoint`, which is `poeWebApi()` in `Config.ts`: the trade host for the language and realm settings, or `www.pathofexile.com` when the trade site setting is `www` |
-| `RateLimiter.ts` | `RateLimiter(max, window)`: at most `max` requests in `window` seconds; `wait`, `waitMulti(limiters)`, `estimateTime` |
+| `RateLimiter.ts` | `RateLimiter(max, window)`: at most `max` requests in `window` seconds; `wait`, `waitMulti(limiters)`, `estimateTime`, `restrict(seconds)`, which holds every request for that time, and `addHits(count)`, which counts requests the server reports without waiting |
 | `Cache.ts` | keeps a search, fetch or exchange result for 300 seconds, keyed by a SHA-1 of the request (`object-hash`); `requestResults` clears its cache when the core currency changes |
 | `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message |
 | `TradeLinks.vue` | the "Trade" button, which opens the same search on the trade site with `window.open`; with "Enable builtin browser" (`builtinBrowser`) on, it opens the built-in browser and a second button opens the search outside |
@@ -128,7 +128,10 @@ is not private, `load()` selects the third league when the list has more than tw
   `x-rate-limit-<rule>-state` replace it with the server's rules, each window longer by `apiLatencySeconds`
   ("Extra time to prevent spurious Rate limiting", default 2). A rule whose two headers are missing, or that does
   not give a limit above 0, a window and a hit count for each entry, is skipped with a `console.warn`. The set then
-  keeps its current limiters beside the rules it could read. Before a search or an exchange request,
+  keeps its current limiters beside the rules it could read. The third field of a `-state` entry is the seconds left
+  of a restriction, and `Retry-After` gives them for every limiter in the set. `RateLimiter.restrict` holds every
+  request on the limiter until they are over, and `estimateTime` counts them. A `Retry-After` that is not a number
+  of seconds is logged and ignored. Before a search or an exchange request,
   `preventQueueCreation` throws `Retry after <n> seconds` when the sets' current use would delay it by 1.5
   seconds or more. A new trade site request uses one of these sets or adds a new one.
 - **Three trade site requests do not use the sets**: the league list (`/api/trade2/data/leagues`), and the item
@@ -160,5 +163,6 @@ covers item filters, stat filters, the missing fractured rules and the pseudo st
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
 `specs/web/prices.test.ts` reads the price service's fixtures. `specs/web/host-proxy.test.ts` checks the URL and
 the header that `Host.proxy` sends. `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit
-headers into limiter sets with `adjustRateLimits`. No test calls a live site. `RateLimiter.ts`, `Leagues.ts`,
-`TradeData.ts` and `poeprices.ts` have no test file of their own.
+headers into limiter sets with `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing
+and restrictions with fake timers. No test calls a live site. `Leagues.ts`, `TradeData.ts` and `poeprices.ts` have
+no test file of their own.

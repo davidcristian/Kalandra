@@ -3,6 +3,7 @@ import { shallowReactive, shallowRef } from "vue";
 export class RateLimiter {
   stack = shallowReactive<ResourceHandle[]>([]);
   queue = shallowRef(0);
+  restriction = shallowRef<ResourceHandle | null>(null);
 
   private _destroyed = false;
 
@@ -17,6 +18,14 @@ export class RateLimiter {
 
   private async _wait(borrow: boolean): Promise<void> {
     if (this._destroyed) throw new Error("RateLimiter is no longer active");
+
+    const restriction = this.restriction.value;
+    if (restriction) {
+      this.queue.value++;
+      await restriction.promise;
+      this.queue.value--;
+      return this._wait(borrow);
+    }
 
     if (this.isFullyUtilized) {
       this.queue.value++;
@@ -40,6 +49,33 @@ export class RateLimiter {
     this.stack.push(handle);
   }
 
+  /** Counts requests that the server reports and this client did not send, up to the free slots. */
+  addHits(count: number) {
+    const hits = Math.min(count, this.available);
+    for (let i = 0; i < hits; ++i) {
+      this.push();
+    }
+  }
+
+  /** Holds every request for `seconds`, unless a longer restriction is already set. */
+  restrict(seconds: number) {
+    const millis = seconds * 1000;
+    const current = this.restriction.value;
+    if (
+      this._destroyed ||
+      (current && current.releasedAt >= Date.now() + millis)
+    ) {
+      return;
+    }
+
+    const handle = new ResourceHandle(millis, () => {
+      if (this.restriction.value === handle) {
+        this.restriction.value = null;
+      }
+    });
+    this.restriction.value = handle;
+  }
+
   static async waitMulti(limiters: Iterable<RateLimiter>): Promise<void> {
     const _limiters = Array.from(limiters);
 
@@ -56,7 +92,7 @@ export class RateLimiter {
       }
     }
 
-    if (_limiters.every((rl) => !rl.isFullyUtilized)) {
+    if (_limiters.every((rl) => !rl.isFullyUtilized && !rl.isRestricted)) {
       _limiters.forEach((rl) => {
         rl.wait();
       });
@@ -76,9 +112,11 @@ export class RateLimiter {
     //       multiple times between calls until queue is cleared.
 
     let simulation: Array<{ max: number; window: number; stack: number[] }>;
+    let restrictedFor = 0;
     {
       const now = Date.now();
-      simulation = Array.from(limiters).map((l) => ({
+      const _limiters = Array.from(limiters);
+      simulation = _limiters.map((l) => ({
         max: l.max,
         window: l.window,
         stack: ignoreState
@@ -87,10 +125,19 @@ export class RateLimiter {
               .map((entry) => entry.releasedAt - now)
               .sort((a, b) => a - b),
       }));
+      if (!ignoreState) {
+        restrictedFor = Math.max(
+          0,
+          ..._limiters.map(
+            (l) => (l.restriction.value?.releasedAt ?? now) - now,
+          ),
+        );
+      }
     }
 
     let total = 0;
     while (count--) {
+      total = Math.max(total, restrictedFor);
       while (simulation.some((limit) => limit.stack.length >= limit.max)) {
         const waitTime = simulation.reduce(
           (ms, limit) =>
@@ -127,11 +174,16 @@ export class RateLimiter {
     return Math.max(this.max - this.stack.length, 0);
   }
 
+  get isRestricted() {
+    return this.restriction.value != null;
+  }
+
   destroy() {
     this._destroyed = true;
-    if (this.queue.value) {
-      // shortcircuit awaiters in queue
-      this.stack[0].cancel(new Error("RateLimiter is no longer active"));
+    // wake the awaiters in the queue, which then throw because the limiter is destroyed
+    this.restriction.value?.release();
+    if (this.queue.value && this.stack.length) {
+      this.stack[0].release();
     }
   }
 
@@ -148,15 +200,13 @@ class ResourceHandle {
   private _tmid!: ReturnType<typeof setTimeout>;
   private _cb: () => void;
   private _resolve!: () => void;
-  private _reject!: (reason?: unknown) => void;
 
   constructor(millis: number, cb: () => void) {
     this.borrowedAt = Date.now();
     this.releasedAt = this.borrowedAt + millis;
     this._cb = cb;
-    this.promise = new Promise((resolve, reject) => {
+    this.promise = new Promise((resolve) => {
       this._resolve = resolve;
-      this._reject = reject;
 
       this._tmid = setTimeout(() => {
         this._cb();
@@ -165,9 +215,9 @@ class ResourceHandle {
     });
   }
 
-  public cancel(reason?: unknown) {
+  public release() {
     clearTimeout(this._tmid);
     this._cb();
-    this._reject(reason);
+    this._resolve();
   }
 }

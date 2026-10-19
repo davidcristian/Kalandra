@@ -197,7 +197,9 @@ Kalandra's code can read it.
 ## Rate limits
 
 The trade site limits how many requests a client sends, and it blocks a client that sends more. Kalandra queues every
-request to stay under the limits the site reports. If a search would wait 1.5 seconds or more, the window shows
+request to stay under the limits the site reports. Searches, listings and bulk exchange searches each have their own
+limits. When the site has blocked one of them for a time, it reports the seconds left, and Kalandra sends no request
+of that kind until they are over. If a search would wait 1.5 seconds or more, the window shows
 `Retry after N seconds` in the **Trade site request failed** box instead of waiting. The **Rate limiting** button at
 the bottom of the screen, beside the window, turns red while requests wait. Click it to see each limit and its queue.
 
