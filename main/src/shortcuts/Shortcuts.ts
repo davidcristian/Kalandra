@@ -8,6 +8,7 @@ import {
 import { typeInChat, stashSearch } from "./text-box";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
 import { HostClipboard } from "./HostClipboard";
+import { logKeyPresses } from "./key-log";
 import { OcrWorker } from "../vision/link-main";
 import type { ShortcutAction } from "../../../ipc/types";
 import type { Logger } from "../RemoteLogger";
@@ -17,9 +18,6 @@ import type { GameConfig } from "../host-files/GameConfig";
 import type { ServerEvents } from "../server";
 
 type UiohookKeyT = keyof typeof UiohookKey;
-const UiohookToName = Object.fromEntries(
-  Object.entries(UiohookKey).map(([k, v]) => [v, k]),
-);
 
 export class Shortcuts {
   private actions: ShortcutAction[] = [];
@@ -76,19 +74,7 @@ export class Shortcuts {
       }
     });
 
-    uIOhook.on("keydown", (e) => {
-      if (!this.logKeys) return;
-      const pressed = eventToString(e);
-      this.logger.write(`debug [Shortcuts] Keydown ${pressed}`);
-    });
-    uIOhook.on("keyup", (e) => {
-      if (!this.logKeys) return;
-      this.logger.write(
-        `debug [Shortcuts] Keyup ${
-          UiohookToName[e.keycode] || "not_supported_key"
-        }`,
-      );
-    });
+    logKeyPresses(this.logger, () => this.logKeys);
 
     uIOhook.on("wheel", (e) => {
       if (!e.ctrlKey || !this.poeWindow.isActive || !this.stashScroll) return;
@@ -334,30 +320,6 @@ function isStashArea(mouse: UiohookWheelEvent, poeWindow: GameWindow): boolean {
     mouse.y > poeWindow.bounds.y + (poeWindow.bounds.height * 154) / 1600 &&
     mouse.y < poeWindow.bounds.y + (poeWindow.bounds.height * 1192) / 1600
   );
-}
-
-function eventToString(e: {
-  keycode: number;
-  ctrlKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
-}) {
-  const { ctrlKey, shiftKey, altKey } = e;
-
-  let code = UiohookToName[e.keycode];
-  if (!code) return "not_supported_key";
-
-  if (code === "Shift" || code === "Alt" || code === "Ctrl") return code;
-
-  if (ctrlKey && shiftKey && altKey) code = `Ctrl + Shift + Alt + ${code}`;
-  else if (shiftKey && altKey) code = `Shift + Alt + ${code}`;
-  else if (ctrlKey && shiftKey) code = `Ctrl + Shift + ${code}`;
-  else if (ctrlKey && altKey) code = `Ctrl + Alt + ${code}`;
-  else if (altKey) code = `Alt + ${code}`;
-  else if (ctrlKey) code = `Ctrl + ${code}`;
-  else if (shiftKey) code = `Shift + ${code}`;
-
-  return code;
 }
 
 function shortcutToElectron(shortcut: string) {
