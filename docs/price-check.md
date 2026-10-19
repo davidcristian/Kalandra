@@ -207,9 +207,9 @@ the bottom of the screen, beside the window, turns red while requests wait. Clic
 ## Errors
 
 - **An error occurred while parsing the item** or **Unknown Item**: the window shows the copied text and
-  **Reload fallback data**, which downloads the trade site's current item and stat lists. If it finds new entries,
-  **Retry Item** checks the item again. A unique that only the trade site's lists have is checked even when its
-  base type is new too: the search uses the copied base type text.
+  **Reload fallback data**, which downloads the trade site's current item and stat lists in English. If it finds new
+  entries, **Retry Item** checks the item again. A unique that only the trade site's lists have is checked even when
+  its base type is new too: the search uses the copied base type text. The lists help only if the game is in English.
 - A requirements line that Kalandra cannot read, or a `{ ... }` modifier line whose prefix, suffix or tier it cannot
   read, does not stop the check: the item has no **Req. Level:** filter, or that modifier is not counted as a prefix
   or suffix.

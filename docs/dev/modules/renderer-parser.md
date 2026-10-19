@@ -48,7 +48,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | File | What it does |
 | --- | --- |
 | `advanced-mod-desc.ts` | `parseModInfoLine` reads one `{ ... }` line, `groupLinesByMod` pairs it with its stat lines, `parseModType` reads a suffix such as ` (implicit)`, ` (enchant)` or ` (rune)` |
-| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id |
+| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id. That text is English in every app language, so the fallback matches only English item text ([refinement 063](../refinements/tasks/063-trade-lists-english-only.md)) |
 | `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
 | `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
 | `match-records.ts` | `recordsMatchingItem` keeps the records of an item lookup that match the copied item: a unique by its base type, and base types that share a translated name by the armour, evasion and energy shield lines the item shows. `findInDatabase` in `Parser.ts` takes the first record it keeps, or the first of all when none matches ([refinement 059](../refinements/tasks/059-shared-translated-item-names.md)) |
@@ -80,7 +80,9 @@ A module exports the internal functions its tests call as `__testExports` (`Pars
   `Stat`; `STAT_BY_MATCH_STR(text)` returns the `Stat` and the `StatMatcher` whose text is exactly `text`;
   `ITEMS_ITERATOR` and `STATS_ITERATOR` scan the raw text for a substring. `TRADE_ITEM_BY_REF`,
   `TRADE_STAT_BY_MATCH_STR` and `TRADE_STAT_BY_STAT_ID` read the trade site lists, for items and stats that the
-  game data does not have yet.
+  game data does not have yet. Both lists come from `www.pathofexile.com` in every app language, so their texts
+  are English, and `TRADE_ITEM_BY_REF` and `TRADE_STAT_BY_MATCH_STR` find only the names and stats of an English
+  item.
 - `stat(text)` records a stat ref that code depends on. After loading, `init` logs `Cannot find stat` with the
   list of recorded refs that `stats.ndjson` does not contain.
 

@@ -93,7 +93,9 @@ that the route needs ([main.md](main.md)).
   `specs/data/itemDrop.test.ts` checks that the item data contains every ref in `item-drop.json`.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
-  lists again and shows how many of their entries are new. `settings-price-check.vue` is the widget's settings page.
+  lists again and shows how many of their entries are new. The lists are English, so they help only an English
+  item ([renderer-parser.md](renderer-parser.md#the-game-data)). `settings-price-check.vue` is the widget's
+  settings page.
 
 ### Price estimates (`background/Prices.ts`, `background/price-source.ts`)
 

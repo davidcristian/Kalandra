@@ -40,7 +40,7 @@ export const useTradeData = createGlobalState(() => {
   const error = shallowRef<string | null>(null);
   // ref data - nameplates are always REF
   const itemData = shallowRef<Set<string>>(new Set([]));
-  // translated data
+  // English stat texts in every app language: only English item text matches
   const statDataSet = shallowRef<Set<string>>(new Set([]));
   const statData = shallowRef<Map<string, { [type: string]: string[] }>>(
     new Map(),
@@ -54,7 +54,6 @@ export const useTradeData = createGlobalState(() => {
     }
 
     const response = await Host.proxy(
-      // don't use `getTradeEndpoint` since we want ref items, not translated
       `www.pathofexile.com/api/trade2/data/stats`,
       {
         signal: downloadController.signal,
