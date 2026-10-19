@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { IpcEvent } from "../../ipc/types";
+import type { IpcEvent, IpcEventPayload } from "../../ipc/types";
 import type { ServerEvents } from "../src/server";
 import { FileWriter } from "../src/host-files/FileWriter";
 import { GameLogWatcher } from "../src/host-files/GameLogWatcher";
@@ -25,6 +25,13 @@ class FakeServer implements ServerEvents {
   sendEventTo: ServerEvents["sendEventTo"] = (_target, event) => {
     this.sent.push(event);
   };
+
+  emit<Name extends IpcEvent["name"]>(
+    name: Name,
+    payload: IpcEventPayload<Name>,
+  ) {
+    this.bus.emit(name, payload);
+  }
 
   gameLogLines(): string[] {
     return this.sent.flatMap((event) =>
@@ -107,5 +114,17 @@ describe("GameLogWatcher.restart", () => {
     await fs.writeFile(steam, "");
     await watcher.restart("", true);
     expect(watcher.actualPath).toBe(steam);
+  });
+
+  it("stops a read in progress without an error when reading is turned off", async () => {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, "a line\n".repeat(100_000));
+    await watcher.restart(file, true);
+
+    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    await watcher.restart(file, false);
+
+    expect(logger.history).not.toContain("Failed to read");
+    expect(server.gameLogLines().length).toBeLessThan(100_000);
   });
 });

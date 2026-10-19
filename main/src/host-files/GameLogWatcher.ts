@@ -32,6 +32,14 @@ const POSSIBLE_PATH =
           ]
         : [];
 
+interface WatchState {
+  offset: number;
+  path: string;
+  file: fs.FileHandle;
+  isReading: boolean;
+  readBuff: Buffer;
+}
+
 export class GameLogWatcher {
   // The logFile whose file is open or opening; null makes the next restart open it again
   private _wantedPath: string | null = null;
@@ -39,13 +47,7 @@ export class GameLogWatcher {
     return this._state?.path ?? null;
   }
 
-  private _state: {
-    offset: number;
-    path: string;
-    file: fs.FileHandle;
-    isReading: boolean;
-    readBuff: Buffer;
-  } | null = null;
+  private _state: WatchState | null = null;
 
   constructor(
     private server: ServerEvents,
@@ -60,7 +62,7 @@ export class GameLogWatcher {
           this.fileWriter.flushClientLogFile();
           this._state.offset = 0;
           this._state.isReading = true;
-          this.readToEOF();
+          void this.readToEOF(this._state);
         } else {
           this.logger.write(
             "warn [GameLogWatcher] Asked to re-parse log but currently reading, skipping",
@@ -74,21 +76,13 @@ export class GameLogWatcher {
     if (!readLog) {
       this.logger.write("info [GameLogWatcher] disabled");
       this._wantedPath = null;
-      if (this._state) {
-        unwatchFile(this._state.path);
-        await this._state.file.close();
-        this._state = null;
-      }
+      await this.closeFile();
       return;
     }
 
     if (this._wantedPath !== logFile) {
       this._wantedPath = logFile;
-      if (this._state) {
-        unwatchFile(this._state.path);
-        await this._state.file.close();
-        this._state = null;
-      }
+      await this.closeFile();
     } else {
       return;
     }
@@ -130,36 +124,51 @@ export class GameLogWatcher {
     }
   }
 
+  private async closeFile() {
+    const state = this._state;
+    if (!state) return;
+    // Cleared before the close so that a read still running stops after its current chunk
+    this._state = null;
+    unwatchFile(state.path);
+    await state.file.close();
+  }
+
   private handleFileChange() {
     if (this._state && !this._state.isReading) {
       this._state.isReading = true;
-      this.readToEOF();
+      void this.readToEOF(this._state);
     }
   }
 
-  private async readToEOF() {
-    if (!this._state) return;
+  private async readToEOF(state: WatchState) {
+    try {
+      while (this._state === state) {
+        const { file, readBuff, offset } = state;
+        const { bytesRead } = await file.read(
+          readBuff,
+          0,
+          readBuff.length,
+          offset,
+        );
+        if (!bytesRead) break;
 
-    const { file, readBuff, offset } = this._state;
-    const { bytesRead } = await file.read(readBuff, 0, readBuff.length, offset);
-
-    if (bytesRead) {
-      const str = readBuff.toString("utf8", 0, bytesRead);
-      const lines = str
-        .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line.length);
-      this.server.sendEventTo("broadcast", {
-        name: "MAIN->CLIENT::game-log",
-        payload: { lines },
-      });
-    }
-
-    if (bytesRead) {
-      this._state.offset += bytesRead;
-      this.readToEOF();
-    } else {
-      this._state.isReading = false;
+        state.offset += bytesRead;
+        const lines = readBuff
+          .toString("utf8", 0, bytesRead)
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line.length);
+        this.server.sendEventTo("broadcast", {
+          name: "MAIN->CLIENT::game-log",
+          payload: { lines },
+        });
+      }
+    } catch (err) {
+      this.logger.write(
+        `error [GameLogWatcher] Failed to read the log file: ${(err as Error).message}`,
+      );
+    } finally {
+      state.isReading = false;
     }
   }
 }
