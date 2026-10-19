@@ -76,6 +76,8 @@ league ([price-service.md](price-service.md)). This doc also covers the backgrou
   price, both in Divine Orbs, for items per hour.
   `buildRelatedItems` in `related-items/related-items.ts` lists the `item-drop.json` group that contains the
   item, and leaves out each ref that the item data does not contain, such as an item from a newer game patch.
+  A ref is `<namespace>::<refName>` from the English `items.ndjson`, and a unique adds ` // <base item>`.
+  `specs/data/itemDrop.test.ts` checks that the item data contains every ref in `item-drop.json`.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again. `settings-price-check.vue` is the widget's settings page.

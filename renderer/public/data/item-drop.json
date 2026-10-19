@@ -138,7 +138,7 @@
   },
   {
     "query": [
-      "GEM::Techrod's Revenge",
+      "GEM::Tecrod's Revenge",
       "GEM::Kulemak's Dominion",
       "GEM::Kurgal's Leash"
     ],
@@ -557,8 +557,7 @@
       "UNIQUE::The Changing Seasons // Seal Relic"
     ],
     "items": [
-      "UNIQUE::Sandstorm Visage // Chain Tiara",
-      "ITEM::Zarokh's Reliquary Key: Sandstorm Visage"
+      "UNIQUE::Sandstorm Visage // Chain Tiara"
     ]
   },
   {
@@ -575,8 +574,7 @@
       "UNIQUE::The Burden of Leadership // Tapestry Relic"
     ],
     "items": [
-      "UNIQUE::Sekhema's Resolve // Ring",
-      "ITEM::Zarokh's Reliquary Key: Sekhema's Resolve"
+      "UNIQUE::Sekhema's Resolve // Ring"
     ]
   },
   {
@@ -599,8 +597,8 @@
   },
   {
     "query": [
-      "ITEM::Legacy of Edyrns Tusks",
-      "UNIQUE::Edyrns Tusks // Iron Cuirass"
+      "ITEM::Legacy of Edyrn's Tusks",
+      "UNIQUE::Edyrn's Tusks // Iron Cuirass"
     ],
     "items": [
       "ITEM::Aldur's Legacy"
