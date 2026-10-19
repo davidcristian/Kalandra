@@ -1,8 +1,10 @@
 import child_process from 'child_process'
-import electron from 'electron'
 import esbuild from 'esbuild'
 
 const isDev = !process.argv.includes('--prod')
+
+// Importing electron throws when its binary is missing, and only the dev runner starts Electron.
+const electron = isDev ? (await import('electron')).default : null
 
 const electronRunner = (() => {
   let handle = null

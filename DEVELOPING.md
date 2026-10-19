@@ -65,6 +65,10 @@ When Electron starts and quits at once, another copy of Kalandra is running: `ma
 calls `app.requestSingleInstanceLock()` and exits when another copy holds it. Quit the other copy
 from its tray icon.
 
+When `npm run dev` in `main/` fails with `Electron failed to install correctly`, the Electron
+binary is missing from `main/node_modules/electron`, because its install script did not run or
+did not finish. `node node_modules/electron/install.js` in `main/` downloads and extracts it.
+
 The command-line options the app reads (`--no-overlay`, `--listen` and `--no-updates`) are on the
 user page [docs/cmd-flags.md](docs/cmd-flags.md). `main/build/script.mjs` starts Electron without
 options.
@@ -89,7 +93,8 @@ part alone:
 
 - `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use
   `npx vitest run` there.
-- `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle.
+- `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle. Only `npm run dev`
+  imports `electron`, so the build works without the Electron binary.
 - `--coverage` and `coverage report` fail when a suite covers less than the floor in its config:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
   `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
