@@ -16,6 +16,7 @@ vi.mock("@/web/Config", async () => {
     TipsFrequency: {
       Always: 1,
     },
+    poeWebApi: () => "www.pathofexile.com",
   };
 });
 let mockConfig: Config;

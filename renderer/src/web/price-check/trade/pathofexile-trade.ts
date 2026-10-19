@@ -550,7 +550,6 @@ export interface PricingResult {
   relativeDate: string;
   priceAmount: number;
   priceCurrency: string;
-  priceCurrencyRank?: number;
   normalizedPrice?: string;
   normalizedPriceCurrency?: CoreCurrency;
   isMine: boolean;
@@ -1341,23 +1340,8 @@ export async function requestResults(
       console.error(e);
     }
 
-    let priceCurrencyRank: PricingResult["priceCurrencyRank"];
-    if (
-      result.listing.price?.currency &&
-      result.listing.price.currency in CONVERT_CURRENCY
-    ) {
-      result.listing.price.currency =
-        CONVERT_CURRENCY[result.listing.price.currency];
-      if (result.listing.price.currency[0] === "G") {
-        priceCurrencyRank = 2;
-      } else if (result.listing.price.currency[0] === "P") {
-        priceCurrencyRank = 3;
-      }
-    }
-
-    const query = getCurrencyDetailsId(
-      result.listing.price?.currency ?? "no price",
-    );
+    const currency = result.listing.price?.currency ?? "no price";
+    const query = getCurrencyDetailsId(currency);
     const normalizedCurrency = cachedCurrencyByQuery(
       query,
       result.listing.price?.amount ?? 0,
@@ -1394,8 +1378,9 @@ export async function requestResults(
           style: "short",
         }) ?? "",
       priceAmount: result.listing.price?.amount ?? 0,
-      priceCurrency: result.listing.price?.currency ?? "no price",
-      priceCurrencyRank,
+      priceCurrency: Object.hasOwn(CONVERT_CURRENCY, currency)
+        ? CONVERT_CURRENCY[currency]
+        : currency,
       normalizedPrice,
       normalizedPriceCurrency,
       hasNote: result.item.note != null,

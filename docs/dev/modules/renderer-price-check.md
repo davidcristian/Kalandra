@@ -58,7 +58,7 @@ that the route needs ([main.md](main.md)).
 
 | File | What it does |
 | --- | --- |
-| `pathofexile-trade.ts` | `createTradeRequest(filters, stats, item)` builds the search body; `requestTradeResultList(body, leagueId)` posts it to `/api/trade2/search/<league>`; `requestResults(queryId, ids, opts)` gets the listings from `/api/trade2/fetch/<ids>?query=<queryId>` |
+| `pathofexile-trade.ts` | `createTradeRequest(filters, stats, item)` builds the search body; `requestTradeResultList(body, leagueId)` posts it to `/api/trade2/search/<league>`; `requestResults(queryId, ids, opts)` gets the listings from `/api/trade2/fetch/<ids>?query=<queryId>`, values each price by its currency's trade tag, and returns a short label such as `G. chaos` for a greater or perfect orb (`CONVERT_CURRENCY`) without changing the cached listing |
 | `trade-api.ts` | `useTradeApi()`: one search, then the listings 10 ids per request, the first two requests at once and the rest one by one until the grouped list has 10 rows (`MIN_GROUPED`) with 7 of them listed at most twice (`MIN_NOT_GROUPED`), or until 100 results or all of them are read |
 | `pathofexile-bulk.ts`, `bulk-api.ts` | `execBulkSearch` posts one exchange request to `/api/trade2/exchange/<league>` and keeps at most 8 offers per currency; `useBulkApi()` searches once with Divine, Exalted and Chaos Orbs as the payment currencies (without the item's own currency), and searches again for one currency when its tab is selected and the first response did not include it |
 | `common.ts` | `RATE_LIMIT_RULES`, `adjustRateLimits`, `preventQueueCreation`, `apiToSatisfySearch`, and `getTradeEndpoint`, which is `poeWebApi()` in `Config.ts`: the trade host for the language and realm settings, or `www.pathofexile.com` when the trade site setting is `www` |
@@ -157,7 +157,7 @@ is not private, `load()` selects the third league when the list has more than tw
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 2103 lines** (2026-10-18,
+- **`pathofexile-trade.ts` is 2088 lines** (2026-10-19,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 
@@ -170,7 +170,9 @@ neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. `specs/web/price-check/filters/`
 covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
 `filters/util.ts`.
-`specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
+`specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
+and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
+file fixture.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks, and
 `specs/web/useBulkApi.test.ts` drives `useBulkApi` with a fake `execBulkSearch` that answers when the test says.
 `specs/web/prices.test.ts` reads the price service's fixtures, and `specs/web/prices-load.test.ts` loads the price
