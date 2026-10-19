@@ -64,10 +64,12 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - `ConfigStore` keeps the file at `apt-data/config.json` under Electron's `userData` folder. `load()` returns its
   text, or `null` when it cannot be read; `server.ts` returns that text from `GET /config`. On
-  `CLIENT->MAIN::save-config` it writes the text and sends it to every client as `MAIN->CLIENT::config-changed`.
-  The first temporary save switches the path to `config.json.tmp` for the rest of the run, so a file that did not
-  parse stays as it was. It creates `apt-data` when it is missing and exits the app with status 1 when a write
-  fails. In development (`VITE_DEV_SERVER_URL` is set) it writes nothing.
+  `CLIENT->MAIN::save-config` it sends the text to every client as `MAIN->CLIENT::config-changed` at once and
+  queues the write. Reads and writes of the file run one at a time in the order they arrive, so the last save is
+  the one on disk, and `load()` returns the text of a save that is still being written. The first temporary save
+  switches the path to `config.json.tmp` for the rest of the run, so a file that did not parse stays as it was. It
+  creates `apt-data` when it is missing and exits the app with status 1 when a write fails. In development
+  (`VITE_DEV_SERVER_URL` is set) it writes nothing.
 
 ## Invariants
 
@@ -98,5 +100,6 @@ old one and keep that file, so a saved config must survive every update: this is
 **Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()`
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it. No test runs
-`defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, and `ConfigStore` has no tests, so an upgrade step is
-checked by reading it against the steps before it and against the type.
+`defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against
+the steps before it and against the type. `main/specs/ConfigStore.test.ts` checks the order of `ConfigStore`'s reads
+and writes in a temporary folder.

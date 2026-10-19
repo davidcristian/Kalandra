@@ -148,8 +148,9 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    the edited copy and calls `pushHostConfig()`, which main applies at once, and `saveConfig()`. The settings
    window is itself an exclusive widget that is still shown at that moment, so that call sends nothing, and the
    file is written by the next save that runs, such as the one when the overlay window loses focus.
-5. `ConfigStore` writes the file and sends `MAIN->CLIENT::config-changed` to every client, and each client
-   replaces its config with the one sent. In development, main writes no file.
+5. `ConfigStore` sends `MAIN->CLIENT::config-changed` to every client, and each client replaces its config with
+   the one sent. It writes the file after any earlier save, so the last save is the one on disk. In development,
+   main writes no file.
 
 A saved config must survive every update: [the one hard rule](../../AGENTS.md#the-one-hard-rule),
 [ADR-0003](adr/ADR-0003-config-survives-updates.md) and [modules/config.md](modules/config.md).
