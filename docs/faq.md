@@ -109,6 +109,13 @@ The interface text of each language is in
 [`renderer/public/data`](https://github.com/davidcristian/Kalandra/tree/master/renderer/public/data), one
 `app_i18n.json` per language. Text missing from a language shows in English.
 
+### Why does the price check show another item with the same name?
+
+In some game languages, Kalandra's game data gives two items the same name. Kalandra picks a unique by its base type
+and a base type by the defences the item shows: armour, evasion and energy shield. When those match too, it takes
+the first of the two in its data, which can be the wrong one. Check the item the price check shows before you use
+its prices.
+
 ## Updates and downloads
 
 ### How do I turn off automatic updates?

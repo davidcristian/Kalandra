@@ -1489,3 +1489,177 @@ UniqueOnUnknownBase.info = {
   unique: { base: "Prism Focus" },
 };
 // #endregion UniqueOnUnknownBase
+
+// No copied text in these languages exists here: each item is a real copied
+// item above with its class, rarity, name, base and property lines replaced by
+// that language's client strings and item names, and other lines left out.
+function sharedNameItem(
+  text: string,
+  refName: string,
+  category: ItemCategory,
+  rarity: ItemRarity,
+): TestItem {
+  const item = new TestItem(text);
+  item.info.refName = refName;
+  item.category = category;
+  item.rarity = rarity;
+  return item;
+}
+
+// #region SharedNameItems
+// From NormalItem
+export const JaArrayedFocus = sharedNameItem(
+  `アイテムクラス: フォーカス
+レアリティ: ノーマル
+整列のフォーカス
+--------
+エナジーシールド: 49
+--------
+アイテムレベル: 81
+`,
+  "Arrayed Focus",
+  ItemCategory.Focus,
+  ItemRarity.Normal,
+);
+
+// From NormalShield
+export const JaArrayBuckler = sharedNameItem(
+  `アイテムクラス: バックラー
+レアリティ: ノーマル
+整列のフォーカス
+--------
+ブロック率: 25%
+回避力: 126
+--------
+アイテムレベル: 54
+`,
+  "Array Buckler",
+  ItemCategory.Buckler,
+  ItemRarity.Normal,
+);
+
+// From NormalItem
+export const DePlatedVestments = sharedNameItem(
+  `Gegenstandsklasse: Körperrüstungen
+Seltenheit: Normal
+Plattiertes Gewand
+--------
+Rüstung: 174
+Energieschild: 60
+--------
+Gegenstandsstufe: 81
+`,
+  "Plated Vestments",
+  ItemCategory.BodyArmour,
+  ItemRarity.Normal,
+);
+
+// From NormalItem
+export const DePlatedRaiment = sharedNameItem(
+  `Gegenstandsklasse: Körperrüstungen
+Seltenheit: Normal
+Plattiertes Gewand
+--------
+Energieschild: 60
+--------
+Gegenstandsstufe: 81
+`,
+  "Plated Raiment",
+  ItemCategory.BodyArmour,
+  ItemRarity.Normal,
+);
+
+// From NormalItem; Vagabond Armour and Wanderer Armour show the same defences
+export const JaVagabondArmour = sharedNameItem(
+  `アイテムクラス: 鎧
+レアリティ: ノーマル
+放浪者の鎧
+--------
+アーマー: 174
+回避力: 60
+--------
+アイテムレベル: 81
+`,
+  "Vagabond Armour",
+  ItemCategory.BodyArmour,
+  ItemRarity.Normal,
+);
+
+// From UniqueItem
+export const JaAtzirisDisdain = sharedNameItem(
+  `アイテムクラス: 兜
+レアリティ: ユニーク
+アッツィリの軽蔑
+金のサークレット
+--------
+エナジーシールド: 44
+--------
+アイテムレベル: 81
+`,
+  "Atziri's Disdain",
+  ItemCategory.Helmet,
+  ItemRarity.Unique,
+);
+
+// From UniqueItem
+export const JaAtzirisContempt = sharedNameItem(
+  `アイテムクラス: 槍
+レアリティ: ユニーク
+アッツィリの軽蔑
+二又の槍
+--------
+アイテムレベル: 81
+`,
+  "Atziri's Contempt",
+  ItemCategory.Spear,
+  ItemRarity.Unique,
+);
+
+// From UniqueItem; no unique in the item data has this name on Swathed Cap
+export const JaAtziriOnOtherBase = sharedNameItem(
+  `アイテムクラス: 兜
+レアリティ: ユニーク
+アッツィリの軽蔑
+巻き布の帽子
+--------
+アイテムレベル: 81
+`,
+  "Atziri's Contempt",
+  ItemCategory.Spear,
+  ItemRarity.Unique,
+);
+
+// From UniqueItem
+export const DeCoutureOfCrimson = sharedNameItem(
+  `Gegenstandsklasse: Körperrüstungen
+Seltenheit: Einzigartig
+Blutroter Mantel
+Vergoldetes Gewand
+--------
+Rüstung: 222
+Energieschild: 63
+--------
+Gegenstandsstufe: 81
+`,
+  "Couture of Crimson",
+  ItemCategory.BodyArmour,
+  ItemRarity.Unique,
+);
+
+// From UniqueItem
+export const DeCoatOfRed = sharedNameItem(
+  `Gegenstandsklasse: Körperrüstungen
+Seltenheit: Einzigartig
+Blutroter Mantel
+Kettenpanzer
+--------
+Rüstung: 25
+Ausweichwert: 16
+--------
+Gegenstandsstufe: 81
+`,
+  "Coat of Red",
+  ItemCategory.BodyArmour,
+  ItemRarity.Unique,
+);
+// #endregion SharedNameItems

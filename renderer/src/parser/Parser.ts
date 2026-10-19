@@ -27,6 +27,7 @@ import {
   EditorItem,
 } from "./ParsedItem";
 import { magicBasetype } from "./magic-name";
+import { recordsMatchingItem } from "./match-records";
 import {
   parseModType,
   ModifierInfo,
@@ -348,19 +349,7 @@ function findInDatabase(item: ParserState) {
     }
   }
 
-  if (info[0].unique) {
-    const uniqueInfo = info.filter(
-      (info) => info.unique!.base === item.baseType,
-    );
-    if (uniqueInfo?.length) {
-      info = uniqueInfo;
-    } else if (item.baseType) {
-      const baseInfo = ITEM_BY_TRANSLATED("ITEM", item.baseType);
-      if (baseInfo?.length) {
-        info = info.filter((info) => info.unique!.base === baseInfo[0].refName);
-      }
-    }
-  }
+  info = recordsMatchingItem(info, item);
   item.infoVariants = info;
   // choose 1st variant, correct one will be picked at the end of parsing
   item.info = info[0];

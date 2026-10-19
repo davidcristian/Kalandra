@@ -11,6 +11,7 @@ import type {
   CatalystGroup,
 } from "./interfaces";
 import { loadClientStrings } from "../client-string-loader";
+import { lineStartsByHash } from "./hash-index";
 import { useTradeData } from "@/web/background/TradeData";
 import { GEM, ItemCategory } from "@/parser/meta";
 import { ItemRarity } from "@/parser/ParsedItem";
@@ -180,25 +181,22 @@ async function loadItems(language: string) {
       ns: BaseType["namespace"],
       name: string,
     ): BaseType[] | undefined {
-      let start = dataBinarySearch(
-        index,
-        Number(fnv1a(`${ns}::${name}`, { size: 32 })),
-        0,
-        INDEX_WIDTH,
-      );
-      if (start === -1) return undefined;
-      start = index[start * INDEX_WIDTH + 1];
+      const hash = Number(fnv1a(`${ns}::${name}`, { size: 32 }));
+      const starts = lineStartsByHash(index, hash, INDEX_WIDTH);
+      if (!starts.length) return undefined;
       const out: BaseType[] = [];
-      while (start !== ndjson.length) {
-        const end = ndjson.indexOf("\n", start);
-        const record = JSON.parse(ndjson.slice(start, end)) as BaseType;
-        if (record.namespace === ns && record[prop] === name) {
+      let readUntil = 0;
+      for (let start of starts) {
+        if (start < readUntil) continue;
+        while (start !== ndjson.length) {
+          const end = ndjson.indexOf("\n", start);
+          const record = JSON.parse(ndjson.slice(start, end)) as BaseType;
+          if (record.namespace !== ns || record[prop] !== name) break;
           out.push(record);
+          start = end + 1;
           if (!record.disc && !record.unique) break;
-        } else {
-          break;
         }
-        start = end + 1;
+        readUntil = start;
       }
       return out;
     };

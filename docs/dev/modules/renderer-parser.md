@@ -51,6 +51,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id |
 | `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
 | `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
+| `match-records.ts` | `recordsMatchingItem` keeps the records of an item lookup that match the copied item: a unique by its base type, and base types that share a translated name by the armour, evasion and energy shield lines the item shows. `findInDatabase` in `Parser.ts` takes the first record it keeps, or the first of all when none matches ([refinement 059](../refinements/tasks/059-shared-translated-item-names.md)) |
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others |
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
 | `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting |
@@ -91,9 +92,11 @@ The files, per language under `renderer/public/data/<lang>/`:
 | `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)) | by hand |
 
 A lookup hashes its key with `@sindresorhus/fnv1a`, binary searches the index file, and parses the line that
-starts there. An item lookup also reads the following lines with the same namespace and name while each record
-has a `unique` or `disc` (variant) field, so it returns every variant. `STAT_BY_MATCH_STR` compares the
-matcher text after the lookup and returns `undefined` on a hash collision.
+starts there. The item index files have one row per namespace and `refName`, so items that share a translated name
+have rows with the same hash. An item lookup reads the line of each such row (`lineStartsByHash` in `hash-index.ts`)
+in file order, and after each line the following lines with the same namespace and name while each record has a
+`unique` or `disc` (variant) field. It returns every item with the name and every variant of each.
+`STAT_BY_MATCH_STR` compares the matcher text after the lookup and returns `undefined` on a hash collision.
 [make-index-files.mjs](../../../renderer/src/assets/make-index-files.mjs) writes `stats-ref`,
 `stats-matcher`, `items-name` and `items-ref` for each language in its `LANGUAGES` list: `en`, `ru`, `cmn-Hant`,
 `ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.

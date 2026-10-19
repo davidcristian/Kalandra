@@ -118,3 +118,4 @@ layout and its reasons.
 - 056: [A null list in a poe.ninja response stops the price service](tasks/056-price-service-null-lists.md)
 - 057: [Check the GitHub, Cloudflare and Docker behaviors the runbooks describe](tasks/057-outside-service-behaviors.md)
 - 058: [A stat without a trade id for its modifier type makes a filter without a trade id](tasks/058-stat-without-trade-id-for-its-type.md)
+- 059: [The parser cannot distinguish items that share a translated name and defences](tasks/059-shared-translated-item-names.md)
