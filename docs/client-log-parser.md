@@ -15,8 +15,8 @@ study a play session afterwards, for example to time a campaign run from its `lo
 3. Click **Save**.
 
 Kalandra writes `client-log.ndjson` to the **Output Folder** of the Library widget, which is
-`%APPDATA%\kalandra\apt-data\csv-data` on Windows by default. [Item data](/item-data) describes that setting. The
-folder must exist: Kalandra creates it when a Library session starts, but not for this file.
+`%APPDATA%\kalandra\apt-data\csv-data` on Windows by default. [Item data](/item-data) describes that setting.
+Kalandra creates the folder when it does not exist.
 
 When **PoE log file** on the **General** settings page is empty, Kalandra looks for `Client.txt` in the default game
 folders, which [Settings](/settings#general) lists for each operating system. When it finds the file in none of these

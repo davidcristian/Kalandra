@@ -113,6 +113,7 @@ export class FileWriter {
       return;
     if (e.action === "client-log-event") {
       if (!this._state.clientLogFile) {
+        await fs.mkdir(this.uploadsPath, { recursive: true });
         const filePath = path.join(this.uploadsPath, "client-log.ndjson");
         await this.openChannel(filePath, FileChannel.ClientLog, true);
       }

@@ -35,8 +35,8 @@ change.
 - **Log item to csv**: the key that logs the item under the cursor. It has no default.
 - **Output Folder**: the folder for the CSV files. When it is empty, Kalandra uses the `apt-data\csv-data` folder of
   its data folder, which is `%APPDATA%\kalandra\apt-data\csv-data` on Windows. Kalandra creates the folder when a
-  session starts. A new folder applies from the next session: a running session keeps writing to its file in the
-  folder it started in.
+  session starts or a client log entry arrives. A new folder applies from the next session: a running session keeps
+  writing to its file in the folder it started in.
 - **Recording settings**: the checkboxes **keep explicit mods**, **keep implicit mods**, **keep enchant mods** and
   **keep augment mods** choose which kinds of modifiers the modifier columns include. Only **keep explicit mods** is
   checked by default. It keeps prefixes, suffixes, and mutated, fractured, desecrated and crafted modifiers.

@@ -1,6 +1,6 @@
 # client-log.ndjson drops its first entry and can mix up its lines
 
-**Status:** open
+**Status:** done 2026-10-19
 **Area:** main
 **Origin:** [main/src/host-files/FileWriter.ts](../../../../main/src/host-files/FileWriter.ts)
 **Verified:** 2026-10-19
@@ -36,3 +36,4 @@ describes; `npm test` in `main/` runs them.
   reproduced in a running app.
 - 2026-10-19: The first two defects are fixed by fix(main): write client log entries in
   order after the file opens. The output folder is still to do.
+- 2026-10-19: Done by fix(main): create the output folder before opening the client log.

@@ -177,17 +177,26 @@ describe("FileWriter.restart", () => {
   });
 
   it("logs a client log file that cannot be opened and handles the next event", async () => {
-    await writer.restart(true, path.join(folder, "missing"));
+    const blocker = path.join(folder, "a file");
+    await fs.writeFile(blocker, "");
+    await writer.restart(true, path.join(blocker, "csv"));
     await sendEntry(1);
     await writer.restart(true, folder);
     await sendEntry(2);
 
     expect(logger.history).toContain(
-      "error [FileWriter] A file operation failed: ENOENT",
+      "error [FileWriter] A file operation failed: ",
     );
     expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
       entryLines(2),
     );
+  });
+
+  it("creates the output folder before it opens the client log file", async () => {
+    const output = path.join(folder, "apt-data", "csv-data");
+    await writer.restart(true, output);
+
+    await writeEntries(output, 1);
   });
 });
 

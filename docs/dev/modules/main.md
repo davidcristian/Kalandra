@@ -160,12 +160,13 @@ The entry, the server and the app services, in `main/src/`:
   the file is open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path
   separator, and `failed` while it is off or when the folder or file cannot be created, with the reason in the
   log. It writes `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run
-  and at the first write after a log re-parse. The folder is the library
-  output path, or `apt-data/csv-data` by default. A restart that turns it off closes both files. One that changes
-  the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file
-  open in the folder it started in until the session stops. Each event, `restart` and `flushClientLogFile` starts
-  after the one before it ends, so an entry that comes while its file opens is written once the file is open, and
-  lines keep the order of their events. A failed open or write is logged, and the next event still runs.
+  and at the first write after a log re-parse. The folder is the library output path, or `apt-data/csv-data` by
+  default, and it creates the folder before it opens either file. A restart that turns it off closes both files. One
+  that changes the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a
+  session file open in the folder it started in until the session stops. Each event, `restart` and
+  `flushClientLogFile` starts after the one before it ends, so an entry that comes while its file opens is written
+  once the file is open, and lines keep the order of their events. A failed open or write is logged, and the next
+  event still runs.
 - `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
   or `undefined` when none is.
 
