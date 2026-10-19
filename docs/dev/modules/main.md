@@ -171,15 +171,16 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (19.4% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (20.5% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
 `app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins
 and host names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
 `x-kalandra-proxy` header, through a fake `net.request` that answers with the request it was given.
-`ConfigStore.test.ts` saves configs in a temporary folder through a fake writer that is slow or fails. A test of a
-module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run
-lint` runs ESLint; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
-capture and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,
-[host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it still has to
-run.
+`ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
+write or fail the rename as Windows does for a file another program has open. A test of a module that imports
+Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the
+production bundle, and `npm run lint` runs ESLint; the Build workflow packages main on all three platforms.
+Hotkeys, overlay focus, clipboard capture and OCR need the game:
+[runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
+lists every host check, and each task's Status line says whether it still has to run.

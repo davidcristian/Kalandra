@@ -5,13 +5,38 @@ import path from "path";
 
 export interface ConfigFiles {
   writeFile: (file: string, contents: string) => Promise<void>;
+  rename: (from: string, to: string) => Promise<void>;
 }
 
 const diskFiles: ConfigFiles = {
   writeFile: async (file, contents) => {
-    await fs.writeFile(file, contents);
+    const handle = await fs.open(file, "w");
+    try {
+      await handle.writeFile(contents);
+      // Without the flush, a power loss soon after the rename can leave an empty file
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
   },
+  rename: fs.rename,
 };
+
+// Windows fails a rename over a file that any program has open, such as a backup tool reading
+// config.json, with EPERM (measured on Node 24); the retries give it 750 ms to close the file
+const RENAME_RETRY_DELAYS_MS = [50, 100, 200, 400];
+
+async function renameWithRetry(files: ConfigFiles, from: string, to: string) {
+  for (const delay of RENAME_RETRY_DELAYS_MS) {
+    try {
+      await files.rename(from, to);
+      return;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  await files.rename(from, to);
+}
 
 export class ConfigStore {
   private isTmpFile = false;
@@ -66,9 +91,12 @@ export class ConfigStore {
       this.cfgPath += ".tmp";
       this.isTmpFile = true;
     }
+    // A crash before the rename leaves the previous config.json whole
+    const newFile = `${this.cfgPath}.new`;
     try {
       await fs.mkdir(path.dirname(this.cfgPath), { recursive: true });
-      await this.files.writeFile(this.cfgPath, contents);
+      await this.files.writeFile(newFile, contents);
+      await renameWithRetry(this.files, newFile, this.cfgPath);
     } catch {
       app.exit(1);
     }

@@ -83,6 +83,9 @@ Kalandra stores its settings in `config.json` in a folder named `apt-data`. On W
 tray menu item **Open config folder**, which opens `apt-data` on every operating system. The same folder holds the
 other files Kalandra saves, such as uploaded images and the OCR files.
 
+Kalandra writes new settings to `config.json.new` first and then renames that file to `config.json`, so a crash or
+a power loss during a save keeps your previous settings.
+
 ## Moving from Exiled Exchange 2
 
 Kalandra installs beside Exiled Exchange 2 and keeps its settings in its own folder. To copy your Exiled Exchange 2

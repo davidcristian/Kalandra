@@ -68,8 +68,11 @@ old one and keep that file, so a saved config must survive every update: this is
   queues the write. Reads and writes of the file run one at a time in the order they arrive, so the last save is
   the one on disk, and `load()` returns the text of a save that is still being written. The first temporary save
   switches the path to `config.json.tmp` for the rest of the run, so a file that did not parse stays as it was. It
-  creates `apt-data` when it is missing and exits the app with status 1 when a write fails. In development
-  (`VITE_DEV_SERVER_URL` is set) it writes nothing.
+  creates `apt-data` when it is missing. A write goes to the file's name with `.new` added, is flushed to disk and
+  is renamed over the file, so a crash or a power loss during a save leaves the previous file whole. Windows fails
+  a rename over a file that another program has open, so the rename is tried again for up to 750 ms. When the
+  write or the rename fails, the file stays as it was and the app exits with status 1; the next save overwrites
+  the `.new` file. In development (`VITE_DEV_SERVER_URL` is set) it writes nothing.
 
 ## Invariants
 
@@ -101,5 +104,6 @@ old one and keep that file, so a saved config must survive every update: this is
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it. No test runs
 `defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against
-the steps before it and against the type. `main/specs/ConfigStore.test.ts` checks the order of `ConfigStore`'s reads
-and writes in a temporary folder.
+the steps before it and against the type. `main/specs/ConfigStore.test.ts` checks `ConfigStore` in a temporary
+folder: the order of its reads and writes, a write that stops partway, and a rename that fails while another
+program has the file open.
