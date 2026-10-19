@@ -1411,3 +1411,40 @@ BowThreeAugments.augmentSockets = {
 };
 
 // #endregion BowThreeAugments
+
+// The items below are MagicItem, a real copied item, with one line changed to a
+// form the game data does not match. No real copied text of these forms exists.
+function magicItemWithLine(from: string, to: string): TestItem {
+  if (!MagicItem.rawText.includes(from)) {
+    throw new Error(`MagicItem has no line "${from}"`);
+  }
+  const item = Object.assign(
+    new TestItem(""),
+    structuredClone({ ...MagicItem }),
+  );
+  item.rawText = MagicItem.rawText.replace(from, to);
+  return item;
+}
+
+// #region RequiresUnknownFormat
+export const RequiresUnknownFormat = magicItemWithLine(
+  "Requires: Level 28, 57 (augmented) Str",
+  "Requires: Level 28, 57 (augmented) Str, 20 Spirit",
+);
+RequiresUnknownFormat.requires = undefined;
+// #endregion RequiresUnknownFormat
+
+// #region ModifierLineUnknownFormat
+export const ModifierLineUnknownFormat = magicItemWithLine(
+  '{ Prefix Modifier "Crackling" (Tier: 7) — Damage, Elemental, Lightning, Attack }',
+  '{ Prefix Modifier "Crackling" (Tier: 7) (Grade: 2) — Damage, Elemental, Lightning, Attack }',
+);
+ModifierLineUnknownFormat.prefixCount = 0;
+// #endregion ModifierLineUnknownFormat
+
+// #region ModifierIncreaseUnknownFormat
+export const ModifierIncreaseUnknownFormat = magicItemWithLine(
+  '{ Suffix Modifier "of the Brute" (Tier: 8) — Attribute }',
+  '{ Suffix Modifier "of the Brute" (Tier: 8) — Attribute — Increased by 20% }',
+);
+// #endregion ModifierIncreaseUnknownFormat

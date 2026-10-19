@@ -67,11 +67,10 @@ export function parseModInfoLine(
         rank = 6;
         break;
     }
+  } else if (!_$.MODIFIER_LINE.test(modText)) {
+    console.log("Cannot parse the modifier line:", line);
   } else {
-    const match = modText.match(_$.MODIFIER_LINE);
-    if (!match) {
-      throw new Error("Invalid regex for mod info line");
-    }
+    const match = modText.match(_$.MODIFIER_LINE)!;
     if (match.groups!.type.startsWith(_$.FRACTURED_MODIFIER)) {
       match.groups!.type = match
         .groups!.type.slice(_$.FRACTURED_MODIFIER.length)
@@ -159,9 +158,11 @@ export function parseModInfoLine(
       xText2 !== undefined && incrText !== xText2 ? xText2 : undefined;
 
     tags = tagsText ? tagsText.split(", ") : [];
-    rollIncr = incrText
-      ? Number(_$.MODIFIER_INCREASED.exec(incrText)![1])
-      : undefined;
+    const incrMatch = incrText ? _$.MODIFIER_INCREASED.exec(incrText) : null;
+    if (incrText && !incrMatch) {
+      console.log("Cannot parse the modifier roll increase:", line);
+    }
+    rollIncr = incrMatch ? Number(incrMatch[1]) : undefined;
   }
 
   return { type, generation, name, tier, rank, tags, rollIncr };

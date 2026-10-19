@@ -3,7 +3,16 @@
  */
 
 import { parseClipboard } from "@/parser";
-import { CharmQuality, NormalItem, RareItem, SpectreIncSpirit } from "./items";
+import { ModifierType } from "@/parser/modifiers";
+import {
+  CharmQuality,
+  ModifierIncreaseUnknownFormat,
+  ModifierLineUnknownFormat,
+  NormalItem,
+  RareItem,
+  RequiresUnknownFormat,
+  SpectreIncSpirit,
+} from "./items";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
@@ -80,5 +89,58 @@ describe("Parse Charm Properties", () => {
     const parsedItem = item._unsafeUnwrap();
 
     expect(parsedItem.quality).toBe(CharmQuality.quality);
+  });
+});
+
+describe("Parse lines the game data does not match", () => {
+  beforeEach(async () => {
+    setupTests();
+    await init("en");
+  });
+
+  it("keeps the item when the requirements line cannot be read", () => {
+    const item = parseClipboard(RequiresUnknownFormat.rawText);
+
+    expect(item.isOk()).toBe(true);
+    const parsedItem = item._unsafeUnwrap();
+    expect(parsedItem.requires).toBeUndefined();
+    expect(parsedItem.itemLevel).toBe(RequiresUnknownFormat.itemLevel);
+    expect(parsedItem.weaponPHYSICAL).toBe(
+      RequiresUnknownFormat.weaponPHYSICAL,
+    );
+    expect(parsedItem.newMods).toHaveLength(2);
+  });
+
+  it("keeps the type, tags and stats of a modifier line it cannot read", () => {
+    const item = parseClipboard(ModifierLineUnknownFormat.rawText);
+
+    expect(item.isOk()).toBe(true);
+    const [prefix, suffix] = item._unsafeUnwrap().newMods;
+    expect(prefix.info).toMatchObject({
+      type: ModifierType.Explicit,
+      generation: undefined,
+      name: undefined,
+      tier: undefined,
+      tags: ["Damage", "Elemental", "Lightning", "Attack"],
+    });
+    expect(prefix.stats.map((stat) => stat.stat.ref)).toEqual([
+      "Adds # to # Lightning Damage",
+    ]);
+    expect(suffix.info.generation).toBe("suffix");
+  });
+
+  it("keeps a modifier whose roll increase it cannot read", () => {
+    const item = parseClipboard(ModifierIncreaseUnknownFormat.rawText);
+
+    expect(item.isOk()).toBe(true);
+    const suffix = item._unsafeUnwrap().newMods[1];
+    expect(suffix.info).toMatchObject({
+      generation: "suffix",
+      name: "of the Brute",
+      tier: 8,
+      tags: ["Attribute"],
+      rollIncr: undefined,
+    });
+    expect(suffix.stats[0].roll?.value).toBe(8);
   });
 });

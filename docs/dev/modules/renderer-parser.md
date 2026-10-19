@@ -116,7 +116,9 @@ matcher text after the lookup and returns `undefined` on a hash collision.
 - **Item text is untrusted.** `parseClipboard` runs inside a `try`, logs what it caught and returns
   `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat goes to
   `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is not
-  its own instead of throwing.
+  its own instead of throwing. A requirements line that `REQUIRES_LINE` does not match is logged and leaves
+  `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or `MODIFIER_INCREASED` does not match is logged, and the
+  modifier keeps its type and tags without the parts that did not match.
 - **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
@@ -131,7 +133,7 @@ imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loa
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (40.1% of the lines of `src/` on 19 Oct 2026). The parser suites are
+below the floor in `renderer/vitest.config.ts` (43.0% of the lines of `src/` on 19 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces

@@ -219,4 +219,18 @@ describe("parseRequirements", () => {
       expect(parsedItem.requires).toEqual(expectedResult);
     },
   );
+
+  it("takes a requirements line it cannot read without setting requires", async () => {
+    setupTests();
+    await init("en");
+    const parsedItem = {} as ParsedItem;
+
+    const res = __testExports.parseRequirements(
+      ["Requires: Level 28, 57 (augmented) Str, 20 Spirit"],
+      parsedItem,
+    );
+
+    expect(res).toBe("SECTION_PARSED");
+    expect(parsedItem.requires).toBeUndefined();
+  });
 });

@@ -731,9 +731,9 @@ function parseRequirements(section: string[], item: ParsedItem) {
   }
 
   const match = section[0].match(_$.REQUIRES_LINE);
-  // TODO: remove once validated in other langs
   if (!match) {
-    throw new Error("Failed to parse requirements");
+    console.log("Cannot parse the requirements line:", section[0]);
+    return "SECTION_PARSED";
   }
 
   item.requires = {
