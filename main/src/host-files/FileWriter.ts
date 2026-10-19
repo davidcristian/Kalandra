@@ -53,7 +53,7 @@ export class FileWriter {
         this._currentDateTime = e.data.ts;
         this.writeLine(JSON.stringify(e.data), FileChannel.ClientLog);
         if (e.close) {
-          this.closeChannel(FileChannel.ClientLog);
+          await this.closeChannel(FileChannel.ClientLog);
         }
         return;
       }
@@ -71,22 +71,33 @@ export class FileWriter {
 
         await this.writeSessionStart(e.name, e.header);
       } else {
-        this.closeChannel(FileChannel.Item);
+        await this.closeChannel(FileChannel.Item);
       }
     });
   }
 
   async restart(enabled: boolean, outputPath: string | null) {
+    const uploadsPath = outputPath?.length
+      ? outputPath
+      : this.defaultUploadsPath;
+    const folderChanged = uploadsPath !== this.uploadsPath;
     this._enabled = enabled;
-    this.uploadsPath = outputPath ?? this.defaultUploadsPath;
-    if (!this.uploadsPath.length) {
-      this.uploadsPath = this.defaultUploadsPath;
+    this.uploadsPath = uploadsPath;
+
+    // The handler ignores a session stop while the feature is off, so nothing else would close it
+    if (!enabled && this._state.itemFile) {
+      await this.closeChannel(FileChannel.Item);
+    }
+    // The next entry opens client-log.ndjson again, in the new folder. A session file stays in
+    // the folder it started in until the session stops.
+    if ((!enabled || folderChanged) && this._state.clientLogFile) {
+      await this.closeChannel(FileChannel.ClientLog);
     }
   }
 
-  public flushClientLogFile() {
+  public async flushClientLogFile() {
     if (this._state?.clientLogFile) {
-      this.closeChannel(FileChannel.ClientLog);
+      await this.closeChannel(FileChannel.ClientLog);
     }
   }
 
@@ -104,32 +115,36 @@ export class FileWriter {
     }
   }
 
-  private closeChannel(channel: FileChannel) {
+  private async closeChannel(channel: FileChannel) {
+    let file: fs.FileHandle | null;
     switch (channel) {
       case FileChannel.Item:
-        if (!this._state.itemFile) {
-          this.logger.write("error [FileWriter] Channel item already closed.");
-          return;
-        }
-        this.logger.write("info [FileWriter] Channel item closed.");
-        this._state.itemFile.close();
+        file = this._state.itemFile;
         this._state.itemFile = null;
         break;
       case FileChannel.ClientLog:
-        if (!this._state.clientLogFile) {
-          this.logger.write(
-            "error [FileWriter] Channel client-log already closed.",
-          );
-          return;
-        }
-        this.logger.write("info [FileWriter] Channel client-log closed.");
-        this._state.clientLogFile.close();
+        file = this._state.clientLogFile;
         this._state.clientLogFile = null;
         break;
 
       default:
         this.logger.write("error [FileWriter] Invalid channel.");
-        break;
+        return;
+    }
+    if (!file) {
+      this.logger.write(
+        `error [FileWriter] Channel ${channel} already closed.`,
+      );
+      return;
+    }
+
+    this.logger.write(`info [FileWriter] Channel ${channel} closed.`);
+    try {
+      await file.close();
+    } catch (err) {
+      this.logger.write(
+        `error [FileWriter] Failed to close channel ${channel}: ${(err as Error).message}`,
+      );
     }
   }
 

@@ -27,10 +27,11 @@ the file in **PoE log file** to fix this.
 
 - The file is NDJSON (newline-delimited JSON): each line is one JSON object, which holds one entry.
 - Kalandra reads only the lines the game adds to `Client.txt` while Kalandra runs, not the lines already in it.
-- Kalandra empties the file when the first entry arrives after Kalandra starts, so the file holds the entries of one
-  run of Kalandra.
+- Kalandra empties the file when the first entry arrives after Kalandra starts, after Item Data Collection is turned
+  on again, or after a new **Output Folder** is saved, which starts the file in that folder. So the file holds the
+  entries since the latest of these.
 - Kalandra does not write the entries that arrive while it opens the file. This always includes the first entry
-  after Kalandra starts.
+  after each of these.
 - Lines can be out of order. Sort the entries by `ts`, then by `ms`, when you need them in order.
 - Kalandra matches the `level-up` line in the language of the **Language** setting, and the lines of every other
   type in English.

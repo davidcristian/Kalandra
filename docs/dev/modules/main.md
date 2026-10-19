@@ -140,7 +140,9 @@ The entry, the server and the app services, in `main/src/`:
   on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`
   between a `session` start and stop. It writes `client-log-event` lines to `client-log.ndjson`, which it
   overwrites at its first write in a run and at the first write after a log re-parse. The folder is the library
-  output path, or `apt-data/csv-data` by default.
+  output path, or `apt-data/csv-data` by default. A restart that turns it off closes both files. One that changes
+  the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file
+  open in the folder it started in until the session stops.
 - `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
   or `undefined` when none is.
 
@@ -175,16 +177,18 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (23.9% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (29.1% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
-`app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins
-and host names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
+`app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins and host
+names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
 `x-kalandra-proxy` header, through a fake `net.request` that answers with the request it was given.
 `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
-write or fail the rename as Windows does for a file another program has open. A test of a module that imports
-Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs `tsc --noEmit` and the
-production bundle, and `npm run lint` runs ESLint; the Build workflow packages main on all three platforms.
+write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
+`FileWriter.test.ts` read and write real files in a temporary folder and send client events through the fake server
+in `fake-server.ts`. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
+`npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
+workflow packages main on all three platforms.
 Hotkeys, overlay focus, clipboard capture and OCR need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
 lists every host check, and each task's Status line says whether it still has to run.

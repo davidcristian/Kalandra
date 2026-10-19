@@ -1,45 +1,17 @@
-import { EventEmitter } from "events";
 import { promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { IpcEvent, IpcEventPayload } from "../../ipc/types";
-import type { ServerEvents } from "../src/server";
 import { FileWriter } from "../src/host-files/FileWriter";
 import { GameLogWatcher } from "../src/host-files/GameLogWatcher";
 import { MAX_LINE_BYTES } from "../src/host-files/LineSplitter";
 import { Logger } from "../src/RemoteLogger";
+import { FakeServer } from "./fake-server";
 
 vi.mock("electron", async () => {
   const os = await import("node:os");
   return { app: { getPath: () => os.tmpdir() } };
 });
-
-class FakeServer implements ServerEvents {
-  readonly sent: IpcEvent[] = [];
-  private readonly bus = new EventEmitter();
-
-  onEventAnyClient: ServerEvents["onEventAnyClient"] = (name, cb) => {
-    this.bus.on(name, cb);
-  };
-
-  sendEventTo: ServerEvents["sendEventTo"] = (_target, event) => {
-    this.sent.push(event);
-  };
-
-  emit<Name extends IpcEvent["name"]>(
-    name: Name,
-    payload: IpcEventPayload<Name>,
-  ) {
-    this.bus.emit(name, payload);
-  }
-
-  gameLogLines(): string[] {
-    return this.sent.flatMap((event) =>
-      event.name === "MAIN->CLIENT::game-log" ? event.payload.lines : [],
-    );
-  }
-}
 
 let folder = "";
 let logger: Logger;
