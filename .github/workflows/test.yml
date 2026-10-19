@@ -39,7 +39,8 @@ jobs:
           && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
           range="$BEFORE..HEAD"
         fi
-        if [ -n "$range" ] && git diff --name-only "$range" > changed.txt; then
+        # --no-renames lists a moved file under its old and its new path, so the jobs of its old folder run too.
+        if [ -n "$range" ] && git diff --name-only --no-renames "$range" > changed.txt; then
           cat changed.txt
           python3 scripts/ci_paths.py < changed.txt | tee -a "$GITHUB_OUTPUT"
         else

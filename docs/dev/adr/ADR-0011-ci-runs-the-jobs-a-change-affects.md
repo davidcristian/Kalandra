@@ -1,6 +1,6 @@
 # ADR-0011: CI runs the test jobs a change can affect
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-19)
 
 ## Context
 
@@ -13,10 +13,12 @@ the script does not know.
 ## Decision
 
 **1. `scripts/ci_paths.py` maps each changed path to the jobs it affects.** The Changed paths job of `test.yml`
-lists the paths with `git diff --name-only`, from the merge base for a pull request and from the push's `before`
-commit for a push, and passes them to the script. Each of the Tests, Price service, Scripts and Docs jobs runs only
-when a path affects it. Reason: a change to the docs alone runs the docs build alone, and the rules are Python with a
-unit test, not a list inside the workflow that nothing checks.
+lists the paths with `git diff --name-only --no-renames`, from the merge base for a pull request and from the push's
+`before` commit for a push, and passes them to the script. Each of the Tests, Price service, Scripts and Docs jobs
+runs only when a path affects it. Reason: a change to the docs alone runs the docs build alone, and the rules are
+Python with a unit test, not a list inside the workflow that nothing checks. `--no-renames` lists a moved file under
+its old and its new path, because git otherwise prints only the new one, and a file moved out of `main/` must still
+run the main tests.
 
 **2. The first matching rule applies, and every job runs when no rule matches or no diff can be read.** A file rule
 comes before the rule for its folder, and `test_ci_paths.py` fails when an earlier rule hides a later one. The first
