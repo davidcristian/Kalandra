@@ -154,6 +154,9 @@ is not private, `load()` selects the third league when the list has more than tw
   [the files](price-service.md#the-files).
 - **Trade responses are untrusted.** A trade site `error` is thrown as an `Error` and shown in the result list. A
   listing that `parseFetchResult` cannot read is logged and kept without its item tooltip.
+- **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
+  search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
+  error when they end.
 - **`pathofexile-trade.ts` is 2103 lines** (2026-10-18,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
@@ -168,7 +171,8 @@ neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
 `filters/util.ts`.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
-`specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
+`specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks, and
+`specs/web/useBulkApi.test.ts` drives `useBulkApi` with a fake `execBulkSearch` that answers when the test says.
 `specs/web/prices.test.ts` reads the price service's fixtures, and `specs/web/prices-load.test.ts` loads the price
 file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
 with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.

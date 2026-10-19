@@ -53,14 +53,14 @@ export function useTradeApi() {
     stats: StatFilter[],
     item: ParsedItem,
   ) {
+    searchId += 1;
+    const _searchId = searchId;
     try {
-      searchId += 1;
       error.value = null;
       searchResult.value = null;
       const _fetchResults: PricingResult[] = shallowReactive([]);
       fetchResults.value = _fetchResults;
 
-      const _searchId = searchId;
       const request = createTradeRequest(filters, stats, item);
       const _searchResult = await requestTradeResultList(
         request,
@@ -124,7 +124,9 @@ export function useTradeApi() {
       }
       await fetchMore();
     } catch (err) {
-      error.value = (err as Error).message;
+      if (_searchId === searchId) {
+        error.value = (err as Error).message;
+      }
     }
   }
 

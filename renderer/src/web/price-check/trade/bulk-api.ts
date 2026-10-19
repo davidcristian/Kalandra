@@ -18,12 +18,11 @@ export function useBulkApi() {
   const result = shallowRef<BulkSearchExtended | null>(null);
 
   async function search(item: ParsedItem, filters: ItemFilters) {
+    searchId += 1;
+    const _searchId = searchId;
     try {
-      searchId += 1;
       error.value = null;
       result.value = null;
-
-      const _searchId = searchId;
 
       // override, because at league start many players set wrong price, and this breaks optimistic search
       let have;
@@ -52,18 +51,28 @@ export function useBulkApi() {
             filters,
             optimisticSearch,
             "divine",
+            _searchId,
           ),
           xchgExalted: getResultsByHave(
             item,
             filters,
             optimisticSearch,
             "exalted",
+            _searchId,
           ),
-          xchgChaos: getResultsByHave(item, filters, optimisticSearch, "chaos"),
+          xchgChaos: getResultsByHave(
+            item,
+            filters,
+            optimisticSearch,
+            "chaos",
+            _searchId,
+          ),
         };
       }
     } catch (err) {
-      error.value = (err as Error).message;
+      if (_searchId === searchId) {
+        error.value = (err as Error).message;
+      }
     }
   }
 
@@ -72,6 +81,7 @@ export function useBulkApi() {
     filters: ItemFilters,
     preloaded: Array<BulkSearch | null>,
     have: "divine" | "exalted" | "chaos",
+    _searchId: number,
   ) {
     const _result = shallowRef(
       preloaded.some((res) => res?.haveTag === have)
@@ -94,6 +104,7 @@ export function useBulkApi() {
               )[0]!,
             );
             items.value = _result.value.listed;
+            if (_searchId !== searchId) return;
             const otherHave =
               have === "divine"
                 ? result.value?.xchgExalted?.listed.value
@@ -101,7 +112,9 @@ export function useBulkApi() {
             // fix best guess we did while making optimistic search
             otherHave!.total -= _result.value.total;
           } catch (err) {
-            error.value = (err as Error).message;
+            if (_searchId === searchId) {
+              error.value = (err as Error).message;
+            }
           }
         })();
       }

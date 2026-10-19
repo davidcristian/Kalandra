@@ -10,6 +10,7 @@ import {
 } from "@/web/price-check/trade/pathofexile-trade";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
+import { settle } from "./held-requests";
 
 vi.mock("@/web/price-check/trade/pathofexile-trade", () => {
   return {
@@ -77,4 +78,56 @@ describe("useTradeApi", () => {
       expect(requestResults).toHaveBeenCalledTimes(expectedCalls);
     },
   );
+
+  it("keeps the newer search's state when an older search fails later", async () => {
+    const olderListings = Promise.withResolvers<PricingResult[]>();
+    vi.mocked(createTradeRequest).mockReturnValue(
+      {} as ReturnType<typeof createTradeRequest>,
+    );
+    vi.mocked(requestTradeResultList).mockImplementation(
+      async (_body, league) => ({
+        id: league,
+        result: [`${league}-listing`],
+        total: 1,
+      }),
+    );
+    vi.mocked(requestResults).mockImplementation(async (queryId, ids) =>
+      queryId === "older" ? olderListings.promise : ids.map(listing),
+    );
+
+    const older = composableResult.search(
+      { trade: { league: "older" } } as ItemFilters,
+      [],
+      {} as ParsedItem,
+    );
+    await settle();
+    await composableResult.search(
+      { trade: { league: "newer" } } as ItemFilters,
+      [],
+      {} as ParsedItem,
+    );
+    olderListings.reject(new Error("Rate limit exceeded"));
+    await older;
+
+    expect(composableResult.error.value).toBeNull();
+    expect(composableResult.searchResult.value?.id).toBe("newer");
+    expect(composableResult.groupedResults.value.map((res) => res.id)).toEqual([
+      "newer-listing",
+    ]);
+  });
 });
+
+function listing(id: string): PricingResult {
+  return {
+    id,
+    relativeDate: "",
+    priceAmount: 1,
+    priceCurrency: "exalted",
+    isMine: false,
+    hasNote: true,
+    isInstantBuyout: false,
+    accountName: id,
+    accountStatus: "online",
+    ign: id,
+  };
+}
