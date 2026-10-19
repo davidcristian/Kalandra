@@ -12,9 +12,9 @@ request to poe.ninja's API, because poe.ninja asks apps to use their own backend
 
 | File | Does |
 | --- | --- |
-| `price_service/__main__.py` | reads the environment, then runs one cycle per interval, or one cycle with `--once` |
+| `price_service/__main__.py` | reads the environment, then calls `run_schedule` with `--once` or without it |
 | `price_service/ninja.py` | `NinjaClient`: the requests to poe.ninja, one at a time, with ETags and a fallback copy |
-| `price_service/service.py` | `run_cycle` and `build_league`: one file per league and `index.json` |
+| `price_service/service.py` | `run_schedule`: one cycle per interval, or one cycle with `--once`; `run_cycle` and `build_league`: one file per league and `index.json` |
 | `price_service/transform.py` | turns poe.ninja's responses into the price file, in the key order the app searches |
 
 ## Public contract
@@ -136,6 +136,10 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 - An overview request that fails with no copy skips its whole league, which is logged and listed in `failed`. So
   does a value that becomes too large for a float in the conversion to divines. A league list request that fails
   with no copy ends the cycle before any league, and no `index.json` is written.
+- Any other error in a cycle, such as a failed disk write, ends that cycle with `ERROR cycle failed` and its
+  traceback (`run_schedule` in `service.py`). The process keeps running, and the next cycle starts on time. A
+  process that ends would make Docker start a new one (`restart: unless-stopped` in `compose.yaml`), and the new
+  one would send its requests again at once.
 
 ## App side
 
@@ -175,9 +179,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 38 tests on 19 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 40 tests on 19 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 86.7% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 90.0% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

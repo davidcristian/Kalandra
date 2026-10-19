@@ -89,10 +89,14 @@ first cycle.
   status poe.ninja returned. A network error such as `URLError` or `TimeoutError` means the machine did not reach
   poe.ninja. The next cycle starts `PRICE_INTERVAL_MINUTES` after the failed one started. Do not restart the service
   to retry sooner.
-- A Python traceback, and `docker compose ps` shows `prices` restarting: the process ended on an error the service
-  does not catch, such as a failed disk write. Every start sends a new cycle of requests, so first stop it with
-  `docker compose stop prices`, then read the traceback. `web` keeps serving the last files while `prices` is
-  stopped. Fix the cause in the code, with a test that replays the response, and deploy again.
+- `ERROR cycle failed` followed by a Python traceback: the cycle ended on an error that is not a failed request,
+  such as a failed disk write. The service keeps running, and the next cycle starts `PRICE_INTERVAL_MINUTES` after
+  the failed one started, so the error sends no extra requests. `web` keeps serving the last files. Read the
+  traceback. A full disk or a read-only volume needs no deploy: the next cycle writes the files once the volume is
+  writable. For an error in the code, fix it with a test that replays the response, and deploy again.
+- A Python traceback without `cycle failed`, and `docker compose ps` shows `prices` restarting: the process ends at
+  start, before its first request, so the restarts send no requests. Read the traceback; the next case is the known
+  one.
 - `load_categories` or `SnapshotError: unsupported schemaVersion` in the traceback: the image's `namespaceMap.json`
   is not schema version 1, and the service stops at start, before any request
   ([price-service.md](../modules/price-service.md#namespacemapjson)).

@@ -3,11 +3,10 @@
 import argparse
 import logging
 import os
-import time
 from pathlib import Path
 
-from .ninja import NinjaClient, NinjaError, urllib_get
-from .service import run_cycle
+from .ninja import NinjaClient, urllib_get
+from .service import run_cycle, run_schedule
 from .transform import load_categories
 
 DEFAULT_CONTACT = "https://github.com/davidcristian/Kalandra/issues"
@@ -32,15 +31,7 @@ def main() -> None:
     )
 
     output.mkdir(parents=True, exist_ok=True)
-    while True:
-        started = time.monotonic()
-        try:
-            run_cycle(client, categories, output)
-        except NinjaError as error:
-            logging.getLogger(__name__).error("cycle failed: %s", error)  # noqa: TRY400 a failed request needs no traceback
-        if args.once:
-            return
-        time.sleep(max(0.0, interval - (time.monotonic() - started)))
+    run_schedule(lambda: run_cycle(client, categories, output), interval, once=args.once)
 
 
 if __name__ == "__main__":

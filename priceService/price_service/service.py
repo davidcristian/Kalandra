@@ -2,6 +2,7 @@
 
 import json
 import logging
+import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -72,3 +73,27 @@ def run_cycle(
     write_atomic(output, "index.json", json.dumps(index, ensure_ascii=False, indent=2))
     log.info("wrote %d leagues, %d failed", len(written), len(failed))
     return index
+
+
+def run_schedule(
+    cycle: Callable[[], object],
+    interval: float,
+    *,
+    once: bool = False,
+    sleep: Callable[[float], None] = time.sleep,
+    clock: Callable[[], float] = time.monotonic,
+) -> None:
+    """Runs a cycle every interval seconds, or one cycle with once; an error ends only its own cycle."""
+    while True:
+        started = clock()
+        try:
+            cycle()
+        except NinjaError as error:
+            log.error("cycle failed: %s", error)  # noqa: TRY400 a failed request needs no traceback
+        # The process keeps running, because Docker restarts a process that ends and the new one requests every
+        # category again at once, while poe.ninja asks for at most one request per category an hour
+        except Exception:
+            log.exception("cycle failed")
+        if once:
+            return
+        sleep(max(0.0, interval - (clock() - started)))

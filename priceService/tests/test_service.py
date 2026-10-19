@@ -7,7 +7,7 @@ from pathlib import Path
 from support import FIXTURES, FakeGet, fixture, league_routes, ok
 
 from price_service.ninja import NinjaClient, Reply
-from price_service.service import build_league, run_cycle, write_atomic
+from price_service.service import build_league, run_cycle, run_schedule, write_atomic
 from price_service.transform import Category, SnapshotError
 
 CATEGORIES = [
@@ -84,6 +84,45 @@ class RunCycleTest(unittest.TestCase):
                     index = run_cycle(client(routes), CATEGORIES, output, now=lambda: NOW)
                 self.assertEqual(index["failed"], ["Bad"])
                 self.assertEqual(sorted(path.name for path in output.iterdir()), ["index.json", "standard.json"])
+
+
+class StopScheduleError(Exception):
+    pass
+
+
+class RunScheduleTest(unittest.TestCase):
+    def test_an_error_ends_only_its_cycle_and_the_next_starts_on_time(self) -> None:
+        get = FakeGet(league_routes())
+        ninja = NinjaClient(get, user_agent="test", sleep=lambda _: None)
+        times = iter([0.0, 25.0, 3600.0, 3625.0])
+        sleeps: list[float] = []
+
+        def sleep(seconds: float) -> None:
+            sleeps.append(seconds)
+            if len(sleeps) == 2:
+                raise StopScheduleError
+
+        with tempfile.TemporaryDirectory() as name:
+            missing = Path(name) / "missing"
+            with self.assertLogs("price_service.service", "ERROR") as logs, self.assertRaises(StopScheduleError):
+                run_schedule(
+                    lambda: run_cycle(ninja, CATEGORIES, missing), 3600, sleep=sleep, clock=lambda: next(times)
+                )
+        self.assertEqual(sleeps, [3575.0, 3575.0])
+        self.assertEqual(len(get.calls), 8)
+        self.assertEqual([record.exc_info is not None for record in logs.records], [True, True])
+
+    def test_once_runs_one_cycle_and_logs_a_failed_request_without_a_traceback(self) -> None:
+        sleeps: list[float] = []
+        failing = client({"/leagues": [Reply(503, b"", None)]})
+        with tempfile.TemporaryDirectory() as name, self.assertLogs("price_service.service", "ERROR") as logs:
+            run_schedule(lambda: run_cycle(failing, CATEGORIES, Path(name)), 3600, once=True, sleep=sleeps.append)
+        self.assertEqual(sleeps, [])
+        self.assertEqual(
+            logs.output,
+            ["ERROR:price_service.service:cycle failed: https://poe.ninja/poe2/api/economy/leagues: HTTP 503"],
+        )
+        self.assertIsNone(logs.records[0].exc_info)
 
 
 class WriteAtomicTest(unittest.TestCase):
