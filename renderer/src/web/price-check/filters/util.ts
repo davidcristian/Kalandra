@@ -10,7 +10,9 @@ function decimalPlaces(value: number, dp: number | boolean): number {
 
 export function roundRoll(value: number, dp: boolean) {
   const rounding = Math.pow(10, decimalPlaces(value, dp));
-  return Math.trunc(value * rounding) / rounding;
+  const scaled = value * rounding;
+  // 1.15 * 100 is 114.99999999999999, so a small step away from zero keeps 1.15
+  return Math.trunc(scaled + Math.sign(scaled) * 1e-9) / rounding;
 }
 
 export function percentRoll(

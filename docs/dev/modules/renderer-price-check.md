@@ -160,7 +160,8 @@ the price file ([price-service.md](price-service.md)); `renderer/public/data/nam
 neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. `specs/web/price-check/filters/`
-covers item filters, stat filters, the missing fractured rules and the pseudo stats.
+covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
+`filters/util.ts`.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
 `specs/web/prices.test.ts` reads the price service's fixtures. `specs/web/host-proxy.test.ts` checks the URL and
