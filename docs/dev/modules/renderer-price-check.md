@@ -65,6 +65,7 @@ that the route needs ([main.md](main.md)).
 | `RateLimiter.ts` | `RateLimiter(max, window)`: at most `max` requests in `window` seconds; `wait`, `waitMulti(limiters)`, `estimateTime`, `restrict(seconds)`, which holds every request for that time, and `addHits(count)`, which counts requests the server reports without waiting |
 | `Cache.ts` | keeps a search, fetch or exchange result for 300 seconds, keyed by a SHA-1 of the request (`object-hash`); `requestResults` clears its cache when the core currency changes |
 | `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message |
+| `listing-markers.ts` | `listingMarkers(listing, showSeller)`: the "You", "in demand" and "Gone" markers of a listing, shown after its listed time, or after its seller when "Show seller" is set |
 | `TradeLinks.vue` | the "Trade" button, which opens the same search on the trade site with `window.open`; with "Enable builtin browser" (`builtinBrowser`) on, it opens the built-in browser and a second button opens the search outside |
 | `RateLimiterState.vue` | the "Rate limiting" button, which shows each limiter's use and queue (`showRateLimitState`) |
 
@@ -180,4 +181,5 @@ file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's ite
 with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
 `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing and restrictions with fake
-timers. No test calls a live site. `Leagues.ts` and `poeprices.ts` have no test file of their own.
+timers. `listing-markers.test.ts` there checks which column shows a listing's markers. No test calls a live site.
+`Leagues.ts` and `poeprices.ts` have no test file of their own.

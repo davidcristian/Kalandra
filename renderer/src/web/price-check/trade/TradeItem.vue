@@ -61,24 +61,24 @@
         </div>
       </div>
       <span
-        v-if="!showSeller && result.isMine"
+        v-if="markers.listed.you"
         class="rounded px-1 text-gray-800 bg-gray-400 ml-1"
         >{{ t("You") }}</span
       >
       <span
-        v-if="!showSeller && result.inDemand"
+        v-if="markers.listed.inDemand"
         class="rounded px-1 bg-yellow-500 text-black ml-1"
         >{{ t("in demand") }}</span
       >
       <span
-        v-if="!showSeller && result.gone"
+        v-if="markers.listed.gone"
         class="rounded border px-1 border-red-500 text-red-500 ml-1"
         >{{ t("Gone") }}</span
       >
     </td>
     <td v-if="showSeller" class="px-2 whitespace-nowrap">
       <span
-        v-if="result.isMine"
+        v-if="markers.seller.you"
         class="rounded px-1 text-gray-800 bg-gray-400"
         >{{ t("You") }}</span
       >
@@ -86,12 +86,12 @@
         showSeller === "ign" ? result.ign : result.accountName
       }}</span>
       <span
-        v-if="result.inDemand"
+        v-if="markers.seller.inDemand"
         class="rounded px-1 bg-yellow-500 text-black ml-1"
         >{{ t("in demand") }}</span
       >
       <span
-        v-if="!showSeller && result.gone"
+        v-if="markers.seller.gone"
         class="rounded border-2 px-1 border-red-500 text-red-500 ml-1"
         >{{ t("Gone") }}</span
       >
@@ -123,6 +123,7 @@ import { AppConfig } from "@/web/Config";
 import { ItemCategory } from "@/parser";
 import TooltipItem from "./TooltipItem.vue";
 import { GEM, GRANTS_REAL_SKILL } from "@/parser/meta";
+import { listingMarkers } from "./listing-markers";
 
 export default defineComponent({
   name: "TradeItem",
@@ -222,6 +223,7 @@ export default defineComponent({
       isHovered,
       isShiftPressed,
       ItemCategory,
+      markers: computed(() => listingMarkers(props.result, props.showSeller)),
       isGem: computed(
         () => props.item.category && GEM.has(props.item.category),
       ),

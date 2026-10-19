@@ -139,7 +139,7 @@ when the item level filter exists, **Level** and **Sockets** for gems, **Quality
   tab.
 - The dot before the listed time shows the seller's status: pink for online, orange for away, red for offline.
   Listings you can buy at once have no dot.
-- **You** marks your own listings, found by **Account name**.
+- **You** marks your own listings, found by **Account name**. **Gone** marks a listing the trade site reports as gone.
 - Hold `Shift` and point at a listing to see the listed item, as set by **Show item when hovering over price**.
 
 When more than 15 listings show and fewer than 5 of them ask for Chaos, Exalted or Divine Orbs (or for fewer than 30
