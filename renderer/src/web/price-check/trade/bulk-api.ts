@@ -1,18 +1,29 @@
 import { ParsedItem } from "@/parser";
 import { AppConfig } from "@/web/Config";
-import { Ref, ComputedRef, shallowRef, shallowReactive, computed } from "vue";
+import {
+  Ref,
+  ShallowRef,
+  computed,
+  shallowReactive,
+  shallowRef,
+  watch,
+} from "vue";
 import { ItemFilters } from "../filters/interfaces";
 import { BulkSearch, execBulkSearch, PricingResult } from "./pathofexile-bulk";
 
-export function useBulkApi() {
-  type BulkSearchExtended = Record<
-    "xchgExalted" | "xchgChaos" | "xchgStable",
-    {
-      listed: Ref<BulkSearch | null>;
-      listedLazy: ComputedRef<PricingResult[]>;
-    }
-  >;
+export interface BulkTab {
+  listed: ShallowRef<BulkSearch | null>;
+  load: () => Promise<void>;
+}
 
+export type BulkSearchExtended = Record<
+  "xchgExalted" | "xchgChaos" | "xchgStable",
+  BulkTab
+>;
+
+const SHOWN_ROWS = 8;
+
+export function useBulkApi() {
   let searchId = 0;
   const error = shallowRef<string | null>(null);
   const result = shallowRef<BulkSearchExtended | null>(null);
@@ -82,48 +93,61 @@ export function useBulkApi() {
     preloaded: Array<BulkSearch | null>,
     have: "divine" | "exalted" | "chaos",
     _searchId: number,
-  ) {
+  ): BulkTab {
     const _result = shallowRef(
       preloaded.some((res) => res?.haveTag === have)
         ? shallowReactive(preloaded.find((res) => res?.haveTag === have)!)
         : null,
     );
-    const items = shallowRef<PricingResult[]>(_result.value?.listed ?? []);
     let requested: boolean = _result.value != null;
 
-    const listedLazy = computed(() => {
-      if (!requested) {
-        (async function () {
-          try {
-            requested = true;
-            _result.value = shallowReactive(
-              (
-                await execBulkSearch(item, filters, [have], {
-                  accountName: AppConfig().accountName,
-                })
-              )[0]!,
-            );
-            items.value = _result.value.listed;
-            if (_searchId !== searchId) return;
-            const otherHave =
-              have === "divine"
-                ? result.value?.xchgExalted?.listed.value
-                : result.value?.xchgStable?.listed.value;
-            // fix best guess we did while making optimistic search
-            otherHave!.total -= _result.value.total;
-          } catch (err) {
-            if (_searchId === searchId) {
-              error.value = (err as Error).message;
-            }
-          }
-        })();
+    async function load() {
+      if (requested) return;
+      requested = true;
+      try {
+        _result.value = shallowReactive(
+          (
+            await execBulkSearch(item, filters, [have], {
+              accountName: AppConfig().accountName,
+            })
+          )[0]!,
+        );
+        if (_searchId !== searchId) return;
+        const otherHave =
+          have === "divine"
+            ? result.value?.xchgExalted.listed.value
+            : result.value?.xchgStable.listed.value;
+        // fix best guess we did while making optimistic search
+        if (otherHave) otherHave.total -= _result.value.total;
+      } catch (err) {
+        if (_searchId === searchId) {
+          error.value = (err as Error).message;
+        }
       }
+    }
 
-      return items.value;
-    });
-
-    return { listed: _result, listedLazy };
+    return { listed: _result, load };
   }
 
   return { error, result, search };
+}
+
+/** Returns the rows of the shown tab, and loads the tab when the first search left it out. */
+export function useShownRows(
+  result: Readonly<Ref<BulkSearchExtended | null>>,
+  selected: Readonly<Ref<keyof BulkSearchExtended>>,
+  ready: Readonly<Ref<boolean>>,
+) {
+  const shown = computed(() =>
+    ready.value ? result.value?.[selected.value] : undefined,
+  );
+  // Runs after the window updates, so a new result's tab is selected before it loads
+  watch(shown, (tab) => tab?.load(), { flush: "post" });
+
+  return computed(() => {
+    const rows = new Array<PricingResult | undefined>(SHOWN_ROWS);
+    const listed = shown.value?.listed.value?.listed ?? [];
+    rows.splice(0, listed.length, ...listed);
+    return rows;
+  });
 }

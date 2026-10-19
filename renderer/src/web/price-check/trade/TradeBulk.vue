@@ -179,7 +179,7 @@ import { artificialSlowdown } from "./artificial-slowdown";
 import OnlineFilter from "./OnlineFilter.vue";
 import TradeLinks from "./TradeLinks.vue";
 import { Host } from "@/web/background/IPC";
-import { useBulkApi } from "./bulk-api";
+import { useBulkApi, useShownRows } from "./bulk-api";
 
 const slowdown = artificialSlowdown(900);
 
@@ -216,14 +216,11 @@ export default defineComponent({
       { immediate: true },
     );
 
-    const selectedResults = computed(() => {
-      const arr = Array(8);
-      if (!slowdown.isReady.value || !result.value) return arr;
-
-      const listed = result.value[selectedCurr.value].listedLazy.value;
-      arr.splice(0, listed.length, ...listed);
-      return arr;
-    });
+    const selectedResults = useShownRows(
+      result,
+      selectedCurr,
+      slowdown.isReady,
+    );
 
     watch(result, () => {
       // TODO: If we start having more than just ex & c, this is not scalable
