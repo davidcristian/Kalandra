@@ -95,8 +95,9 @@ the stats that Kalandra hides by default.
 
 The two boxes next to each filter are the minimum and maximum value for the trade search. Kalandra fills in a minimum
 below the item's own value, by the percentage in Settings, Price check, **Fill stat values** (10% by default), so the
-search also finds items with slightly lower rolls. **Exact value** uses the item's own value. Type in a box to change
-it.
+search also finds items with slightly lower rolls. **Exact value** uses the item's own value. An exact search, such as
+for a normal or unidentified item, takes at most 2%, as [Price check](/price-check#filters) explains. Type in a box to
+change it.
 
 [Price check](/price-check) explains every part of the window, and [Features](/features) lists everything else
 Kalandra does.

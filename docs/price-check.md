@@ -86,8 +86,10 @@ Each stat row has:
 - a checkbox: click the stat text to turn the filter on or off,
 - a minimum and a maximum field. Kalandra fills the minimum with the item's value minus the **Fill stat values**
   percentage (10% by default), or the maximum for a stat where lower is better. For a unique it takes that percentage
-  of the roll range, and a slider shows the range. Right-click a field to clear it, and press `Enter` in a field to
-  search,
+  of the roll range, and a slider shows the range. An exact search takes at most 2%: the **Base item** tab, Mageblood,
+  a normal or unidentified item, and a flask, relic or wombgift that is not unique. Kalandra takes 0% for a tablet
+  that is not unique, the Charm Slots stat, a magic item you cannot modify and a unique's stat at its best roll.
+  Right-click a field to clear it, and press `Enter` in a field to search,
 - a tag that names where the stat comes from (**explicit**, **implicit**, **pseudo** for a
   [pseudo stat](/quick-start#terms), **Augment** and others), and **Tier 1** or **Tier 2** for a modifier of that
   tier. **Always show tier** shows every tier,
@@ -228,7 +230,7 @@ Open Settings, **Price check** page, or click the price check title bar. Changes
 | **or Private League** | empty | A private league name. See [Private leagues](/private-leagues). |
 | **Account name** | empty | Your account name, so your own listings show **You**. |
 | **Show seller** | **No** | Adds a **Seller** column with the **Account name** or the **Last character name**. |
-| **Fill stat values** | 10% | How far from the item's value the minimum (or maximum) starts, from 0 to 50. **Exact value** sets 0. |
+| **Fill stat values** | 10% | How far from the item's value the minimum (or maximum) starts, from 0 to 50. **Exact value** sets 0. An exact search takes at most 2% ([Filters](#filters)). |
 | **Primary base currency:** | Exalted Orb | Exalted Orb or Chaos Orb, for estimates, the title bar rate and prices in brackets. With Chaos Orb, these show in Exalted Orbs while one Divine Orb costs fewer than 5 Chaos Orbs. |
 | **Remember the Buyout Currency filter** | off | Keeps the currency filter from the previous check. |
 | **Remember listing type** | off | Keeps the listing type from the previous check. |
