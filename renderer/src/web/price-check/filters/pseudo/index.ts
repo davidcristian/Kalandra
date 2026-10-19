@@ -4,7 +4,6 @@ import {
   stat,
   STAT_BY_REF,
 } from "@/assets/data";
-// import { STAT_BY_REF } from "@/assets/data";
 import { ModifierType, StatCalculated, StatSource } from "@/parser/modifiers";
 import {
   calculatedStatToFilter,
@@ -362,6 +361,7 @@ const PSEUDO_RULES: PseudoRule[] = [
       { ref: stat("Adds an Otherworldy Breach to a Map \n# use remaining") },
       { ref: stat("Empowers the Map Boss of a Map \n# use remaining") },
       { ref: stat("Adds Abysses to a Map \n# use remaining") },
+      { ref: stat("Adds Vaal Beacons to a Map \n# use remaining") },
     ],
   },
 ];

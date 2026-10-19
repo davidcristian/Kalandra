@@ -1490,6 +1490,21 @@ UniqueOnUnknownBase.info = {
 };
 // #endregion UniqueOnUnknownBase
 
+// #region TempleTablet
+// No copied Temple Tablet text exists here: this is TwoLineOneImplicitItem with
+// its base and implicit lines replaced by the Temple Tablet's from the game data.
+export const TempleTablet = itemWithLine(
+  itemWithLine(
+    TwoLineOneImplicitItem,
+    "Delirium Precursor Tablet",
+    "Temple Tablet",
+  ),
+  "Adds a Mirror of Delirium to a Map",
+  "Adds Vaal Beacons to a Map",
+);
+TempleTablet.info.refName = "Temple Tablet";
+// #endregion TempleTablet
+
 // No copied text in these languages exists here: each item is a real copied
 // item above with its class, rarity, name, base and property lines replaced by
 // that language's client strings and item names, and other lines left out.

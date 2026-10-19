@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
-import { init, Stat, StatBetter } from "@/assets/data";
+import { createTestCreateOptions } from "@specs/helper";
+import { TempleTablet } from "@specs/Parser/items";
+import { init, Stat, StatBetter, STATS_ITERATOR } from "@/assets/data";
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { __testExports, filterPseudo } from "@/web/price-check/filters/pseudo";
 import { FiltersCreationContext } from "@/web/price-check/filters/create-stat-filters";
-import { ParsedItem } from "@/parser";
+import { createPresets } from "@/web/price-check/filters/create-presets";
+import { ItemCategory, ParsedItem, parseClipboard } from "@/parser";
 
 describe("filterPseudoSources", () => {
   beforeEach(async () => {
@@ -314,5 +317,38 @@ describe("filterPseudo", () => {
     expect(uses).toBeDefined();
     expect(uses?.disabled).toBe(false);
     expect(uses?.roll?.value).toBe(8);
+  });
+
+  it("should add uses remaining for every tablet stat with a use count", () => {
+    const refs = [...STATS_ITERATOR("use remaining")]
+      .map((stat) => stat.ref)
+      .filter((ref) => ref.endsWith("\n# use remaining"));
+    const missing = refs.filter((ref) => {
+      const ctx: FiltersCreationContext = {
+        item: { info: { refName: "name" } } as ParsedItem,
+        searchInRange: 0,
+        filters: [],
+        statsByType: [createStatHelper(ref, 5, ModifierType.Implicit)],
+      };
+      filterPseudo(ctx);
+      return !ctx.filters.some(
+        (f) => f.statRef === "# uses remaining" && f.roll?.value === 5,
+      );
+    });
+
+    expect(refs.length).toBeGreaterThan(0);
+    expect(missing).toEqual([]);
+  });
+
+  it("should give a Temple Tablet an enabled uses remaining filter", () => {
+    const item = parseClipboard(TempleTablet.rawText)._unsafeUnwrap();
+    const { presets, active } = createPresets(item, createTestCreateOptions());
+    const stats = presets.find((preset) => preset.id === active)!.stats;
+    const uses = stats.find((f) => f.statRef === "# uses remaining");
+
+    expect(item.category).toBe(ItemCategory.Tablet);
+    expect(uses?.disabled).toBe(false);
+    expect(uses?.roll?.value).toBe(17);
+    expect(uses?.roll?.min).toBe(17);
   });
 });

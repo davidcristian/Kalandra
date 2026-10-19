@@ -13,10 +13,10 @@ export default defineConfig({
       reporter: ["text-summary"],
       // The floor CI checks with --coverage; raise a number when the tests cover more
       thresholds: {
-        statements: 45.3,
-        branches: 36.7,
-        functions: 48.8,
-        lines: 45.2,
+        statements: 46.7,
+        branches: 38.8,
+        functions: 50.2,
+        lines: 46.7,
       },
     },
   },
