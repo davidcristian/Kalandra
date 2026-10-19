@@ -122,12 +122,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from "vue";
+import { defineComponent, computed } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import UiRadio from "@/web/ui/UiRadio.vue";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
-import { configModelValue, configProp } from "./utils";
-import { AppConfig } from "@/web/Config";
+import { alphaModelValue, configModelValue, configProp } from "./utils";
 import { settingsDraft } from "./draft";
 
 export default defineComponent({
@@ -136,22 +135,6 @@ export default defineComponent({
   props: configProp(),
   setup(props) {
     const { t } = useI18nNs("settings");
-    const libraryAlpha = ref(
-      AppConfig().enableAlphas && AppConfig().alphas.includes("library"),
-    );
-    watch(
-      libraryAlpha,
-      (value) => {
-        if (value) {
-          props.config.alphas.push("library");
-        } else {
-          props.config.alphas = props.config.alphas.filter(
-            (alpha) => alpha !== "library",
-          );
-        }
-      },
-      { immediate: true },
-    );
 
     return {
       t,
@@ -232,7 +215,7 @@ export default defineComponent({
       windowTitle: configModelValue(() => props.config, "windowTitle"),
       enableAlphas: configModelValue(() => props.config, "enableAlphas"),
       readClientLog: configModelValue(() => props.config, "readClientLog"),
-      libraryAlpha,
+      libraryAlpha: alphaModelValue(() => props.config, "library"),
     };
   },
 });

@@ -30,6 +30,23 @@ export function configModelValue<
   });
 }
 
+/** Returns a checkbox model that adds the alpha feature to `alphas` once, or removes every copy of it. */
+export function alphaModelValue(
+  getConfig: () => Config,
+  alpha: Config["alphas"][number],
+) {
+  return computed<boolean>({
+    get() {
+      return getConfig().alphas.includes(alpha);
+    },
+    set(value) {
+      const config = getConfig();
+      const others = config.alphas.filter((entry) => entry !== alpha);
+      config.alphas = value ? [...others, alpha] : others;
+    },
+  });
+}
+
 export function _configModelValue<
   ObjectT extends object,
   KeyT extends keyof ObjectT,
