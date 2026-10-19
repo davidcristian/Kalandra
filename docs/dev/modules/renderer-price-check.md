@@ -43,6 +43,8 @@ that the route needs ([main.md](main.md)).
   true and `likelyFinishedItem` is false.
 - `createFilters` (`create-item-filters.ts`) returns the `ItemFilters`: name, base type, rarity, sockets,
   quality, levels, the corrupted and other states, and the `trade` options (league, listing type, currency).
+  A unique's base type comes from the item data through `uniqueBaseTradeName` in `filters/common.ts`, or is
+  the copied base type text when the item data does not have that base.
 - `initUiModFilters` and `createExactStatFilters` (`create-stat-filters.ts`) return the `StatFilter` list, one
   per stat with its trade ids, roll range and `FilterTag`. `pseudo/` adds filters for the trade site's pseudo
   stats, each the sum of several item stats, such as total fire resistance (`filterPseudo` and its

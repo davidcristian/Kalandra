@@ -5,7 +5,7 @@ import { ModifierType } from "@/parser/modifiers";
 import { BaseType, ITEM_BY_REF } from "@/assets/data";
 import { CATEGORY_TO_TRADE_ID } from "../trade/pathofexile-trade";
 import { ARMOUR, GEM, WEAPON } from "@/parser/meta";
-import { maxUsefulItemLevel } from "./common";
+import { maxUsefulItemLevel, uniqueBaseTradeName } from "./common";
 
 export const SPECIAL_SUPPORT_GEM = [
   "Empower Support",
@@ -138,7 +138,7 @@ export function createFilters(
       filters.searchExact = {
         name: item.info.name,
         nameTrade: t(opts, item.info),
-        baseTypeTrade: t(opts, ITEM_BY_REF("ITEM", item.info.unique.base)![0]),
+        baseTypeTrade: uniqueBaseTradeName(item.info.unique.base, opts.useEn),
       };
     } else {
       filters.searchExact = {
@@ -195,7 +195,7 @@ export function createFilters(
     filters.searchExact = {
       name: item.info.name,
       nameTrade: t(opts, item.info),
-      baseTypeTrade: t(opts, ITEM_BY_REF("ITEM", item.info.unique.base)![0]),
+      baseTypeTrade: uniqueBaseTradeName(item.info.unique.base, opts.useEn),
     };
   } else {
     filters.searchExact = {

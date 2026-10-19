@@ -1470,3 +1470,22 @@ RuneLineWithoutRuneStat.augmentSockets = {
   ],
 };
 // #endregion RuneLineWithoutRuneStat
+
+// #region UniqueOnUnknownBase
+// Its name and base type lines name a unique and a base that the item data does
+// not have; tradeItemFallback.test.ts adds them to the trade site's item list.
+export const UniqueOnUnknownBase = itemWithLine(
+  itemWithLine(UniqueItem, "The Eternal Spark", "Stormglass Reverie"),
+  "Crystal Focus",
+  "Prism Focus",
+);
+UniqueOnUnknownBase.category = ItemCategory.Unknown;
+UniqueOnUnknownBase.info = {
+  name: "Stormglass Reverie",
+  refName: "Stormglass Reverie",
+  namespace: "UNIQUE",
+  icon: "%NOT_FOUND%",
+  tags: [],
+  unique: { base: "Prism Focus" },
+};
+// #endregion UniqueOnUnknownBase

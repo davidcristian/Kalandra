@@ -34,7 +34,8 @@ that use.
 - `ParsedItem` ([ParsedItem.ts](../../../renderer/src/parser/ParsedItem.ts)) holds the item's properties
   (`rarity`, `category`, `itemLevel`, armour and weapon values, `quality`, `augmentSockets`, `requires` and
   others), `info`, the matched `BaseType` record from `items.ndjson` (or one built from the trade site's item list
-  when `items.ndjson` has none), and `rawText`, the copied text. `newMods` is every modifier as a
+  when `items.ndjson` has none), and `rawText`, the copied text. A unique whose base type `items.ndjson` does not
+  have gets the category `Unknown`, and the parser logs the base type. `newMods` is every modifier as a
   `ParsedModifier`: its `ModifierInfo` (type, generation such as prefix or suffix, name, tier, tags) and its
   `ParsedStat` list. `statsByType` is the same stats grouped by stat and modifier type, each with the modifiers
   it comes from (`sumStatsByModType`).
@@ -133,7 +134,7 @@ imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loa
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (43.3% of the lines of `src/` on 19 Oct 2026). The parser suites are
+below the floor in `renderer/vitest.config.ts` (44.3% of the lines of `src/` on 19 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces

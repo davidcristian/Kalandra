@@ -372,10 +372,10 @@ function findInDatabase(item: ParserState) {
     if (item.info.craftable) {
       item.category = item.info.craftable.category;
     } else if (item.info.unique) {
-      item.category = ITEM_BY_REF(
-        "ITEM",
-        item.info.unique.base,
-      )![0].craftable!.category;
+      const { base } = item.info.unique;
+      const category = ITEM_BY_REF("ITEM", base)?.[0]?.craftable?.category;
+      if (!category) console.log("No category for the unique base type:", base);
+      item.category = category ?? ItemCategory.Unknown;
     }
   }
 }
@@ -1965,7 +1965,7 @@ function calcBasePercentile(item: ParsedItem) {
   performance.mark("calcBasePercentile");
   // use ref since we have ref from unique.base
   const info = item.info.unique
-    ? ITEM_BY_REF("ITEM", item.info.unique.base)![0].armour
+    ? ITEM_BY_REF("ITEM", item.info.unique.base)?.[0]?.armour
     : item.info.armour;
   if (!info) return;
 

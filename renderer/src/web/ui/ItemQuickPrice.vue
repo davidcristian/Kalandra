@@ -116,9 +116,10 @@ export default defineComponent({
     const imgSize = computed(() => {
       if (!props.itemBase) return "w-8 h-8";
 
-      const base = props.itemBase.unique
-        ? ITEM_BY_REF("ITEM", props.itemBase.unique.base)![0]
-        : props.itemBase;
+      const base =
+        (props.itemBase.unique &&
+          ITEM_BY_REF("ITEM", props.itemBase.unique.base)?.[0]) ||
+        props.itemBase;
 
       const width = base.w ?? 1;
       const height = base.h ?? 1;
