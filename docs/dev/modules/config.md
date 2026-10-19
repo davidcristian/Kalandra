@@ -37,6 +37,9 @@ old one and keep that file, so a saved config must survive every update: this is
   `wmType` is `type`. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
   in place. The settings window edits a deep copy and applies it on Save
   ([architecture.md](../architecture.md#the-config-from-file-to-settings) says when the file is then written).
+  `settings/draft.ts` holds the copy. While the window is open, Language and Preferred trade site also go into the
+  current config, so the window's text switches at once and **Refresh** on its Price check page uses the new trade
+  site. Closing the window without Save puts back the old values.
 - `updateConfig(config)` replaces the current config with a deep copy and sets the page's root font size from
   `fontSize`.
 - `saveConfig(opts?)` sends `CLIENT->MAIN::save-config` with `JSON.stringify(AppConfig())` when the config differs

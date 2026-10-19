@@ -109,7 +109,6 @@ import {
   PropType,
   nextTick,
   inject,
-  reactive,
   watch,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -118,7 +117,6 @@ import {
   updateConfig,
   saveConfig,
   pushHostConfig,
-  Config,
 } from "@/web/Config";
 import { APP_PATRONS } from "@/assets/data";
 import { Host } from "@/web/background/IPC";
@@ -143,6 +141,7 @@ import SettingsItemSearch from "../item-search/settings-item-search.vue";
 import SettingsLeveling from "../leveling/settings-leveling.vue";
 import SettingsLibrary from "../library/settings-library.vue";
 import { disableWidget, enableWidget, findWidget } from "./utils";
+import { settingsDraft } from "./draft";
 
 function shuffle<T>(array: T[]): T[] {
   let currentIndex = array.length;
@@ -199,17 +198,17 @@ export default defineComponent({
     const podiumVisible = shallowRef(false);
     const patrons = shallowRef<Array<typeof APP_PATRONS>>([]);
 
-    const configClone = shallowRef<Config | null>(null);
+    const configClone = settingsDraft.copy;
     watch(
       () => props.config.wmWants,
       (wmWants) => {
         if (wmWants === "show") {
-          configClone.value = reactive(JSON.parse(JSON.stringify(AppConfig())));
+          settingsDraft.open(AppConfig());
           patrons.value = [1, 2, 3, 4, 5].map((i) =>
             shuffle(APP_PATRONS.filter((row) => row.style === i)),
           );
         } else {
-          configClone.value = null;
+          settingsDraft.close(AppConfig());
           if (selectedWmId.value != null) {
             selectedWmId.value = null;
             selectedComponent.value = SettingsHotkeys;

@@ -128,6 +128,7 @@ import UiRadio from "@/web/ui/UiRadio.vue";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import { configModelValue, configProp } from "./utils";
 import { AppConfig } from "@/web/Config";
+import { settingsDraft } from "./draft";
 
 export default defineComponent({
   name: "settings.general",
@@ -171,7 +172,7 @@ export default defineComponent({
         },
         set(value) {
           props.config.language = value;
-          AppConfig().language = value;
+          settingsDraft.preview("language", value);
           if (value !== "cmn-Hant") {
             props.config.realm = "pc-ggg";
           }
@@ -207,7 +208,7 @@ export default defineComponent({
         },
         set(value) {
           props.config.preferredTradeSite = value;
-          AppConfig().preferredTradeSite = value;
+          settingsDraft.preview("preferredTradeSite", value);
         },
       }),
 

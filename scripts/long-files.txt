@@ -33,4 +33,4 @@
 2103 renderer/src/web/price-check/trade/pathofexile-trade.ts
 307 renderer/src/web/price-check/trends/PriceTrend.vue
 347 renderer/src/web/price-check/trends/getDetailsId.ts
-541 renderer/src/web/settings/SettingsWindow.vue
+540 renderer/src/web/settings/SettingsWindow.vue

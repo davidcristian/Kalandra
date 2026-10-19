@@ -46,7 +46,7 @@ This page lists the chat commands that Kalandra types into the game chat, each w
 
 | Label | Default | What it changes |
 | --- | --- | --- |
-| **Language** | English | The language of Kalandra's text and of the item text it reads. Set the language of your game: when they differ, a price check shows "POE2 language doesn't match Kalandra". |
+| **Language** | English | The language of Kalandra's text and of the item text it reads. Set the language of your game: when they differ, a price check shows "POE2 language doesn't match Kalandra". The settings window switches to the new language when you pick it, and **Cancel** switches it back. |
 | **Preferred trade site** | The site for the language | Shown when **Language** is not English. Chooses between the trade site for your language, such as `ru.pathofexile.com`, and `www.pathofexile.com`. |
 | **Realm** | International | Shown when **Language** is 正體中文 (Traditional Chinese). The other choice, **Hotcool**, is the Taiwan realm, whose trade site is `pathofexile.tw`. |
 | **Font size** | 16 px | The base text size of the overlay. |
