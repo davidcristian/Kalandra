@@ -74,7 +74,7 @@ export class Shortcuts {
       }
     });
 
-    logKeyPresses(this.logger, () => this.logKeys);
+    logKeyPresses(this.logger, this.poeWindow, () => this.logKeys);
 
     uIOhook.on("wheel", (e) => {
       if (!e.ctrlKey || !this.poeWindow.isActive || !this.stashScroll) return;

@@ -1,19 +1,30 @@
 import { uIOhook, UiohookKey } from "uiohook-napi";
 import type { Logger } from "../RemoteLogger";
+import type { GameWindow } from "../windowing/GameWindow";
 
 const UiohookToName = Object.fromEntries(
   Object.entries(UiohookKey).map(([k, v]) => [v, k]),
 );
 
-/** Writes each key press and release to the log while `isOn()` returns true. */
-export function logKeyPresses(logger: Logger, isOn: () => boolean) {
+/**
+ * Writes each key press and release to the log while `isOn()` returns true
+ * and the game window is active.
+ */
+export function logKeyPresses(
+  logger: Logger,
+  gameWindow: Pick<GameWindow, "isActive">,
+  isOn: () => boolean,
+) {
+  // The global hook also reports keys typed in other programs, such as passwords
+  const shouldLog = () => isOn() && gameWindow.isActive;
+
   uIOhook.on("keydown", (e) => {
-    if (!isOn()) return;
+    if (!shouldLog()) return;
     const pressed = eventToString(e);
     logger.write(`debug [Shortcuts] Keydown ${pressed}`);
   });
   uIOhook.on("keyup", (e) => {
-    if (!isOn()) return;
+    if (!shouldLog()) return;
     logger.write(
       `debug [Shortcuts] Keyup ${
         UiohookToName[e.keycode] || "not_supported_key"

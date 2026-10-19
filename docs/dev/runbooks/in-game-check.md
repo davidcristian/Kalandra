@@ -29,9 +29,9 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
   `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. To open Settings,
   press the overlay key (Shift + Space) and click the cog icon in the main button bar. The tray item
   Settings/League only shows a message that says this.
-- **Record all key presses**, a checkbox in Settings, Debug, makes main log every key as
-  `debug [Shortcuts] Keydown <keys>` and `debug [Shortcuts] Keyup <key>`, and every hotkey it
-  handles as
+- **Record all key presses**, a checkbox in Settings, Debug, makes main log every key pressed
+  while the game window is active as `debug [Shortcuts] Keydown <keys>` and
+  `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
   `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`,
   `paste-in-chat`, `stash-search`, `trigger-event` or `ocr-text`.
 - **The renderer's console** holds what the page logs, such as a price file that failed to load. A
@@ -78,6 +78,9 @@ Three lines from `main/src/shortcuts/Shortcuts.ts` apply to every key below:
   - With "Fully hide overlay when it loses focus instead of making it transparent." ticked in
     Settings, General, switching to another window hides the overlay window. Unticked, the default,
     the overlay window stays open and turns transparent, as the label says.
+  - With Record all key presses ticked, type in another program, such as a text editor, and in the
+    overlay's Item search: Settings, Debug shows no `Keydown` line for those keys. Keys pressed in
+    the game do show.
 - **Logs:** `debug [Shortcuts] Action type: toggle-overlay` with key recording on. The overlay key
   is required, and main keeps it even when another action uses the same key.
 

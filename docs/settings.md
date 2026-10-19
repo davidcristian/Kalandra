@@ -113,7 +113,7 @@ did not find. Add the log when you [report a problem on GitHub](https://github.c
 
 | Label | Default | What it changes |
 | --- | --- | --- |
-| **Record all key presses** | Off | When on, Kalandra writes every key press and release to the log, and the action of each hotkey it runs. While the overlay is not active, the last lines of the log show over the game. Use it to check which keys reach Kalandra. |
+| **Record all key presses** | Off | When on, Kalandra writes each key press and release to the log while the game window is active, and the action of each hotkey it runs. It records no key while the overlay or another program is active. It does record the text you type in the game's chat, so read the log before you post it. While the overlay is not active, the last lines of the log show over the game. Use it to check which keys reach Kalandra. |
 
 ## About
 

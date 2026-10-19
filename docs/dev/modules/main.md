@@ -74,9 +74,9 @@ The entry, the server and the app services, in `main/src/`:
   `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item`
   (presses the copy keys, sends `MAIN->CLIENT::item-text` to the last active client and, with `focusOverlay`,
   makes the overlay active when the overlay was the last active client) or `ocr-text` (Windows only, sends
-  `MAIN->CLIENT::ocr-text`). With `logKeys` it logs every key (`key-log.ts`). With `stashScroll` (the Stash tab
-  scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active,
-  except over the area `isStashArea()` computes.
+  `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is active (`key-log.ts`). With
+  `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel
+  while the game is active, except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: `readItemText()` clears the clipboard when it holds item text, then polls every 48 ms
   (`POLL_DELAY`) after the first delay, for at most 500 ms (`POLL_LIMIT`). It resolves with text that starts as
   `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and rejects. On Linux it always
@@ -93,8 +93,9 @@ The entry, the server and the app services, in `main/src/`:
   `send` it presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring back the last chat line.
   `stashSearch(text, clipboard, overlay)` focuses the game, presses `Ctrl + F`, pastes the text and presses
   `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
-- `key-log.ts`: `logKeyPresses(logger, isOn)` logs `debug [Shortcuts] Keydown <keys>` and
-  `debug [Shortcuts] Keyup <key>` for each key the `uiohook-napi` global hook reports while `isOn()` returns true.
+- `key-log.ts`: `logKeyPresses(logger, gameWindow, isOn)` logs `debug [Shortcuts] Keydown <keys>` and
+  `debug [Shortcuts] Keyup <key>` for each key the `uiohook-napi` global hook reports while `isOn()` returns true
+  and the game window is active. It leaves out the keys typed in other programs, which the global hook also reports.
 
 `windowing/`:
 
@@ -188,7 +189,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (41.0% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (41.1% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.

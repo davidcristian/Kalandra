@@ -9,9 +9,9 @@ vi.mock("uiohook-napi", async () => {
   return { uIOhook: hook, UiohookKey: Key };
 });
 
-function startLog(isOn: () => boolean) {
+function startLog(isOn: () => boolean, game = { isActive: true }) {
   const logger = new Logger(new FakeServer());
-  logKeyPresses(logger, isOn);
+  logKeyPresses(logger, game, isOn);
   return logger;
 }
 
@@ -86,5 +86,21 @@ describe("logKeyPresses", () => {
     isOn = true;
     hook.press(Key.D);
     expect(loggedLines(logger)).toEqual(["debug [Shortcuts] Keydown D"]);
+  });
+
+  it("logs no key typed while another program is active", () => {
+    const game = { isActive: false };
+    const logger = startLog(() => true, game);
+    hook.press(Key.D);
+    hook.release(Key.D);
+    expect(loggedLines(logger)).toEqual([]);
+
+    game.isActive = true;
+    hook.press(Key.D);
+    hook.release(Key.D);
+    expect(loggedLines(logger)).toEqual([
+      "debug [Shortcuts] Keydown D",
+      "debug [Shortcuts] Keyup D",
+    ]);
   });
 });
