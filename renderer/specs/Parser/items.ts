@@ -37,6 +37,7 @@ export class TestItem implements ParsedItem {
   areaLevel?: number | undefined;
   talismanTier?: number | undefined;
   quality?: number | undefined;
+  qualityType?: string | undefined;
   augmentSockets?:
     | {
         empty: number;
@@ -1470,6 +1471,23 @@ RuneLineWithoutRuneStat.augmentSockets = {
   ],
 };
 // #endregion RuneLineWithoutRuneStat
+
+// #region CatalysedRing
+// Built from RareWithImplicit, not copied from the game: it adds the quality line
+// of Adaptive Catalyst quality and its 20% increase on the Attribute modifier.
+export const CatalysedRing = itemWithLine(
+  itemWithLine(
+    RareWithImplicit,
+    "--------\nRequires: Level 45",
+    "--------\nQuality (Attribute Modifiers): +20% (augmented)\n--------\nRequires: Level 45",
+  ),
+  '{ Suffix Modifier "of the Wrestler" (Tier: 7) — Attribute }',
+  '{ Suffix Modifier "of the Wrestler" (Tier: 7) — Attribute — 20% Increased }',
+);
+CatalysedRing.quality = 20;
+CatalysedRing.qualityType = "attribute_catalyst";
+CatalysedRing.sectionCount = 6;
+// #endregion CatalysedRing
 
 // #region UniqueOnUnknownBase
 // Its name and base type lines name a unique and a base that the item data does

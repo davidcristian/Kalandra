@@ -181,7 +181,8 @@ modify it or it has sockets, and for a ring, amulet or jewel that is not unique 
   or armour group, then **Default**. A set saved for **Marital Weapons** is not applied in this version.
 - Quality, for rings, amulets and jewels. Pick a catalyst and an amount (0, 20, 30, 40 or 50; up to 70 for a Breach
   Ring; 0 or 20 for a jewel) to see the filters as if the item had that quality. The price on the right is the
-  catalyst price times the amount.
+  catalyst price times the amount. When the item already has catalyst quality, the square shows that catalyst, and
+  the catalyst you pick replaces that quality instead of adding to it.
 
 ## Built-in browser
 

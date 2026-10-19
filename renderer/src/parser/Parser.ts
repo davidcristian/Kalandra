@@ -8,8 +8,6 @@ import {
   ITEM_BY_TRANSLATED,
   TRADE_ITEM_BY_REF,
   AUGMENT_DATA_BY_TRADE_ID,
-  CATALYST_TYPES,
-  CATALYST_TO_TAG,
 } from "@/assets/data";
 import { ModifierType, StatCalculated, sumStatsByModType } from "./modifiers";
 import {
@@ -46,6 +44,7 @@ import { AppConfig } from "@/web/Config";
 import { buildEditorItems, getSavedAugments } from "./augment-builder";
 import { useAugment } from "@/web/price-check/item-editor/augment";
 import { avg, combinations } from "./utils";
+import { parseJewelleryQuality } from "./jewellery-quality";
 
 type SectionParseResult =
   | "SECTION_PARSED"
@@ -908,25 +907,6 @@ function parseQualityNested(section: string[], item: ParsedItem) {
     if (line.startsWith(_$.QUALITY)) {
       // "Quality: +20% (augmented)"
       item.quality = parseInt(line.slice(_$.QUALITY.length), 10);
-
-      if (
-        item.category === ItemCategory.Ring ||
-        item.category === ItemCategory.Amulet ||
-        item.category === ItemCategory.Jewel
-      ) {
-        const catalysts =
-          item.category === ItemCategory.Jewel
-            ? CATALYST_TYPES.Refined
-            : CATALYST_TYPES.Normal;
-        for (const catalyst of catalysts) {
-          for (const tag of CATALYST_TO_TAG[catalyst.tags[1]]) {
-            if (line.includes(tag)) {
-              item.qualityType = catalyst.tags[1];
-              return;
-            }
-          }
-        }
-      }
       return;
     }
   }
@@ -1457,18 +1437,15 @@ function parseJewelery(section: string[], item: ParsedItem) {
   if (
     item.category !== ItemCategory.Amulet &&
     item.category !== ItemCategory.Ring &&
-    item.category !== ItemCategory.Belt
+    item.category !== ItemCategory.Belt &&
+    item.category !== ItemCategory.Jewel
   ) {
     return "PARSER_SKIPPED";
   }
 
-  for (const line of section) {
-    if (line.startsWith(_$.QUALITY.substring(0, _$.QUALITY.indexOf(":")))) {
-      return "SECTION_PARSED";
-    }
-  }
-
-  return "SECTION_SKIPPED";
+  return parseJewelleryQuality(section, item)
+    ? "SECTION_PARSED"
+    : "SECTION_SKIPPED";
 }
 
 function parseCharmSlots(section: string[], item: ParsedItem) {
@@ -2251,6 +2228,7 @@ export const __testExports = {
   parseFractured,
   parseUnidentified,
   parseTrials,
+  parseJewelery,
   determineAugments,
   modifiedBfs,
   parseAugmentSockets,

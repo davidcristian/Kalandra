@@ -89,3 +89,4 @@ A check is not a design, so it has more outcomes than a refinement:
 - 015: [Item text and log lines from a game client in another language](tasks/015-other-game-languages.md)
 - 016: [Install, update and moving settings on Windows](tasks/016-install-and-migration.md)
 - 017: [Take Path of Exile 2 screenshots for the pages that lost theirs](tasks/017-game-screenshots.md)
+- 018: [The price check reads the catalyst quality of rings, amulets and jewels](tasks/018-catalyst-quality-lines.md)

@@ -120,3 +120,4 @@ layout and its reasons.
 - 058: [A stat without a trade id for its modifier type makes a filter without a trade id](tasks/058-stat-without-trade-id-for-its-type.md)
 - 059: [The parser cannot distinguish items that share a translated name and defences](tasks/059-shared-translated-item-names.md)
 - 060: [The clipboard restore after a chat command can come before the game pastes](tasks/060-clipboard-restore-before-paste.md)
+- 061: [The Carapace Catalyst matches no modifier tag that Path of Exile 2 copies](tasks/061-carapace-catalyst-defences-tag.md)

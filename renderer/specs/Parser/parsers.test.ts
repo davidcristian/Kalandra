@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import {
   ArmourHighValueRareItem,
+  CatalysedRing,
   HighDamageRareItem,
   MagicItem,
   NormalItem,
@@ -34,6 +35,7 @@ describe("itemTextToSections", () => {
     [HighDamageRareItem.rawText, HighDamageRareItem.sectionCount],
     [ArmourHighValueRareItem.rawText, ArmourHighValueRareItem.sectionCount],
     [WandRareItem.rawText, WandRareItem.sectionCount],
+    [CatalysedRing.rawText, CatalysedRing.sectionCount],
   ])("%#. standard item", (text: string, sectionCount: number) => {
     const sections = __testExports.itemTextToSections(text);
     expect(sections.length).toBe(sectionCount);
