@@ -49,7 +49,8 @@ its commands.
 Text that starts or ends with `@last` uses other keys, which the next section describes.
 
 On macOS, Kalandra presses `Cmd` in place of `Ctrl`. After a command, the clipboard holds the command text. To get
-your previous clipboard text back, check `Restore clipboard` in Settings, `General`.
+your previous clipboard text back, check `Restore clipboard` in Settings, `General`. Its row on the
+[Settings](/settings#general) page says when the game can paste that previous text in place of the command.
 
 Kalandra skips a chat command or a stash search that comes less than 120 ms after the previous one. This limits how
 fast it sends actions to the game, which disconnects a player who sends too many.

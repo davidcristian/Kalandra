@@ -119,3 +119,4 @@ layout and its reasons.
 - 057: [Check the GitHub, Cloudflare and Docker behaviors the runbooks describe](tasks/057-outside-service-behaviors.md)
 - 058: [A stat without a trade id for its modifier type makes a filter without a trade id](tasks/058-stat-without-trade-id-for-its-type.md)
 - 059: [The parser cannot distinguish items that share a translated name and defences](tasks/059-shared-translated-item-names.md)
+- 060: [The clipboard restore after a chat command can come before the game pastes](tasks/060-clipboard-restore-before-paste.md)
