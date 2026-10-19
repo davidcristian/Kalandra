@@ -1,0 +1,99 @@
+import fs from "fs";
+import path from "path";
+import { reactive } from "vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { setupTests } from "@specs/vitest.setup";
+import { init } from "@/assets/data";
+import { AppConfig } from "@/web/Config";
+import { Host } from "@/web/background/IPC";
+import { useLeagues } from "@/web/background/Leagues";
+import { usePoeninja } from "@/web/background/Prices";
+import { PriceCheckWidget } from "@/web/overlay/widgets";
+import { HeldRequests, settle } from "./held-requests";
+
+vi.mock("@/web/background/Leagues", async () => {
+  const { computed, shallowRef } = await import("vue");
+  const selectedId = shallowRef("Standard");
+  const selected = computed(() => ({
+    id: selectedId.value,
+    realm: "pc-ggg",
+    isPopular: true,
+  }));
+  return { useLeagues: () => ({ selectedId, selected }) };
+});
+
+const PRICE_FILE = fs.readFileSync(
+  path.resolve(
+    __dirname,
+    "../../../priceService/tests/fixtures/price_file.json",
+  ),
+  "utf-8",
+);
+const EXALTED_ORB = { ns: "ITEM", name: "Exalted Orb" };
+
+let widget: PriceCheckWidget;
+let warnings: string[];
+
+/** Answers each price file request with `body`, and fails an aborted request as fetch does. */
+function servePriceFile(body: string, status = 200) {
+  vi.mocked(Host.proxy).mockImplementation(async (_url, init) => {
+    init?.signal?.throwIfAborted();
+    return new Response(body, { status });
+  });
+}
+
+/** Selects a league that no earlier test selected, so its price file loads at once. */
+async function selectLeague(id: string) {
+  useLeagues().selectedId.value = id;
+  await settle();
+}
+
+describe("usePoeninja after a change of league or core currency", () => {
+  beforeEach(async () => {
+    setupTests();
+    vi.mocked(Host.proxy).mockReset();
+    await init("en");
+    widget = reactive({
+      ...AppConfig<PriceCheckWidget>("price-check")!,
+      coreCurrency: "exalted",
+    });
+    AppConfig().widgets = [widget];
+    warnings = [];
+    vi.spyOn(console, "warn").mockImplementation((error: unknown) => {
+      warnings.push(String(error));
+    });
+  });
+
+  it("drops converted prices while the new league's price file downloads", async () => {
+    const prices = usePoeninja();
+    servePriceFile(PRICE_FILE);
+    await selectLeague("Fixture League A");
+    expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)?.currency).toBe(
+      "exalted",
+    );
+
+    const priceHost = new HeldRequests();
+    vi.mocked(Host.proxy).mockImplementation(
+      async (_url, init) => await priceHost.answer(PRICE_FILE, init?.signal),
+    );
+    await selectLeague("Fixture League B");
+    expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)).toBeUndefined();
+  });
+
+  it("drops converted prices when the reload after a core currency change fails", async () => {
+    const prices = usePoeninja();
+    servePriceFile(PRICE_FILE);
+    await selectLeague("Fixture League C");
+    expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)?.currency).toBe(
+      "exalted",
+    );
+
+    servePriceFile("", 404);
+    widget.coreCurrency = "chaos";
+    await settle();
+    expect(warnings).toEqual([
+      "Error: No price file for Fixture League C (404)",
+    ]);
+    expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)).toBeUndefined();
+  });
+});

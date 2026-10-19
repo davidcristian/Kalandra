@@ -413,18 +413,18 @@ export const usePoeninja = createGlobalState(() => {
     load();
   }, RETRY_INTERVAL_MS);
 
-  watch(leagues.selectedId, () => {
+  function reloadForNewSelection() {
     xchgRate.value = undefined;
     PRICES_DB = [];
+    priceCache.clear();
     load(true);
-  });
+  }
 
+  watch(leagues.selectedId, reloadForNewSelection);
   watch(selectedCoreCurrencyId, (curr, prev) => {
     if (curr === prev) return;
     xchgRateCurrency.value = curr ?? "exalted";
-    xchgRate.value = undefined;
-    PRICES_DB = [];
-    load(true);
+    reloadForNewSelection();
   });
 
   return {

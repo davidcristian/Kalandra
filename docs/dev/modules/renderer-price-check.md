@@ -102,9 +102,9 @@ that the route needs ([main.md](main.md)).
   private, on realm `pc-ggg`. It loads the file again when the last successful load is over 31 minutes old
   (`UPDATE_INTERVAL_MS`) and `queuePricesFetch()` ran in the last 20 minutes (`INTEREST_SPAN_MS`). The price check
   and each item selected in the item search call `queuePricesFetch()`, and a timer runs the same check every 4
-  minutes (`RETRY_INTERVAL_MS`). A change of league or core currency clears the loaded prices and loads the file at
-  once. A load that starts while another runs aborts it, and only the newest load clears the loading state that
-  `initialLoading()` reads.
+  minutes (`RETRY_INTERVAL_MS`). A change of league or core currency clears the loaded prices and the converted
+  prices that `cachedCurrencyByQuery` keeps for trade listings, and loads the file at once. A load that starts while
+  another runs aborts it, and only the newest load clears the loading state that `initialLoading()` reads.
 - `parseXchg`, `splitJsonBlob` and `findInDatabase` search the raw text of the file instead of parsing it
   ([price-service.md](price-service.md#why-the-key-order-is-a-format)). `parseXchg` returns the `core` object, whose
   `rates` hold the price of one Divine Orb in Exalted Orbs and in Chaos Orbs. Every value in the file is in Divine
