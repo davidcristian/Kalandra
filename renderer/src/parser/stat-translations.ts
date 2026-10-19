@@ -197,7 +197,7 @@ export function tryParseTranslation(
         continue;
       }
 
-      backupParsedStat = trySecondaryParseTranslation(combination.stat);
+      backupParsedStat = tryTradeStatTranslation(combination.stat, realType);
       if (backupParsedStat) {
         backupParsedCombination = combination;
       }
@@ -337,9 +337,9 @@ export function getRollOrMinmaxAvg(values: number[]): number {
   }
 }
 
-function trySecondaryParseTranslation(stat: string): ParsedStat | undefined {
+function tryTradeStatTranslation(stat: string, type: ModifierType) {
   const tradeStat = TRADE_STAT_BY_MATCH_STR(stat);
-  if (!tradeStat) return;
+  if (!tradeStat || (type === ModifierType.Augment && !tradeStat[type])) return;
 
   // use naive stat
   const statLine: Stat = {

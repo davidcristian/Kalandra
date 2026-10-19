@@ -47,7 +47,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | File | What it does |
 | --- | --- |
 | `advanced-mod-desc.ts` | `parseModInfoLine` reads one `{ ... }` line, `groupLinesByMod` pairs it with its stat lines, `parseModType` reads a suffix such as ` (implicit)`, ` (enchant)` or ` (rune)` |
-| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text |
+| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id |
 | `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
 | `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others |
@@ -133,7 +133,7 @@ imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loa
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (43.0% of the lines of `src/` on 19 Oct 2026). The parser suites are
+below the floor in `renderer/vitest.config.ts` (43.3% of the lines of `src/` on 19 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces

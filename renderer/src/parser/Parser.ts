@@ -2165,8 +2165,8 @@ function determineAugments(
   // const augmentTradeId = statCalcs[0].stat.trade.ids[ModifierType.Augment][0];
   // const possibleAugments = AUGMENT_DATA_BY_TRADE_ID[augmentTradeId];
 
-  const allTradeIds = statCalcs.map(
-    (c) => c.stat.trade.ids[ModifierType.Augment][0],
+  const allTradeIds = statCalcs.flatMap(
+    (c) => c.stat.trade.ids[ModifierType.Augment]?.[0] ?? [],
   );
   const allPossibleAugments = allTradeIds
     .map((id) => AUGMENT_DATA_BY_TRADE_ID[id])

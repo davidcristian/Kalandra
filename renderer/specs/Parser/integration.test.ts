@@ -11,6 +11,7 @@ import {
   NormalItem,
   RareItem,
   RequiresUnknownFormat,
+  RuneLineWithoutRuneStat,
   SpectreIncSpirit,
 } from "./items";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -142,5 +143,21 @@ describe("Parse lines the game data does not match", () => {
       rollIncr: undefined,
     });
     expect(suffix.stats[0].roll?.value).toBe(8);
+  });
+
+  it("keeps a rune line the trade site lists for no rune as unknown", () => {
+    const item = parseClipboard(RuneLineWithoutRuneStat.rawText);
+
+    expect(item.isOk()).toBe(true);
+    const parsedItem = item._unsafeUnwrap();
+    expect(parsedItem.unknownModifiers).toEqual([
+      { text: "15% increased Light Radius", type: ModifierType.Augment },
+    ]);
+    const sockets = parsedItem.augmentSockets!;
+    const expected = RuneLineWithoutRuneStat.augmentSockets!;
+    expect(sockets.empty).toBe(expected.empty);
+    expect(sockets.augments.map((augment) => augment?.refName)).toEqual(
+      expected.augments.map((augment) => augment?.refName),
+    );
   });
 });

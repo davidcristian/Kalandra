@@ -280,4 +280,36 @@ describe("tryParseTranslation", () => {
     expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
     expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalledOnce();
   });
+
+  it("should not use a trade stat without a rune id for a rune line", () => {
+    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue(undefined);
+    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
+      EXACT_MATCH_STAT.trade.ids,
+    );
+
+    const result = __testExports.tryParseTranslation(
+      { string: "Players are Cursed with Enfeeble", unscalable: false },
+      ModifierType.Augment,
+      undefined,
+    );
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should use a trade stat with a rune id for an added rune line", () => {
+    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue(undefined);
+    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
+      PHYS_DAMAGE_STAT.trade.ids,
+    );
+
+    const result = __testExports.tryParseTranslation(
+      { string: "36% increased Physical Damage", unscalable: false },
+      ModifierType.AddedAugment,
+      undefined,
+    );
+
+    expect(result?.stat.trade.ids.rune).toEqual(
+      PHYS_DAMAGE_STAT.trade.ids.rune,
+    );
+  });
 });

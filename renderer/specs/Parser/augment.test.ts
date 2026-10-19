@@ -216,6 +216,15 @@ describe("determineAugments", () => {
     );
     expect(result.map((augment) => augment.refName)).toEqual(expectedRef);
   });
+
+  it("finds no augment for a stat without a rune trade id", () => {
+    const result = __testExports.determineAugments(
+      { info: { type: ModifierType.Augment, tags: [] }, stats: [] },
+      [makeCalcStat("#% increased Light Radius", 15, ModifierType.Augment)],
+    );
+
+    expect(result).toEqual([]);
+  });
 });
 
 describe("BFS", () => {
