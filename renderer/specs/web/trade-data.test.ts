@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as TradeData from "@/web/background/TradeData";
-import { HeldRequests } from "./held-requests";
+import { HeldRequests, settle } from "./held-requests";
+
+const THIRTY_MINUTES = 30 * 60 * 1000;
 
 /** Answers the trade site's item and stat list requests from `lists`. */
 class FakeTradeSite {
@@ -56,5 +58,73 @@ describe("useTradeData", () => {
     expect(tradeData.isLoading.value).toBe(false);
     expect(tradeData.error.value).toBeNull();
     expect([...tradeData.tradeItemData.value]).toEqual(["Iron Ring"]);
+  });
+
+  it("applies a reload that brings new stats and no new items", async () => {
+    site.lists = { items: ["Iron Ring"], stats: ["stat_1"] };
+    await tradeData.load(true);
+    site.lists = { items: ["Iron Ring"], stats: ["stat_1", "stat_2"] };
+
+    expect(await tradeData.load(true)).toEqual({
+      foundItems: 0,
+      foundStats: 1,
+    });
+    expect([...tradeData.tradeStatDataSet.value]).toEqual(["stat_1", "stat_2"]);
+  });
+
+  it("applies a shorter list and counts only the entries that are new", async () => {
+    site.lists = { items: ["Iron Ring", "Gold Ring"], stats: ["stat_1"] };
+    await tradeData.load(true);
+    site.lists = { items: ["Iron Ring"], stats: ["stat_2"] };
+
+    expect(await tradeData.load(true)).toEqual({
+      foundItems: 0,
+      foundStats: 1,
+    });
+    expect([...tradeData.tradeItemData.value]).toEqual(["Iron Ring"]);
+    expect([...tradeData.tradeStatData.value.keys()]).toEqual(["stat_2"]);
+  });
+
+  it("keeps the loaded lists when a response has an empty list", async () => {
+    site.lists = { items: ["Iron Ring"], stats: ["stat_1"] };
+    await tradeData.load(true);
+    site.lists = { items: ["Gold Ring"], stats: [] };
+
+    expect(await tradeData.load(true)).toEqual({
+      foundItems: 0,
+      foundStats: 0,
+    });
+    expect([...tradeData.tradeItemData.value]).toEqual(["Iron Ring"]);
+    expect([...tradeData.tradeStatDataSet.value]).toEqual(["stat_1"]);
+  });
+
+  it("loads again at the next timer tick after a response with an empty list", async () => {
+    site.lists = { items: [], stats: ["stat_1"] };
+    await tradeData.load(true);
+    site.lists = { items: ["Iron Ring"], stats: ["stat_1"] };
+
+    tradeData.expressInterest();
+    await vi.advanceTimersByTimeAsync(THIRTY_MINUTES);
+    await settle();
+    expect([...tradeData.tradeItemData.value]).toEqual(["Iron Ring"]);
+  });
+
+  it("waits 2 hours after a load that applied the lists", async () => {
+    site.lists = { items: ["Iron Ring"], stats: ["stat_1"] };
+    await tradeData.load(true);
+    site.lists = {
+      items: ["Iron Ring", "Gold Ring"],
+      stats: ["stat_1", "stat_2"],
+    };
+
+    tradeData.expressInterest();
+    await vi.advanceTimersByTimeAsync(3 * THIRTY_MINUTES);
+    await settle();
+    expect(tradeData.tradeItemData.value.size).toBe(1);
+
+    tradeData.expressInterest();
+    await vi.advanceTimersByTimeAsync(THIRTY_MINUTES);
+    await settle();
+    expect(tradeData.tradeItemData.value.size).toBe(2);
   });
 });

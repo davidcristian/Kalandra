@@ -83,7 +83,7 @@ that the route needs ([main.md](main.md)).
   `specs/data/itemDrop.test.ts` checks that the item data contains every ref in `item-drop.json`.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
-  lists again. `settings-price-check.vue` is the widget's settings page.
+  lists again and shows how many of their entries are new. `settings-price-check.vue` is the widget's settings page.
 
 ### Price estimates (`background/Prices.ts`, `background/price-source.ts`)
 
@@ -141,7 +141,8 @@ is not private, `load()` selects the third league when the list has more than tw
   and stat lists in `web/background/TradeData.ts` (`/api/trade2/data/items` and `/data/stats` on
   `www.pathofexile.com`). The league list loads at start, on Refresh and on Retry. The two lists load with the
   game data, on "Reload fallback data", and from a 30 minute timer at most every 2 hours when they were used in
-  the last hour.
+  the last hour. A response with an empty item or stat list keeps the loaded lists, and the timer tries again at its
+  next run.
 - **Prices come only from the price file** ([ADR-0006](../adr/ADR-0006-own-price-service.md)). No code here
   requests poe.ninja. `findPriceByQuery` builds a link to the item's poe.ninja page, which the price trend opens
   with `window.open` when the user clicks it.

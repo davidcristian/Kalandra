@@ -27,6 +27,10 @@ interface TradeStat {
   text: string;
 }
 
+function countNew(next: Set<string>, current: Set<string>) {
+  return [...next].filter((entry) => !current.has(entry)).length;
+}
+
 export const useTradeData = createGlobalState(() => {
   let lastUpdateTime = 0;
   let downloadController: AbortController | undefined;
@@ -157,21 +161,20 @@ export const useTradeData = createGlobalState(() => {
       error.value = null;
 
       // grab the data
-      const [outItemData, outStatTuple] = await Promise.all([
+      const [outItemData, [outStatData, outStatDataSet]] = await Promise.all([
         loadItemData(),
         loadStatData(),
       ]);
 
-      foundItems = outItemData.size - itemData.value.size;
-      foundStats = outStatTuple[1].size - statDataSet.value.size;
-      // don't regress
-      if (foundItems > 0 && foundStats > 0) {
+      // An empty list means the request failed, so the loaded lists stay
+      if (outItemData.size && outStatDataSet.size) {
+        foundItems = countNew(outItemData, itemData.value);
+        foundStats = countNew(outStatDataSet, statDataSet.value);
         itemData.value = outItemData;
-        statData.value = outStatTuple[0];
-        statDataSet.value = outStatTuple[1];
+        statData.value = outStatData;
+        statDataSet.value = outStatDataSet;
+        lastUpdateTime = Date.now();
       }
-
-      lastUpdateTime = Date.now();
     } catch (e) {
       if (controller === downloadController) {
         console.warn(e);
