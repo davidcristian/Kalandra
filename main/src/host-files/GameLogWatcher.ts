@@ -5,6 +5,7 @@ import { guessFileLocation } from "./utils";
 import { ServerEvents } from "../server";
 import { Logger } from "../RemoteLogger";
 import { FileWriter } from "./FileWriter";
+import { LineSplitter } from "./LineSplitter";
 
 const POSSIBLE_PATH =
   process.platform === "win32"
@@ -38,6 +39,7 @@ interface WatchState {
   file: fs.FileHandle;
   isReading: boolean;
   readBuff: Buffer;
+  lines: LineSplitter;
 }
 
 export class GameLogWatcher {
@@ -61,6 +63,7 @@ export class GameLogWatcher {
         if (!this._state.isReading) {
           this.fileWriter.flushClientLogFile();
           this._state.offset = 0;
+          this._state.lines.reset();
           this._state.isReading = true;
           void this.readToEOF(this._state);
         } else {
@@ -117,6 +120,7 @@ export class GameLogWatcher {
         offset: stats.size,
         isReading: false,
         readBuff: Buffer.allocUnsafe(64 * 1024),
+        lines: new LineSplitter(this.logger),
       };
     } catch {
       this._wantedPath = null;
@@ -153,15 +157,13 @@ export class GameLogWatcher {
         if (!bytesRead) break;
 
         state.offset += bytesRead;
-        const lines = readBuff
-          .toString("utf8", 0, bytesRead)
-          .split("\n")
-          .map((line) => line.trim())
-          .filter((line) => line.length);
-        this.server.sendEventTo("broadcast", {
-          name: "MAIN->CLIENT::game-log",
-          payload: { lines },
-        });
+        const lines = state.lines.push(readBuff.subarray(0, bytesRead));
+        if (lines.length) {
+          this.server.sendEventTo("broadcast", {
+            name: "MAIN->CLIENT::game-log",
+            payload: { lines },
+          });
+        }
       }
     } catch (err) {
       this.logger.write(

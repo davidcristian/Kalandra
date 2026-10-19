@@ -7,6 +7,7 @@ import type { IpcEvent, IpcEventPayload } from "../../ipc/types";
 import type { ServerEvents } from "../src/server";
 import { FileWriter } from "../src/host-files/FileWriter";
 import { GameLogWatcher } from "../src/host-files/GameLogWatcher";
+import { MAX_LINE_BYTES } from "../src/host-files/LineSplitter";
 import { Logger } from "../src/RemoteLogger";
 
 vi.mock("electron", async () => {
@@ -126,5 +127,62 @@ describe("GameLogWatcher.restart", () => {
 
     expect(logger.history).not.toContain("Failed to read");
     expect(server.gameLogLines().length).toBeLessThan(100_000);
+  });
+});
+
+// The watcher reads at most 64 KiB at a time, and a re-parse reads the whole file from the start
+describe("GameLogWatcher reads", () => {
+  const READ_BYTES = 64 * 1024;
+
+  async function reparse(content: string) {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, content);
+    await watcher.restart(file, true);
+    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+  }
+
+  it("sends a line that the end of a read cuts in two as one line", async () => {
+    const first = "a".repeat(READ_BYTES - 20);
+    const cut =
+      "2026/10/19 05:00:00 1 abc [INFO Client 1] : You have entered Clearfell.";
+    await reparse(`${first}\n${cut}\n`);
+
+    await vi.waitFor(() => expect(server.gameLogLines()).toEqual([first, cut]));
+  });
+
+  it("decodes a character that the end of a read cuts in two", async () => {
+    const first = "a".repeat(READ_BYTES - 2);
+    const cut = "€ starts one byte before the end of the first read";
+    await reparse(`${first}\n${cut}\n`);
+
+    await vi.waitFor(() => expect(server.gameLogLines()).toEqual([first, cut]));
+  });
+
+  it("skips a line longer than the longest line it keeps", async () => {
+    await reparse(`${"x".repeat(MAX_LINE_BYTES * 2)}\nthe next line\n`);
+
+    await vi.waitFor(() =>
+      expect(server.gameLogLines()).toEqual(["the next line"]),
+    );
+    expect(logger.history).toContain(
+      `Skipped a line longer than ${MAX_LINE_BYTES} bytes`,
+    );
+  });
+
+  it("drops the partial last line when the log is read again", async () => {
+    await reparse("a whole line\nhalf a li");
+    await vi.waitFor(() =>
+      expect(server.gameLogLines()).toEqual(["a whole line"]),
+    );
+
+    // A re-parse sent while the last one still reads is skipped, so the test sends it until one runs
+    await vi.waitFor(
+      () => {
+        server.emit("CLIENT->MAIN::re-parse-log", undefined);
+        expect(server.gameLogLines().length).toBeGreaterThan(1);
+      },
+      { interval: 100 },
+    );
+    expect(new Set(server.gameLogLines())).toEqual(new Set(["a whole line"]));
   });
 });
