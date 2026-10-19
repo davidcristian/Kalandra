@@ -1,4 +1,4 @@
-import { promises as fs, watchFile, unwatchFile } from "fs";
+import { promises as fs, watchFile, unwatchFile, type BigIntStats } from "fs";
 import path from "path";
 import { app } from "electron";
 import { guessFileLocation } from "./utils";
@@ -32,6 +32,16 @@ const POSSIBLE_PATH =
             ),
           ]
         : [];
+
+async function statIfExists(file: string): Promise<BigIntStats | null> {
+  try {
+    return await fs.stat(file, { bigint: true });
+  } catch (err) {
+    // The path is missing between a delete and the game writing the file again
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+}
 
 interface WatchState {
   offset: number;
@@ -137,6 +147,33 @@ export class GameLogWatcher {
     await state.file.close();
   }
 
+  // The user can empty or delete the log while it is open, and the game then writes a new one
+  private async followFile(state: WatchState) {
+    const open = await state.file.stat({ bigint: true });
+    const onDisk = await statIfExists(state.path);
+    if (onDisk && (onDisk.ino !== open.ino || onDisk.dev !== open.dev)) {
+      const file = await fs.open(state.path, "r");
+      if (this._state !== state) {
+        await file.close();
+        return;
+      }
+      const replaced = state.file;
+      state.file = file;
+      await replaced.close();
+      this.logger.write(
+        "info [GameLogWatcher] The log file was replaced, reading the new file from the start",
+      );
+    } else if (open.size < BigInt(state.offset)) {
+      this.logger.write(
+        "info [GameLogWatcher] The log file got shorter, reading it again from the start",
+      );
+    } else {
+      return;
+    }
+    state.offset = 0;
+    state.lines.reset();
+  }
+
   private handleFileChange() {
     if (this._state && !this._state.isReading) {
       this._state.isReading = true;
@@ -146,6 +183,7 @@ export class GameLogWatcher {
 
   private async readToEOF(state: WatchState) {
     try {
+      await this.followFile(state);
       while (this._state === state) {
         const { file, readBuff, offset } = state;
         const { bytesRead } = await file.read(

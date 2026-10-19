@@ -130,10 +130,11 @@ The entry, the server and the app services, in `main/src/`:
   error that asks for a path. It polls the file every 450 ms with `fs.watchFile`, starts at the end of the file, and
   sends new non-empty lines as `MAIN->CLIENT::game-log`. `LineSplitter.ts` keeps a partial line until the game writes
   the rest, so a line or a character that the end of a 64 KiB read cuts is sent whole, and it skips a line longer than
-  64 KiB with a warning. A restart with the same `logFile` keeps the open file. After a restart with `readLog` false,
-  or one that found or opened no file, it opens the file again. `CLIENT->MAIN::re-parse-log` reads the file again from
-  the start. A restart that closes the file stops a read in progress after its current chunk, and a failed read is
-  logged.
+  64 KiB with a warning. Each time it reads, it first compares the open file with the path: when the file is shorter
+  than the read position, or the path holds another file, it reads from the start. A restart with the same `logFile`
+  keeps the open file. After a restart with `readLog` false, or one that found or opened no file, it opens the file
+  again. `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read
+  in progress after its current chunk, and a failed read is logged.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection
   on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`
@@ -174,7 +175,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (22.8% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (23.9% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
 `app` that emits `ready` once. `server.test.ts` starts the server and sends `..` paths, foreign origins

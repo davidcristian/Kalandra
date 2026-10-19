@@ -190,7 +190,8 @@ it.
   by default. With "PoE log file" empty, main looks in the Windows folders that
   [Settings](../../settings.md#general) lists (`main/src/host-files/GameLogWatcher.ts`). Save.
 - **Press:** open the overlay and click XP in the main button bar. Enter a new area, then gain a level.
-  Uncheck the setting, Save, check it again, Save, and enter another area.
+  Uncheck the setting, Save, check it again, Save, and enter another area. Then empty `Client.txt`
+  in a text editor while the game runs, save it, and enter another area.
 - **See:** the widget shows the character level, `Exp` and `Over`. `Exp` and `Over` follow the
   area level, which changes when the game writes `Generating level <n> area "<id>" with seed <n>`
   for a new area. The character level changes when the game writes
@@ -198,13 +199,17 @@ it.
   `renderer/public/data/en/client_strings.js`. An area whose id contains `town` or `hideout`
   leaves the area level as it was (`renderer/src/web/client-log/client-log.ts`). Main reads only
   the lines written after it opened the file, and looks for new ones every 450 ms. The area level
-  also follows the area entered after the setting was turned off and on again.
+  also follows the area entered after the setting was turned off and on again, and the area entered
+  after `Client.txt` was emptied.
 - **Logs:**
   - `info [GameLogWatcher] disabled` when the setting is off.
   - `error [GameLogWatcher] No log file found` when neither path exists.
   - `error [GameLogWatcher] Found 2 log files, please enter one into settings:` and both paths,
     when both exist. Enter one in "PoE log file".
   - `error [GameLogWatcher] Failed to watch file.` when main cannot open the file.
+  - `info [GameLogWatcher] The log file got shorter, reading it again from the start` after the
+    file was emptied, or `info [GameLogWatcher] The log file was replaced, reading the new file
+    from the start` when the editor saved a new file in its place.
 
 ## After the check
 

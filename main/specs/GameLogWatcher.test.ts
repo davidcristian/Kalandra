@@ -186,3 +186,55 @@ describe("GameLogWatcher reads", () => {
     expect(new Set(server.gameLogLines())).toEqual(new Set(["a whole line"]));
   });
 });
+
+describe("GameLogWatcher after the log changes on disk", () => {
+  // fs.watchFile misses a change made before its first stat, so each try writes again
+  async function untilSent(line: string, write: () => Promise<void>) {
+    await vi.waitFor(
+      async () => {
+        await write();
+        expect(server.gameLogLines()).toContain(line);
+      },
+      { timeout: 4000, interval: 250 },
+    );
+  }
+
+  it("reads the log from the start after it gets shorter", async () => {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, `${"an old line\n".repeat(20)}half of an old li`);
+    await watcher.restart(file, true);
+    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    await vi.waitFor(() => expect(server.gameLogLines()).toHaveLength(20));
+
+    await untilSent("a new line", () => fs.writeFile(file, "a new line\n"));
+    expect(logger.history).toContain("The log file got shorter");
+  });
+
+  it("reads the new file from the start after the log is deleted and written again", async () => {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, "an old line\n");
+    await watcher.restart(file, true);
+
+    const line = "a new line that is longer than the whole old file";
+    await untilSent(line, async () => {
+      await fs.rm(file);
+      await fs.writeFile(file, `${line}\n`);
+    });
+    expect(logger.history).toContain("The log file was replaced");
+    expect(logger.history).not.toContain("Failed to read");
+  });
+
+  it("reads the file it has open while the log is deleted and not written again", async () => {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, "an old line\n");
+    await watcher.restart(file, true);
+
+    await fs.rm(file);
+    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+
+    await vi.waitFor(() =>
+      expect(server.gameLogLines()).toEqual(["an old line"]),
+    );
+    expect(logger.history).not.toContain("Failed to read");
+  });
+});

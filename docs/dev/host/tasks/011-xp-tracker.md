@@ -20,6 +20,9 @@ from April 2026, game version `4.4.0j`. [docs/xp-tracker.md](../../../xp-tracker
 - While the game runs, the widget changes the level on each level up and the area level on each new
   area. Towns and hideouts leave the area level as it was: `client-log.ts` skips an area id that
   contains `town` or `hideout` in lower case.
+- After `Client.txt` is emptied while the game runs, the widget follows the next area:
+  `GameLogWatcher` reads the file from its start when it gets shorter. This needs the game to write
+  its next line at the new end of the file.
 - `G1_1`, The Riverbank, is the first campaign area. `client-log.ts` sets the level to 1 when a
   character enters it, because only a new character goes there. If a character above level 1 can
   enter it again, the widget shows level 1 there.
@@ -30,7 +33,8 @@ and try to return to The Riverbank with that character. Open `Client.txt` and fi
 each.
 
 **Pass.** The lines of the current patch match the two patterns, the log is at one of the two paths,
-the widget follows each new area and level up, and a character above level 1 cannot enter `G1_1`.
+the widget follows each new area and level up, also after `Client.txt` was emptied, and a character
+above level 1 cannot enter `G1_1`.
 
 **Record.** The game patch, and real lines if they differ from the test logs. A difference goes into
 docs/xp-tracker.md or a refinement, in the same commit as this file's History line. The macOS path

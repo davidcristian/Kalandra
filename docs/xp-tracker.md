@@ -40,8 +40,9 @@ looks for the file again, even when the field has not changed, for example after
 
 ### What Kalandra reads
 
-Kalandra reads new lines as the game writes them, starting at the end of the file. When Kalandra starts, the widget
-uses level 1 for you and for the area. You can type your level into it, and two kinds of log lines update it:
+Kalandra reads new lines as the game writes them, starting at the end of the file. When the file gets shorter, or is
+deleted and written again, Kalandra reads it from the start. When Kalandra starts, the widget uses level 1 for you
+and for the area. You can type your level into it, and two kinds of log lines update it:
 
 - `<character> (<class>) is now level <N>` sets your level.
 - `Generating level <N> area "<area>" with seed <N>` sets the area level. Towns and hideouts do not change it.
