@@ -72,11 +72,15 @@ class HostTransport {
   }
 
   async importFile(file: File): Promise<string> {
-    const response = await fetch(`/uploads/${file.name}`, {
+    // main reads the extension from the URL path, which a # or ? in the name would cut short
+    const response = await fetch(`/uploads/${encodeURIComponent(file.name)}`, {
       method: "POST",
       headers: { "Content-Type": "application/octet-stream" },
       body: file,
     });
+    if (!response.ok) {
+      throw new Error(`Storing ${file.name} failed (${response.status})`);
+    }
     const body = (await response.json()) as { name: string };
     return body.name;
   }

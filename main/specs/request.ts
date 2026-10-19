@@ -12,22 +12,35 @@ export async function get(
   urlPath: string,
   headers: http.OutgoingHttpHeaders = {},
 ): Promise<Reply> {
+  return await send({ host: "127.0.0.1", port, path: urlPath, headers });
+}
+
+export async function post(
+  port: number,
+  urlPath: string,
+  body: string,
+): Promise<Reply> {
+  const options = { host: "127.0.0.1", port, path: urlPath, method: "POST" };
+  return await send(options, body);
+}
+
+async function send(
+  options: http.RequestOptions,
+  requestBody?: string,
+): Promise<Reply> {
   return await new Promise((resolve, reject) => {
-    const req = http.request(
-      { host: "127.0.0.1", port, path: urlPath, headers },
-      (res) => {
-        let body = "";
-        res.setEncoding("utf-8");
-        res.on("data", (chunk: string) => {
-          body += chunk;
-        });
-        res.on("end", () => {
-          resolve({ status: res.statusCode ?? 0, body });
-        });
-      },
-    );
+    const req = http.request(options, (res) => {
+      let body = "";
+      res.setEncoding("utf-8");
+      res.on("data", (chunk: string) => {
+        body += chunk;
+      });
+      res.on("end", () => {
+        resolve({ status: res.statusCode ?? 0, body });
+      });
+    });
     req.on("error", reject);
-    req.end();
+    req.end(requestBody);
   });
 }
 

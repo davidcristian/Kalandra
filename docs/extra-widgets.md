@@ -35,7 +35,8 @@ Click `edit` again to finish.
 ![The image strip in edit mode, with the title, move, remove and Choose File controls numbered 1 to 4](/reference-images/EditImageStrip.png)
 
 Kalandra copies each added image into the `apt-data\files` folder of its data folder (`%APPDATA%\kalandra` on
-Windows), so you can move or delete the original file. It does not add an image larger than about 16 MB.
+Windows), so you can move or delete the original file. It adds PNG, JPEG, GIF, WebP, AVIF, BMP and ICO images, and
+does not add another kind of file or an image larger than about 16 MB.
 
 ![An image strip titled Some Title with two images](/reference-images/SecondImageStripWidget.png)
 

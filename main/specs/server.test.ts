@@ -3,7 +3,10 @@ import * as path from "path";
 import type { AddressInfo } from "net";
 import { app } from "electron";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { server } from "../src/server";
+import { addFileUploadRoutes } from "../src/host-files/file-uploads";
+import { Logger } from "../src/RemoteLogger";
+import { httpRoutes, server } from "../src/server";
+import { FakeServer } from "./fake-server";
 import { get, openSocket } from "./request";
 
 vi.mock("electron", async () => {
@@ -18,6 +21,7 @@ const userData = app.getPath("userData");
 let port = 0;
 
 beforeAll(async () => {
+  addFileUploadRoutes(httpRoutes, new Logger(new FakeServer()));
   const uploads = path.join(userData, "apt-data", "files");
   fs.mkdirSync(uploads, { recursive: true });
   fs.writeFileSync(path.join(uploads, "image.png"), "image");

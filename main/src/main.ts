@@ -14,6 +14,7 @@ import { AppTray } from "./AppTray";
 import { OverlayVisibility } from "./windowing/OverlayVisibility";
 import { GameLogWatcher } from "./host-files/GameLogWatcher";
 import { HttpProxy } from "./proxy";
+import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { installExtension, VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import { FileWriter } from "./host-files/FileWriter";
 import { startWhenReady } from "./startup";
@@ -65,6 +66,7 @@ startWhenReady(
     const appUpdater = new AppUpdater(eventPipe);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _httpProxy = new HttpProxy(httpRoutes, logger);
+    addFileUploadRoutes(httpRoutes, logger);
     const fileWriter = new FileWriter(eventPipe, logger);
     const gameLogWatcher = new GameLogWatcher(eventPipe, logger, fileWriter);
 

@@ -6,7 +6,6 @@ import * as path from "path";
 import { app } from "electron";
 import { IpcEvent, IpcEventPayload, HostState } from "../../ipc/types";
 import { ConfigStore } from "./host-files/ConfigStore";
-import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { readListenOption } from "./listen-option";
 import { sendFile } from "./served-file";
 import { isAllowedRequest } from "./request-origin";
@@ -31,8 +30,6 @@ export const server = createServer((req, res) => {
 });
 const websocketServer = new WebSocketServer({ noServer: true });
 let lastActiveClient: WebSocket;
-
-addFileUploadRoutes(httpRoutes);
 
 if (!process.env.VITE_DEV_SERVER_URL) {
   httpRoutes.addListener("request", (req, res) => {

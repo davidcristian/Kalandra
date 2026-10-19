@@ -16,10 +16,11 @@ The entry, the server and the app services, in `main/src/`:
   which on macOS waits up to 15 seconds for the accessibility permission and quits without it. It then awaits
   `app.whenReady()`, which also resolves when Electron emitted `ready` during that wait, and runs the start
   function, which creates `AppTray`, `Logger`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter`
-  and `GameLogWatcher`. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on
-  Linux, because the window is black instead of transparent otherwise, and 0 elsewhere. Its
-  `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses it. It then
-  starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue Devtools.
+  and `GameLogWatcher`, and adds the `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and
+  `Shortcuts` after a timer: 1 second on Linux, because the window is black instead of transparent otherwise, and 0
+  elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses
+  it. It then starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue
+  Devtools.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds
   the `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
@@ -116,8 +117,10 @@ The entry, the server and the app services, in `main/src/`:
 `host-files/`:
 
 - `ConfigStore.ts`: `ConfigStore` reads and writes `apt-data/config.json` ([config.md](config.md)).
-- `file-uploads.ts`: `addFileUploadRoutes(server)` adds the `/uploads/` routes, which store files in
-  `apt-data/files/`.
+- `file-uploads.ts`: `addFileUploadRoutes(routes, logger)` adds the `/uploads/` routes, which store files in
+  `apt-data/files/`. `POST` stores only a file whose URL path ends in an image extension that Chromium shows in an
+  `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. A failed
+  write returns 500 and logs `error [uploads] <message>`.
 - `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
   returns 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
   one with `..` segments, which Node passes on in `req.url` as sent.
@@ -178,13 +181,15 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (32.7% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (34.4% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
 `request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
 `app` that emits `ready` once. `text-box.test.ts` types chat commands into the fake clipboard and chat box of
 `fake-chat.ts`, which applies each key press to the text in the box. `server.test.ts` starts the server and sends
-`..` paths, foreign origins and host names to the HTTP routes and to `/events`. `proxy.test.ts` sends `/proxy` requests with and without the
-`x-kalandra-proxy` header, through a fake `net.request` that answers with the request it was given.
+`..` paths, foreign origins and host names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
+images and other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
+`proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake
+`net.request` that answers with the request it was given.
 `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
 write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
 `FileWriter.test.ts` read and write real files in a temporary folder and send client events through the fake server
