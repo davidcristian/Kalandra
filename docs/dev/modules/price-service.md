@@ -12,7 +12,7 @@ request to poe.ninja's API, because poe.ninja asks apps to use their own backend
 
 | File | Does |
 | --- | --- |
-| `price_service/__main__.py` | reads the environment, then calls `run_schedule` with `--once` or without it |
+| `price_service/__main__.py` | `read_settings` reads the environment, then `main` calls `run_schedule` with `--once` or without it |
 | `price_service/ninja.py` | `NinjaClient`: the requests to poe.ninja, one at a time, with ETags and a fallback copy |
 | `price_service/service.py` | `run_schedule`: one cycle per interval, or one cycle with `--once`; `run_cycle` and `build_league`: one file per league and `index.json` |
 | `price_service/transform.py` | turns poe.ninja's responses into the price file, in the key order the app searches |
@@ -103,7 +103,7 @@ deploy with `--build`. A `schemaVersion` other than 1 stops the service at start
 
 ### Environment
 
-`price_service/__main__.py` reads these variables once, at start:
+`read_settings` in `price_service/__main__.py` reads these variables once, at start:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
@@ -180,9 +180,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 40 tests on 19 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 46 tests on 19 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 90.0% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 96.4% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

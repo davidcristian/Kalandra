@@ -4,7 +4,7 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
-from support import FIXTURES, FakeGet, fixture, league_routes, ok
+from support import FIXTURES, FakeGet, FakeSleep, StopScheduleError, fixture, league_routes, ok
 
 from price_service.ninja import NinjaClient, Reply
 from price_service.service import build_league, run_cycle, run_schedule, write_atomic
@@ -86,29 +86,19 @@ class RunCycleTest(unittest.TestCase):
                 self.assertEqual(sorted(path.name for path in output.iterdir()), ["index.json", "standard.json"])
 
 
-class StopScheduleError(Exception):
-    pass
-
-
 class RunScheduleTest(unittest.TestCase):
     def test_an_error_ends_only_its_cycle_and_the_next_starts_on_time(self) -> None:
         get = FakeGet(league_routes())
         ninja = NinjaClient(get, user_agent="test", sleep=lambda _: None)
         times = iter([0.0, 25.0, 3600.0, 3625.0])
-        sleeps: list[float] = []
-
-        def sleep(seconds: float) -> None:
-            sleeps.append(seconds)
-            if len(sleeps) == 2:
-                raise StopScheduleError
-
+        sleep = FakeSleep(stop_at=2)
         with tempfile.TemporaryDirectory() as name:
             missing = Path(name) / "missing"
             with self.assertLogs("price_service.service", "ERROR") as logs, self.assertRaises(StopScheduleError):
                 run_schedule(
                     lambda: run_cycle(ninja, CATEGORIES, missing), 3600, sleep=sleep, clock=lambda: next(times)
                 )
-        self.assertEqual(sleeps, [3575.0, 3575.0])
+        self.assertEqual(sleep.waits, [3575.0, 3575.0])
         self.assertEqual(len(get.calls), 8)
         self.assertEqual([record.exc_info is not None for record in logs.records], [True, True])
 
@@ -123,6 +113,14 @@ class RunScheduleTest(unittest.TestCase):
             ["ERROR:price_service.service:cycle failed: https://poe.ninja/poe2/api/economy/leagues: HTTP 503"],
         )
         self.assertIsNone(logs.records[0].exc_info)
+
+    def test_waits_the_rest_of_the_interval_or_not_at_all(self) -> None:
+        for elapsed, wait in ((0.0, 3600.0), (3599.5, 0.5), (3600.0, 0.0), (5400.0, 0.0)):
+            with self.subTest(elapsed=elapsed):
+                sleep = FakeSleep(stop_at=1)
+                with self.assertRaises(StopScheduleError):
+                    run_schedule(lambda: None, 3600, sleep=sleep, clock=iter([100.0, 100.0 + elapsed]).__next__)
+                self.assertEqual(sleep.waits, [wait])
 
 
 class WriteAtomicTest(unittest.TestCase):

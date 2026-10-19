@@ -12,6 +12,21 @@ def fixture(name: str) -> bytes:
     return (FIXTURES / "ninja" / name).read_bytes()
 
 
+class StopScheduleError(Exception):
+    pass
+
+
+class FakeSleep:
+    def __init__(self, *, stop_at: int) -> None:
+        self.stop_at = stop_at
+        self.waits: list[float] = []
+
+    def __call__(self, seconds: float) -> None:
+        self.waits.append(seconds)
+        if len(self.waits) == self.stop_at:
+            raise StopScheduleError
+
+
 class FakeGet:
     def __init__(self, routes: dict[str, list[Reply | BaseException]]) -> None:
         self.routes = routes
