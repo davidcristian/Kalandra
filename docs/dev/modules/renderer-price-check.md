@@ -74,6 +74,8 @@ league ([price-service.md](price-service.md)). This doc also covers the backgrou
   price file, with a unique's base item as `variant` ([price-service.md](price-service.md#the-price-file-format)).
   `tradeVolume` in `trade-volume.ts` formats the currency exchange volume per hour, and divides the volume by the
   price, both in Divine Orbs, for items per hour.
+  `buildRelatedItems` in `related-items/related-items.ts` lists the `item-drop.json` group that contains the
+  item, and leaves out each ref that the item data does not contain, such as an item from a newer game patch.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again. `settings-price-check.vue` is the widget's settings page.
