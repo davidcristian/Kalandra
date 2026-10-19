@@ -15,7 +15,8 @@
 - With Record all key presses ticked in Settings, Debug, main logs keys only while the game window
   is active, not while the overlay or another program is (`main/src/shortcuts/key-log.ts`).
 - Shift + Space gives the overlay focus. Shift + Space again, Escape, Ctrl + W or a click on the
-  background gives the game focus back.
+  background gives the game focus back. An overlay key with Ctrl, Shift and Alt does the same
+  (`main/src/windowing/overlay-keys.ts`).
 - Holding Alt alone hides the overlay after 275 ms, or 85 ms while it has focus
   (`main/src/windowing/OverlayVisibility.ts`).
 - Widgets hide by their flags as focus moves (`renderer/src/web/overlay/OverlayWindow.vue`). The

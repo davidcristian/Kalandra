@@ -104,11 +104,16 @@ The entry, the server and the app services, in `main/src/`:
   go to the default browser. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server
   in development, or with `--no-overlay` (no window) opens it in the default browser. `assertOverlayActive()`,
   `assertGameActive()` and `toggleActiveState()` move the focus between the overlay and the game, and
-  `isInteractable` is true while the overlay has it. `Escape` and `Ctrl + W` return to the game. `updateOpts()`
-  attaches the window to the game window. With `hideOverlayOnBlur`, the window is hidden rather than transparent
+  `isInteractable` is true while the overlay has it. While the overlay has focus the hotkeys are not registered,
+  so the window's `before-input-event` handler checks each key press with `overlayKeyCommand()`: `Escape` and
+  `Ctrl + W` return to the game, and the overlay key toggles the focus. `updateOpts()` attaches the window to the game window. With `hideOverlayOnBlur`, the window is hidden rather than transparent
   while the overlay is not active and either the game is not active or the page sent
   `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game runs with administrator rights that
   Kalandra lacks, it shows the error box `PoE2 window - No access`.
+- `overlay-keys.ts`: `pressedHotkey(input)` names a key press in the overlay window with `hotkeyToString()` from
+  `ipc/KeyToCode.ts`, the function the Hotkeys settings use to write a hotkey, so every combination of `Ctrl`,
+  `Shift` and `Alt` matches the saved overlay key. `overlayKeyCommand(input, overlayKey)` returns `focus-game`,
+  `toggle-overlay` or `undefined` for a key press.
 - `GameWindow.ts`: `GameWindow`, an `EventEmitter`, attaches through `OverlayController.attachByTitle()` to the
   window whose title is `windowTitle`, and emits `active-change` on the game window's focus and blur. It also has
   `bounds`, `isActive`, `uiSidebarWidth`, `onAttach(cb)` and `screenshot()`.
@@ -189,7 +194,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (41.1% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (42.1% of the lines of `src/` on 19 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
@@ -198,7 +203,8 @@ host address no computer has, `served-file.test.ts` the path check, `request-ori
 messages.
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
 key press to the text in the box. `key-log.test.ts` sends key events through the fake global hook of
-`fake-hook.ts` and reads the log lines. `server.test.ts` starts the server and sends `..` paths, foreign origins
+`fake-hook.ts` and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of
+modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign origins
 and host names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
 images and other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
 `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake

@@ -69,6 +69,8 @@ Three lines from `main/src/shortcuts/Shortcuts.ts` apply to every key below:
   background while "Clicking on the background focuses the game" is ticked, the default. Keys then
   reach the game again.
 - **Also check:**
+  - Set the Overlay key to one with Ctrl, Shift and Alt, such as Ctrl + Shift + Alt + Q. It gives the
+    overlay focus in the game and gives the game focus back while the overlay has it.
   - Hold Alt alone: the overlay disappears after 275 ms, or 85 ms while it has focus, and comes
     back when Alt is released or another key is pressed. Moving the mouse while Alt is held does
     not bring it back (`main/src/windowing/OverlayVisibility.ts`).

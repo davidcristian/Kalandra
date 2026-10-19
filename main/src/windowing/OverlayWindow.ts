@@ -7,6 +7,7 @@ import {
 import type { ServerEvents } from "../server";
 import type { Logger } from "../RemoteLogger";
 import type { GameWindow } from "./GameWindow";
+import { overlayKeyCommand } from "./overlay-keys";
 
 export class OverlayWindow {
   public isInteractable = false;
@@ -135,35 +136,13 @@ export class OverlayWindow {
     event: Electron.Event,
     input: Electron.Input,
   ) => {
-    if (input.type !== "keyDown") return;
-
-    let { code, control: ctrlKey, shift: shiftKey, alt: altKey } = input;
-
-    if (code.startsWith("Key")) {
-      code = code.slice("Key".length);
-    } else if (code.startsWith("Digit")) {
-      code = code.slice("Digit".length);
-    }
-
-    if (shiftKey && altKey) code = `Shift + Alt + ${code}`;
-    else if (ctrlKey && shiftKey) code = `Ctrl + Shift + ${code}`;
-    else if (ctrlKey && altKey) code = `Ctrl + Alt + ${code}`;
-    else if (altKey) code = `Alt + ${code}`;
-    else if (ctrlKey) code = `Ctrl + ${code}`;
-    else if (shiftKey) code = `Shift + ${code}`;
-
-    switch (code) {
-      case "Escape":
-      case "Ctrl + W": {
-        event.preventDefault();
-        process.nextTick(this.assertGameActive);
-        break;
-      }
-      case this.overlayKey: {
-        event.preventDefault();
-        process.nextTick(this.toggleActiveState);
-        break;
-      }
+    const command = overlayKeyCommand(input, this.overlayKey);
+    if (command === "focus-game") {
+      event.preventDefault();
+      process.nextTick(this.assertGameActive);
+    } else if (command === "toggle-overlay") {
+      event.preventDefault();
+      process.nextTick(this.toggleActiveState);
     }
   };
 
