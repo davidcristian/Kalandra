@@ -169,11 +169,11 @@ export const usePoeninja = createGlobalState(() => {
         Date.now() - lastInterestTime > INTEREST_SPAN_MS)
     )
       return;
-    if (downloadController) downloadController.abort();
+    downloadController?.abort();
+    const controller = new AbortController();
+    downloadController = controller;
     try {
       isLoading.value = true;
-      downloadController = new AbortController();
-
       ITEM_DROP.value = BUNDLED_ITEM_DROP;
 
       availableCoreCurrencies.value = getAvailableCoreCurrencies().map(
@@ -191,11 +191,11 @@ export const usePoeninja = createGlobalState(() => {
 
       const ninjaSchema: NinjaSchema = await (
         await fetch(`${import.meta.env.BASE_URL}data/namespaceMap.json`, {
-          signal: downloadController.signal,
+          signal: controller.signal,
         })
       ).json();
       const response = await Host.proxy(priceFileUrl(league.id), {
-        signal: downloadController.signal,
+        signal: controller.signal,
       });
       if (!response.ok) {
         throw new Error(`No price file for ${league.id} (${response.status})`);
@@ -229,9 +229,9 @@ export const usePoeninja = createGlobalState(() => {
 
       lastUpdateTime = Date.now();
     } catch (e) {
-      console.warn(e);
+      if (controller === downloadController) console.warn(e);
     } finally {
-      isLoading.value = false;
+      if (controller === downloadController) isLoading.value = false;
     }
   }
 

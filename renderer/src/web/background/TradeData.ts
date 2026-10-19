@@ -144,7 +144,9 @@ export const useTradeData = createGlobalState(() => {
     )
       return;
 
-    if (downloadController) downloadController.abort();
+    downloadController?.abort();
+    const controller = new AbortController();
+    downloadController = controller;
 
     let foundItems: number = 0;
     let foundStats: number = 0;
@@ -153,7 +155,6 @@ export const useTradeData = createGlobalState(() => {
       performance.mark("trade-data-load-start");
       isLoading.value = true;
       error.value = null;
-      downloadController = new AbortController();
 
       // grab the data
       const [outItemData, outStatTuple] = await Promise.all([
@@ -172,10 +173,12 @@ export const useTradeData = createGlobalState(() => {
 
       lastUpdateTime = Date.now();
     } catch (e) {
-      console.warn(e);
-      error.value = (e as Error).message;
+      if (controller === downloadController) {
+        console.warn(e);
+        error.value = (e as Error).message;
+      }
     } finally {
-      isLoading.value = false;
+      if (controller === downloadController) isLoading.value = false;
     }
     performance.mark("trade-data-load-end");
 

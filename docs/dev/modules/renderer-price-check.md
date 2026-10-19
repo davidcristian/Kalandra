@@ -101,7 +101,8 @@ that the route needs ([main.md](main.md)).
   (`UPDATE_INTERVAL_MS`) and `queuePricesFetch()` ran in the last 20 minutes (`INTEREST_SPAN_MS`). The price check
   and each item selected in the item search call `queuePricesFetch()`, and a timer runs the same check every 4
   minutes (`RETRY_INTERVAL_MS`). A change of league or core currency clears the loaded prices and loads the file at
-  once.
+  once. A load that starts while another runs aborts it, and only the newest load clears the loading state that
+  `initialLoading()` reads.
 - `parseXchg`, `splitJsonBlob` and `findInDatabase` search the raw text of the file instead of parsing it
   ([price-service.md](price-service.md#why-the-key-order-is-a-format)). `parseXchg` returns the `core` object, whose
   `rates` hold the price of one Divine Orb in Exalted Orbs and in Chaos Orbs. Every value in the file is in Divine
@@ -164,8 +165,9 @@ covers item filters, stat filters, the missing fractured rules, the pseudo stats
 `filters/util.ts`.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks.
-`specs/web/prices.test.ts` reads the price service's fixtures. `specs/web/host-proxy.test.ts` checks the URL and
-the header that `Host.proxy` sends. `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit
-headers into limiter sets with `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing
-and restrictions with fake timers. No test calls a live site. `Leagues.ts`, `TradeData.ts` and `poeprices.ts` have
-no test file of their own.
+`specs/web/prices.test.ts` reads the price service's fixtures, and `specs/web/prices-load.test.ts` loads the price
+file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
+with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.
+`specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
+`adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing and restrictions with fake
+timers. No test calls a live site. `Leagues.ts` and `poeprices.ts` have no test file of their own.
