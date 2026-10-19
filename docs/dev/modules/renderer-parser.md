@@ -55,7 +55,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others |
 | `jewellery-quality.ts` | `parseJewelleryQuality` reads the quality line of a ring, amulet, belt or jewel, such as `Quality (Attribute Modifiers): +20% (augmented)`, into `quality`, and sets `qualityType` to the catalyst whose modifier tag in `CATALYST_TO_TAG` the line names. The item editor and the stat filters read `qualityType` |
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
-| `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting |
+| `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category. Each effect line takes its numbers from its own `values` array, because the data scales a number, such as Life regeneration per minute to per second, only for the line that shows it; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting |
 | `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
 
 A module exports the internal functions its tests call as `__testExports` (`Parser.ts`, `stat-translations.ts`,

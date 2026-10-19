@@ -31,32 +31,39 @@ export function buildEditorItems(
     .filter((augment) => augment !== undefined);
 }
 
-function zipHashAndValues(strings?: string[], values?: number[][]): string {
-  if (!strings || !values) return "ns(shouldn't see this)";
-
-  // if each value array is not the same, return empty
-  if (
-    !values.every(
-      (v) =>
-        v.length === values[0].length && v.every((v, i) => v === values[0][i]),
-    )
-  )
-    return "ve(shouldn't see this)";
-
-  const valueGenerator = values[0].values();
-
-  const outString = strings
-    .map((str) => {
-      const replaceCount = str.match(/#/g)?.length ?? 0;
-      const valuesToAdd = [];
-      for (let i = 0; i < replaceCount; i++) {
-        valuesToAdd.push(valueGenerator.next().value ?? 0);
-      }
-      return replaceHashWithValues(str, valuesToAdd);
+/** Writes each effect line with its values, which the lines take in order from their own values arrays. */
+function effectText(lines: AugmentLineData[]): string {
+  let next = 0;
+  return lines
+    .map((line, index) => {
+      const values = (line.string.match(/#/g) ?? []).map(() => {
+        const position = ownPosition(lines, index, next);
+        next = position + 1;
+        return line.values[position] ?? 0;
+      });
+      return replaceHashWithValues(line.string, values);
     })
     .join("\n");
+}
 
-  return outString;
+// The data scales a value, such as 180 Life per minute to 3.0 per second, only in the values array of the
+// line that shows it, so a position where only this line's value differs belongs to this line.
+function ownPosition(
+  lines: AugmentLineData[],
+  index: number,
+  start: number,
+): number {
+  const own = lines[index].values;
+  for (let position = start; position < own.length; position++) {
+    if (
+      lines.every(
+        (other, i) => i === index || other.values[position] !== own[position],
+      )
+    ) {
+      return position;
+    }
+  }
+  return start;
 }
 
 function buildEditorItem(
@@ -69,10 +76,7 @@ function buildEditorItem(
     name: augment.name,
     refName: augment.refName,
     icon: augment.icon,
-    displayString: zipHashAndValues(
-      stats?.map((s) => s.string),
-      stats?.map((s) => s.values),
-    ),
+    displayString: effectText(stats),
     stats,
     baseItem: augment,
   };
