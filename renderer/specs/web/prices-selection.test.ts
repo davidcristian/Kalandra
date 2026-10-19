@@ -48,22 +48,27 @@ async function selectLeague(id: string) {
   await settle();
 }
 
-describe("usePoeninja after a change of league or core currency", () => {
-  beforeEach(async () => {
-    setupTests();
-    vi.mocked(Host.proxy).mockReset();
-    await init("en");
-    widget = reactive({
-      ...AppConfig<PriceCheckWidget>("price-check")!,
-      coreCurrency: "exalted",
-    });
-    AppConfig().widgets = [widget];
-    warnings = [];
-    vi.spyOn(console, "warn").mockImplementation((error: unknown) => {
-      warnings.push(String(error));
-    });
-  });
+/** Returns the fixture price file with one Divine Orb priced at `rate` Chaos Orbs. */
+function withChaosRate(rate: number) {
+  return PRICE_FILE.replace('"chaos":8.53}', `"chaos":${rate}}`);
+}
 
+beforeEach(async () => {
+  setupTests();
+  vi.mocked(Host.proxy).mockReset();
+  await init("en");
+  widget = reactive({
+    ...AppConfig<PriceCheckWidget>("price-check")!,
+    coreCurrency: "exalted",
+  });
+  AppConfig().widgets = [widget];
+  warnings = [];
+  vi.spyOn(console, "warn").mockImplementation((error: unknown) => {
+    warnings.push(String(error));
+  });
+});
+
+describe("usePoeninja after a change of league or core currency", () => {
   it("drops converted prices while the new league's price file downloads", async () => {
     const prices = usePoeninja();
     servePriceFile(PRICE_FILE);
@@ -95,5 +100,38 @@ describe("usePoeninja after a change of league or core currency", () => {
       "Error: No price file for Fixture League C (404)",
     ]);
     expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)).toBeUndefined();
+  });
+});
+
+describe("usePoeninja with Chaos Orb as the core currency", () => {
+  it("converts and labels prices in Exalted Orbs below 5 Chaos Orbs per Divine Orb", async () => {
+    const prices = usePoeninja();
+    widget.coreCurrency = "chaos";
+    servePriceFile(withChaosRate(4.9));
+    await selectLeague("Fixture League D");
+
+    expect(prices.xchgRate.value).toBe(541.6);
+    expect(prices.xchgRateCurrency.value?.id).toBe("exalted");
+    const price = prices.autoCurrency(0.01);
+    expect(price.currency).toBe("exalted");
+    expect(price.min).toBeCloseTo(5.416);
+    expect(prices.comparePrice(price, "<", prices.autoCurrency(0.02))).toBe(
+      true,
+    );
+  });
+
+  it("converts and labels prices in Chaos Orbs from 5 Chaos Orbs per Divine Orb", async () => {
+    const prices = usePoeninja();
+    widget.coreCurrency = "chaos";
+    servePriceFile(withChaosRate(5));
+    await selectLeague("Fixture League E");
+
+    expect(prices.xchgRate.value).toBe(5);
+    expect(prices.xchgRateCurrency.value?.id).toBe("chaos");
+    const price = prices.autoCurrency(0.5);
+    expect(price).toEqual({ min: 2.5, max: 2.5, currency: "chaos" });
+    expect(prices.comparePrice(price, "<", prices.autoCurrency(0.6))).toBe(
+      true,
+    );
   });
 });

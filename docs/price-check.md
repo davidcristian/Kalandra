@@ -231,7 +231,7 @@ Open Settings, **Price check** page, or click the price check title bar. Changes
 | **Account name** | empty | Your account name, so your own listings show **You**. |
 | **Show seller** | **No** | Adds a **Seller** column with the **Account name** or the **Last character name**. |
 | **Fill stat values** | 10% | How far from the item's value the minimum (or maximum) starts, from 0 to 50. **Exact value** sets 0. |
-| **Primary base currency:** | Exalted Orb | Exalted Orb or Chaos Orb, for estimates, the title bar rate and prices in brackets. |
+| **Primary base currency:** | Exalted Orb | Exalted Orb or Chaos Orb, for estimates, the title bar rate and prices in brackets. With Chaos Orb, these show in Exalted Orbs while one Divine Orb costs fewer than 5 Chaos Orbs. |
 | **Remember the Buyout Currency filter** | off | Keeps the currency filter from the previous check. |
 | **Remember listing type** | off | Keeps the listing type from the previous check. |
 | **Always select "Stock" filter** | off | Turns on the **Stock:** filter for a stack of more than one. |

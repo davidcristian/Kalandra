@@ -108,9 +108,10 @@ that the route needs ([main.md](main.md)).
 - `parseXchg`, `splitJsonBlob` and `findInDatabase` search the raw text of the file instead of parsing it
   ([price-service.md](price-service.md#why-the-key-order-is-a-format)). `parseXchg` returns the `core` object, whose
   `rates` hold the price of one Divine Orb in Exalted Orbs and in Chaos Orbs. Every value in the file is in Divine
-  Orbs. `autoCurrency` converts a value to the core currency ("Primary base currency:", `coreCurrency`, default
-  `exalted`). It keeps the value in Divine Orbs when a single value is above 0.94 Divine Orb or the low end of a
-  range is above one.
+  Orbs. `load` sets `xchgRate` to the rate of the core currency ("Primary base currency:", `coreCurrency`, default
+  `exalted`), or to the Exalted Orb rate when the core currency's rate is below 5. `xchgRateCurrency` is the
+  currency of that rate, and `autoCurrency` converts a value with `xchgRate` and labels it with that currency. It
+  keeps the value in Divine Orbs when a single value is above 0.94 Divine Orb or the low end of a range is above one.
 - `price-source.ts`: `PRICE_HOST` is `kalandra.ashoal.com`, `leagueFileName(leagueId)` returns the league's file
   name ([price-service.md](price-service.md#the-files)), and `priceFileUrl(leagueId)` is
   `kalandra.ashoal.com/prices/<file>`.

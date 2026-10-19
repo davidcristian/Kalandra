@@ -154,7 +154,8 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
   Traditional Chinese language, where `pc-garena` is the other choice.
 - The core currency is the currency the app shows prices in, exalted or chaos. It is the **Primary base currency**
   setting in the price check settings (`coreCurrency` in `renderer/src/web/price-check/settings-price-check.vue`).
-  `core.rates` converts the file's divine values to it.
+  `core.rates` converts the file's divine values to it. While one divine costs fewer than 5 chaos, the app shows
+  exalted in place of chaos.
 - `load` loads the file at once after a change of league or core currency, and otherwise at most every 31 minutes
   after a recent price check or item search
   ([renderer-price-check.md](renderer-price-check.md#price-estimates-backgroundpricests-backgroundprice-sourcets)).

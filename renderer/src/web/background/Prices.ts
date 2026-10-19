@@ -132,15 +132,6 @@ export const usePoeninja = createGlobalState(() => {
     },
   });
 
-  const selectedCoreCurrency = computed(() => {
-    const { coreCurrency } = AppConfig<PriceCheckWidget>("price-check")!;
-    if (!availableCoreCurrencies.value || !coreCurrency) return undefined;
-    const listed = availableCoreCurrencies.value.find(
-      (currency) => currency.id === coreCurrency,
-    );
-    return listed;
-  });
-
   /**
    * core/div
    */
@@ -151,6 +142,11 @@ export const usePoeninja = createGlobalState(() => {
   const xchgRateCurrency = shallowRef<"chaos" | "exalted" | undefined>(
     undefined,
   );
+  /** The core currency of xchgRate: the selected one, or Exalted Orb when the selected one's rate is below 5. */
+  const activeCoreCurrency = computed(() => {
+    const id = xchgRateCurrency.value ?? selectedCoreCurrencyId.value;
+    return availableCoreCurrencies.value.find((currency) => currency.id === id);
+  });
 
   const isLoading = shallowRef(false);
   let PRICES_DB: PriceDatabase = [];
@@ -208,16 +204,12 @@ export const usePoeninja = createGlobalState(() => {
 
       // TODO: update to search for requested currency instead of divine
       const divineRates = ninjaXchg.rates;
-      const preferred = selectedCoreCurrency.value;
+      const preferred = selectedCoreCurrencyId.value;
 
       if (divineRates && Object.values(divineRates).some((v) => v >= 10)) {
-        if (
-          preferred &&
-          preferred.id !== "div" &&
-          divineRates[preferred.id] >= 5
-        ) {
-          xchgRate.value = divineRates[preferred.id];
-          xchgRateCurrency.value = preferred.id;
+        if (divineRates[preferred] >= 5) {
+          xchgRate.value = divineRates[preferred];
+          xchgRateCurrency.value = preferred;
         } else {
           xchgRate.value = divineRates.exalted;
           xchgRateCurrency.value = "exalted";
@@ -284,11 +276,11 @@ export const usePoeninja = createGlobalState(() => {
           currency: "div",
         };
       }
-      if (selectedCoreCurrency.value?.id) {
+      if (activeCoreCurrency.value?.id) {
         return {
           min: coreValue[0],
           max: coreValue[1],
-          currency: selectedCoreCurrency.value.id,
+          currency: activeCoreCurrency.value.id,
         };
       }
       // this should never run, assuming we have loaded a currency
@@ -306,11 +298,11 @@ export const usePoeninja = createGlobalState(() => {
         };
       }
     }
-    if (selectedCoreCurrency.value?.id) {
+    if (activeCoreCurrency.value?.id) {
       return {
         min: coreValue,
         max: coreValue,
-        currency: selectedCoreCurrency.value.id,
+        currency: activeCoreCurrency.value.id,
       };
     }
     // this should never run, assuming we have loaded a currency
@@ -429,7 +421,7 @@ export const usePoeninja = createGlobalState(() => {
 
   return {
     xchgRate: readonly(xchgRate),
-    xchgRateCurrency: readonly(selectedCoreCurrency),
+    xchgRateCurrency: readonly(activeCoreCurrency),
     findPriceByQuery,
     autoCurrency,
     queuePricesFetch,
