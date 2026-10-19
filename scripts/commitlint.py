@@ -31,6 +31,9 @@ _POINTERS = (
     (re.compile(r"\b(?:task|rule|decision)\s+0*\d+\b", re.IGNORECASE), "a numbered pointer into a document"),
 )
 _HEX = re.compile(r"\b[0-9a-f]{7,40}\b")
+# The footers are the last paragraph when it starts with a token and `: ` or ` #`, and a value can go on over the
+# next lines: https://www.conventionalcommits.org/en/v1.0.0/#specification
+_FOOTER = re.compile(r"^(?:BREAKING CHANGE|[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)(?:: | #)\S")
 
 
 class Line(NamedTuple):
@@ -79,6 +82,15 @@ def too_wide(text: str) -> bool:
     return len(text) > MAX_WIDTH and len(words) > 1 and max(map(len, words)) <= MAX_WIDTH
 
 
+def footer_start(classified: Sequence[Line]) -> int:
+    """Returns the number of the first footer line, or one past the last line when the message has no footer."""
+    blanks = [line.number for line in classified[1:] if not line.text.strip() and not line.pasted]
+    paragraph: Sequence[Line] = classified[blanks[-1] :] if blanks else []
+    if not paragraph or not _FOOTER.match(paragraph[0].text):
+        return len(classified) + 1
+    return paragraph[0].number
+
+
 def commit_exists(token: str, repo: Path) -> bool:
     """Returns whether ``token`` names a commit in ``repo``."""
     command = ["git", "-C", str(repo), "cat-file", "-e", f"{token}^{{commit}}"]
@@ -102,7 +114,8 @@ def check_body(classified: Sequence[Line], opened: int | None, repo: Path) -> li
         for line in prose
         if too_wide(line.text)
     )
-    words = sum(len(line.text.split()) for line in prose)
+    footer = footer_start(classified)
+    words = sum(len(line.text.split()) for line in prose if line.number < footer)
     if words > MAX_WORDS:
         problems.append(f"the body has {words} words outside code fences, at most {MAX_WORDS}")
     for line in classified:

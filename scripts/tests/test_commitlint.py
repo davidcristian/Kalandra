@@ -18,6 +18,21 @@ skip the default address      main (27)      4 failed, and this fence line is wi
 ```
 """
 
+BREAKING = r"""feat!: rename the app to Kalandra and point it at its own repo
+
+Kalandra is now its own project, but the app, docs and templates still
+named Exiled Exchange 2 and sent users, bug reports and auto updates to
+Kvan7's repo. This renames the app, gives it its own app ID and config
+folder, and repoints every link at davidcristian/Kalandra.
+
+BREAKING CHANGE: settings live in %APPDATA%\kalandra; copy apt-data
+from %APPDATA%\exiled-exchange-2 to keep existing settings.
+"""
+
+
+def words(count: int) -> str:
+    return "\n".join(" ".join(["word"] * min(8, count - start)) for start in range(0, count, 8))
+
 
 class CommitLintTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -42,6 +57,29 @@ class CommitLintTest(unittest.TestCase):
         self.assertIn("the second line is not blank", problems)
         self.assertIn("the body has 53 words outside code fences, at most 50", problems)
         self.assertTrue(any("wrap the body at 72" in problem for problem in problems))
+
+    def test_leaves_footers_out_of_the_word_count(self) -> None:
+        self.assertEqual(self.check(BREAKING), [])
+        footers = "BREAKING-CHANGE: the settings move to a new folder\nand the old one stays\nRefs #settings-folder"
+        self.assertEqual(self.check(f"feat!: a subject\n\n{words(48)}\n\n{footers}\n"), [])
+        self.assertEqual(self.check(f"feat!: a subject\n\n{footers}\n"), [])
+
+    def test_counts_a_last_paragraph_that_does_not_start_with_a_footer(self) -> None:
+        expected = ["the body has 55 words outside code fences, at most 50"]
+        self.assertEqual(self.check(f"fix: a subject\n\n{words(30)}\n\n{words(25)}\n"), expected)
+        self.assertEqual(self.check(f"fix: a subject\n\nRefs: {words(29)}\n\n{words(25)}\n"), expected)
+        self.assertEqual(self.check(f"fix: a subject\n\n{words(30)}\n\n{words(16)}\nRefs: {words(8)}\n"), expected)
+
+    def test_checks_footers_for_width_dashes_and_banned_words(self) -> None:
+        footer = "BREAKING CHANGE: this gates it -- now, and the old folder stays where it was"
+        self.assertEqual(
+            self.check(f"feat!: a subject\n\nA body.\n\n{footer}\n"),
+            [
+                f"line 5 has {len(footer)} characters; wrap the body at 72",
+                "line 5 uses a spaced --",
+                'line 5 uses the banned word "gates"',
+            ],
+        )
 
     def test_reports_dashes_and_banned_words_outside_a_paste(self) -> None:
         dash = chr(0x2014)

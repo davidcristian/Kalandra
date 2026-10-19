@@ -73,7 +73,9 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
 - The first line: at most 72 characters, a lowercase first letter, no period at the end, and no scope that repeats
   the type (`docs(docs)`).
 - The body: a blank second line, at most 72 characters a line unless the line is one long word, and at most 50
-  words.
+  words. The word count leaves out the footers: the last paragraph, when its first line starts with
+  `BREAKING CHANGE: ` or a Conventional Commits footer token such as `Refs: ` or `Refs #`. Every other rule checks
+  the footers too.
 - No em dash, en dash or spaced `--`, and no banned word from the table in AGENTS.md.
 - No pointer into a document that changes: `#12`, `PR 12`, `ADR-0009`, `rule 9`, `task 056`, `decision 3`, or a
   hexadecimal word that `git cat-file` finds as a commit.
@@ -92,11 +94,11 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 51 tests on 18 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 54 tests on 19 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 91.0% of lines and branches on 18 Oct 2026.
+floor in `scripts/.coveragerc`, 91.1% of lines and branches on 19 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.
