@@ -1,3 +1,5 @@
+import type { AddressInfo, Server } from "net";
+
 export interface ListenAddress {
   host: string;
   port: number;
@@ -39,4 +41,38 @@ export function readListenOption(
     return { address: defaults, error: `--listen has a port over ${MAX_PORT}` };
   }
   return { address: { host: host || defaults.host, port } };
+}
+
+/** Listens on `address`, or on `fallback` after `address` fails, and resolves the port. */
+export async function listenWithFallback(
+  server: Server,
+  address: ListenAddress,
+  fallback: ListenAddress,
+  onFallback: (error: Error) => void,
+): Promise<number> {
+  try {
+    return await listen(server, address);
+  } catch (error) {
+    const isFallback =
+      address.host === fallback.host && address.port === fallback.port;
+    if (isFallback || !(error instanceof Error)) throw error;
+    onFallback(error);
+    return await listen(server, fallback);
+  }
+}
+
+async function listen(server: Server, address: ListenAddress) {
+  return await new Promise<number>((resolve, reject) => {
+    const onError = (error: Error) => {
+      server.off("listening", onListening);
+      reject(error);
+    };
+    const onListening = () => {
+      server.off("error", onError);
+      resolve((server.address() as AddressInfo).port);
+    };
+    server.once("error", onError);
+    server.once("listening", onListening);
+    server.listen({ host: address.host, port: address.port });
+  });
 }

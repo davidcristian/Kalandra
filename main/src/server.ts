@@ -1,12 +1,11 @@
 import { WebSocketServer, type WebSocket } from "ws";
-import { type AddressInfo } from "net";
 import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { EventEmitter } from "events";
 import * as path from "path";
 import { app } from "electron";
 import { IpcEvent, IpcEventPayload, HostState } from "../../ipc/types";
 import { ConfigStore } from "./host-files/ConfigStore";
-import { readListenOption } from "./listen-option";
+import { listenWithFallback, readListenOption } from "./listen-option";
 import { sendFile } from "./served-file";
 import { isAllowedRequest } from "./request-origin";
 import type { AppUpdater } from "./AppUpdater";
@@ -146,21 +145,15 @@ export async function startServer(
     }
   });
 
-  const listen = readListenOption(process.argv, {
+  const defaults = {
     host: "127.0.0.1",
     port: process.env.VITE_DEV_SERVER_URL ? 8584 : 0,
-  });
+  };
+  const listen = readListenOption(process.argv, defaults);
   if (listen.error) {
     logger.write(`error [server] ${listen.error}, using the default address`);
   }
-  const { host, port } = listen.address;
-
-  return await new Promise((resolve, reject) => {
-    server
-      .listen({ port, host })
-      .once("error", reject)
-      .once("listening", () => {
-        resolve((server.address() as AddressInfo).port);
-      });
+  return await listenWithFallback(server, listen.address, defaults, (error) => {
+    logger.write(`error [server] ${error.message}, using the default address`);
   });
 }

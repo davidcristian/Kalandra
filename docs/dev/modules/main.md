@@ -19,8 +19,8 @@ The entry, the server and the app services, in `main/src/`:
   and `GameLogWatcher`, and adds the `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and
   `Shortcuts` after a timer: 1 second on Linux, because the window is black instead of transparent otherwise, and 0
   elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses
-  it. It then starts `uIOhook`, calls `startServer()` and loads the page. In development it also installs Vue
-  Devtools.
+  it. It then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects, it shows the
+  error box `Kalandra cannot start` and quits. In development it also installs Vue Devtools.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds
   the `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
@@ -35,7 +35,10 @@ The entry, the server and the app services, in `main/src/`:
   leave it out ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
 - `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
   brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
-  defaults and an `error` text, which `startServer()` writes to the log.
+  defaults and an `error` text, which `startServer()` writes to the log. `listenWithFallback(server, address,
+  fallback, onFallback)` listens on `address`, and after an error such as `EADDRINUSE` or `EADDRNOTAVAIL` passes the
+  error to `onFallback` and listens on `fallback`; it rejects when `address` is `fallback`. `startServer()` passes the
+  defaults as `fallback` and logs the error.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
   sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and
   `kalandra.ashoal.com`. It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()`
@@ -181,12 +184,13 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (34.4% of the lines of `src/` on 19 Oct 2026).
-`listen-option.test.ts` covers the `--listen` parsing, `served-file.test.ts` the path check,
-`request-origin.test.ts` the header check and `startup.test.ts` the startup order on each platform, with a fake
-`app` that emits `ready` once. `text-box.test.ts` types chat commands into the fake clipboard and chat box of
-`fake-chat.ts`, which applies each key press to the text in the box. `server.test.ts` starts the server and sends
-`..` paths, foreign origins and host names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (35.2% of the lines of `src/` on 19 Oct 2026).
+`listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
+host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
+`startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
+`text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
+key press to the text in the box. `server.test.ts` starts the server and sends `..` paths, foreign origins and host
+names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
 images and other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
 `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake
 `net.request` that answers with the request it was given.

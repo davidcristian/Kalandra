@@ -70,10 +70,11 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 ## The boundary between the processes
 
 `main/src/server.ts` runs one Node.js HTTP server. It listens on `127.0.0.1` on a port the operating system picks,
-and `--listen=[host][:port]` sets either part. In development, main listens on port 8584, and Vite's dev server on
-`localhost:5173` forwards these routes to it (`server.proxy` in `renderer/vite.config.mts`). Every request passes
-one check first: its `Host` must be `localhost` or an IP address, and its `Origin`, which a WebSocket must send, must
-match `Host`. A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
+and `--listen=[host][:port]` sets either part; when it cannot listen on that address, it uses the default one. In
+development, main listens on port 8584, and Vite's dev server on `localhost:5173` forwards these routes to it
+(`server.proxy` in `renderer/vite.config.mts`). Every request passes one check first: its `Host` must be
+`localhost` or an IP address, and its `Origin`, which a WebSocket must send, must match `Host`.
+A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
 
 | Route | What it does | Renderer side |
 | --- | --- | --- |

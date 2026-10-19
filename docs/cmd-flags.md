@@ -32,7 +32,9 @@ start.
 
 The host and the port are both optional. Write the value after `=` with no space. With `--listen` alone, a space in
 place of `=`, or a value Kalandra cannot read, Kalandra writes an error to its log (Settings, **Debug** page) and uses
-the default address. Write an IPv6 host in brackets, such as `--listen=[::1]:9001`.
+the default address. It does the same when it cannot listen on the address, such as a port another program uses or a
+host address this computer does not have. When the default address fails too, it shows the error `Kalandra cannot
+start` and quits. Write an IPv6 host in brackets, such as `--listen=[::1]:9001`.
 
 - `--listen=:9001` keeps the loopback address and sets port 9001. The page then always opens at
   `http://localhost:9001`, so you can bookmark it.

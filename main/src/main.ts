@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, systemPreferences } from "electron";
+import { app, dialog, systemPreferences } from "electron";
 import { uIOhook } from "uiohook-napi";
 import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
@@ -123,7 +123,17 @@ startWhenReady(
         );
         uIOhook.start();
         console.log("uIOhook started");
-        const port = await startServer(appUpdater, logger);
+        let port: number;
+        try {
+          port = await startServer(appUpdater, logger);
+        } catch (error) {
+          dialog.showErrorBox(
+            "Kalandra cannot start",
+            `Kalandra cannot start the local web server that serves its page.\n\n${String(error)}`,
+          );
+          app.quit();
+          return;
+        }
         // TODO: move up (currently crashes)
         logger.write(`info ${os.type()} ${os.release} / v${app.getVersion()}`);
         overlay.loadAppPage(port);
