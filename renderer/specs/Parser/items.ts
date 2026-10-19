@@ -1508,6 +1508,18 @@ UniqueOnUnknownBase.info = {
 };
 // #endregion UniqueOnUnknownBase
 
+// #region NormalOnTradeOnlyBase
+// Its name line names a base type that only the saved trade site item list
+// has, so the parser finds no category for it.
+export const NormalOnTradeOnlyBase = itemWithLine(
+  NormalItem,
+  "Superior Divine Crown",
+  "Superior Gladiatoral Helm",
+);
+NormalOnTradeOnlyBase.category = undefined;
+NormalOnTradeOnlyBase.info.refName = "Gladiatoral Helm";
+// #endregion NormalOnTradeOnlyBase
+
 // #region TempleTablet
 // No copied Temple Tablet text exists here: this is TwoLineOneImplicitItem with
 // its base and implicit lines replaced by the Temple Tablet's from the game data.

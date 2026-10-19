@@ -116,8 +116,7 @@ export function openWiki(item: ParsedItem) {
   window.open(`https://www.poe2wiki.net/wiki/${item.info.refName}`);
 }
 export function openPoedb(item: ParsedItem) {
-  const path = getPoe2dbPath(item);
-  window.open(`https://poe2db.tw/${POEDB_LANGS[AppConfig().language]}/${path}`);
+  window.open(poe2dbUrl(item));
 }
 export function openCoE(item: ParsedItem) {
   const encodedClipboard = encodeURIComponent(item.rawText);
@@ -154,10 +153,13 @@ function encodePoe2dbUri(text: string) {
   return text.replaceAll(/ /g, "_").replaceAll(/'/g, "");
 }
 
+function poe2dbUrl(item: ParsedItem) {
+  return `https://poe2db.tw/${POEDB_LANGS[AppConfig().language]}/${getPoe2dbPath(item)}`;
+}
+
 function getPoe2dbPath(item: ParsedItem) {
   const category = item.category;
   const refName = item.info.refName;
-  if (!category) return;
 
   if (item.rarity === ItemRarity.Unique) {
     return encodePoe2dbUri(refName);
@@ -166,8 +168,8 @@ function getPoe2dbPath(item: ParsedItem) {
   if (POE2DB_CONVERSIONS.has(refName)) {
     return POE2DB_CONVERSIONS.get(refName)! + "#ModifiersCalc";
   }
-  // if we don't have a known modifiers page for an item category
-  if (!POE2DB_CONVERSIONS.has(category)) {
+  // an item without a category, or of a category with no modifiers page
+  if (!category || !POE2DB_CONVERSIONS.has(category)) {
     return encodePoe2dbUri(refName);
   }
 
@@ -194,4 +196,5 @@ function getPoe2dbPath(item: ParsedItem) {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const __testExports = {
   encodePoe2dbUri,
+  poe2dbUrl,
 };
