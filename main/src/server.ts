@@ -1,5 +1,10 @@
 import { WebSocketServer, type WebSocket } from "ws";
-import { createServer, type IncomingMessage, type ServerResponse } from "http";
+import {
+  createServer,
+  type IncomingHttpHeaders,
+  type IncomingMessage,
+  type ServerResponse,
+} from "http";
 import { EventEmitter } from "events";
 import * as path from "path";
 import { app } from "electron";
@@ -91,6 +96,12 @@ export const eventPipe = {
   sendEventTo,
 };
 
+// The overlay window's User-Agent contains "Electron", which Host.isElectron in the renderer also tests,
+// and a page in a browser cannot change the User-Agent of its WebSocket
+function isOverlayWindow(headers: IncomingHttpHeaders): boolean {
+  return headers["user-agent"]?.includes("Electron") ?? false;
+}
+
 server.on("upgrade", (req, socket, head) => {
   if (req.url !== "/events") {
     return req.destroy();
@@ -110,11 +121,18 @@ export async function startServer(
 ): Promise<number> {
   const configStore = new ConfigStore(eventPipe);
 
-  websocketServer.on("connection", (socket) => {
+  websocketServer.on("connection", (socket, req: IncomingMessage) => {
     lastActiveClient = socket;
+    const isOverlay = isOverlayWindow(req.headers);
     socket.on("message", (bytes) => {
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const event = JSON.parse(bytes.toString("utf-8")) as IpcEvent;
+      if (!isOverlay && event.name.startsWith("OVERLAY->MAIN::")) {
+        logger.write(
+          `warn [server] Ignored ${event.name} from a page outside the overlay window`,
+        );
+        return;
+      }
       if (event.name === "CLIENT->MAIN::used-recently") {
         lastActiveClient = socket;
       }

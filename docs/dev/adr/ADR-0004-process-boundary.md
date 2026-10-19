@@ -1,6 +1,6 @@
 # ADR-0004: Only the main process reaches the operating system, and the renderer is a web page
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-19)
 
 ## Context
 
@@ -35,9 +35,10 @@ Reason: the TypeScript compiler checks every sender and every handler against on
 
 **4. An event name states its direction.** A name starts with `CLIENT->MAIN::`, `MAIN->CLIENT::`, `MAIN->OVERLAY::`
 or `OVERLAY->MAIN::`. A client is any page connected to `/events`, the overlay window or a browser tab. The overlay
-events have meaning only in the overlay window, and `onEvent` in `renderer/src/web/background/IPC.ts` skips
-`MAIN->OVERLAY` events when the page does not run in Electron. Reason: a reader of a handler sees who sends the
-message without searching for the sender.
+events have meaning only in the overlay window. `onEvent` in `renderer/src/web/background/IPC.ts` skips
+`MAIN->OVERLAY` events when the page does not run in Electron, and `server.ts` in main ignores `OVERLAY->MAIN` events
+from a client whose WebSocket User-Agent does not contain `Electron`. Reason: a reader of a handler sees who sends the
+message without searching for the sender, and a browser tab cannot move the focus or show the overlay window.
 
 **5. A new message starts as a new member of the `IpcEvent` union.** Its sender and its handler follow. Reason:
 `sendEvent` in the renderer and `onEventAnyClient` and `sendEventTo` in `main/src/server.ts` accept only members of

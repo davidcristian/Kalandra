@@ -92,7 +92,7 @@ its direction:
 | `CLIENT->MAIN::` | any client | main |
 | `MAIN->CLIENT::` | main | every client (`sendEventTo("broadcast", ...)`) or the last active one (`"last-active"`) |
 | `MAIN->OVERLAY::` | main | the overlay window; a page outside Electron does not listen for these |
-| `OVERLAY->MAIN::` | the overlay window | main |
+| `OVERLAY->MAIN::` | the overlay window | main, which ignores these from a page outside Electron |
 
 The last active client is the one that most recently connected or sent `CLIENT->MAIN::used-recently`, or the only
 client left after another one disconnects. A new message starts as a new member of the `IpcEvent` union, then gets

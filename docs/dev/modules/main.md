@@ -29,7 +29,8 @@ The entry, the server and the app services, in `main/src/`:
   returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
   client. A new client receives the log history and the current updater state, which the first update check can
-  change after the page reads `GET /config`. The routes are in
+  change after the page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and logged unless the client's
+  WebSocket upgrade request has `Electron` in its User-Agent, as the overlay window's does. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
   address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
@@ -199,8 +200,8 @@ universal dmg on macOS, and publishes to GitHub releases.
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
 `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version, and
-`start-server.test.ts` calls `startServer()` with a fake updater and reads `GET /config` and the first `/events`
-messages.
+`start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
+messages, and sends overlay events with the User-Agent of the overlay window, of a browser and with none.
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
 key press to the text in the box. `key-log.test.ts` sends key events through the fake global hook of
 `fake-hook.ts` and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of

@@ -68,6 +68,23 @@ export async function openSocket(
   });
 }
 
+// Resolves an open /events client that sends the page's own origin and this User-Agent, or none
+export async function openClient(
+  port: number,
+  userAgent?: string,
+): Promise<WebSocket> {
+  return await new Promise((resolve, reject) => {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
+      origin: `http://127.0.0.1:${port}`,
+      headers: userAgent ? { "user-agent": userAgent } : {},
+    });
+    socket.on("open", () => {
+      resolve(socket);
+    });
+    socket.on("error", reject);
+  });
+}
+
 // Resolves the first `count` messages a new /events client receives, or those that came within 2 seconds
 export async function firstMessages(
   port: number,
