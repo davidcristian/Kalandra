@@ -33,6 +33,7 @@ const POSSIBLE_PATH =
         : [];
 
 export class GameLogWatcher {
+  // The logFile whose file is open or opening; null makes the next restart open it again
   private _wantedPath: string | null = null;
   get actualPath() {
     return this._state?.path ?? null;
@@ -50,6 +51,7 @@ export class GameLogWatcher {
     private server: ServerEvents,
     private logger: Logger,
     private fileWriter: FileWriter,
+    private possiblePaths: readonly string[] = POSSIBLE_PATH,
   ) {
     this.server.onEventAnyClient("CLIENT->MAIN::re-parse-log", async () => {
       if (this._state) {
@@ -71,6 +73,7 @@ export class GameLogWatcher {
   async restart(logFile: string, readLog: boolean) {
     if (!readLog) {
       this.logger.write("info [GameLogWatcher] disabled");
+      this._wantedPath = null;
       if (this._state) {
         unwatchFile(this._state.path);
         await this._state.file.close();
@@ -91,15 +94,16 @@ export class GameLogWatcher {
     }
 
     if (!logFile.length) {
-      const guessedPath = await guessFileLocation(POSSIBLE_PATH);
+      const guessedPath = await guessFileLocation(this.possiblePaths);
       if (guessedPath) {
         logFile = guessedPath;
       } else {
+        this._wantedPath = null;
         if (guessedPath === null) {
           this.logger.write(
             "error [GameLogWatcher] Found 2 log files, please enter one into settings:",
           );
-          for (const path of POSSIBLE_PATH) {
+          for (const path of this.possiblePaths) {
             this.logger.write(`\n ${path}`);
           }
         } else {
@@ -121,6 +125,7 @@ export class GameLogWatcher {
         readBuff: Buffer.allocUnsafe(64 * 1024),
       };
     } catch {
+      this._wantedPath = null;
       this.logger.write("error [GameLogWatcher] Failed to watch file.");
     }
   }

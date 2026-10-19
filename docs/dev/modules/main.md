@@ -125,8 +125,9 @@ The entry, the server and the app services, in `main/src/`:
 - `GameLogWatcher.ts`: `GameLogWatcher.restart(logFile, readLog)` follows `Client.txt` only when `readLog` is
   true. With no path it tries the standalone and Steam install folders for the platform, and when both exist it
   logs an error that asks for a path. It polls the file every 450 ms with `fs.watchFile`, starts at the end of the
-  file, and sends new non-empty lines as `MAIN->CLIENT::game-log`. `CLIENT->MAIN::re-parse-log` reads the file
-  again from the start.
+  file, and sends new non-empty lines as `MAIN->CLIENT::game-log`. A restart with the same `logFile` keeps the
+  open file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again.
+  `CLIENT->MAIN::re-parse-log` reads the file again from the start.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection
   on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`

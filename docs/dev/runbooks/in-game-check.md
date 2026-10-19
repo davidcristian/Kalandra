@@ -190,13 +190,15 @@ it.
   by default. With "PoE log file" empty, main looks in the Windows folders that
   [Settings](../../settings.md#general) lists (`main/src/host-files/GameLogWatcher.ts`). Save.
 - **Press:** open the overlay and click XP in the main button bar. Enter a new area, then gain a level.
+  Uncheck the setting, Save, check it again, Save, and enter another area.
 - **See:** the widget shows the character level, `Exp` and `Over`. `Exp` and `Over` follow the
   area level, which changes when the game writes `Generating level <n> area "<id>" with seed <n>`
   for a new area. The character level changes when the game writes
   `<name> (<class>) is now level <n>`. Both patterns are `LOG_ZONE_GEN` and `LOG_LEVEL_UP` in
   `renderer/public/data/en/client_strings.js`. An area whose id contains `town` or `hideout`
   leaves the area level as it was (`renderer/src/web/client-log/client-log.ts`). Main reads only
-  the lines written after it opened the file, and looks for new ones every 450 ms.
+  the lines written after it opened the file, and looks for new ones every 450 ms. The area level
+  also follows the area entered after the setting was turned off and on again.
 - **Logs:**
   - `info [GameLogWatcher] disabled` when the setting is off.
   - `error [GameLogWatcher] No log file found` when neither path exists.

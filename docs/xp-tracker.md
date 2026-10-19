@@ -22,7 +22,7 @@ default.
 
 The same checkbox and the `PoE log file` field are also on the `General` page. A click on `Save` while
 `Allow reading of Client.txt file` is unchecked hides the widget and removes the `XP` button. Checking it and
-clicking `Save` adds the button back.
+clicking `Save` adds the button back, and Kalandra reads the log again.
 
 ### Find the log file
 
@@ -35,7 +35,8 @@ If the widget does not update, open the Settings window and go to `Debug`:
 - `Found 2 log files, please enter one into settings:` means that both the standalone and the Steam file exist.
 - `Failed to watch file.` means that Kalandra could not open the log file.
 
-In each case, enter the full path of your `Client.txt` in `PoE log file` and click `Save`.
+In each case, enter the full path of your `Client.txt` in `PoE log file` and click `Save`. Each click on `Save`
+looks for the file again, even when the field has not changed, for example after the game has created the file.
 
 ### What Kalandra reads
 
