@@ -1,4 +1,4 @@
-import { promises as fs, watchFile, unwatchFile, type BigIntStats } from "fs";
+import { promises as fs, watchFile, unwatchFile } from "fs";
 import path from "path";
 import { app } from "electron";
 import { guessFileLocation } from "./utils";
@@ -33,12 +33,15 @@ const POSSIBLE_PATH =
           ]
         : [];
 
-async function statIfExists(file: string): Promise<BigIntStats | null> {
+// The path holds no file between a delete and the game writing the file again. Windows fails an
+// open with EPERM while the delete runs (measured on Node 24).
+async function ifExists<T>(operation: Promise<T>): Promise<T | null> {
   try {
-    return await fs.stat(file, { bigint: true });
+    return await operation;
   } catch (err) {
-    // The path is missing between a delete and the game writing the file again
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return null;
+    if (code === "EPERM" && process.platform === "win32") return null;
     throw err;
   }
 }
@@ -150,9 +153,12 @@ export class GameLogWatcher {
   // The user can empty or delete the log while it is open, and the game then writes a new one
   private async followFile(state: WatchState) {
     const open = await state.file.stat({ bigint: true });
-    const onDisk = await statIfExists(state.path);
-    if (onDisk && (onDisk.ino !== open.ino || onDisk.dev !== open.dev)) {
-      const file = await fs.open(state.path, "r");
+    const onDisk = await ifExists(fs.stat(state.path, { bigint: true }));
+    const isReplaced =
+      onDisk !== null && (onDisk.ino !== open.ino || onDisk.dev !== open.dev);
+    // A delete between the stat and the open leaves the open file in use
+    const file = isReplaced ? await ifExists(fs.open(state.path, "r")) : null;
+    if (file) {
       if (this._state !== state) {
         await file.close();
         return;

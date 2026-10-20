@@ -149,10 +149,11 @@ The entry, the server and the app services, in `main/src/`:
   sends new non-empty lines as `MAIN->CLIENT::game-log`. `LineSplitter.ts` keeps a partial line until the game writes
   the rest, so a line or a character that the end of a 64 KiB read cuts is sent whole, and it skips a line longer than
   64 KiB with a warning. Each time it reads, it first compares the open file with the path: when the file is shorter
-  than the read position, or the path holds another file, it reads from the start. A restart with the same `logFile`
-  keeps the open file. After a restart with `readLog` false, or one that found or opened no file, it opens the file
-  again. `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read
-  in progress after its current chunk, and a failed read is logged.
+  than the read position, or the path holds another file, it reads from the start. When the path holds no file, or
+  its new file is deleted before it opens, it reads the open file. A restart with the same `logFile` keeps the open
+  file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again.
+  `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read in
+  progress after its current chunk, and a failed read is logged.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection
   on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`
@@ -220,7 +221,8 @@ images and other files to the `/uploads/` routes, and an image while a file hold
 write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
 `FileWriter.test.ts` read and write real files in a temporary folder and send client events through the fake server
 in `fake-server.ts`, whose `emit` settles when the promises the handlers return settle. `FileWriter.test.ts` also
-delays the first file write to check that lines keep their order.
+delays the first file write to check that lines keep their order. `GameLogWatcher.test.ts` also deletes a new log
+as the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete.
 A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
 `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
 workflow packages main on all three platforms.

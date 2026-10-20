@@ -36,6 +36,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await watcher.restart("", false);
+  vi.restoreAllMocks();
   await fs.rm(folder, { recursive: true, force: true });
 });
 
@@ -209,4 +210,58 @@ describe("GameLogWatcher after the log changes on disk", () => {
     );
     expect(logger.history).not.toContain("Failed to read");
   });
+
+  // Writes a new log, then deletes it as the watcher opens it, and fails that open with openError
+  async function reparseWhileNewLogIsDeleted(openError?: Error) {
+    const file = path.join(folder, "Client.txt");
+    await fs.writeFile(file, "an old line\n");
+    await watcher.restart(file, true);
+    await fs.rm(file);
+    await fs.writeFile(file, "a new line\n");
+
+    const open = fs.open;
+    vi.spyOn(fs, "open").mockImplementationOnce(async (...args) => {
+      await fs.rm(file);
+      if (openError) throw openError;
+      return await open(...args);
+    });
+    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+  }
+
+  function epermError(): Error {
+    const err = new Error("EPERM: operation not permitted, open");
+    return Object.assign(err, { code: "EPERM" });
+  }
+
+  it("reads the file it has open when the new log is deleted before it opens", async () => {
+    await reparseWhileNewLogIsDeleted();
+
+    await vi.waitFor(() =>
+      expect(server.gameLogLines()).toEqual(["an old line"]),
+    );
+    expect(logger.history).not.toContain("Failed to read");
+  });
+
+  it.runIf(process.platform === "win32")(
+    "reads the file it has open when Windows fails the open of the new log as it deletes it",
+    async () => {
+      await reparseWhileNewLogIsDeleted(epermError());
+
+      await vi.waitFor(() =>
+        expect(server.gameLogLines()).toEqual(["an old line"]),
+      );
+      expect(logger.history).not.toContain("Failed to read");
+    },
+  );
+
+  it.skipIf(process.platform === "win32")(
+    "logs a failed read when the open of the new log fails with EPERM outside Windows",
+    async () => {
+      await reparseWhileNewLogIsDeleted(epermError());
+
+      await vi.waitFor(() =>
+        expect(logger.history).toContain("Failed to read the log file: EPERM"),
+      );
+    },
+  );
 });
