@@ -10,6 +10,7 @@ import type {
   CatalystGroup,
 } from "./interfaces";
 import { loadClientStrings } from "../client-string-loader";
+import { fetchData } from "./fetch-data";
 import { lineStartsByHash } from "./hash-index";
 import { markItemDataLoaded } from "./loads";
 import { type StatMatch, statsByMatcherText } from "./stats-by-matcher";
@@ -156,24 +157,14 @@ function itemNamesFromLines(items: Generator<BaseType>) {
 }
 
 async function loadItems(language: string) {
-  const ndjson = await (
-    await fetch(`${import.meta.env.BASE_URL}data/${language}/items.ndjson`)
-  ).text();
+  const ndjson = await (await fetchData(`${language}/items.ndjson`)).text();
 
   const INDEX_WIDTH = 2;
   const indexNames = new Uint32Array(
-    await (
-      await fetch(
-        `${import.meta.env.BASE_URL}data/${language}/items-name.index.bin`,
-      )
-    ).arrayBuffer(),
+    await (await fetchData(`${language}/items-name.index.bin`)).arrayBuffer(),
   );
   const indexRefNames = new Uint32Array(
-    await (
-      await fetch(
-        `${import.meta.env.BASE_URL}data/${language}/items-ref.index.bin`,
-      )
-    ).arrayBuffer(),
+    await (await fetchData(`${language}/items-ref.index.bin`)).arrayBuffer(),
   );
 
   function commonFind(index: Uint32Array, prop: "name" | "refName") {
@@ -216,23 +207,15 @@ async function loadItems(language: string) {
 }
 
 async function loadStats(language: string) {
-  const ndjson = await (
-    await fetch(`${import.meta.env.BASE_URL}data/${language}/stats.ndjson`)
-  ).text();
+  const ndjson = await (await fetchData(`${language}/stats.ndjson`)).text();
 
   const INDEX_WIDTH = 2;
   const indexRef = new Uint32Array(
-    await (
-      await fetch(
-        `${import.meta.env.BASE_URL}data/${language}/stats-ref.index.bin`,
-      )
-    ).arrayBuffer(),
+    await (await fetchData(`${language}/stats-ref.index.bin`)).arrayBuffer(),
   );
   const indexMatcher = new Uint32Array(
     await (
-      await fetch(
-        `${import.meta.env.BASE_URL}data/${language}/stats-matcher.index.bin`,
-      )
+      await fetchData(`${language}/stats-matcher.index.bin`)
     ).arrayBuffer(),
   );
 
@@ -263,12 +246,8 @@ export function stat(text: string) {
 
 export async function init(lang: string) {
   CLIENT_STRINGS_REF = await loadClientStrings("en");
-  ITEM_DROP = await (
-    await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)
-  ).json();
-  APP_PATRONS = await (
-    await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)
-  ).json();
+  ITEM_DROP = await (await fetchData("item-drop.json")).json();
+  APP_PATRONS = await (await fetchData("patrons.json")).json();
 
   await loadForLang(lang);
 

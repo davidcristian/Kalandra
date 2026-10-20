@@ -1,5 +1,6 @@
 import { createI18n, Composer as I18n, useI18n } from "vue-i18n";
 import { nextTick } from "vue";
+import { fetchData } from "@/assets/data/fetch-data";
 
 let _global: I18n;
 
@@ -12,9 +13,7 @@ export async function init(lang: string) {
     fallbackWarn: false,
     missingWarn: false,
     messages: {
-      en: await (
-        await fetch(`${import.meta.env.BASE_URL}data/en/app_i18n.json`)
-      ).json(),
+      en: await (await fetchData("en/app_i18n.json")).json(),
     },
   });
   _global = plugin.global;
@@ -24,9 +23,7 @@ export async function init(lang: string) {
 
 export async function loadLang(lang: string): Promise<void> {
   if (lang !== "en") {
-    const messages = await (
-      await fetch(`${import.meta.env.BASE_URL}data/${lang}/app_i18n.json`)
-    ).json();
+    const messages = await (await fetchData(`${lang}/app_i18n.json`)).json();
     _global.setLocaleMessage(lang, messages);
   }
   const prevLang = _global.locale.value;

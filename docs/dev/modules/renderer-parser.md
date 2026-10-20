@@ -65,7 +65,9 @@ A module exports the internal functions its tests call as `__testExports` (`Pars
 ## The game data
 
 [renderer/src/assets/data/index.ts](../../../renderer/src/assets/data/index.ts) loads the files under
-`renderer/public/data/` over HTTP from the page's own server and exposes them as module variables.
+`renderer/public/data/` over HTTP from the page's own server and exposes them as module variables. It and
+`web/i18n.ts` fetch each file with `fetchData(file)` from `fetch-data.ts`, which throws a `DataLoadError` with the
+file and the status when the server does not return it, so a missing index file fails the load.
 
 - `init(lang)` runs once from `renderer/src/main.ts`. It loads `CLIENT_STRINGS_REF` (the English client strings),
   `item-drop.json` and `patrons.json`, then calls `loadForLang(lang)`. A change to the language setting calls
@@ -149,7 +151,8 @@ through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
 below the floor in `renderer/vitest.config.ts` (53.1% of the lines of `src/` on 20 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
-text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
+text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader,
+and `specs/data/fetchData.test.ts` a data file that the server does not return.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces
 `@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` returns the trade site's
 `data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no test
