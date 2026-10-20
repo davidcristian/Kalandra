@@ -88,10 +88,11 @@ The entry, the server and the app services, in `main/src/`:
   (`POLL_DELAY`) after the first delay, for at most 500 ms (`POLL_LIMIT`). It resolves with text that starts as
   `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and rejects. On Linux it always
   writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard" feature and a Proton 10 bug
-  (linked in the code). With Restore clipboard on it writes the previous text back. `restoreShortly(cb)` runs `cb`
+  (linked in the code). With Restore clipboard on it writes the previous text back. On Linux it also does so after a
+  failed read that leaves the marker, unless the previous text was empty or item text. `restoreShortly(cb)` runs `cb`
   and, with Restore clipboard on, restores the clipboard after 120 ms (`RESTORE_AFTER`). It drops a call that comes
-  within those 120 ms, to avoid the game's "Too many actions" disconnects. `LANGUAGE_DETECTOR` holds the first line
-  of copied item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
+  within those 120 ms, to avoid the game's "Too many actions" disconnects. `LANGUAGE_DETECTOR` holds the first line of
+  copied item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
 - `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. It presses `Enter`, then
   `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
   When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
@@ -215,7 +216,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (59.5% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (61.9% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once. `AppUpdater.test.ts`
@@ -223,12 +224,12 @@ creates the updater with a fake electron-updater whose check finds a new version
 calls `startServer()` with a fake updater, reads `GET /config` and the first `/events` messages, sends overlay events
 with the User-Agent of the overlay window, of a browser and with none, sends messages main cannot use, and sends
 client log entries from the overlay window and a browser tab. `client-log-writer.test.ts` picks the writer from lists
-of fake clients. `RemoteLogger.test.ts` writes more entries than the history keeps. `text-box.test.ts` types chat
-commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each key press to the text in the box.
-`stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that records
-the window each key press reaches. `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts`
-and reads the log lines. `shortcuts.test.ts` registers hotkeys through the fake `globalShortcut` of
-`fake-global-shortcut.ts`, which throws on a key name it does not know. `overlay-keys.test.ts` names a key press with
+of fake clients. `RemoteLogger.test.ts` writes more entries than the history keeps. `HostClipboard.test.ts` reads item
+text from a fake clipboard on each platform. `text-box.test.ts` types chat commands into the fake clipboard and chat
+box of `fake-chat.ts`, which applies each key press to the text in the box. `stash-search.test.ts` runs stash searches
+through `OverlayWindow` and `GameWindow` with a fake desktop that records the window each key press reaches.
+`key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
+`shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts`. `overlay-keys.test.ts` names a key press with
 each combination of modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends
 `..` paths, foreign origins and host names to the HTTP routes and to `/events`, and paths and methods that no route
 serves. `file-uploads.test.ts` posts images and other files to the `/uploads/` routes, and an image while a file holds

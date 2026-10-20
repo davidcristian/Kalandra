@@ -35,6 +35,7 @@ export class HostClipboard {
     }
 
     let textBefore = clipboard.readText();
+    let marker: string | null = null;
     if (isPoeItem(textBefore)) {
       textBefore = "";
       if (process.platform !== "linux") {
@@ -42,11 +43,11 @@ export class HostClipboard {
       } else {
         // workaround KDE's "Prevent empty clipboard" feature
         // see https://github.com/SnosMe/awakened-poe-trade/issues/1790#issuecomment-4062830614 (please don't comment on, add issue in Kalandra if discussion is requested)
-        clipboard.writeText(`__EE2_FORCE_EMPTY_${Date.now()}`);
+        marker = writeMarker();
       }
     } else if (process.platform === "linux") {
       // workaround bug in Proton 10+ https://github.com/SnosMe/awakened-poe-trade/issues/1846 (please don't comment on, add issue in Kalandra if discussion is requested)
-      clipboard.writeText(`__EE2_FORCE_EMPTY_${Date.now()}`);
+      marker = writeMarker();
     }
 
     this.pollPromise = new Promise((resolve, reject) => {
@@ -64,7 +65,11 @@ export class HostClipboard {
           if (this.elapsed < POLL_LIMIT) {
             setTimeout(poll, POLL_DELAY);
           } else {
-            if (this.shouldRestore) {
+            // On Linux the marker replaced the copied text, which goes back even with Restore clipboard off.
+            // No empty text is written back, since the KDE workaround above avoids an empty clipboard.
+            const markerReplacedText =
+              textAfter === marker && textBefore !== "";
+            if (this.shouldRestore || markerReplacedText) {
               clipboard.writeText(textBefore);
             }
             this.pollPromise = undefined;
@@ -105,6 +110,12 @@ export class HostClipboard {
   updateDelay(delay: number) {
     this.initialDelay = delay;
   }
+}
+
+function writeMarker() {
+  const marker = `__EE2_FORCE_EMPTY_${Date.now()}`;
+  clipboard.writeText(marker);
+  return marker;
 }
 
 function isPoeItem(text: string) {
