@@ -3,12 +3,14 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [docs/stash-search.md](../../../stash-search.md)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-20
 
 **Claims.** `stashSearch` in `main/src/shortcuts/text-box.ts` focuses the game, puts the text on the
-clipboard, and presses Ctrl + F, Ctrl + V and Enter. With Restore clipboard ticked in Settings,
-General, it puts the old clipboard text back 120 ms later (`restoreShortly` in
-`main/src/shortcuts/HostClipboard.ts`). The game does the rest.
+clipboard, and presses Ctrl + F, Ctrl + V and Enter. When the game window does not have the focus
+after that, `focusGameFor` in `main/src/windowing/OverlayWindow.ts` logs
+`warn [Overlay] Skipped a stash search because the game window does not have the focus` and nothing
+is pressed. With Restore clipboard ticked in Settings, General, it puts the old clipboard text back
+120 ms later (`restoreShortly` in `main/src/shortcuts/HostClipboard.ts`). The game does the rest.
 [docs/stash-search.md](../../../stash-search.md) and [docs/item-info.md](../../../item-info.md)
 say:
 
@@ -28,7 +30,8 @@ say:
 Settings, Hotkeys (it has no default), open Item info on an item, and click Find in Stash. Repeat
 with a vendor window open. Try a search with quotes and one regular expression from the guide.
 Click the dollar sign on items with a price note whose note and name, without quotes, have 46 and
-47 characters together.
+47 characters together. Open Kalandra's page with the tray's Open in Browser, click a search there,
+and check that nothing is typed into the browser and that Settings, Debug shows the warning.
 
 **Pass.** Each claim holds, and the game's own limit for the search box is noted.
 
@@ -39,3 +42,5 @@ History line.
 
 - 2026-10-18: Filed from the claims the writers of docs/stash-search.md and docs/item-info.md could
   not settle from the code, which only presses keys.
+- 2026-10-20: Added the claim that a search presses nothing while the game window does not have the
+  focus, such as after a click in a browser tab.

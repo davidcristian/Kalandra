@@ -113,6 +113,17 @@ export class OverlayWindow {
     }
   };
 
+  // Keys go to the window with the focus, which is the browser after a click in a browser tab
+  focusGameFor = (action: string): boolean => {
+    this.assertGameActive();
+    if (!this.poeWindow.isActive) {
+      this.logger.write(
+        `warn [Overlay] Skipped ${action} because the game window does not have the focus`,
+      );
+    }
+    return this.poeWindow.isActive;
+  };
+
   toggleActiveState = () => {
     this.isOverlayKeyUsed = true;
     if (this.isInteractable) {

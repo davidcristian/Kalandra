@@ -60,7 +60,7 @@ export function stashSearch(
   overlay: OverlayWindow,
 ) {
   clipboard.restoreShortly((clipboard) => {
-    overlay.assertGameActive();
+    if (!overlay.focusGameFor("a stash search")) return;
     clipboard.writeText(text);
     uIOhook.keyTap(Key.F, [Key.Ctrl]);
 

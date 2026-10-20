@@ -98,8 +98,8 @@ The entry, the server and the app services, in `main/src/`:
   `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text
   ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With
   `send` it presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring back the last chat line.
-  `stashSearch(text, clipboard, overlay)` focuses the game, presses `Ctrl + F`, pastes the text and presses
-  `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
+  `stashSearch(text, clipboard, overlay)` calls `overlay.focusGameFor()` and, when the game window has the focus,
+  presses `Ctrl + F`, pastes the text and presses `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
 - `key-log.ts`: `logKeyPresses(logger, gameWindow, isOn)` logs `debug [Shortcuts] Keydown <keys>` and
   `debug [Shortcuts] Keyup <key>` for each key the `uiohook-napi` global hook reports while `isOn()` returns true
   and the game window is active. It leaves out the keys typed in other programs, which the global hook also reports.
@@ -111,7 +111,9 @@ The entry, the server and the app services, in `main/src/`:
   go to the default browser. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server
   in development, or with `--no-overlay` (no window) opens it in the default browser. `assertOverlayActive()`,
   `assertGameActive()` and `toggleActiveState()` move the focus between the overlay and the game, and
-  `isInteractable` is true while the overlay has it. While the overlay has focus the hotkeys are not registered,
+  `isInteractable` is true while the overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns
+  whether the game window has the focus, and logs `warn [Overlay] Skipped <action>` when it does not, since keys go
+  to the window with the focus, such as a browser. While the overlay has focus the hotkeys are not registered,
   so the window's `before-input-event` handler checks each key press with `overlayKeyCommand()`: `Escape` and
   `Ctrl + W` return to the game, and the overlay key toggles the focus. `updateOpts()` attaches the window to the game window. With `hideOverlayOnBlur`, the window is hidden rather than transparent
   while the overlay is not active and either the game is not active or the page sent
@@ -220,7 +222,8 @@ messages, sends overlay events with the User-Agent of the overlay window, of a b
 messages main cannot use, and sends client log entries from the overlay window and a browser tab.
 `client-log-writer.test.ts` picks the writer from lists of fake clients.
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
-key press to the text in the box. `key-log.test.ts` sends key events through the fake global hook of
+key press to the text in the box. `stash-search.test.ts` runs stash searches through `OverlayWindow` and
+`GameWindow` with a fake desktop that records the window each key press reaches. `key-log.test.ts` sends key events through the fake global hook of
 `fake-hook.ts` and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of
 modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign
 origins and host names to the HTTP routes and to `/events`, and paths and methods that no route serves.

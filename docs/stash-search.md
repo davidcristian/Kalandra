@@ -24,6 +24,10 @@ widget has no title, shows `Untitled`, and starts with one search, `Currency`. Y
 When you click a search, Kalandra switches to the game, presses `Ctrl + F` to select the search box, pastes the
 text with `Ctrl + V` (`Cmd + V` on macOS) and presses `Enter`.
 
+Kalandra presses these keys only when the game window has the focus after the switch. When it does not, such as
+after a click in Kalandra's page in a web browser, Kalandra skips the search and writes
+`Skipped a stash search because the game window does not have the focus` to its log, on the **Debug** settings page.
+
 The text goes through the clipboard, so after a search the clipboard holds the search text. To get your previous
 clipboard text back after each search, check `Restore clipboard` in Settings, `General`. Kalandra skips a search
 that comes less than 120 ms after the previous search or [chat command](/chat-commands).
