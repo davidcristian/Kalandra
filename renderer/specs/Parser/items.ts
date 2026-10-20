@@ -1735,3 +1735,14 @@ Gegenstandsstufe: 81
   ItemRarity.Unique,
 );
 // #endregion SharedNameItems
+
+// #region MagicNameWithHashOfAnotherItem
+// From MagicItem, its name line changed: "ITEM::Milarofilegu" has the same 32-bit
+// FNV-1a hash as "ITEM::Sapphire Ring", so the item index has a row for its first
+// word that points to another item.
+export const MagicNameWithHashOfAnotherItem = itemWithLine(
+  MagicItem,
+  "Crackling Temple Maul of the Brute",
+  "Milarofilegu Temple Maul of the Brute",
+);
+// #endregion MagicNameWithHashOfAnotherItem

@@ -6,6 +6,7 @@ import { parseClipboard } from "@/parser";
 import { ModifierType } from "@/parser/modifiers";
 import {
   CharmQuality,
+  MagicNameWithHashOfAnotherItem,
   ModifierIncreaseUnknownFormat,
   ModifierLineUnknownFormat,
   NormalItem,
@@ -159,5 +160,16 @@ describe("Parse lines the game data does not match", () => {
     expect(sockets.augments.map((augment) => augment?.refName)).toEqual(
       expected.augments.map((augment) => augment?.refName),
     );
+  });
+
+  it("finds the base of a magic item whose name has a word with another item's hash", () => {
+    const item = parseClipboard(MagicNameWithHashOfAnotherItem.rawText);
+
+    expect(item.isOk()).toBe(true);
+    const parsedItem = item._unsafeUnwrap();
+    expect(parsedItem.info.refName).toBe(
+      MagicNameWithHashOfAnotherItem.info.refName,
+    );
+    expect(parsedItem.category).toBe(MagicNameWithHashOfAnotherItem.category);
   });
 });

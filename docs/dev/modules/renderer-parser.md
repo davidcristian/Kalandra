@@ -104,7 +104,8 @@ A lookup hashes its key with `@sindresorhus/fnv1a`, binary searches the index fi
 starts there. The item index files have one row per namespace and `refName`, so items that share a translated name
 have rows with the same hash. An item lookup reads the line of each such row (`lineStartsByHash` in `hash-index.ts`)
 in file order, and after each line the following lines with the same namespace and name while each record has a
-`unique` or `disc` (variant) field. It returns every item with the name and every variant of each.
+`unique` or `disc` (variant) field. It returns every item with the name and every variant of each, and `undefined`
+when no line it reads has the name, as for a key whose hash only another item's key has.
 The stats matcher index has one row per matcher text, so stats that share a text have rows with the same hash.
 `STAT_BY_MATCH_STR` (`statsByMatcherText` in `stats-by-matcher.ts`) reads the line of each such row once, in file
 order, and keeps each stat with a matcher whose text is exactly the key, which skips a row for another text with the

@@ -189,7 +189,7 @@ async function loadItems(language: string) {
         }
         readUntil = start;
       }
-      return out;
+      return out.length ? out : undefined;
     };
   }
 
