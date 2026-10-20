@@ -33,7 +33,8 @@ const routes: HttpRoutes = new EventEmitter<{
   request: [IncomingMessage, ServerResponse];
 }>();
 const server = createServer((req, res) => routes.emit("request", req, res));
-const logger = new Logger(new FakeServer());
+const events = new FakeServer();
+const logger = new Logger(events);
 let port = 0;
 
 const md5 = (text: string) =>
@@ -49,7 +50,7 @@ beforeAll(async () => {
 
 beforeEach(() => {
   fs.rmSync(uploads, { recursive: true, force: true });
-  logger.history = "";
+  events.sent.length = 0;
 });
 
 afterAll(() => {
@@ -84,7 +85,9 @@ describe("POST /uploads/<name>", () => {
 
       expect(reply.status).toBe(415);
       expect(fs.existsSync(uploads)).toBe(false);
-      expect(logger.history).toContain("warn [uploads] Not an image file");
+      expect(events.logEntries().join("")).toContain(
+        "warn [uploads] Not an image file",
+      );
     },
   );
 
@@ -95,6 +98,6 @@ describe("POST /uploads/<name>", () => {
     const reply = await post(port, "/uploads/cheat-sheet.png", "image");
 
     expect(reply.status).toBe(500);
-    expect(logger.history).toContain("error [uploads]");
+    expect(events.logEntries().join("")).toContain("error [uploads]");
   });
 });

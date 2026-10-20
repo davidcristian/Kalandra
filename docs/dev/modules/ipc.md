@@ -34,7 +34,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::ocr-text` | `target`, `pressTime`, `ocrTime`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
-| `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history to a new client | `Host` (`Host.logs`) |
+| `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`) |
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
 | `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |

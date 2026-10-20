@@ -27,6 +27,12 @@ export class FakeServer implements ServerEvents {
     await Promise.all(handlers.map((cb) => cb(payload)));
   }
 
+  logEntries(): string[] {
+    return this.sent.flatMap((event) =>
+      event.name === "MAIN->CLIENT::log-entry" ? [event.payload.message] : [],
+    );
+  }
+
   gameLogLines(): string[] {
     return this.sent.flatMap((event) =>
       event.name === "MAIN->CLIENT::game-log" ? event.payload.lines : [],
