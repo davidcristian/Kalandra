@@ -31,6 +31,7 @@ the file in **PoE log file** to fix this.
   on again, or after a new **Output Folder** is saved, which starts the file in that folder. So the file holds the
   entries since the latest of these.
 - The entries are in the order of their lines in `Client.txt`.
+- Kalandra writes each entry once, also when its page is open in a browser tab next to the overlay.
 - Kalandra matches the `level-up` line in the language of the **Language** setting, and the lines of every other
   type in English.
 

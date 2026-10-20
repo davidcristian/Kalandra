@@ -113,6 +113,9 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   visibility or area tracking. `server.ts` also ignores and logs an `OVERLAY->MAIN::` message from a client whose
   WebSocket upgrade request has no `Electron` in its User-Agent, so a browser tab cannot move the focus to the game
   or show the overlay window.
+- Every page handles `MAIN->CLIENT::game-log` and sends the same `client-log-event` entries, so `server.ts` passes
+  on those of one client only: the newest overlay window, or the last active client when no overlay window is
+  connected (`clientLogWriter()` in `main/src/client-log-writer.ts`).
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
 - Neither end checks a payload. `server.ts` ignores and logs a message that is not JSON, has no string `name` or

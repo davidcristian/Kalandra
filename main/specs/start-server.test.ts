@@ -1,6 +1,7 @@
 import { app } from "electron";
 import * as fs from "fs";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import type WebSocket from "ws";
 import type { IpcEvent, UpdateInfo } from "../../ipc/types";
 import { Logger } from "../src/RemoteLogger";
 import { onEventAnyClient, server, startServer } from "../src/server";
@@ -24,6 +25,7 @@ const BROWSER_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 const logger = new Logger(new FakeServer());
 const handled: IpcEvent["name"][] = [];
+const clientLogEntries: number[] = [];
 let lastEventHandled = () => {};
 let port = 0;
 
@@ -41,6 +43,9 @@ beforeAll(async () => {
   onEventAnyClient("CLIENT->MAIN::re-parse-log", () => {
     throw new Error("the handler failed");
   });
+  onEventAnyClient("CLIENT->MAIN::write-data", (e) => {
+    if (e.action === "client-log-event") clientLogEntries.push(e.data.ms);
+  });
 });
 
 afterAll(() => {
@@ -48,12 +53,8 @@ afterAll(() => {
   fs.rmSync(app.getPath("userData"), { recursive: true, force: true });
 });
 
-// Sends these texts and then a client event from one client, and resolves when main has handled that event
-async function sendMessages(
-  texts: string[],
-  userAgent?: string,
-): Promise<void> {
-  const socket = await openClient(port, userAgent);
+// Sends these texts and then a client event, and resolves when main has handled that event
+async function sendFrom(socket: WebSocket, texts: string[]): Promise<void> {
   const lastEvent = new Promise<void>((resolve) => {
     lastEventHandled = resolve;
   });
@@ -65,7 +66,27 @@ async function sendMessages(
     socket.send(text);
   }
   await lastEvent;
+}
+
+async function sendMessages(
+  texts: string[],
+  userAgent?: string,
+): Promise<void> {
+  const socket = await openClient(port, userAgent);
+  await sendFrom(socket, texts);
   socket.close();
+}
+
+function clientLogEntry(ms: number): string {
+  const event: IpcEvent = {
+    name: "CLIENT->MAIN::write-data",
+    payload: {
+      action: "client-log-event",
+      data: { ts: 0, ms, type: "game-start" },
+      close: false,
+    },
+  };
+  return JSON.stringify(event);
 }
 
 // Sends two overlay events, and resolves those main handled
@@ -157,5 +178,19 @@ describe("a message main cannot use", () => {
     expect(await logLinesFor(JSON.stringify(event))).toContain(
       "error [server] Handling CLIENT->MAIN::re-parse-log failed: the handler failed",
     );
+  });
+});
+
+describe("client log entries", () => {
+  it("are passed on only from the overlay window when a browser tab sends them too", async () => {
+    clientLogEntries.length = 0;
+    const overlay = await openClient(port, OVERLAY_USER_AGENT);
+    // The tab connects last, so it is the last active client
+    const tab = await openClient(port, BROWSER_USER_AGENT);
+    await sendFrom(tab, [clientLogEntry(1)]);
+    await sendFrom(overlay, [clientLogEntry(2)]);
+    overlay.close();
+    tab.close();
+    expect(clientLogEntries).toEqual([2]);
   });
 });

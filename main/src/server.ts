@@ -13,6 +13,7 @@ import { ConfigStore } from "./host-files/ConfigStore";
 import { listenWithFallback, readListenOption } from "./listen-option";
 import { sendFile } from "./served-file";
 import { isAllowedRequest } from "./request-origin";
+import { clientLogWriter } from "./client-log-writer";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
 
@@ -34,6 +35,7 @@ export const server = createServer((req, res) => {
 });
 const websocketServer = new WebSocketServer({ noServer: true });
 let lastActiveClient: WebSocket;
+const overlayClients = new WeakSet<WebSocket>();
 
 // The /config route in startServer(), addFileUploadRoutes() and HttpProxy answer these paths
 function hasOwnRoute(url: string): boolean {
@@ -155,6 +157,7 @@ export async function startServer(
   websocketServer.on("connection", (socket, req: IncomingMessage) => {
     lastActiveClient = socket;
     const isOverlay = isOverlayWindow(req.headers);
+    if (isOverlay) overlayClients.add(socket);
     socket.on("message", (bytes) => {
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const message = readClientMessage(bytes.toString("utf-8"));
@@ -180,6 +183,18 @@ export async function startServer(
         return;
       }
       try {
+        // Every page parses the game log and sends the same entries, so main takes those of one page
+        if (
+          event.name === "CLIENT->MAIN::write-data" &&
+          event.payload.action === "client-log-event" &&
+          clientLogWriter(
+            websocketServer.clients,
+            (client) => overlayClients.has(client),
+            lastActiveClient,
+          ) !== socket
+        ) {
+          return;
+        }
         evBus.emit(event.name, event.payload);
       } catch (error) {
         logger.write(

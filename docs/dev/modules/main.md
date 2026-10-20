@@ -33,8 +33,11 @@ The entry, the server and the app services, in `main/src/`:
   change after the page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and logged unless the client's
   WebSocket upgrade request has `Electron` in its User-Agent, as the overlay window's does. A message that is not
   JSON, has no string `name` or names an event without a handler is ignored with a `warn [server]` line, and a
-  handler that throws is logged. The routes are in
+  handler that throws is logged. It passes on a `client-log-event` only from the client `clientLogWriter()` returns,
+  because every page parses the game log and sends the same entries. The routes are in
   [architecture.md](../architecture.md#the-boundary-between-the-processes).
+- `client-log-writer.ts`: `clientLogWriter(clients, isOverlay, lastActive)` returns the newest overlay window, or
+  `lastActive` when no overlay window is connected.
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
   address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
   leave it out ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
@@ -213,8 +216,9 @@ host address no computer has, `served-file.test.ts` the path check, `request-ori
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
 `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version, and
 `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
-messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, and sends
-messages main cannot use.
+messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, sends
+messages main cannot use, and sends client log entries from the overlay window and a browser tab.
+`client-log-writer.test.ts` picks the writer from lists of fake clients.
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
 key press to the text in the box. `key-log.test.ts` sends key events through the fake global hook of
 `fake-hook.ts` and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of
