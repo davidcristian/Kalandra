@@ -13,7 +13,7 @@ request to poe.ninja's API, because poe.ninja asks apps to use their own backend
 | File | Does |
 | --- | --- |
 | `price_service/__main__.py` | `read_settings` reads the environment, then `main` calls `run_schedule` with `--once` or without it |
-| `price_service/ninja.py` | `NinjaClient`: the requests to poe.ninja, one at a time, with ETags and a fallback copy |
+| `price_service/ninja.py` | `NinjaClient`: the requests to poe.ninja, one at a time, with ETags, a fallback copy and a stop on a 429 |
 | `price_service/service.py` | `run_schedule`: one cycle per interval, or one cycle with `--once`; `run_cycle` and `build_league`: one file per league and `index.json` |
 | `price_service/transform.py` | turns poe.ninja's responses into the price file, in the key order the app searches |
 
@@ -136,6 +136,12 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
   also rejects `NaN`, `Infinity`, a number such as `1e999` that Python reads as an infinity, and a lone surrogate
   escape such as `"\ud800"`. Python's JSON parser accepts them, and the price file cannot hold them. The service
   keeps the copies in memory only, so the first cycle after a start has none.
+- A 429 status, which asks a client to send fewer requests, stops the cycle at once, with or without a copy. So does
+  the third 5xx status in a row, counted across cycles until a response with another status (`MAX_SERVER_ERRORS` in
+  `ninja.py`). The stopped cycle sends no more requests and writes no `index.json`, and the leagues it has not
+  written keep their files. `run_schedule` logs `ERROR cycle stopped: <url>: HTTP <status>`. The next cycle starts
+  after `PRICE_INTERVAL_MINUTES`, or after the response's `Retry-After` in seconds when that is longer, at most a
+  day. A `Retry-After` in the date form is ignored.
 - An overview request that fails with no copy skips its whole league, which is logged and listed in `failed`. So
   does a value that becomes too large for a float in the conversion to divines. A league list request that fails
   with no copy ends the cycle before any league, and no `index.json` is written.
@@ -183,9 +189,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 48 tests on 19 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 54 tests on 20 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 96.5% of lines and branches on 19 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 96.9% of lines and branches on 20 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

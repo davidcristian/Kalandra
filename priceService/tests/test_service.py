@@ -2,11 +2,12 @@ import json
 import tempfile
 import unittest
 from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path
 
 from support import FIXTURES, FakeGet, FakeSleep, StopScheduleError, fixture, league_routes, ok
 
-from price_service.ninja import NinjaClient, Reply
+from price_service.ninja import NinjaClient, Reply, StopCycleError
 from price_service.service import build_league, run_cycle, run_schedule, write_atomic
 from price_service.transform import Category, SnapshotError
 
@@ -63,6 +64,24 @@ class RunCycleTest(unittest.TestCase):
         self.assertEqual(index["leagues"], [])
         self.assertEqual(index["failed"], ["Standard", "///"])
 
+    def test_a_429_stops_the_cycle_and_keeps_the_last_files(self) -> None:
+        routes = league_routes()
+        routes["/leagues"] = [ok([{"id": "Runes of Aldur"}, {"id": "Standard"}])]
+        get = FakeGet(routes)
+        ninja = NinjaClient(get, user_agent="test", sleep=lambda _: None)
+        run_cycle(ninja, CATEGORIES, self.output, now=lambda: NOW)
+        written = {path.name: path.read_text("utf-8") for path in self.output.iterdir()}
+        limited: dict[str, list[Reply | BaseException]] = {
+            "type=UniqueWeapons": [Reply(429, b"", None)],
+            "/economy/": [Reply(304, b"", None)],
+        }
+        get.routes = limited
+        get.calls.clear()
+        with self.assertRaises(StopCycleError):
+            run_cycle(ninja, CATEGORIES, self.output, now=lambda: datetime(2026, 10, 18, 13, 0, tzinfo=UTC))
+        self.assertEqual(len(get.calls), 3)
+        self.assertEqual({path.name: path.read_text("utf-8") for path in self.output.iterdir()}, written)
+
     def test_skips_a_league_whose_values_the_file_cannot_hold(self) -> None:
         nan, surrogate = (json.loads(fixture("exchange_currency.json")) for _ in range(2))
         nan["lines"][0]["primaryValue"] = float("nan")
@@ -113,6 +132,23 @@ class RunScheduleTest(unittest.TestCase):
             ["ERROR:price_service.service:cycle failed: https://poe.ninja/poe2/api/economy/leagues: HTTP 503"],
         )
         self.assertIsNone(logs.records[0].exc_info)
+
+    def test_a_stopped_cycle_waits_for_a_longer_retry_after(self) -> None:
+        cases = [(None, 3599.0, ""), ("60", 3599.0, ", retry after 60 seconds")]
+        cases.append(("7200", 7200.0, ", retry after 7200 seconds"))
+        for header, wait, reason in cases:
+            with self.subTest(header=header):
+                ninja = client({"/leagues": [Reply(429, b"", None, header)]})
+                sleep = FakeSleep(stop_at=1)
+                with tempfile.TemporaryDirectory() as name, self.assertLogs("price_service.service", "ERROR") as logs:
+                    cycle = partial(run_cycle, ninja, CATEGORIES, Path(name))
+                    with self.assertRaises(StopScheduleError):
+                        run_schedule(cycle, 3600, sleep=sleep, clock=iter([0.0, 1.0]).__next__)
+                    self.assertEqual(list(Path(name).iterdir()), [])
+                self.assertEqual(sleep.waits, [wait])
+                url = "https://poe.ninja/poe2/api/economy/leagues"
+                self.assertEqual(logs.output, [f"ERROR:price_service.service:cycle stopped: {url}: HTTP 429{reason}"])
+                self.assertIsNone(logs.records[0].exc_info)
 
     def test_waits_the_rest_of_the_interval_or_not_at_all(self) -> None:
         for elapsed, wait in ((0.0, 3600.0), (3599.5, 0.5), (3600.0, 0.0), (5400.0, 0.0)):

@@ -89,6 +89,12 @@ first cycle.
   status poe.ninja returned. A network error such as `URLError` or `TimeoutError` means the machine did not reach
   poe.ninja. The next cycle starts `PRICE_INTERVAL_MINUTES` after the failed one started. Do not restart the service
   to retry sooner.
+- `ERROR cycle stopped: <url>: HTTP 429`, or a 5xx status followed by `3 server errors in a row`: poe.ninja asked
+  the service to send fewer requests, or failed three times in a row. The cycle sent no more requests and wrote no
+  `index.json`, and the leagues it had not written keep their files. The next cycle starts `PRICE_INTERVAL_MINUTES`
+  after the stopped one started, or later when the line ends with `retry after <n> seconds`. Do not restart the
+  service to retry sooner. A 429 in every cycle means poe.ninja allows fewer requests than the service sends: raise
+  `PRICE_REQUEST_DELAY_SECONDS` and deploy again.
 - `ERROR cycle failed` followed by a Python traceback: the cycle ended on an error that is not a failed request,
   such as a failed disk write. The service keeps running, and the next cycle starts `PRICE_INTERVAL_MINUTES` after
   the failed one started, so the error sends no extra requests. `web` keeps serving the last files. Read the

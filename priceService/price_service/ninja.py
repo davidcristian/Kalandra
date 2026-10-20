@@ -4,6 +4,7 @@ import gzip
 import http.client
 import json
 import logging
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -18,6 +19,8 @@ from .transform import Category, Json, as_array, as_object
 
 BASE_URL = "https://poe.ninja/poe2/api/economy"
 MAX_LEAGUES = 12
+MAX_SERVER_ERRORS = 3
+MAX_RETRY_AFTER_SECONDS = 24 * 60 * 60
 # A body cut short raises IncompleteRead or EOFError and a corrupt gzip body zlib.error, and none is an OSError
 REQUEST_ERRORS = (OSError, http.client.HTTPException, EOFError, zlib.error)
 
@@ -28,6 +31,14 @@ class NinjaError(RuntimeError):
     """poe.ninja did not return a usable response."""
 
 
+class StopCycleError(RuntimeError):
+    """poe.ninja rate limited the service or failed several times in a row, so the cycle sends no more requests."""
+
+    def __init__(self, message: str, retry_after: float | None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
 @dataclass(frozen=True)
 class Reply:
     """The parts of an HTTP response the client uses."""
@@ -35,6 +46,7 @@ class Reply:
     status: int
     body: bytes
     etag: str | None
+    retry_after: str | None = None
 
 
 class HttpGet(Protocol):
@@ -51,9 +63,23 @@ def urllib_get(url: str, headers: dict[str, str], timeout: float) -> Reply:
                 body = gzip.decompress(body)
             return Reply(response.status, body, response.headers.get("ETag"))
     except urllib.error.HTTPError as error:
-        etag = error.headers.get("ETag")
+        etag = error.headers.get("ETag") if error.code == HTTPStatus.NOT_MODIFIED else None
+        retry_after = error.headers.get("Retry-After")
         error.close()
-        return Reply(error.code, b"", etag if error.code == HTTPStatus.NOT_MODIFIED else None)
+        return Reply(error.code, b"", etag, retry_after)
+
+
+def retry_after_seconds(header: str | None) -> float | None:
+    """Reads a Retry-After header in seconds, at most a day; a date or any other text gives None."""
+    text = (header or "").strip()
+    if not re.fullmatch(r"[0-9]+", text):
+        return None
+    try:
+        seconds = int(text)
+    # int() raises on more than 4300 digits, a number far above the cap
+    except ValueError:
+        seconds = MAX_RETRY_AFTER_SECONDS
+    return float(min(seconds, MAX_RETRY_AFTER_SECONDS))
 
 
 def parse_json(body: bytes) -> object:
@@ -82,6 +108,7 @@ class NinjaClient:
         self._timeout = timeout_seconds
         self._sleep = sleep
         self._cache: dict[str, tuple[str | None, object]] = {}
+        self._server_errors = 0
 
     def leagues(self) -> list[str]:
         """Returns the ids of the leagues poe.ninja lists, at most MAX_LEAGUES of them."""
@@ -116,6 +143,7 @@ class NinjaClient:
         except REQUEST_ERRORS as error:
             failure = f"{type(error).__name__}: {error}"
         else:
+            self._check_status(url, reply)
             if reply.status == HTTPStatus.NOT_MODIFIED and cached:
                 return cached[1]
             failure = f"HTTP {reply.status}"
@@ -134,3 +162,17 @@ class NinjaClient:
             return cached[1]
         msg = f"{url}: {failure}"
         raise NinjaError(msg)
+
+    def _check_status(self, url: str, reply: Reply) -> None:
+        """Raises StopCycleError on a 429, or on a 5xx that makes MAX_SERVER_ERRORS of them in a row."""
+        server_error = reply.status >= HTTPStatus.INTERNAL_SERVER_ERROR
+        self._server_errors = self._server_errors + 1 if server_error else 0
+        if reply.status != HTTPStatus.TOO_MANY_REQUESTS and self._server_errors < MAX_SERVER_ERRORS:
+            return
+        msg = f"{url}: HTTP {reply.status}"
+        if server_error:
+            msg += f", {self._server_errors} server errors in a row"
+        retry_after = retry_after_seconds(reply.retry_after)
+        if retry_after is not None:
+            msg += f", retry after {retry_after:.0f} seconds"
+        raise StopCycleError(msg, retry_after)

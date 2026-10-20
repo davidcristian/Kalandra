@@ -7,7 +7,16 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from support import FakeGet, fixture, ok
 
-from price_service.ninja import MAX_LEAGUES, HttpGet, NinjaClient, NinjaError, Reply, urllib_get
+from price_service.ninja import (
+    MAX_LEAGUES,
+    HttpGet,
+    NinjaClient,
+    NinjaError,
+    Reply,
+    StopCycleError,
+    retry_after_seconds,
+    urllib_get,
+)
 from price_service.transform import Category
 
 CURRENCY = Category("Currency", exchange=True)
@@ -84,6 +93,59 @@ class OverviewTest(unittest.TestCase):
                     client.overview("Standard", CURRENCY)
 
 
+class StopCycleTest(unittest.TestCase):
+    def test_a_429_stops_the_cycle_even_with_a_last_good_copy(self) -> None:
+        sleeps: list[float] = []
+        get = FakeGet({"type=Currency": [ok({"lines": [1]}), Reply(429, b"", None, "120")]})
+        client = client_for(get, sleeps)
+        client.overview("Standard", CURRENCY)
+        with self.assertRaisesRegex(StopCycleError, r"type=Currency: HTTP 429, retry after 120 seconds$") as caught:
+            client.overview("Standard", CURRENCY)
+        self.assertEqual(caught.exception.retry_after, 120.0)
+        self.assertEqual(sleeps, [0.5, 0.5])
+
+    def test_the_third_server_error_in_a_row_stops_the_cycle(self) -> None:
+        errors = [Reply(503, b"", None), Reply(500, b"", None), Reply(502, b"", None, "60")]
+        get = FakeGet({"type=Currency": [ok({"lines": [1]}), *errors]})
+        client = client_for(get)
+        client.overview("Standard", CURRENCY)
+        with self.assertLogs("price_service.ninja", "WARNING") as logs:
+            client.overview("Standard", CURRENCY)
+            client.overview("Standard", CURRENCY)
+        self.assertEqual(len(logs.records), 2)
+        with self.assertRaisesRegex(StopCycleError, r"HTTP 502, 3 server errors in a row, retry after 60") as caught:
+            client.overview("Standard", CURRENCY)
+        self.assertEqual(caught.exception.retry_after, 60.0)
+
+    def test_any_other_status_starts_the_count_of_server_errors_again(self) -> None:
+        for other in (ok({"lines": [2]}), Reply(304, b"", None), Reply(404, b"", None)):
+            with self.subTest(status=other.status):
+                errors: list[Reply | BaseException] = [Reply(503, b"", None), Reply(503, b"", None)]
+                get = FakeGet({"type=Currency": [ok({"lines": [1]}), *errors, other, *errors, ok({"lines": [3]})]})
+                client = client_for(get)
+                with self.assertLogs("price_service.ninja", "WARNING"):
+                    for _ in range(6):
+                        client.overview("Standard", CURRENCY)
+                self.assertEqual(client.overview("Standard", CURRENCY), {"lines": [3]})
+
+    def test_reads_retry_after_in_seconds_up_to_a_day(self) -> None:
+        cases: dict[str | None, float | None] = {
+            "120": 120.0,
+            " 7 ": 7.0,
+            "0": 0.0,
+            "86401": 86400.0,
+            "9" * 5000: 86400.0,
+            None: None,
+            "": None,
+            "-5": None,
+            "1.5": None,
+            "Wed, 21 Oct 2026 07:28:00 GMT": None,
+        }
+        for header, seconds in cases.items():
+            with self.subTest(header=(header or "")[:40]):
+                self.assertEqual(retry_after_seconds(header), seconds)
+
+
 class LeaguesTest(unittest.TestCase):
     def test_returns_the_league_ids_in_order(self) -> None:
         client = client_for(FakeGet({"/leagues": [ok(fixture("leagues.json"))]}))
@@ -117,6 +179,10 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/cut":
             body, length = b'{"ok": tr', 12
             self.send_response(200)
+        elif self.path == "/busy":
+            body = b""
+            self.send_response(429)
+            self.send_header("Retry-After", "120")
         elif self.path == "/same" and self.headers.get("If-None-Match") == '"abc"':
             body = b""
             self.send_response(304)
@@ -153,6 +219,7 @@ class UrllibGetTest(unittest.TestCase):
     def test_returns_304_and_errors_as_replies(self) -> None:
         self.assertEqual(urllib_get(f"{self.base}/same", {"If-None-Match": '"abc"'}, 5), Reply(304, b"", '"abc"'))
         self.assertEqual(urllib_get(f"{self.base}/missing", {}, 5).status, 500)
+        self.assertEqual(urllib_get(f"{self.base}/busy", {}, 5), Reply(429, b"", None, "120"))
 
     def test_a_body_cut_short_or_corrupt_is_a_failed_request(self) -> None:
         for path, error in (("/cut", "IncompleteRead"), ("/gzip-cut", "EOFError"), ("/gzip-corrupt", "error")):

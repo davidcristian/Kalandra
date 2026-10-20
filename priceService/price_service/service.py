@@ -7,7 +7,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .ninja import NinjaClient, NinjaError
+from .ninja import NinjaClient, NinjaError, StopCycleError
 from .transform import (
     Category,
     Json,
@@ -83,11 +83,18 @@ def run_schedule(
     sleep: Callable[[float], None] = time.sleep,
     clock: Callable[[], float] = time.monotonic,
 ) -> None:
-    """Runs a cycle every interval seconds, or one cycle with once; an error ends only its own cycle."""
+    """Runs a cycle every interval seconds, or one cycle with once; an error ends only its own cycle.
+
+    After a StopCycleError, the next cycle also waits for the Retry-After of the reply that stopped it.
+    """
     while True:
         started = clock()
+        retry_after = 0.0
         try:
             cycle()
+        except StopCycleError as error:
+            log.error("cycle stopped: %s", error)  # noqa: TRY400 poe.ninja's status needs no traceback
+            retry_after = error.retry_after or 0.0
         except NinjaError as error:
             log.error("cycle failed: %s", error)  # noqa: TRY400 a failed request needs no traceback
         # The process keeps running, because Docker restarts a process that ends and the new one requests every
@@ -96,4 +103,5 @@ def run_schedule(
             log.exception("cycle failed")
         if once:
             return
-        sleep(max(0.0, interval - (clock() - started)))
+        # Retry-After counts from the cycle's last reply, so from now, and the interval from the cycle's start
+        sleep(max(0.0, interval - (clock() - started), retry_after))
