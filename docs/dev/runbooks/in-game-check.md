@@ -108,7 +108,7 @@ General, sets another path), and uses Alt when the file does not set it
     [Nothing happens](../../nothing-happens.md) lists the usual causes.
   - `error [GameConfig] Failed to find game configuration file in the default location.`,
     `error [GameConfig] Found more than one game configuration file, enter one in settings: <paths>`,
-    `error [GameConfig] Failed to read game configuration file.`,
+    `error [GameConfig] Failed to read game configuration file: <reason>`,
     `error [GameConfig] Failed to read key: <value>.` or
     `error [GameConfig] Failed to read modifier key: <value>.` when main cannot read the key.
 - **Setting:** main starts reading the clipboard 48 ms after the copy, "Initial clipboard check
@@ -212,7 +212,8 @@ it.
   - `error [GameLogWatcher] No log file found` when neither path exists.
   - `error [GameLogWatcher] Found 2 log files, please enter one into settings:` and both paths,
     when both exist. Enter one in "PoE log file".
-  - `error [GameLogWatcher] Failed to watch file.` when main cannot open the file.
+  - `error [GameLogWatcher] Failed to watch file: <reason>` when main cannot open the file, with
+    Node's error, such as `ENOENT` for a missing file.
   - `info [GameLogWatcher] The log file got shorter, reading it again from the start` after the
     file was emptied, or `info [GameLogWatcher] The log file was replaced, reading the new file
     from the start` when the editor saved a new file in its place.

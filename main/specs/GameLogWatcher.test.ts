@@ -68,7 +68,7 @@ describe("GameLogWatcher.restart", () => {
 
     await watcher.restart(file, true);
     expect(watcher.actualPath).toBeNull();
-    expect(logger.history).toContain("Failed to watch file.");
+    expect(logger.history).toContain("Failed to watch file: ENOENT");
 
     await fs.writeFile(file, "");
     await watcher.restart(file, true);

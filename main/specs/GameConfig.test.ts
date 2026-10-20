@@ -67,6 +67,16 @@ describe("GameConfig.readConfig", () => {
     expect(logger.history).not.toContain("Failed to find");
   });
 
+  it("logs why the file at the path in settings cannot be read", async () => {
+    const reader = createReader();
+
+    await reader.readConfig(configPath());
+
+    expect(logger.history).toContain(
+      "error [GameConfig] Failed to read game configuration file: ENOENT",
+    );
+  });
+
   it("reads the file at the same path again after a read failed", async () => {
     const file = configPath();
     const reader = createReader();

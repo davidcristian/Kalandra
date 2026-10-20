@@ -33,7 +33,8 @@ If the widget does not update, open the Settings window and go to `Debug`:
 
 - `No log file found` means that `Client.txt` is in none of these folders.
 - `Found 2 log files, please enter one into settings:` means that both the standalone and the Steam file exist.
-- `Failed to watch file.` means that Kalandra could not open the log file.
+- `Failed to watch file: <reason>` means that Kalandra could not open the log file. The reason starts with an error
+  code, such as `ENOENT` when the file does not exist or `EACCES` when Kalandra has no permission to read it.
 
 In each case, enter the full path of your `Client.txt` in `PoE log file` and click `Save`. Each click on `Save`
 looks for the file again, even when the field has not changed, for example after the game has created the file.

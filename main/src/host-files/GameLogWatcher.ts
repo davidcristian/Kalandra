@@ -135,9 +135,11 @@ export class GameLogWatcher {
         readBuff: Buffer.allocUnsafe(64 * 1024),
         lines: new LineSplitter(this.logger),
       };
-    } catch {
+    } catch (err) {
       this._wantedPath = null;
-      this.logger.write("error [GameLogWatcher] Failed to watch file.");
+      this.logger.write(
+        `error [GameLogWatcher] Failed to watch file: ${(err as Error).message}`,
+      );
     }
   }
 

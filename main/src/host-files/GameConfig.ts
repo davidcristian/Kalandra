@@ -93,9 +93,9 @@ export class GameConfig {
       );
 
       this._actualPath = filePath;
-    } catch {
+    } catch (err) {
       this.logger.write(
-        "error [GameConfig] Failed to read game configuration file.",
+        `error [GameConfig] Failed to read game configuration file: ${(err as Error).message}`,
       );
     }
   }
