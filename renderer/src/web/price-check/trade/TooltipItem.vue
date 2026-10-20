@@ -41,7 +41,7 @@
                       ? 'text-gray-400'
                       : $style[`number-color-${mod.color}`]
                   "
-                  >{{ translateMod(mod.text) }}</span
+                  >{{ lineText(mod.text) }}</span
                 >
                 <span
                   v-if="mod.value"
@@ -85,16 +85,7 @@ import { defineComponent, PropType } from "vue";
 import { PricingResult } from "./pathofexile-trade";
 import { useI18n } from "vue-i18n";
 import UiDetailedItemImg from "@/web/ui/UiDetailedItemImg.vue";
-
-const STRIP_PERCENT_MODS = new Set([
-  "item.crit",
-  "item.map_pack_size",
-  "item.map_magic_monsters",
-  "item.map_rare_monsters",
-  "item.map_drop_chance",
-  "item.map_item_rarity",
-  "item.map_gold",
-]);
+import { tooltipLineText } from "./tooltip-text";
 
 export default defineComponent({
   components: {
@@ -108,15 +99,8 @@ export default defineComponent({
   },
   setup(props) {
     const item = props.result.displayItem;
-    const { t } = useI18n();
-
-    function translateMod(key: string): string {
-      const translated = t(key);
-      if (STRIP_PERCENT_MODS.has(key)) {
-        return translated.slice(0, translated.lastIndexOf(" ")) + " ";
-      }
-      return translated;
-    }
+    const { t, te } = useI18n();
+    const lineText = (text: string) => tooltipLineText(text, { t, te });
 
     const sections = item
       ? [
@@ -168,7 +152,7 @@ export default defineComponent({
 
     return {
       t,
-      translateMod,
+      lineText,
       item,
       sections,
       dividerVisible,

@@ -1720,7 +1720,7 @@ function buildNameBlock(
           continue;
 
         case TradePropType.Quality:
-          text = `${parseAffixStrings(name)}: {0}`;
+          text = `${parseAffixStrings(name)}: `;
           break;
 
         case TradePropType.WeaponSpeed:
