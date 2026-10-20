@@ -21,21 +21,20 @@ The entry, the server and the app services, in `main/src/`:
   elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses
   it. It then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects, it shows the
   error box `Kalandra cannot start` and quits. In development it also installs Vue Devtools.
-- `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds
-  the `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
+- `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
+  `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
-  `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
-  returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every
-  path the other routes do not, so no request is left without a response.
-  The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
-  client. A new client receives the log history and the current updater state, which the first update check can
-  change after the page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and logged unless the client's
-  WebSocket upgrade request has `Electron` in its User-Agent, as the overlay window's does. A message that is not
-  JSON, has no string `name` or names an event without a handler is ignored with a `warn [server]` line, and a
-  handler that throws is logged. It passes on a `client-log-event` only from the client `clientLogWriter()` returns,
-  because every page parses the game log and sends the same entries. The routes are in
-  [architecture.md](../architecture.md#the-boundary-between-the-processes).
+  `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and returns
+  403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every path the
+  other routes do not, so no request is left without a response. The target `"broadcast"` sends to every client, and
+  `"last-active"` and `"any"` both send to the last active client. A new client receives the log history and the
+  current updater state, which the first update check can change after the page reads `GET /config`. An
+  `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its
+  User-Agent, as the overlay window's does. A message that is not JSON, has no string `name` or names an event without
+  a handler is ignored with a `warn [server]` line, and a handler that throws is logged. It passes on a
+  `client-log-event` only from the client `clientLogWriter()` returns, because every page parses the game log and
+  sends the same entries. The routes are in [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `client-log-writer.ts`: `clientLogWriter(clients, isOverlay, lastActive)` returns the newest overlay window, or
   `lastActive` when no overlay window is connected.
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
@@ -48,14 +47,13 @@ The entry, the server and the app services, in `main/src/`:
   error to `onFallback` and listens on `fallback`; it rejects when `address` is `fallback`. `startServer()` passes the
   defaults as `fallback` and logs the error.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
-  sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and
-  `kalandra.ashoal.com`. It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()`
-  sends and a page on another site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
-  It drops the `sec-*`, `host`, `origin`, `content-length` and `x-kalandra-proxy` request headers, sends the
-  request through `net.request` with the session's cookies and `app.userAgentFallback` as the User-Agent, and
-  drops `content-encoding` from the response.
-  It removes the `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it
-  and `net.request` cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
+  sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and `kalandra.ashoal.com`.
+  It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()` sends and a page on another
+  site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`,
+  `origin`, `content-length` and `x-kalandra-proxy` request headers, sends the request through `net.request` with the
+  session's cookies and `app.userAgentFallback` as the User-Agent, and drops `content-encoding` from the response. It
+  removes the `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and
+  `net.request` cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
 - `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the
   last 1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start each message with
   its level (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. The Debug settings page
@@ -167,19 +165,18 @@ The entry, the server and the app services, in `main/src/`:
   `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read in
   progress after its current chunk, and a failed read is logged.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
-  enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection
-  on, in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv`
-  between a `session` start and stop. It answers each start with `MAIN->CLIENT::library-session`: `started` once
-  the file is open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path
-  separator, and `failed` while it is off or when the folder or file cannot be created, with the reason in the
-  log. It writes `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run
-  and at the first write after a log re-parse. The folder is the library output path, or `apt-data/csv-data` by
-  default, and it creates the folder before it opens either file. A restart that turns it off closes both files. One
-  that changes the folder closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a
-  session file open in the folder it started in until the session stops. Each event, `restart` and
-  `flushClientLogFile` starts after the one before it ends, so an entry that comes while its file opens is written
-  once the file is open, and lines keep the order of their events. A failed open or write is logged, and the next
-  event still runs.
+  enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection on,
+  in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv` between a
+  `session` start and stop. It answers each start with `MAIN->CLIENT::library-session`: `started` once the file is
+  open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path separator, and
+  `failed` while it is off or when the folder or file cannot be created, with the reason in the log. It writes
+  `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run and at the first
+  write after a log re-parse. The folder is the library output path, or `apt-data/csv-data` by default, and it creates
+  the folder before it opens either file. A restart that turns it off closes both files. One that changes the folder
+  closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file open in the
+  folder it started in until the session stops. Each event, `restart` and `flushClientLogFile` starts after the one
+  before it ends, so an entry that comes while its file opens is written once the file is open, and lines keep the
+  order of their events. A failed open or write is logged, and the next event still runs.
 - `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
   or `undefined` when none is.
 
@@ -219,32 +216,30 @@ universal dmg on macOS, and publishes to GitHub releases.
 `--coverage`, which fails below the floor in `main/vitest.config.ts` (54.7% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
-`startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
-`AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails,
-and `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
-messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, sends
-messages main cannot use, and sends client log entries from the overlay window and a browser tab.
-`client-log-writer.test.ts` picks the writer from lists of fake clients. `RemoteLogger.test.ts` writes more
-entries than the history keeps. `text-box.test.ts` types chat commands into the fake clipboard and chat box of
-`fake-chat.ts`, which applies each key press to the text in the box. `stash-search.test.ts` runs stash searches
-through `OverlayWindow` and `GameWindow` with a fake desktop that records the window each key press reaches.
-`key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
-`overlay-keys.test.ts` names a key press with each combination of modifiers and checks which presses move the
-focus. `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes
-and to `/events`, and paths and methods that no route serves. `file-uploads.test.ts` posts images and other files
-to the `/uploads/` routes, and an image while a file holds the place of the uploads folder. `proxy.test.ts` sends
-`/proxy` requests with and without the `x-kalandra-proxy` header, through a fake `net.request` that answers with
-the request it was given. `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write
-slowly, stop partway through a write or fail the rename as Windows does for a file another program has open.
-`GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary folder and send client
-events through the fake server in `fake-server.ts`, whose `emit` settles when the promises the handlers return
+`startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once. `AppUpdater.test.ts`
+creates the updater with a fake electron-updater whose check finds a new version or fails, and `start-server.test.ts`
+calls `startServer()` with a fake updater, reads `GET /config` and the first `/events` messages, sends overlay events
+with the User-Agent of the overlay window, of a browser and with none, sends messages main cannot use, and sends
+client log entries from the overlay window and a browser tab. `client-log-writer.test.ts` picks the writer from lists
+of fake clients. `RemoteLogger.test.ts` writes more entries than the history keeps. `text-box.test.ts` types chat
+commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each key press to the text in the box.
+`stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that records
+the window each key press reaches. `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts`
+and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of modifiers and checks which
+presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the
+HTTP routes and to `/events`, and paths and methods that no route serves. `file-uploads.test.ts` posts images and
+other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
+`proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake `net.request`
+that answers with the request it was given. `ConfigStore.test.ts` saves configs in a temporary folder through fakes
+that write slowly, stop partway through a write or fail the rename as Windows does for a file another program has
+open. `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary folder and send
+client events through the fake server in `fake-server.ts`, whose `emit` settles when the promises the handlers return
 settle. `FileWriter.test.ts` also delays the first file write to check that lines keep their order.
-`GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open with EPERM
-as Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and passes its
-own default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink,
-fails or exits. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
-`npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
-workflow packages main on all three platforms.
-Hotkeys, overlay focus, clipboard capture and OCR need the game:
+`GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open with EPERM as
+Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and passes its own
+default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink, fails or
+exits. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in
+`main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build workflow packages
+main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
 lists every host check, and each task's Status line says whether it still has to run.
