@@ -186,7 +186,9 @@ The entry, the server and the app services, in `main/src/`:
 `vision/`: `OcrWorker` in `link-main.ts` runs `link-worker.ts`, bundled as `dist/vision.js`, in a worker thread
 through Comlink. The worker loads the Tesseract and OpenCV WebAssembly builds from `apt-data/cv-ocr/`, which the
 user installs ([the OCR guide](../../ocr-guide.md)), and `HeistGemFinder` reads Heist gem names from a screenshot
-of the game window. `init()` in `wasm-bindings.ts` throws on every platform but Windows.
+of the game window. `init()` in `wasm-bindings.ts` throws on every platform but Windows. When the worker thread
+fails or exits, `WorkerCalls` in `worker-calls.ts` logs `error [OCR] Worker failed: <message>` or `Worker exited
+with code <code>`, and rejects each call that waits for a reply or comes later, so the start does not wait for it.
 
 ## Invariants
 
@@ -214,7 +216,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (52.9% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (54.7% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
@@ -232,15 +234,15 @@ focus. `server.test.ts` starts the server and sends `..` paths, foreign origins 
 and to `/events`, and paths and methods that no route serves. `file-uploads.test.ts` posts images and other files
 to the `/uploads/` routes, and an image while a file holds the place of the uploads folder. `proxy.test.ts` sends
 `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake `net.request` that answers with
-the request it was given.
-`ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
-write or fail the rename as Windows does for a file another program has open. `GameLogWatcher.test.ts` and
-`FileWriter.test.ts` read and write real files in a temporary folder and send client events through the fake server
-in `fake-server.ts`, whose `emit` settles when the promises the handlers return settle. `FileWriter.test.ts` also
-delays the first file write to check that lines keep their order. `GameLogWatcher.test.ts` also deletes a new log
-as the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete.
-`GameConfig.test.ts` writes game config files in a temporary folder and passes its own default paths.
-A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
+the request it was given. `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write
+slowly, stop partway through a write or fail the rename as Windows does for a file another program has open.
+`GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary folder and send client
+events through the fake server in `fake-server.ts`, whose `emit` settles when the promises the handlers return
+settle. `FileWriter.test.ts` also delays the first file write to check that lines keep their order.
+`GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open with EPERM
+as Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and passes its
+own default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink,
+fails or exits. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
 `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
 workflow packages main on all three platforms.
 Hotkeys, overlay focus, clipboard capture and OCR need the game:

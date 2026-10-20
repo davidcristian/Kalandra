@@ -33,7 +33,7 @@ export class Shortcuts {
     gameConfig: GameConfig,
     server: ServerEvents,
   ) {
-    const ocrWorker = await OcrWorker.create();
+    const ocrWorker = await OcrWorker.create(logger);
     const shortcuts = new Shortcuts(
       logger,
       overlay,

@@ -182,10 +182,11 @@ OCR (optical character recognition) reads text from a screenshot of the game win
   `cv-ocr` files, on one line, and reads the text between them
   (`main/src/vision/HeistGemFinder.ts`). This is why the OCR guide asks for both icons to be fully
   visible.
-- **Logs:** no error line. `OcrWorker` in `main/src/vision/link-main.ts` drops its start-up errors
-  in empty `catch` blocks, and `Shortcuts.ts` drops a failed OCR, so a missing `cv-ocr` folder
-  shows no error. With key recording on, `debug [Shortcuts] Action type: ocr-text` shows that the
-  key fired.
+- **Logs:** no error line for a failed OCR. `OcrWorker` in `main/src/vision/link-main.ts` drops its
+  start-up errors in empty `catch` blocks, and `Shortcuts.ts` drops a failed OCR, so a missing
+  `cv-ocr` folder shows no error. Only a worker thread that crashes or exits logs
+  `error [OCR] Worker failed: <message>` or `error [OCR] Worker exited with code <code>`. With key
+  recording on, `debug [Shortcuts] Action type: ocr-text` shows that the key fired.
 
 ## 8. Client.txt for the XP tracker
 
