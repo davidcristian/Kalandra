@@ -62,8 +62,9 @@ One line of compact JSON, UTF-8 with non-ASCII names kept, with the keys in this
 `primaryValue` and `volumePrimaryValue` are in divines, which the app expects. poe.ninja reports some leagues in
 another currency: on 18 Oct 2026, `HC Runes of Aldur` in exalted and `Hardcore` in chaos, and the saved response
 `tests/fixtures/ninja/hardcore_exchange_currency.json` is in exalted. `divine_factor` converts each response with the
-divine rate in its own `core`. A response with neither a divine primary currency nor a positive divine rate gives no
-lines.
+divine rate in its own `core`. A response that has lines but neither a divine primary currency nor a positive divine
+rate makes `_lines_factor` raise `SnapshotError`, so its league is skipped and keeps its last file. A response with
+no lines gives an empty category.
 
 ### Why the key order is a format
 
@@ -189,9 +190,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 54 tests on 20 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 57 tests on 20 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 96.9% of lines and branches on 20 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 97.6% of lines and branches on 20 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

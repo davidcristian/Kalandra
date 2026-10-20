@@ -138,12 +138,22 @@ class DivineConversionTest(unittest.TestCase):
         }
         self.assertEqual(stash_lines(response)[0]["primaryValue"], 2.0)
 
-    def test_drops_lines_it_cannot_convert(self) -> None:
+    def test_rejects_lines_it_cannot_convert(self) -> None:
         self.response["core"]["rates"].pop("divine")
+        with self.assertRaisesRegex(SnapshotError, "^core in exalted has no divine rate to convert its lines$"):
+            exchange_lines(self.response)
+        lines = [{"name": "Rune", "primaryValue": 4}]
+        cores: list[object] = [{"primary": "chaos", "rates": {}}, {"primary": "chaos", "rates": {"divine": 0}}, None]
+        for core in cores:
+            with self.subTest(core=core), self.assertRaises(SnapshotError):
+                stash_lines({"core": core, "lines": lines})
+
+    def test_needs_no_divine_rate_for_a_category_without_lines(self) -> None:
+        self.response["core"]["rates"].pop("divine")
+        self.response["lines"] = []
         self.assertEqual(exchange_lines(self.response), [])
-        self.assertEqual(
-            stash_lines({"core": {"primary": "chaos", "rates": {}}, "lines": [{"name": "Rune", "primaryValue": 4}]}), []
-        )
+        self.assertEqual(stash_lines({"core": {"primary": "chaos", "rates": {}}, "lines": []}), [])
+        self.assertEqual(stash_lines({}), [])
 
 
 class StashTest(unittest.TestCase):

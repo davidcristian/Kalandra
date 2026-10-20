@@ -30,12 +30,14 @@ def build_league(client: NinjaClient, categories: list[Category], league: str) -
     overviews: list[tuple[str, list[Json]]] = []
     for category in categories:
         response = client.overview(league, category)
-        if category.exchange:
-            overviews.append((category.type, exchange_lines(response)))
-            if category.type == CORE_CATEGORY:
-                core = exchange_core(response)
-        else:
-            overviews.append((category.type, stash_lines(response)))
+        if category.exchange and category.type == CORE_CATEGORY:
+            core = exchange_core(response)
+        try:
+            lines = exchange_lines(response) if category.exchange else stash_lines(response)
+        except SnapshotError as error:
+            msg = f"{category.type}: {error}"
+            raise SnapshotError(msg) from error
+        overviews.append((category.type, lines))
     if core is None:
         msg = f"no {CORE_CATEGORY} category to take exchange rates from"
         raise SnapshotError(msg)

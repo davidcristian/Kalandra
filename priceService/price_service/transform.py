@@ -96,6 +96,16 @@ def divine_factor(response: Json) -> float | None:
     return float(rate) if _is_number(rate) and rate > 0 else None
 
 
+def _lines_factor(response: Json, lines: list[Json]) -> float:
+    """Returns the divine factor for a response's lines, 1.0 when it has none; raises SnapshotError if it is unknown."""
+    factor = divine_factor(response)
+    if factor is None and lines:
+        primary = (as_object(response.get("core")) or {}).get("primary")
+        msg = f"core in {primary} has no divine rate to convert its lines"
+        raise SnapshotError(msg)
+    return 1.0 if factor is None else factor
+
+
 def _in_divines(value: object, factor: float) -> object:
     return value * factor if factor != 1.0 and _is_number(value) else value
 
@@ -123,12 +133,11 @@ def exchange_core(response: Json) -> Json:
 
 def exchange_lines(response: Json) -> list[Json]:
     """Joins exchange lines with their item names and values in divines, skipping lines without a named item."""
-    factor = divine_factor(response)
-    if factor is None:
-        return []
+    entries = _objects(response, "lines")
+    factor = _lines_factor(response, entries)
     items = {item["id"]: item for item in _objects(response, "items") if isinstance(item.get("id"), str)}
     lines: list[Json] = []
-    for line in _objects(response, "lines"):
+    for line in entries:
         line_id = line.get("id")
         item = items.get(line_id) if isinstance(line_id, str) else None
         if item is None or not isinstance(item.get("name"), str) or not _is_number(line.get("primaryValue")):
@@ -150,11 +159,10 @@ def exchange_lines(response: Json) -> list[Json]:
 
 def stash_lines(response: Json) -> list[Json]:
     """Keeps the name, variant, value in divines, details id and sparkline of each stash line."""
-    factor = divine_factor(response)
-    if factor is None:
-        return []
+    entries = _objects(response, "lines")
+    factor = _lines_factor(response, entries)
     lines: list[Json] = []
-    for line in _objects(response, "lines"):
+    for line in entries:
         if not isinstance(line.get("name"), str) or not _is_number(line.get("primaryValue")):
             continue
         entry: Json = {"name": line["name"]}

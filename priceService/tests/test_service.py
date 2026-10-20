@@ -9,7 +9,7 @@ from support import FIXTURES, FakeGet, FakeSleep, StopScheduleError, fixture, le
 
 from price_service.ninja import NinjaClient, Reply, StopCycleError
 from price_service.service import build_league, run_cycle, run_schedule, write_atomic
-from price_service.transform import Category, SnapshotError
+from price_service.transform import Category, Json, SnapshotError
 
 CATEGORIES = [
     Category("Currency", exchange=True),
@@ -27,6 +27,14 @@ class BuildLeagueTest(unittest.TestCase):
     def test_matches_the_price_file_the_app_tests_read(self) -> None:
         text = build_league(client(league_routes()), CATEGORIES, "Runes of Aldur")
         self.assertEqual(text + "\n", (FIXTURES / "price_file.json").read_text("utf-8"))
+
+    def test_names_a_currency_core_without_a_divine_rate(self) -> None:
+        response = json.loads(fixture("hardcore_exchange_currency.json"))
+        response["core"]["rates"].pop("divine")
+        routes = league_routes()
+        routes["type=Currency"] = [ok(response)]
+        with self.assertRaisesRegex(SnapshotError, "^exchange core in exalted has no divine rate$"):
+            build_league(client(routes), CATEGORIES, "HC Runes of Aldur")
 
     def test_needs_a_currency_category_for_the_exchange_rates(self) -> None:
         with self.assertRaises(SnapshotError):
@@ -81,6 +89,20 @@ class RunCycleTest(unittest.TestCase):
             run_cycle(ninja, CATEGORIES, self.output, now=lambda: datetime(2026, 10, 18, 13, 0, tzinfo=UTC))
         self.assertEqual(len(get.calls), 3)
         self.assertEqual({path.name: path.read_text("utf-8") for path in self.output.iterdir()}, written)
+
+    def test_keeps_the_old_file_of_a_league_with_a_category_it_cannot_convert(self) -> None:
+        (self.output / "bad.json").write_text("old", encoding="utf-8")
+        in_chaos: Json = {"core": {"primary": "chaos", "rates": {}}, "lines": [{"name": "Rune", "primaryValue": 1}]}
+        routes: dict[str, list[Reply | BaseException]] = {"league=Bad&type=UniqueWeapons": [ok(in_chaos)]}
+        routes.update(league_routes())
+        routes["/leagues"] = [ok([{"id": "Bad"}, {"id": "Standard"}])]
+        with self.assertLogs("price_service.service", "WARNING") as logs:
+            index = run_cycle(client(routes), CATEGORIES, self.output, now=lambda: NOW)
+        reason = "UniqueWeapons: core in chaos has no divine rate to convert its lines"
+        self.assertEqual(logs.output, [f"WARNING:price_service.service:league 'Bad' skipped: {reason}"])
+        self.assertEqual((self.output / "bad.json").read_text("utf-8"), "old")
+        self.assertEqual(index["failed"], ["Bad"])
+        self.assertEqual(index["leagues"], [{"id": "Standard", "file": "standard.json"}])
 
     def test_skips_a_league_whose_values_the_file_cannot_hold(self) -> None:
         nan, surrogate = (json.loads(fixture("exchange_currency.json")) for _ in range(2))
