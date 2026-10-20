@@ -79,7 +79,10 @@ export const OTHER_PSEUDO_STATS: InternalStatGroup = {
   },
   RELOAD_SPEED: {
     flat: [],
-    incr: [stat("#% increased Attack Speed")],
+    incr: [
+      stat("#% increased Attack Speed"),
+      stat("#% increased Reload Speed"),
+    ],
   },
   SPIRIT: {
     flat: [stat("# to Spirit")],

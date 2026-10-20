@@ -5,6 +5,7 @@ import {
 } from "../create-stat-filters";
 import {
   calcPropBounds,
+  OTHER_PSEUDO_STATS,
   propAt20Quality,
   QUALITY_STATS,
 } from "@/parser/calc-q20";
@@ -391,10 +392,7 @@ function weaponProps(ctx: FiltersCreationContext) {
   if (item.weaponRELOAD) {
     const reloadTime = calcPropBounds(
       item.weaponRELOAD,
-      {
-        incr: ["#% increased Attack Speed"],
-        flat: [],
-      },
+      OTHER_PSEUDO_STATS.RELOAD_SPEED,
       item,
       // Inverted since lower is better for reload time
       true,

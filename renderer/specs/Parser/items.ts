@@ -1543,6 +1543,22 @@ MagicJewel.rarity = ItemRarity.Magic;
 MagicJewel.itemLevel = 79;
 // #endregion MagicJewel
 
+// #region ReloadSpeedCrossbow
+// Built from HighDamageRareItem, not copied from the game: its "of the Sniper" suffix
+// has a Reload Speed roll, and the reload time is the base time of 0.75 divided by
+// 1.49 for that 24% and the 25% Attack Speed.
+export const ReloadSpeedCrossbow = itemWithLine(
+  itemWithLine(
+    HighDamageRareItem,
+    "Reload Time: 0.60 (augmented)",
+    "Reload Time: 0.50 (augmented)",
+  ),
+  "+7 to Level of all Projectile Skills",
+  "24(20-25)% increased Reload Speed",
+);
+ReloadSpeedCrossbow.weaponRELOAD = 0.5;
+// #endregion ReloadSpeedCrossbow
+
 // #region UniqueOnUnknownBase
 // Its name and base type lines name a unique and a base that the item data does
 // not have; tradeItemFallback.test.ts adds them to the trade site's item list.
