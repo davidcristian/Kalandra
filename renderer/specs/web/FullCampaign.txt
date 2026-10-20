@@ -372,16 +372,16 @@
 2025/12/12 13:09:01 1004935015 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 840 x 840
 2025/12/12 13:09:01 1004935187 1a620748 [DEBUG Client 1157464] Joined guild named some guild's with 103 members
 2025/12/12 13:09:01 1004935187 1a62038d [DEBUG Client 1157464] InstanceClientSetSelfPartyInvitationSecurityCode = 0
-2025/12/12 13:09:32 1004966031 3ef232c2 [INFO Client 1157464] @To WoojieAWOOOOOOOO: Maelström Core, Makeshift Crossbow
-2025/12/12 13:09:36 1004970718 3ef232c2 [INFO Client 1157464] &BoubleSBear: oh yeah getting stunned in the middle of slam animation
-2025/12/12 13:09:38 1004972500 3ef232c2 [INFO Client 1157464] &BoubleSBear: I missed that
+2025/12/12 13:09:32 1004966031 3ef232c2 [INFO Client 1157464] @To ExampleTrader: Maelström Core, Makeshift Crossbow
+2025/12/12 13:09:36 1004970718 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: the boss fight is hard
+2025/12/12 13:09:38 1004972500 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: I will try again
 2025/12/12 13:09:56 1004990109 7fbd122f [INFO Client 1157464] [SCENE] Set Source [Act 1]
 2025/12/12 13:09:56 1004990156 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 705 x 465
-2025/12/12 13:09:57 1004991671 3ef232c2 [INFO Client 1157464] &toestyydru: why do i have 7 million gold
+2025/12/12 13:09:57 1004991671 3ef232c2 [INFO Client 1157464] &ExampleGuildmateTwo: how much gold do you have
 2025/12/12 13:09:59 1004993343 7fbd122f [INFO Client 1157464] [SCENE] Set Source [(null)]
 2025/12/12 13:09:59 1004993343 7fbd122f [INFO Client 1157464] [SCENE] Set Source [The Grelwood]
 2025/12/12 13:09:59 1004993421 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 840 x 840
-2025/12/12 13:10:20 1005014750 3ef232c2 [INFO Client 1157464] &toestyydru: am i not playing on the newest league?
+2025/12/12 13:10:20 1005014750 3ef232c2 [INFO Client 1157464] &ExampleGuildmateTwo: which league is this?
 2025/12/12 13:10:42 1005036296 2d8e9b94 [DEBUG Client 1157464] Got Instance Details from login server
 2025/12/12 13:10:42 1005036296 91c6cce [INFO Client 1157464] Connecting to instance server at 34.110.172.86:21360
 2025/12/12 13:10:42 1005036312 91c6525 [DEBUG Client 1157464] Connect time to instance server was 16ms
@@ -424,14 +424,14 @@
 2025/12/12 13:31:49 1006303812 bf08f1fa [DEBUG Client 1157464] [Item Filter] Online item filter request resolved to: 23.55.236.138
 2025/12/12 13:31:49 1006303812 bf091691 [INFO Client 1157464] [Item Filter] Successfully saved online filter MNBJmpC0. Hash is now: edaf4f5bfe56e4feafc6bc4c1d7ba59c
 2025/12/12 13:31:49 1006303828 ddd288d2 [INFO Client 1157464] [Item Filter] Finished reloading online filter MNBJmpC0. Result: true. Hash: edaf4f5bfe56e4feafc6bc4c1d7ba59c. Type: Normal. Message:
-2025/12/12 13:32:36 1006350687 3ef232c2 [INFO Client 1157464] @From RunItBackSlanted: Standard player 0.0
+2025/12/12 13:32:36 1006350687 3ef232c2 [INFO Client 1157464] @From ExampleFriendOne: hello there
 2025/12/12 13:32:47 1006361359 3ef232c2 [INFO Client 1157464] : Unable to add account to friends list because: This account is already on your friends list.
-2025/12/12 13:33:04 1006378484 3ef232c2 [INFO Client 1157464] @To RunItBackSlanted: testing ee2 stuff :(
-2025/12/12 13:33:15 1006389734 3ef232c2 [INFO Client 1157464] @To RunItBackSlanted: they renamed some stuff so double checking it still works
-2025/12/12 13:33:44 1006418250 3ef232c2 [INFO Client 1157464] @From RunItBackSlanted: ahahahha fair enough, dw il be act 1 until the end of the day
-2025/12/12 13:37:05 1006619875 3ef232c2 [INFO Client 1157464] &BoubleSBear: Serrated Changeling Talisman of Menace I guess this is best I can get atm
-2025/12/12 13:37:41 1006655812 3ef232c2 [INFO Client 1157464] @To WoojieAWOOOOOOOO: ill give you Divine Orb for it
-2025/12/12 13:46:14 1007168515 3ef232c2 [INFO Client 1157464] &BoubleSBear: wait the new boss overtuned
+2025/12/12 13:33:04 1006378484 3ef232c2 [INFO Client 1157464] @To ExampleFriendOne: testing the overlay
+2025/12/12 13:33:15 1006389734 3ef232c2 [INFO Client 1157464] @To ExampleFriendOne: checking that the price check still works
+2025/12/12 13:33:44 1006418250 3ef232c2 [INFO Client 1157464] @From ExampleFriendOne: sounds good, see you later
+2025/12/12 13:37:05 1006619875 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: Serrated Changeling Talisman of Menace for now
+2025/12/12 13:37:41 1006655812 3ef232c2 [INFO Client 1157464] @To ExampleTrader: I can offer a Divine Orb for it
+2025/12/12 13:46:14 1007168515 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: the new boss is hard
 2025/12/12 14:06:34 1008388109 3ef232c2 [INFO Client 1157464] : AFK mode is now ON. Autoreply "This player is AFK."
 2025/12/12 14:07:11 1008425796 3ef232c2 [INFO Client 1157464] : AFK mode is now OFF.
 2025/12/12 14:09:13 1008547078 4f3e4d2a [INFO Client 1157464] Async connecting to tor.login.pathofexile2.com:21277
@@ -1490,8 +1490,8 @@
 2025/12/12 15:40:48 1014042828 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 515 x 515
 2025/12/12 15:40:48 1014042968 1a620748 [DEBUG Client 1157464] Joined guild named some guild's with 103 members
 2025/12/12 15:40:48 1014042968 1a62038d [DEBUG Client 1157464] InstanceClientSetSelfPartyInvitationSecurityCode = 0
-2025/12/12 15:42:00 1014114781 3ef232c2 [INFO Client 1157464] &BoubleSBear: I have bneen stuck in geonor
-2025/12/12 15:42:04 1014118250 3ef232c2 [INFO Client 1157464] &BoubleSBear: for 20 deaths straight
+2025/12/12 15:42:00 1014114781 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: still on the same boss
+2025/12/12 15:42:04 1014118250 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: after a few tries
 2025/12/12 15:45:30 1014324125 3ef232c2 [INFO Client 1157464] : HolyMolyThisIsCharName (Mercenary) is now level 16
 2025/12/12 15:45:46 1014340187 cd3be1f1 [WARN Client 1157464] Unable to find thigh bone or waist groups for Metadata/Monsters/RamGiant/RamGiantQuarryWheel_@17. Defaulting to group index 0
 2025/12/12 15:45:49 1014343406 3ef232c2 [INFO Client 1157464] : HolyMolyThisIsCharName has been slain.
@@ -1992,7 +1992,7 @@
 2025/12/12 16:30:17 1017011984 3a81fdad [DEBUG Client 1157464] [WINDOW] TriggerDeviceReset
 2025/12/12 16:31:38 1017092375 3ef232c2 [INFO Client 1157464] : HolyMolyThisIsCharName (Mercenary) is now level 21
 2025/12/12 16:31:42 1017096250 f4ab5a9a [INFO Client 1157464] Successfully allocated passive skill id: grenades10, name: Grenadier
-2025/12/12 16:32:27 1017141937 3ef232c2 [INFO Client 1157464] @To WoojieAWOOOOOOOO: Torment Core, Varnished Crossbow +3?
+2025/12/12 16:32:27 1017141937 3ef232c2 [INFO Client 1157464] @To ExampleTrader: Torment Core, Varnished Crossbow
 2025/12/12 16:34:41 1017275656 2d8e9b94 [DEBUG Client 1157464] Got Instance Details from login server
 2025/12/12 16:34:41 1017275656 91c6cce [INFO Client 1157464] Connecting to instance server at 89.104.170.73:21360
 2025/12/12 16:34:41 1017275703 91c6525 [DEBUG Client 1157464] Connect time to instance server was 31ms
@@ -3928,9 +3928,9 @@
 2025/12/12 17:20:00 1019994046 4d35b2e9 [WARN Client 1157464] Tried to SetExtraActivationRangeAroundTile() after level generation was complete
 2025/12/12 17:20:00 1019994046 4d35b2e9 [WARN Client 1157464] Tried to SetExtraActivationRangeAroundTile() after level generation was complete
 2025/12/12 17:20:22 1020016859 f4ab5a9a [INFO Client 1157464] Successfully allocated passive skill id: strength83, name: Attribute
-2025/12/12 17:23:39 1020213671 3ef232c2 [INFO Client 1157464] @To WoojieAWOOOOOOOO: Gloom Core, Bombard Crossbow 5th 2+ levels, 3rd 3+ levels actually check my pc
-2025/12/12 17:24:28 1020262046 3ef232c2 [INFO Client 1157464] &BoubleSBear: Gale Branch, Familial Talisman omg
-2025/12/12 17:24:31 1020265187 3ef232c2 [INFO Client 1157464] &BoubleSBear: finally a good talisman
+2025/12/12 17:23:39 1020213671 3ef232c2 [INFO Client 1157464] @To ExampleTrader: Gloom Core, Bombard Crossbow
+2025/12/12 17:24:28 1020262046 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: Gale Branch, Familial Talisman
+2025/12/12 17:24:31 1020265187 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: a good talisman
 2025/12/12 17:25:54 1020348421 3ef232c2 [INFO Client 1157464] : HolyMolyThisIsCharName (Mercenary) is now level 29
 2025/12/12 17:25:58 1020352921 f4ab5a9a [INFO Client 1157464] Successfully allocated passive skill id: area_attacks15, name: Attack Area
 2025/12/12 17:26:11 1020365640 3ef232c2 [INFO Client 1157464] The Countess: You again! The fool under the Hooded One's sway. Do you even know what he is? No matter. You'll find my King far more capable than Count Geonor.
@@ -3940,7 +3940,7 @@
 My King—take the power you were promised. Put an end to this nuisance!
 
 
-2025/12/12 17:26:30 1020384578 3ef232c2 [INFO Client 1157464] &BoubleSBear: yes bear can spent rage on level 1
+2025/12/12 17:26:30 1020384578 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: rage works at level 1
 2025/12/12 17:26:31 1020386000 3ef232c2 [INFO Client 1157464] Jamanra, the Abomination: Ahh... the Sekhema of the Ardura. Bow before your King!
 2025/12/12 17:26:37 1020391843 3ef232c2 [INFO Client 1157464] Sekhema Asala: The Maraketh do not bow to kings. We skin them.
 2025/12/12 17:26:46 1020400687 3ef232c2 [INFO Client 1157464] Jamanra, the Abomination: The Era of the Faridun is now!
@@ -4090,7 +4090,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 17:31:38 1020692562 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 540 x 480
 2025/12/12 17:31:54 1020708406 7fbd122f [INFO Client 1157464] [SCENE] Set Source [Act 2]
 2025/12/12 17:31:54 1020708421 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 670 x 330
-2025/12/12 17:31:56 1020710656 3ef232c2 [INFO Client 1157464] &BoubleSBear: okay fissure bear is going to be broken I can already feel işt
+2025/12/12 17:31:56 1020710656 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: this build looks strong
 2025/12/12 17:31:57 1020711312 7fbd122f [INFO Client 1157464] [SCENE] Set Source [(null)]
 2025/12/12 17:31:57 1020711312 7fbd122f [INFO Client 1157464] [SCENE] Set Source [The Ardura Caravan]
 2025/12/12 17:31:57 1020711328 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 540 x 480
@@ -4161,15 +4161,15 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 17:32:20 1020734453 7fbd122f [INFO Client 1157464] [SCENE] Set Source [(null)]
 2025/12/12 17:32:20 1020734453 7fbd122f [INFO Client 1157464] [SCENE] Set Source [The Ardura Caravan]
 2025/12/12 17:32:20 1020734484 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 540 x 480
-2025/12/12 17:32:49 1020763421 3ef232c2 [INFO Client 1157464] &BoubleSBear: don't know yet I'll learn when I will be level 41 lol
+2025/12/12 17:32:49 1020763421 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: I will see at level 41
 2025/12/12 17:32:52 1020766875 7fbd122f [INFO Client 1157464] [SCENE] Set Source [Act 2]
 2025/12/12 17:32:52 1020766890 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 670 x 330
 2025/12/12 17:32:56 1020770531 7fbd122f [INFO Client 1157464] [SCENE] Set Source [(null)]
 2025/12/12 17:32:56 1020770531 7fbd122f [INFO Client 1157464] [SCENE] Set Source [The Ardura Caravan]
 2025/12/12 17:32:56 1020770546 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 540 x 480
 2025/12/12 17:33:01 1020775296 d26be0f6 [WARN Client 1157464] [ControlManager::SetControllerUIContextLayer] Tried to set Controller UI Context Layer with a control that already exists! ID: OptionsPanel.save_changes_prompt
-2025/12/12 17:33:05 1020779406 3ef232c2 [INFO Client 1157464] &BoubleSBear: but I can socket crater support on pounce
-2025/12/12 17:33:09 1020783078 3ef232c2 [INFO Client 1157464] &BoubleSBear: which is yeeah babyu
+2025/12/12 17:33:05 1020779406 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: the support gem fits too
+2025/12/12 17:33:09 1020783078 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: nice
 2025/12/12 17:33:45 1020819046 7fbd122f [INFO Client 1157464] [SCENE] Set Source [Act 2]
 2025/12/12 17:33:45 1020819062 99240e14 [DEBUG Client 1157464] [SCENE] Height Map Texture: 670 x 330
 2025/12/12 17:33:45 1020819703 7fbd122f [INFO Client 1157464] [SCENE] Set Source [(null)]
@@ -4208,7 +4208,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 17:43:09 1021383156 faf1bd58 [CRIT Client 1157464] [ENTITY2] [Metadata/Effects/Microtransactions/Weapon_effects/Weapon_effects/harmony_divergence/fx_trail.trl] Pipeline generation failed. (Signature:  "Metadata/EngineGraphs/base.fxgraph" "Metadata/EngineGraphs/disable_lighting.fxgraph" "Metadata/EngineGraphs/GpuTrails/trail_default.fxgraph" "Metadata/EngineGraphs/trail_uv_fixed.fxgraph" "Art/Microtransactions/weapon_effects/harmony_divergence/trail_tip_wpfx.mat" )
 2025/12/12 17:43:09 1021383578 33788f5b [CRIT Client 1157464] [RENDER] Shader uses incorrect vertex layout (shader: 0x00000008 mesh: 0x00000000)
 2025/12/12 17:43:09 1021383578 faf1bd58 [CRIT Client 1157464] [ENTITY2] [Metadata/Effects/Microtransactions/Weapon_effects/Weapon_effects/harmony_divergence/fx_trail.trl] Pipeline generation failed. (Signature:  "Metadata/EngineGraphs/base.fxgraph" "Metadata/EngineGraphs/disable_lighting.fxgraph" "Metadata/EngineGraphs/GpuTrails/trail_camerafacing.fxgraph" "Metadata/EngineGraphs/trail_uv_fixed.fxgraph" "Art/Microtransactions/weapon_effects/harmony_divergence/trail_tip_wpfx.mat" )
-2025/12/12 17:45:16 1021510656 3ef232c2 [INFO Client 1157464] &BoubleSBear: can fissures be scaled with aoe?
+2025/12/12 17:45:16 1021510656 3ef232c2 [INFO Client 1157464] &ExampleGuildmateOne: does area of effect help?
 2025/12/12 17:52:40 ***** LOG FILE OPENING *****
 2025/12/12 17:52:40 1021954140 84b56f99 [INFO Client 1222380] [JOB] Irrecoverable Exception Callback: SET
 2025/12/12 17:52:40 1021954312 44e52699 [INFO Client 1222380] [CMD][Unrecognized] --nopatch
@@ -4491,7 +4491,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 17:56:35 1022189296 3ef232c2 [INFO Client 1222380] : You have received 2 Weapon Set Passive Skill Points.
 2025/12/12 17:57:51 1022265890 f4ab5a9a [INFO Client 1222380] Successfully allocated passive skill id: area_attacks10, name: Area Damage
 2025/12/12 17:57:53 1022267421 f4ab5a9a [INFO Client 1222380] Successfully allocated passive skill id: area_attacks16_, name: Area Damage and Armour Break
-2025/12/12 17:58:11 1022285093 3ef232c2 [INFO Client 1222380] &BoubleSBear: Corpse Gnarl, Frenzied Talisman I sold my amulet for this lmao
+2025/12/12 17:58:11 1022285093 3ef232c2 [INFO Client 1222380] &ExampleGuildmateOne: Corpse Gnarl, Frenzied Talisman
 2025/12/12 17:58:17 1022291171 2d8e9b94 [DEBUG Client 1222380] Got Instance Details from login server
 2025/12/12 17:58:17 1022291171 91c6cce [INFO Client 1222380] Connecting to instance server at 89.104.170.73:21360
 2025/12/12 17:58:17 1022291218 91c6525 [DEBUG Client 1222380] Connect time to instance server was 32ms
@@ -4584,7 +4584,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 18:07:12 1022826593 3ef232c2 [INFO Client 1222380] : HolyMolyThisIsCharName has received 30% increased [AilmentThreshold|Elemental Ailment Threshold].
 2025/12/12 18:07:19 1022833078 3ef232c2 [INFO Client 1222380] : Trade cancelled.
 2025/12/12 18:07:19 1022833812 3ef232c2 [INFO Client 1222380] Servi: Some odds and ends we found in the jungle.
-2025/12/12 18:07:55 1022869453 3ef232c2 [INFO Client 1222380] &BoubleSBear: Doedre's Tenure, Stitched Gloves oh look
+2025/12/12 18:07:55 1022869453 3ef232c2 [INFO Client 1222380] &ExampleGuildmateOne: Doedre's Tenure, Stitched Gloves
 2025/12/12 18:08:00 1022874968 3ef232c2 [INFO Client 1222380] : 4 Items identified
 2025/12/12 18:08:33 1022907375 3ef232c2 [INFO Client 1222380] Servi: Some pretty things, yes?
 2025/12/12 18:08:33 1022907968 3ef232c2 [INFO Client 1222380] Servi: It's a deal.
@@ -8132,7 +8132,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/12 19:56:03 1029357171 3ef232c2 [INFO Client 1196912] Servi: It's a deal.
 2025/12/12 19:56:22 1029376390 aad37c39 [WARN Client 1196912] Matching object found for InstanceClientActionUpdate, but no matching action was found on object to update.
 2025/12/12 19:56:22 1029376390 aad37c39 [WARN Client 1196912] Matching object found for InstanceClientActionUpdate, but no matching action was found on object to update.
-2025/12/12 19:56:45 1029399312 3ef232c2 [INFO Client 1196912] &HolyMolyThisIsCharName: if anyone wants +3 its in guild stash, dont need this anymore Torment Core, Varnished Crossbow
+2025/12/12 19:56:45 1029399312 3ef232c2 [INFO Client 1196912] &HolyMolyThisIsCharName: Torment Core, Varnished Crossbow is in the guild stash
 2025/12/12 19:57:00 1029414437 7fbd122f [INFO Client 1196912] [SCENE] Set Source [Act 3]
 2025/12/12 19:57:00 1029414500 99240e14 [DEBUG Client 1196912] [SCENE] Height Map Texture: 705 x 465
 2025/12/12 19:57:04 1029418328 2d8e9b94 [DEBUG Client 1196912] Got Instance Details from login server
@@ -13236,7 +13236,7 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/13 01:36:08 1049762718 3ef232c2 [INFO Client 1196912] Zelina, Blood Priestess: Ma'oxe ik'el!
 2025/12/13 01:36:12 1049766921 3ef232c2 [INFO Client 1196912] Zolin, Blood Priest: Atziri le'itzil!
 2025/12/13 01:36:18 1049772734 3ef232c2 [INFO Client 1196912] Zelina, Blood Priestess: Xatlene kujkuali!
-2025/12/13 01:36:21 1049775937 3ef232c2 [INFO Client 1196912] @From SlantedDogVI: USERNAME why are you still awake ?
+2025/12/13 01:36:21 1049775937 3ef232c2 [INFO Client 1196912] @From ExampleFriendTwo: are you still online ?
 2025/12/13 01:36:22 1049776953 3ef232c2 [INFO Client 1196912] Zolin, Blood Priest: Gyan'uks ko'janti!
 2025/12/13 01:36:28 1049782765 3ef232c2 [INFO Client 1196912] Zelina, Blood Priestess: A'te 'Ibil!
 2025/12/13 01:36:32 1049786671 3ef232c2 [INFO Client 1196912] Zolin, Blood Priest: What nonsense do you speak?
@@ -13255,9 +13255,9 @@ My King—take the power you were promised. Put an end to this nuisance!
 2025/12/13 01:37:11 1049825625 3ef232c2 [INFO Client 1196912] Zelina, Blood Priestess: Ugh... foul Outlander!
 2025/12/13 01:37:13 1049827546 3ef232c2 [INFO Client 1196912] Zelina, Blood Priestess: Ugh... damn you!
 2025/12/13 01:37:16 1049830218 3ef232c2 [INFO Client 1196912] Zolin, Blood Priest: Enough, we submit!
-2025/12/13 01:37:28 1049842093 3ef232c2 [INFO Client 1196912] @To SlantedDogVI: cause im bad
-2025/12/13 01:37:44 1049858468 3ef232c2 [INFO Client 1196912] @To SlantedDogVI: also i dont have anything to do tomorrow so we gamin
-2025/12/13 01:37:58 1049872421 3ef232c2 [INFO Client 1196912] @From SlantedDogVI: based, also im still act 1 so no i bad you pro
+2025/12/13 01:37:28 1049842093 3ef232c2 [INFO Client 1196912] @To ExampleFriendTwo: yes
+2025/12/13 01:37:44 1049858468 3ef232c2 [INFO Client 1196912] @To ExampleFriendTwo: playing a bit longer
+2025/12/13 01:37:58 1049872421 3ef232c2 [INFO Client 1196912] @From ExampleFriendTwo: have fun
 2025/12/13 01:38:15 1049889078 7fbd122f [INFO Client 1196912] [SCENE] Set Source [Interlude]
 2025/12/13 01:38:15 1049889093 99240e14 [DEBUG Client 1196912] [SCENE] Height Map Texture: 330 x 330
 2025/12/13 01:38:17 1049891031 7fbd122f [INFO Client 1196912] [SCENE] Set Source [(null)]
