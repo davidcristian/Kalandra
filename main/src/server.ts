@@ -111,6 +111,28 @@ function isOverlayWindow(headers: IncomingHttpHeaders): boolean {
   return headers["user-agent"]?.includes("Electron") ?? false;
 }
 
+type ClientMessage = { event: IpcEvent } | { problem: string };
+
+function readClientMessage(text: string): ClientMessage {
+  let message: unknown;
+  try {
+    message = JSON.parse(text);
+  } catch (error) {
+    return {
+      problem: `a message that is not JSON (${(error as Error).message})`,
+    };
+  }
+  if (
+    typeof message !== "object" ||
+    message === null ||
+    !("name" in message) ||
+    typeof message.name !== "string"
+  ) {
+    return { problem: "a message without an event name" };
+  }
+  return { event: message as IpcEvent };
+}
+
 server.on("upgrade", (req, socket, head) => {
   if (req.url !== "/events") {
     return req.destroy();
@@ -135,7 +157,12 @@ export async function startServer(
     const isOverlay = isOverlayWindow(req.headers);
     socket.on("message", (bytes) => {
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      const event = JSON.parse(bytes.toString("utf-8")) as IpcEvent;
+      const message = readClientMessage(bytes.toString("utf-8"));
+      if ("problem" in message) {
+        logger.write(`warn [server] Ignored ${message.problem}`);
+        return;
+      }
+      const { event } = message;
       if (!isOverlay && event.name.startsWith("OVERLAY->MAIN::")) {
         logger.write(
           `warn [server] Ignored ${event.name} from a page outside the overlay window`,
@@ -145,7 +172,20 @@ export async function startServer(
       if (event.name === "CLIENT->MAIN::used-recently") {
         lastActiveClient = socket;
       }
-      evBus.emit(event.name, event.payload);
+      // A client can send any name, and EventEmitter throws for "error" when nothing listens for it
+      if (evBus.listenerCount(event.name) === 0) {
+        logger.write(
+          `warn [server] Ignored ${event.name}, which main does not handle`,
+        );
+        return;
+      }
+      try {
+        evBus.emit(event.name, event.payload);
+      } catch (error) {
+        logger.write(
+          `error [server] Handling ${event.name} failed: ${(error as Error).message}`,
+        );
+      }
     });
     socket.on("close", () => {
       const clients = websocketServer.clients;

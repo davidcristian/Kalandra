@@ -38,6 +38,9 @@ beforeAll(async () => {
   onEventAnyClient("CLIENT->MAIN::user-action", () => {
     lastEventHandled();
   });
+  onEventAnyClient("CLIENT->MAIN::re-parse-log", () => {
+    throw new Error("the handler failed");
+  });
 });
 
 afterAll(() => {
@@ -45,29 +48,47 @@ afterAll(() => {
   fs.rmSync(app.getPath("userData"), { recursive: true, force: true });
 });
 
-// Sends two overlay events and then a client event, and resolves the overlay events main handled before it
-async function sendOverlayEvents(
+// Sends these texts and then a client event from one client, and resolves when main has handled that event
+async function sendMessages(
+  texts: string[],
   userAgent?: string,
-): Promise<IpcEvent["name"][]> {
-  handled.length = 0;
+): Promise<void> {
   const socket = await openClient(port, userAgent);
   const lastEvent = new Promise<void>((resolve) => {
     lastEventHandled = resolve;
   });
-  const events: IpcEvent[] = [
-    { name: "OVERLAY->MAIN::focus-game", payload: undefined },
-    { name: "OVERLAY->MAIN::render-state", payload: { shouldShow: true } },
-    {
-      name: "CLIENT->MAIN::user-action",
-      payload: { action: "check-for-update" },
-    },
-  ];
-  for (const event of events) {
-    socket.send(JSON.stringify(event));
+  const last: IpcEvent = {
+    name: "CLIENT->MAIN::user-action",
+    payload: { action: "check-for-update" },
+  };
+  for (const text of [...texts, JSON.stringify(last)]) {
+    socket.send(text);
   }
   await lastEvent;
   socket.close();
+}
+
+// Sends two overlay events, and resolves those main handled
+async function sendOverlayEvents(
+  userAgent?: string,
+): Promise<IpcEvent["name"][]> {
+  handled.length = 0;
+  const events: IpcEvent[] = [
+    { name: "OVERLAY->MAIN::focus-game", payload: undefined },
+    { name: "OVERLAY->MAIN::render-state", payload: { shouldShow: true } },
+  ];
+  await sendMessages(
+    events.map((event) => JSON.stringify(event)),
+    userAgent,
+  );
   return [...handled];
+}
+
+// Sends one text, and resolves the log lines main wrote before it handled the client's next event
+async function logLinesFor(text: string): Promise<string> {
+  const start = logger.history.length;
+  await sendMessages([text], OVERLAY_USER_AGENT);
+  return logger.history.slice(start);
 }
 
 describe("startServer", () => {
@@ -108,5 +129,33 @@ describe("the /events WebSocket", () => {
 
   it("ignores the overlay events of a client without a User-Agent", async () => {
     expect(await sendOverlayEvents()).toEqual([]);
+  });
+});
+
+describe("a message main cannot use", () => {
+  it.each([
+    ["not json", "warn [server] Ignored a message that is not JSON ("],
+    ["null", "warn [server] Ignored a message without an event name"],
+    ['{"name":5}', "warn [server] Ignored a message without an event name"],
+    [
+      '{"name":"error"}',
+      "warn [server] Ignored error, which main does not handle",
+    ],
+    [
+      '{"name":"CLIENT->MAIN::unknown"}',
+      "warn [server] Ignored CLIENT->MAIN::unknown, which main does not handle",
+    ],
+  ])("is logged for %s, and the next event is handled", async (text, line) => {
+    expect(await logLinesFor(text)).toContain(line);
+  });
+
+  it("is logged when its handler throws, and the next event is handled", async () => {
+    const event: IpcEvent = {
+      name: "CLIENT->MAIN::re-parse-log",
+      payload: undefined,
+    };
+    expect(await logLinesFor(JSON.stringify(event))).toContain(
+      "error [server] Handling CLIENT->MAIN::re-parse-log failed: the handler failed",
+    );
   });
 });

@@ -115,9 +115,10 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   or show the overlay window.
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
-- Neither end validates a message: `server.ts` casts `JSON.parse()` to `IpcEvent`, and `IPC.ts` passes the
-  untyped result of `JSON.parse()` to `selfDispatch()`. main serves the renderer files it was packaged with, so
-  both ends come from one build.
+- Neither end checks a payload. `server.ts` ignores and logs a message that is not JSON, has no string `name` or
+  names an event main has no handler for, and logs a handler that throws; `IPC.ts` passes the untyped result of
+  `JSON.parse()` to `selfDispatch()`. main serves the renderer files it was packaged with, so both ends come from
+  one build.
 - A new `HostConfig` field is set in `getConfigForHost()`, whose return type makes `tsc` fail until it is, and is
   read in the `main.ts` handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
 - Saved configs store hotkeys as `hotkeyToString()` writes them, so renaming a key in these tables changes what a
