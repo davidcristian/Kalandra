@@ -89,7 +89,7 @@ export default defineComponent({
   setup() {
     usePoeninja();
     useLeagues().load();
-    const { handleLine } = useClientLog();
+    const { handleLines } = useClientLog();
 
     const active = shallowRef(!Host.isElectron);
     const gameFocused = shallowRef(false);
@@ -152,20 +152,9 @@ export default defineComponent({
       hideUI.value = !e.isVisible;
     });
 
-    const lineQueue: string[] = [];
-    let processing = false;
     Host.onEvent("MAIN->CLIENT::game-log", (e) => {
-      lineQueue.push(...e.lines);
-      processQueue();
+      handleLines(e.lines);
     });
-    function processQueue() {
-      if (processing) return;
-      processing = true;
-      while (lineQueue.length) {
-        handleLine(lineQueue.shift()!);
-      }
-      processing = false;
-    }
 
     onMounted(() => {
       nextTick(() => {

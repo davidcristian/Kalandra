@@ -1151,6 +1151,31 @@ describe("clientLog", () => {
       ).toBe(false);
     }
   });
+
+  it("logs a line that fails and handles the lines after it", () => {
+    const versionWithoutPatch =
+      "2026/10/20 09:00:00 1800000000 a1e2d252 [INFO Client 443804] [HTTP2] User agent: PoE poe2_production/tags/0.4 Windows x64";
+    const levelUp = (level: number) =>
+      `2026/10/20 09:00:01 1800000100 3ef232c2 [INFO Client 443804] : kvanClientLogTestOne (Mercenary) is now level ${level}`;
+    const logged: unknown[][] = [];
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation((...args: unknown[]) => {
+        logged.push(args);
+      });
+    const { handleLines, playerLevel } = useClientLog();
+
+    try {
+      handleLines([versionWithoutPatch, levelUp(30)]);
+      expect(playerLevel.value).toBe(30);
+      handleLines([levelUp(31)]);
+      expect(playerLevel.value).toBe(31);
+    } finally {
+      consoleError.mockRestore();
+    }
+    expect(logged).toHaveLength(1);
+    expect(logged[0]).toContain(versionWithoutPatch);
+  });
 });
 
 describe("local performance tests", () => {

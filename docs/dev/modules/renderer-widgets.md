@@ -33,8 +33,9 @@ that a saved config survives every update covers it ([config.md](config.md),
   `bringToTop`, `create(wmType)`, `setFlag`, `widgets`, `active`, `size` and `poePanelWidth`. Showing a widget
   hides the `exclusive` widget that is shown, if any. It sends `OVERLAY->MAIN::render-state` with `shouldShow`
   whenever the overlay starts or stops having something to draw, saves the config when the window loses focus,
-  and starts the background state: `usePoeninja()`, `useLeagues().load()` and `useClientLog()`, which reads the
-  `MAIN->CLIENT::game-log` lines.
+  and starts the background state: `usePoeninja()`, `useLeagues().load()` and `useClientLog()`, whose
+  `handleLines()` reads the `MAIN->CLIENT::game-log` lines in order. A line that throws is logged with
+  `console.error` and skipped, and the lines after it are still read.
 - [Widget.vue](../../../renderer/src/web/overlay/Widget.vue) is the frame, with the "hide", "edit", "move" and
   "delete" buttons. Its props: `config` (a widget with an `anchor`: `pos` such as `tl` or `cc`, and `x` and `y` in
   percent of the screen), `moveHandles`, `readonly`, `removable`, `hideable` and `inlineEdit`. With `inlineEdit`
@@ -118,7 +119,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
 until main opens its file), `specs/web/client-log.test.ts` (the client log the XP tracker reads, with
-`FullCampaign.txt`), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
+`FullCampaign.txt`, and a line that fails), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
 Overlay focus, hiding on blur and the hotkeys need the game:

@@ -20,6 +20,25 @@ export const useClientLog = createGlobalState(() => {
   let logParseVersion = 0; // UPDATE ME IF GAME LOG FORMAT CHANGES, so the default is correct for current game version
 
   let currentDateTime = 0;
+  const lineQueue: string[] = [];
+  let processing = false;
+
+  /** Handles the lines in order, and logs and skips a line that fails, so the lines after it are still handled. */
+  function handleLines(lines: readonly string[]) {
+    lineQueue.push(...lines);
+    if (processing) return;
+    processing = true;
+    let line = lineQueue.shift();
+    while (line !== undefined) {
+      try {
+        handleLine(line);
+      } catch (error) {
+        console.error("Skipped a Client.txt line that failed:", line, error);
+      }
+      line = lineQueue.shift();
+    }
+    processing = false;
+  }
 
   function handleLine(line: string) {
     const wholeLineMatch = line.match(LogRegex);
@@ -86,6 +105,7 @@ export const useClientLog = createGlobalState(() => {
 
   return {
     handleLine,
+    handleLines,
     playerLevel: readonly(playerLevel),
     areaLevel: readonly(areaLevel),
     zoneName: readonly(zoneName),
