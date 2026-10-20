@@ -13,6 +13,11 @@ on:
 permissions:
   contents: read
 
+# A new run waits for the running one, so the newest commit uploads last and no upload stops halfway.
+concurrency:
+  group: build-release-upload
+  cancel-in-progress: false
+
 jobs:
   renderer:
     runs-on: ubuntu-latest

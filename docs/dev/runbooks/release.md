@@ -46,6 +46,10 @@ draft. The `npm run package` step of each `package` job logs one of three outcom
 So the draft must exist before the push that builds the version, and while it exists, every Build
 run for that version replaces its files.
 
+Build runs one at a time. The `concurrency` group in `main.yml` makes a new run wait until the
+running one ends, and a newer push replaces a run that still waits. So the run for the newest
+commit uploads last, and no run is cancelled in the middle of its uploads.
+
 ## The five version places
 
 `versionCheck.py` fails unless these have the same version. It prints `Version mismatch detected:` and the version

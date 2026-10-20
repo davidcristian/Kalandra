@@ -12,7 +12,8 @@ them:
 - [runbooks/release.md](../../runbooks/release.md): GitHub lists draft releases only to a token
   with write access; a new release for an existing tag uses that tag's commit; Re-run all jobs on a
   Build run uploads the files again and replaces the files with the same names; the matrix's
-  default `fail-fast` cancels the other `package` jobs when one fails.
+  default `fail-fast` cancels the other `package` jobs when one fails; a new Build run waits for
+  the running one in its `concurrency` group, and a newer push cancels a run that still waits.
 - [runbooks/docs-site.md](../../runbooks/docs-site.md): `configure-pages` or `deploy-pages` fails
   when the Pages source is not GitHub Actions, or when the branch rule of the `github-pages`
   environment does not allow the branch.
