@@ -90,11 +90,7 @@ async function requestTradeResultList(
 
     data = await readTradeData<SearchResult>(response);
 
-    cache.set<SearchResult>(
-      [body, leagueId],
-      data,
-      Cache.deriveTtl(...RATE_LIMIT_RULES.EXCHANGE),
-    );
+    cache.set<SearchResult>([body, leagueId], data);
   }
 
   return data;

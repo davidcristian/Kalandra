@@ -1282,11 +1282,7 @@ export async function requestTradeResultList(
 
     data = await readTradeData<SearchResult>(response);
 
-    cache.set<SearchResult>(
-      [body, leagueId],
-      data,
-      Cache.deriveTtl(...RATE_LIMIT_RULES.SEARCH, ...RATE_LIMIT_RULES.FETCH),
-    );
+    cache.set<SearchResult>([body, leagueId], data);
   }
 
   return data;
@@ -1316,11 +1312,7 @@ export async function requestResults(
     }>(response);
     data = _data.result.filter((res) => res != null);
 
-    cache.set<FetchResult[]>(
-      resultIds,
-      data,
-      Cache.deriveTtl(...RATE_LIMIT_RULES.SEARCH, ...RATE_LIMIT_RULES.FETCH),
-    );
+    cache.set<FetchResult[]>(resultIds, data);
   }
 
   return data.map<PricingResult>((result) => {
