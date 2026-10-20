@@ -66,4 +66,31 @@ describe("GameConfig.readConfig", () => {
     );
     expect(logger.history).not.toContain("Failed to find");
   });
+
+  it("reads the file at the same path again after a read failed", async () => {
+    const file = configPath();
+    const reader = createReader();
+
+    await reader.readConfig(file);
+    expect(logger.history).toContain("Failed to read game configuration file");
+
+    await writeConfig(file);
+    await reader.readConfig(file);
+    expect(reader.showModsKey).toBe("Z");
+  });
+
+  it("looks for the default file again after none was found", async () => {
+    const documents = configPath("documents");
+    const proton = configPath("proton");
+    const reader = createReader([documents, proton]);
+
+    await reader.readConfig("");
+    expect(logger.history).toContain(
+      "Failed to find game configuration file in the default location.",
+    );
+
+    await writeConfig(proton);
+    await reader.readConfig("");
+    expect(reader.showModsKey).toBe("Z");
+  });
 });

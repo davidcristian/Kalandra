@@ -58,12 +58,10 @@ export class GameConfig {
   ) {}
 
   async readConfig(filePath: string) {
-    if (this._wantedPath !== filePath) {
-      this._wantedPath = filePath;
-      this._actualPath = null;
-    } else {
-      return;
-    }
+    // A read that failed runs again, so a file the game writes after Kalandra starts is read
+    if (this._wantedPath === filePath && this._actualPath !== null) return;
+    this._wantedPath = filePath;
+    this._actualPath = null;
 
     if (!filePath.length) {
       const guessedPath = await guessFileLocation(this.possiblePaths);
