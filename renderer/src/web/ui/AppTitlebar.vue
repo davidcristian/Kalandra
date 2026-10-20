@@ -6,7 +6,7 @@
       @click.stop="emit('close')"
       tabindex="-1"
       :class="[$style.button, $style.close]"
-      title="Close"
+      :title="t('app.close')"
     >
       <i class="fas fa-window-close"></i>
     </button>
@@ -14,6 +14,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
 defineProps<{
   title?: string;
 }>();
@@ -21,6 +23,8 @@ defineProps<{
 const emit = defineEmits<{
   (e: "click" | "close"): void;
 }>();
+
+const { t } = useI18n();
 </script>
 
 <style lang="postcss" module>

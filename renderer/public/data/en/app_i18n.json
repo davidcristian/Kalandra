@@ -18,6 +18,7 @@
     "release_notes": "Release notes",
     "report_bug": "Report a bug on GitHub",
     "quit": "Quit",
+    "close": "Close",
     "deprecated": "This feature is deprecated and will be removed in update {0}"
   },
   "map.mods.heist": "heist",
@@ -251,6 +252,7 @@
   },
   "widget": {
     "title": "widget title",
+    "untitled": "Untitled",
     "hide": "hide",
     "edit": "edit",
     "move": "move",
@@ -515,6 +517,18 @@
     "all": "Default",
     "save": "Save",
     "confirm": "Confirm",
-    "clear": "Clear Saved"
+    "clear": "Clear Saved",
+    "tab_rune": "Rune",
+    "tab_soul_core": "Soul Core",
+    "tab_idol": "Idol",
+    "tab_legacy": "Legacy",
+    "tab_other": "Other",
+    "tab_rune_lesser": "Lesser",
+    "tab_rune_normal": "Normal",
+    "tab_rune_greater": "Greater",
+    "tab_rune_perfect": "Perfect",
+    "tab_rune_other": "Other",
+    "tab_soul_core_normal": "Normal",
+    "tab_soul_core_special": "Special"
   }
 }

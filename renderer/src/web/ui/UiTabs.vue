@@ -3,17 +3,17 @@
     <div class="flex mb-1 gap-px">
       <button
         v-for="(tab, index) in tabs"
-        :key="tab"
-        @click="updateTab(tab)"
+        :key="tab.value"
+        @click="updateTab(tab.value)"
         class="px-2 py-1 text-gray-400 leading-none"
         :class="{
-          'bg-gray-900': modelValue === tab,
-          'bg-gray-700': modelValue !== tab,
+          'bg-gray-900': modelValue === tab.value,
+          'bg-gray-700': modelValue !== tab.value,
           'rounded-l': index === 0,
           'rounded-r': index === tabs.length - 1,
         }"
       >
-        {{ tab }}
+        {{ tab.label }}
       </button>
     </div>
 
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   name: "UiTabs",
@@ -32,7 +32,7 @@ export default defineComponent({
       required: true,
     },
     tabs: {
-      type: Array as () => string[],
+      type: Array as PropType<Array<{ value: string; label: string }>>,
       required: true,
     },
   },

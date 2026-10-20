@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/public/data/en/app_i18n.json](../../../../renderer/public/data/en/app_i18n.json)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-20
 
 [AGENTS.md](../../../../AGENTS.md#architecture-rules) says a new UI string goes into
 `renderer/public/data/en/app_i18n.json`, and translators work from that file. 20 files in
@@ -37,10 +37,13 @@ Two strings do not go through `t()` at all: the label `Open base item on Craft o
 Done looks like: each string has an entry in the English file, and the two literals use a key. The
 English file already maps some texts to themselves, such as `seconds`, so adding each text as a
 top-level key keeps the code and the Russian entries working. The `Hotcool` label needs the realm's
-name from the maintainer, in English and in `cmn-Hant`.
+name from the maintainer, in English and in `cmn-Hant`. `renderer/specs/web/i18n-keys.test.ts` lists
+the 42 keys and fails when one of them gets an English entry, so remove each one there as it does.
 
 ## History
 
 - 2026-10-18: Found while docs/settings.md and docs/item-data.md were written, by checking each
   label the settings pages show against the English `app_i18n.json`. The same day the list was
   extended to every literal `t()` key in `renderer/src/` that the English file does not define.
+- 2026-10-20: A test now checks every literal `t()` key in `renderer/src/` against the English file
+  and lists these 42 as missing. The list above still matches the code.

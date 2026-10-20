@@ -6,7 +6,7 @@
   >
     <div class="widget-default-style p-1" style="min-width: 5rem">
       <div v-if="!isEditing" class="text-gray-100 m-1 leading-4 text-center">
-        {{ config.wmTitle || "Untitled" }}
+        {{ config.wmTitle || t("widget.untitled") }}
       </div>
       <input
         v-else

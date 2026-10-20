@@ -41,16 +41,12 @@
     <hr class="my-2 border-gray-700" />
     <div>
       <!-- augment adding section -->
-      <ui-tabs
-        v-if="displayGroups"
-        v-model="mainTab"
-        :tabs="['Rune', 'Soul Core', 'Idol', 'Legacy', 'Other']"
-      >
+      <ui-tabs v-if="displayGroups" v-model="mainTab" :tabs="tabs.main">
         <template #default="{ selected }">
           <ui-tabs
             v-if="selected === 'Rune'"
             v-model="runeTab"
-            :tabs="['Lesser', 'Normal', 'Greater', 'Perfect', 'Other']"
+            :tabs="tabs.rune"
           >
             <template #default="{ selected }">
               <augments-list
@@ -83,7 +79,7 @@
           <ui-tabs
             v-else-if="selected === 'Soul Core'"
             v-model="soulCoreTab"
-            :tabs="['Normal', 'Special']"
+            :tabs="tabs.soulCore"
           >
             <template #default="{ selected }">
               <augments-list
@@ -174,6 +170,7 @@ import ItemSumPrice from "@/web/ui/ItemSumPrice.vue";
 import UiTabs from "@/web/ui/UiTabs.vue";
 import AugmentsList from "./AugmentsList.vue";
 import { useAugment, categoryAugments } from "./augment";
+import { augmentTabs } from "./augment-tabs";
 import { AppConfig } from "@/web/Config";
 import { EditorItem } from "@/parser/ParsedItem";
 import { buildEditorItems } from "@/parser/augment-builder";
@@ -248,9 +245,11 @@ export default defineComponent({
     }
 
     const { t } = useI18nNs("item_editor");
+    const tabs = computed(() => augmentTabs(t));
 
     return {
       t,
+      tabs,
       mainTab,
       runeTab,
       soulCoreTab,

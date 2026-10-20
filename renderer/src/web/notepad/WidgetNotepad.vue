@@ -13,7 +13,7 @@
       }"
     >
       <div v-if="!isEditing" class="m-1 text-center truncate">
-        {{ config.wmTitle || "Untitled" }}
+        {{ config.wmTitle || t("widget.untitled") }}
       </div>
       <input
         v-else

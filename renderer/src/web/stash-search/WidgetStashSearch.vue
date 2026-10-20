@@ -5,7 +5,9 @@
       style="min-width: 5rem"
     >
       <div class="text-gray-100 p-1 flex items-center justify-between gap-4">
-        <span class="truncate">{{ config.wmTitle || "Untitled" }}</span>
+        <span class="truncate">{{
+          config.wmTitle || t("widget.untitled")
+        }}</span>
         <ui-toggle v-if="hasHotkeys" v-model="config.enableHotkeys">{{
           t("stash_search.enable_keys")
         }}</ui-toggle>
