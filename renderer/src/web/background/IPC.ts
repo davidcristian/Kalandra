@@ -41,7 +41,11 @@ class HostTransport {
         onmessage: (e) => {
           this.selfDispatch(JSON.parse(e.data));
         },
-        onopen: resolve,
+        onopen: (e) => {
+          // main sends its whole log history first on each connection, including one after a reconnect
+          this.logs.value = "";
+          resolve(e);
+        },
       });
     });
   }

@@ -34,7 +34,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::ocr-text` | `target`, `pressTime`, `ocrTime`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
-| `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`, the last 1000 lines) |
+| `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`, the last 1000 lines, cleared when the socket opens) |
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
 | `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |
@@ -116,6 +116,11 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - Every page handles `MAIN->CLIENT::game-log` and sends the same `client-log-event` entries, so `server.ts` passes
   on those of one client only: the newest overlay window, or the last active client when no overlay window is
   connected (`clientLogWriter()` in `main/src/client-log-writer.ts`).
+- Sockette in `IPC.ts` opens the socket again one second after it closes with a code other than 1000, 1001 or
+  1005, and main treats the reopened socket as a new client and the last active one. The page sends nothing again:
+  main keeps the `HostConfig` for its whole run, and a main that starts again opens a new page, which sends its own.
+  The page clears `Host.logs` when the socket opens, so the history main sends to the new client replaces the
+  page's copy rather than repeating it.
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
 - Neither end checks a payload. `server.ts` ignores and logs a message that is not JSON, has no string `name` or

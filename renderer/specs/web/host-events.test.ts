@@ -7,19 +7,31 @@ const OVERLAY_USER_AGENT =
 const BROWSER_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
-/** Stands in for the browser's WebSocket: opens at once and keeps the text the page sends. */
+/** Stands in for the browser's WebSocket: opens at once, keeps the text the page sends and passes on main's messages. */
 class FakeWebSocket {
   static readonly sent: string[] = [];
+  static readonly created: FakeWebSocket[] = [];
   onopen: (e: Event) => void = () => {};
+  onmessage: (e: { data: string }) => void = () => {};
+  onclose: (e: { code: number }) => void = () => {};
+  readonly isOpen: Promise<void>;
 
   constructor() {
-    queueMicrotask(() => {
-      this.onopen(new Event("open"));
+    FakeWebSocket.created.push(this);
+    this.isOpen = new Promise((resolve) => {
+      queueMicrotask(() => {
+        this.onopen(new Event("open"));
+        resolve();
+      });
     });
   }
 
   send(text: string) {
     FakeWebSocket.sent.push(text);
+  }
+
+  receive(event: IpcEvent) {
+    this.onmessage({ data: JSON.stringify(event) });
   }
 }
 
@@ -104,5 +116,36 @@ describe("Host.logs", () => {
     expect(lines).toHaveLength(LOG_LINES);
     expect(lines[0]).toBe("[12:00:00] info entry 2");
     expect(lines.at(-1)).toBe("[12:00:02] info second new");
+  });
+});
+
+const logEntry = (message: string): IpcEvent => ({
+  name: "MAIN->CLIENT::log-entry",
+  payload: { message },
+});
+
+describe("Host.logs after a reconnect", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("replaces the page's copy with the history main sends to the new socket", async () => {
+    vi.stubGlobal("WebSocket", FakeWebSocket);
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const first = FakeWebSocket.created.at(-1)!;
+    first.receive(logEntry("[12:00:00] info before\n"));
+
+    first.onclose({ code: 1006 });
+    vi.runOnlyPendingTimers();
+    const second = FakeWebSocket.created.at(-1)!;
+    await second.isOpen;
+    second.receive(
+      logEntry("[12:00:00] info before\n[12:00:01] info while closed\n"),
+    );
+
+    expect(second).not.toBe(first);
+    expect(Host.logs.value).toBe(
+      "[12:00:00] info before\n[12:00:01] info while closed\n",
+    );
   });
 });
