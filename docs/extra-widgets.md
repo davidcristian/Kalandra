@@ -36,7 +36,8 @@ Click `edit` again to finish.
 
 Kalandra copies each added image into the `apt-data\files` folder of its data folder (`%APPDATA%\kalandra` on
 Windows), so you can move or delete the original file. It adds PNG, JPEG, GIF, WebP, AVIF, BMP and ICO images, and
-does not add another kind of file or an image larger than about 16 MB.
+does not add another kind of file or an image larger than about 16 MB. When it does not add a file, a red message
+under `Choose File` says so.
 
 ![An image strip titled Some Title with two images](/reference-images/SecondImageStripWidget.png)
 

@@ -48,7 +48,10 @@
           </div>
         </template>
         <template #footer v-if="isEditing">
-          <div :class="$style.card" class="flex justify-center items-center">
+          <div
+            :class="$style.card"
+            class="flex flex-col justify-center items-center"
+          >
             <input
               type="file"
               id="file"
@@ -61,6 +64,12 @@
               for="file"
               ><i class="fas fa-file-import"></i> {{ t("choose_file") }}</label
             >
+            <p
+              v-if="failed"
+              class="text-red-400 text-xs leading-tight text-center mt-1"
+            >
+              {{ t("image_strip.import_failed") }}
+            </p>
           </div>
         </template>
       </DndContainer>
@@ -103,6 +112,7 @@ import { inject, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { Host } from "@/web/background/IPC";
 import { WidgetManager } from "./interfaces";
+import { useImageImport } from "./image-import";
 
 import DndContainer from "vuedraggable";
 import Widget from "./Widget.vue";
@@ -134,17 +144,14 @@ if (props.config.wmFlags[0] === "uninitialized") {
   });
 }
 
+const { failed, addImage } = useImageImport(props.config, (file) =>
+  Host.importFile(file),
+);
+
 async function handleFile(e: Event) {
   const target = (e as InputEvent).target as HTMLInputElement;
-  try {
-    const name = await Host.importFile(target.files![0]);
-    props.config.images.push({
-      id: Math.max(0, ...props.config.images.map((_) => _.id)) + 1,
-      url: name,
-    });
-  } finally {
-    target.value = "";
-  }
+  await addImage(target.files![0]);
+  target.value = "";
 }
 
 function remove(id: number) {

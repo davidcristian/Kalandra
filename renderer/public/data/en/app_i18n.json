@@ -295,7 +295,8 @@
     "friendly_name": "friendly name"
   },
   "image_strip": {
-    "name": "Image strip"
+    "name": "Image strip",
+    "import_failed": "Could not add the file. Kalandra adds PNG, JPEG, GIF, WebP, AVIF, BMP and ICO images up to about 16 MB."
   },
   "item_search": {
     "name": "Item search",
