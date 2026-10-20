@@ -125,3 +125,4 @@ layout and its reasons.
 - 063: [The trade site's item and stat lists match only English item text](tasks/063-trade-lists-english-only.md)
 - 064: [The parser cannot distinguish some stats that share a text](tasks/064-shared-stat-texts.md)
 - 065: [The stats.ndjson files of the languages differ in their refs and stats](tasks/065-stat-refs-differ-between-languages.md)
+- 066: [ConfigStore sends config-changed before the save is written](tasks/066-config-changed-before-write.md)
