@@ -1348,8 +1348,7 @@ export async function requestResults(
         : result.item.socketedItems
             ?.filter((s) => s.gemSockets)
             .map((s) => s.gemSockets!)
-            // sort in descending order
-            .toSorted((a, b) => a!.length - b!.length)[0]?.length,
+            .toSorted((a, b) => b.length - a.length)[0]?.length,
       relativeDate:
         DateTime.fromISO(result.listing.indexed).toRelative({
           style: "short",
