@@ -182,7 +182,7 @@ covers item filters, stat filters, the missing fractured rules, the pseudo stats
 `filters/util.ts`.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
-file fixture.
+file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks, and
 `specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` that answers when
 the test says.
