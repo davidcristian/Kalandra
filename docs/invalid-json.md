@@ -2,19 +2,20 @@
 title: Invalid JSON
 ---
 
-A price check can fail with an error whose message starts with `Unexpected token` and ends with
-`is not valid JSON`:
+A price check can fail with an error box titled **Trade site request failed** that shows this line:
+
+`Error: The trade site sent a web page instead of data (status 503). It can be down, under maintenance or showing a bot check.`
+
+The number is the HTTP status that the trade site answered with, such as 403 or 503. The error can appear on an
+item search and on a bulk search, such as a currency price check. Older versions of Kalandra show the line
+`Error: Unexpected token '<', "<!DOCTYPE "... is not valid JSON` for the same cause:
 
 ![The Trade site request failed error box with an Unexpected token message that ends in is not valid JSON, and the buttons Retry and Browser](/reference-images/jsonError.png)
 
-The error box is titled **Trade site request failed** and shows the line
-`Error: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`. It can appear on an item search and on a bulk
-search, such as a currency price check.
-
-JSON is the data format of the trade site's responses. The error means that the trade site sent a web page where
-Kalandra expected JSON: a web page starts with `<!DOCTYPE`, and its first character `<` is the unexpected token. The
-trade site sends a web page when it is down or under maintenance, or when it shows a bot check: a page that tells
-people from automated programs.
+JSON is the data format of the trade site's responses. Both errors mean that the trade site sent a web page where
+Kalandra expected JSON. A web page starts with `<!DOCTYPE`, and its first character `<` is the unexpected token of
+the older message. The trade site sends a web page when it is down or under maintenance, or when it shows a bot
+check: a page that tells people from automated programs.
 
 ## Fix it
 

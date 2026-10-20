@@ -133,7 +133,8 @@ that the route needs ([main.md](main.md)).
 it at start. The "Refresh" button next to the league list in the price check settings and the "Retry" button
 under "Failed to load leagues" call it again. A league whose id contains `Ruthless` or ends in `(PL<number>)`
 counts as private, so `isPopular` is false and no price file is read. When the saved league is not in the list and
-is not private, `load()` selects the third league when the list has more than two, otherwise the first.
+is not private, `load()` selects the third league when the list has more than two, otherwise the first. A failed
+load is logged with `console.warn` and its message kept in `error`.
 
 ## Invariants
 
@@ -162,12 +163,16 @@ is not private, `load()` selects the third league when the list has more than tw
 - **The price file's key order and file names are shared with `priceService/`**: see
   [why the key order is a format](price-service.md#why-the-key-order-is-a-format) and
   [the files](price-service.md#the-files).
-- **Trade responses are untrusted.** A trade site `error` is thrown as an `Error` and shown in the result list. A
-  listing that `parseFetchResult` cannot read is logged and kept without its item tooltip.
+- **Trade responses are untrusted.** `readTradeData()` in `trade/trade-response.ts` reads the search, fetch,
+  exchange, league, item and stat list responses. A body that is not a JSON object, such as the web page the site
+  sends while it is down or checks for bots, a trade site `error` and any other failed status each throw a
+  `TradeResponseError` with the HTTP status in `status`. Its message names the status, or is the site's own message
+  for an `error`, and the result lists show it. A listing that `parseFetchResult` cannot read is logged and kept
+  without its item tooltip.
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 2088 lines** (2026-10-19,
+- **`pathofexile-trade.ts` is 2079 lines** (2026-10-20,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 
@@ -191,5 +196,7 @@ file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's ite
 with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
 `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing and restrictions with fake
-timers. `listing-markers.test.ts` there checks which column shows a listing's markers. No test calls a live site.
+timers. `listing-markers.test.ts` there checks which column shows a listing's markers, and `trade-response.test.ts`
+reads hand-written responses with `readTradeData` and answers each trade site request with a web page. No test
+calls a live site.
 `Leagues.ts` and `poeprices.ts` have no test file of their own.

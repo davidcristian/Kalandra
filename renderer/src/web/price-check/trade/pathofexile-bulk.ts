@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 import { Host } from "@/web/background/IPC";
 import {
-  TradeResponse,
   Account,
   getTradeEndpoint,
   RATE_LIMIT_RULES,
@@ -10,6 +9,7 @@ import {
   preventQueueCreation,
 } from "./common";
 import { RateLimiter } from "./RateLimiter";
+import { readTradeData } from "./trade-response";
 import { ItemFilters } from "../filters/interfaces";
 import { ParsedItem } from "@/parser";
 import { Cache } from "./Cache";
@@ -88,12 +88,7 @@ async function requestTradeResultList(
     );
     adjustRateLimits(RATE_LIMIT_RULES.EXCHANGE, response.headers);
 
-    const _data = (await response.json()) as TradeResponse<SearchResult>;
-    if (_data.error) {
-      throw new Error(_data.error.message);
-    } else {
-      data = _data;
-    }
+    data = await readTradeData<SearchResult>(response);
 
     cache.set<SearchResult>(
       [body, leagueId],

@@ -68,4 +68,5 @@ issue on [GitHub](https://github.com/davidcristian/Kalandra/issues).
 - [No stats to select](/no-item-mods): what to do when the price check window shows no mods.
 - [Query is too complex](/complex-query): what to do when the trade site rejects a search as too complex.
 - [Failed to load leagues](/failed-load-leagues): what to do when Kalandra cannot load the league list.
-- [Invalid JSON](/invalid-json): what the invalid JSON error means and what to check before reporting it.
+- [Invalid JSON](/invalid-json): what the error about a web page instead of data, which older versions call invalid
+  JSON, means and what to check before reporting it.

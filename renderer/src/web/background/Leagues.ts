@@ -2,6 +2,7 @@ import { computed, shallowRef, readonly } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { AppConfig, poeWebApi } from "@/web/Config";
 import { Host } from "./IPC";
+import { readTradeData } from "@/web/price-check/trade/trade-response";
 
 // pc-ggg, pc-garena
 // const PERMANENT_SC = ['Standard', '標準模式']
@@ -52,9 +53,7 @@ export const useLeagues = createGlobalState(() => {
       const response = await Host.proxy(
         `${poeWebApi()}/api/trade2/data/leagues`,
       );
-      if (!response.ok)
-        throw new Error(JSON.stringify(Object.fromEntries(response.headers)));
-      const leagues: { result: TradeLeague[] } = await response.json();
+      const leagues = await readTradeData<{ result: TradeLeague[] }>(response);
       tradeLeagues.value = leagues.result.map((league) => {
         return { id: league.id, isPopular: true, text: league.text };
       });
@@ -72,6 +71,7 @@ export const useLeagues = createGlobalState(() => {
         }
       }
     } catch (e) {
+      console.warn("Cannot load the trade leagues:", e);
       error.value = (e as Error).message;
     } finally {
       isLoading.value = false;

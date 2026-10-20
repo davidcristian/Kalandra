@@ -28,6 +28,6 @@
 379 renderer/src/web/price-check/settings-price-check.vue
 419 renderer/src/web/price-check/trade/TooltipItem.vue
 353 renderer/src/web/price-check/trade/TradeListing.vue
-2088 renderer/src/web/price-check/trade/pathofexile-trade.ts
+2079 renderer/src/web/price-check/trade/pathofexile-trade.ts
 345 renderer/src/web/price-check/trends/getDetailsId.ts
 540 renderer/src/web/settings/SettingsWindow.vue

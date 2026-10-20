@@ -11,7 +11,6 @@ import { setProperty as propSet } from "dot-prop";
 import { DateTime } from "luxon";
 import { Host } from "@/web/background/IPC";
 import {
-  TradeResponse,
   Account,
   getTradeEndpoint,
   adjustRateLimits,
@@ -20,6 +19,7 @@ import {
 } from "./common";
 import { STAT_BY_REF, CLIENT_STRINGS as _$ } from "@/assets/data";
 import { RateLimiter } from "./RateLimiter";
+import { readTradeData } from "./trade-response";
 import { ModifierType } from "@/parser/modifiers";
 import { Cache } from "./Cache";
 import { parseAffixStrings } from "@/parser/Parser";
@@ -1280,12 +1280,7 @@ export async function requestTradeResultList(
     );
     adjustRateLimits(RATE_LIMIT_RULES.SEARCH, response.headers);
 
-    const _data = (await response.json()) as TradeResponse<SearchResult>;
-    if (_data.error) {
-      throw new Error(_data.error.message);
-    } else {
-      data = _data;
-    }
+    data = await readTradeData<SearchResult>(response);
 
     cache.set<SearchResult>(
       [body, leagueId],
@@ -1316,14 +1311,10 @@ export async function requestResults(
     );
     adjustRateLimits(RATE_LIMIT_RULES.FETCH, response.headers);
 
-    const _data = (await response.json()) as TradeResponse<{
+    const _data = await readTradeData<{
       result: Array<FetchResult | null>;
-    }>;
-    if (_data.error) {
-      throw new Error(_data.error.message);
-    } else {
-      data = _data.result.filter((res) => res != null);
-    }
+    }>(response);
+    data = _data.result.filter((res) => res != null);
 
     cache.set<FetchResult[]>(
       resultIds,

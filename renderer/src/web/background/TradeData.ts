@@ -1,6 +1,7 @@
 import { readonly, shallowRef } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { Host } from "@/web/background/IPC";
+import { readTradeData } from "@/web/price-check/trade/trade-response";
 
 // from Prices.ts, but longer periods since maybe would slowdown ui more
 const RETRY_INTERVAL_MS = 30 * 60 * 1000; // 30 min, try to get new stuff
@@ -59,12 +60,10 @@ export const useTradeData = createGlobalState(() => {
         signal: downloadController.signal,
       },
     );
-    const resText = await response.text();
-    const tradeStatsProcessingTime = performance.now();
-
-    const rawStatsData = JSON.parse(resText) as {
+    const rawStatsData = await readTradeData<{
       result: Array<{ id: string; entries: TradeStat[] }>;
-    };
+    }>(response);
+    const tradeStatsProcessingTime = performance.now();
 
     const outStatData: Map<string, { [type: string]: string[] }> = new Map();
     const statDataSet = new Set<string>();
@@ -109,12 +108,10 @@ export const useTradeData = createGlobalState(() => {
         signal: downloadController.signal,
       },
     );
-    const resText = await response.text();
-    const tradeItemsProcessingTime = performance.now();
-
-    const rawItemData = JSON.parse(resText) as {
+    const rawItemData = await readTradeData<{
       result: Array<{ entries: TradeItem[] }>;
-    };
+    }>(response);
+    const tradeItemsProcessingTime = performance.now();
 
     const outItemData = new Set<string>();
 

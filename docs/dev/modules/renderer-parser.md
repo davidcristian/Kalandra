@@ -149,7 +149,7 @@ imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loa
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (53.2% of the lines of `src/` on 20 Oct 2026). The parser suites are
+below the floor in `renderer/vitest.config.ts` (54.2% of the lines of `src/` on 20 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader,
 and `specs/data/fetchData.test.ts` a data file that the server does not return.
