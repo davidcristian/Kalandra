@@ -127,3 +127,4 @@ layout and its reasons.
 - 065: [The stats.ndjson files of the languages differ in their refs and stats](tasks/065-stat-refs-differ-between-languages.md)
 - 066: [ConfigStore sends config-changed before the save is written](tasks/066-config-changed-before-write.md)
 - 067: [An event the page sends while the events socket reopens is lost](tasks/067-events-sent-while-socket-reopens.md)
+- 068: [The listing tooltip names an unidentified item's tier in English](tasks/068-unidentified-tier-tag.md)
