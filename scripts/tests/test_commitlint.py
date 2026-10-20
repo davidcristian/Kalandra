@@ -1,6 +1,10 @@
+import io
+import os
 import subprocess
+import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 from support import RULES_TABLE, repo
@@ -28,6 +32,10 @@ folder, and repoints every link at davidcristian/Kalandra.
 BREAKING CHANGE: settings live in %APPDATA%\kalandra; copy apt-data
 from %APPDATA%\exiled-exchange-2 to keep existing settings.
 """
+
+
+COMMENT_LINE = "fix: a subject\n\n#12 is a line that starts with a hash -- here\n"
+SCRIPT = Path(commitlint.__file__).resolve()
 
 
 def words(count: int) -> str:
@@ -108,6 +116,41 @@ class CommitLintTest(unittest.TestCase):
         self.assertEqual(self.check("Merge branch 'master' into dev\n\nThis gates it -- now.\n"), [])
         self.assertEqual(self.check("fixup! fix: a subject\n\nThis gates it -- now.\n"), [])
         self.assertEqual(self.check("fix: a subject\n# Please enter the commit message -- here\n"), [])
+
+    def test_checks_lines_that_start_with_a_hash_in_a_message_not_typed_in_an_editor(self) -> None:
+        self.assertEqual(
+            commitlint.check_message(COMMENT_LINE, Path(), self.rules, from_editor=False),
+            ["line 3 uses a spaced --", "line 3 has an issue or pull request number"],
+        )
+
+    def test_main_reads_from_the_environment_whether_git_opened_an_editor(self) -> None:
+        message = Path(self.rules.parent) / "COMMIT_EDITMSG"
+        message.write_text(COMMENT_LINE, encoding="utf-8")
+        output = io.StringIO()
+        with redirect_stderr(output):
+            without_editor = commitlint.main([str(message)], {"GIT_EDITOR": ":"})
+            with_editor = commitlint.main([str(message)], {"GIT_EDITOR": "vim"})
+            unset = commitlint.main([str(message)], {})
+        self.assertEqual((without_editor, with_editor, unset), (1, 0, 0))
+        self.assertIn("commitlint: line 3 has an issue or pull request number", output.getvalue())
+
+    def test_checks_the_lines_that_git_keeps_as_a_commit_msg_hook(self) -> None:
+        with repo({"a.txt": "a\n", "message.txt": COMMENT_LINE}) as root:
+            hook = root / "hooks" / "commit-msg"
+            hook.parent.mkdir()
+            python, script = Path(sys.executable).as_posix(), SCRIPT.as_posix()
+            hook.write_text(f'#!/bin/sh\nexec "{python}" "{script}" "$1"\n', encoding="utf-8", newline="\n")
+            hook.chmod(0o755)
+            git = ["git", "-C", str(root), "-c", "core.hooksPath=hooks", "-c", "user.name=t", "-c", "user.email=t@t"]
+            env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+            subprocess.run([*git, "add", "a.txt"], check=True, env=env)  # noqa: S603 a fixed git command
+            commit = [*git, "commit", "-q", "-F", "message.txt"]
+            kept = subprocess.run(commit, capture_output=True, text=True, check=False, env=env)  # noqa: S603 a fixed git command
+            editor = {**env, "GIT_EDITOR": "test -f"}
+            dropped = subprocess.run([*commit, "-e"], capture_output=True, text=True, check=False, env=editor)  # noqa: S603 a fixed git command
+        self.assertEqual(kept.returncode, 1, kept.stderr)
+        self.assertIn("commitlint: line 3 has an issue or pull request number", kept.stderr)
+        self.assertEqual(dropped.returncode, 0, dropped.stderr)
 
     def test_reports_a_fence_nothing_closes(self) -> None:
         self.assertIn("line 3 opens a code fence that nothing closes", self.check("fix: a subject\n\n```\npasted\n"))

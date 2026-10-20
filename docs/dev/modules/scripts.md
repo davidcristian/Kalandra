@@ -68,8 +68,11 @@ repo root affects no job, and any other path that no rule matches affects every 
 ### commitlint.py
 
 The commit-msg hook runs `python scripts/commitlint.py <message file>`, after conventional-pre-commit has checked
-the type and form. It drops the lines that start with `#`, which git leaves out of the message, then prints
-`commitlint: <problem>` for each rule the message breaks and exits with 1, or exits with 0.
+the type and form. When git opened an editor for the message, the script drops the lines that start with `#`, which
+git then removes. A message given with `-m` or `-F` keeps them under git's default cleanup, and git runs the hook with
+`GIT_EDITOR=:`, so the script checks them. To check a stored message by hand, such as the output of
+`git log -1 --format=%B`, set `GIT_EDITOR=:` too. The script prints `commitlint: <problem>` for each rule the message
+breaks and exits with 1, or exits with 0.
 
 - The first line: at most 72 characters, a lowercase first letter, no period at the end, and no scope that repeats
   the type (`docs(docs)`).
@@ -95,11 +98,11 @@ the type and form. It drops the lines that start with `#`, which git leaves out 
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 54 tests on 19 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 57 tests on 20 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 91.1% of lines and branches on 19 Oct 2026.
+floor in `scripts/.coveragerc`, 92.8% of lines and branches on 20 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

@@ -1,10 +1,11 @@
 """Checks one commit message against the commit rules in AGENTS.md that a machine can read."""
 
 import argparse
+import os
 import re
 import subprocess
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import NamedTuple
 
@@ -144,9 +145,14 @@ def check_words(classified: Sequence[Line], rules: Path) -> list[str]:
     return [f'line {hit.line} uses the banned word "{hit.word}"' for hit in bannedwords.find_words(prose, pattern)]
 
 
-def check_message(text: str, repo: Path, rules: Path = RULES) -> list[str]:
-    """Returns every problem with a commit message, or nothing for a merge or a fixup."""
-    lines = [line for line in text.splitlines() if not line.startswith("#")]
+def check_message(text: str, repo: Path, rules: Path = RULES, *, from_editor: bool = True) -> list[str]:
+    """Returns every problem with a commit message, or nothing for a merge or a fixup.
+
+    It drops the lines that start with `#` only from a message typed in an editor, where git drops them too.
+    """
+    lines = text.splitlines()
+    if from_editor:
+        lines = [line for line in lines if not line.startswith("#")]
     while lines and not lines[-1].strip():
         lines.pop()
     header = lines[0] if lines else ""
@@ -156,14 +162,17 @@ def check_message(text: str, repo: Path, rules: Path = RULES) -> list[str]:
     return check_header(header) + check_body(classified, opened, repo) + check_words(classified, rules)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv: Sequence[str] | None = None, environ: Mapping[str, str] = os.environ) -> int:
     """Checks the commit message file git passes to the commit-msg hook."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("message_file", type=Path, help="the file that holds the commit message")
     parser.add_argument("--repo", type=Path, default=Path(), help="the repo that commit hashes are looked up in")
     args = parser.parse_args(argv)
     message_file: Path = args.message_file
-    problems = check_message(message_file.read_text(encoding="utf-8"), args.repo)
+    # git sets GIT_EDITOR to ":" for the hook when it opens no editor (https://git-scm.com/docs/githooks), and then
+    # its default cleanup keeps the lines that start with `#` (`--cleanup` in https://git-scm.com/docs/git-commit).
+    from_editor = environ.get("GIT_EDITOR") != ":"
+    problems = check_message(message_file.read_text(encoding="utf-8"), args.repo, from_editor=from_editor)
     for problem in problems:
         print(f"commitlint: {problem}", file=sys.stderr)
     if problems:
