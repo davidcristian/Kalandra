@@ -107,6 +107,7 @@ General, sets another path), and uses Alt when the file does not set it
     uses Ctrl + Alt + C, or the game did not copy: the user page
     [Nothing happens](../../nothing-happens.md) lists the usual causes.
   - `error [GameConfig] Failed to find game configuration file in the default location.`,
+    `error [GameConfig] Found more than one game configuration file, enter one in settings: <paths>`,
     `error [GameConfig] Failed to read game configuration file.`,
     `error [GameConfig] Failed to read key: <value>.` or
     `error [GameConfig] Failed to read modifier key: <value>.` when main cannot read the key.

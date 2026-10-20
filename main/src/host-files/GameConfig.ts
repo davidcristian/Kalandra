@@ -54,6 +54,7 @@ export class GameConfig {
   constructor(
     private server: ServerEvents,
     private logger: Logger,
+    private possiblePaths: readonly string[] = POSSIBLE_PATH,
   ) {}
 
   async readConfig(filePath: string) {
@@ -65,9 +66,14 @@ export class GameConfig {
     }
 
     if (!filePath.length) {
-      const guessedPath = await guessFileLocation(POSSIBLE_PATH);
+      const guessedPath = await guessFileLocation(this.possiblePaths);
       if (guessedPath != null) {
         filePath = guessedPath;
+      } else if (guessedPath === null) {
+        this.logger.write(
+          `error [GameConfig] Found more than one game configuration file, enter one in settings: ${this.possiblePaths.join(", ")}`,
+        );
+        return;
       } else {
         this.logger.write(
           "error [GameConfig] Failed to find game configuration file in the default location.",

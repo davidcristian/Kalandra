@@ -141,8 +141,9 @@ The entry, the server and the app services, in `main/src/`:
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on
-  Linux, and `Path of Exile 2/Preferences/` under the application data folder on macOS. `showModsKey` is that key,
-  or `Alt` when none was read.
+  Linux, and `Path of Exile 2/Preferences/` under the application data folder on macOS. When the file exists in
+  more than one default location, it reads neither and logs an error that names them and asks for a path.
+  `showModsKey` is that key, or `Alt` when none was read.
 - `GameLogWatcher.ts`: `GameLogWatcher.restart(logFile, readLog)` follows `Client.txt` only when `readLog` is true.
   With no path it tries the standalone and Steam install folders for the platform, and when both exist it logs an
   error that asks for a path. It polls the file every 450 ms with `fs.watchFile`, starts at the end of the file, and
@@ -202,7 +203,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (42.1% of the lines of `src/` on 19 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (46.7% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
@@ -223,6 +224,7 @@ write or fail the rename as Windows does for a file another program has open. `G
 in `fake-server.ts`, whose `emit` settles when the promises the handlers return settle. `FileWriter.test.ts` also
 delays the first file write to check that lines keep their order. `GameLogWatcher.test.ts` also deletes a new log
 as the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete.
+`GameConfig.test.ts` writes game config files in a temporary folder and passes its own default paths.
 A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`.
 `npm run build` in `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build
 workflow packages main on all three platforms.

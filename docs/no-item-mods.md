@@ -24,7 +24,8 @@ names the log line that shows it.
   `error [GameConfig] Failed to read modifier key: <value>.` Bind a keyboard key alone, or with `Shift`, `Ctrl` or
   `Alt`, then restart Kalandra.
 - **The key is not `Alt`, and Kalandra cannot read the game's config file**, so it presses `Alt`. The log shows
-  `error [GameConfig] Failed to find game configuration file in the default location.` or
+  `error [GameConfig] Failed to find game configuration file in the default location.`,
+  `error [GameConfig] Found more than one game configuration file, enter one in settings: <paths>` or
   `error [GameConfig] Failed to read game configuration file.` Set the path of `poe2_production_Config.ini` in
   **PoE config file** on the **General** settings page. On Windows, Kalandra looks for the file in
   `Documents\My Games\Path of Exile 2`.
