@@ -35,34 +35,43 @@ export const server = createServer((req, res) => {
 const websocketServer = new WebSocketServer({ noServer: true });
 let lastActiveClient: WebSocket;
 
-if (!process.env.VITE_DEV_SERVER_URL) {
-  httpRoutes.addListener("request", (req, res) => {
-    if (
-      req.url?.startsWith("/config") ||
-      req.url?.startsWith("/uploads") ||
-      req.url?.startsWith("/proxy")
-    )
-      return;
-
-    const filePath = req.url === "/" ? "/index.html" : req.url!;
-    switch (path.extname(filePath)) {
-      case ".html":
-        res.setHeader("content-type", "text/html");
-        break;
-      case ".js":
-        res.setHeader("content-type", "text/javascript");
-        break;
-      case ".json":
-        res.setHeader("content-type", "application/json");
-        break;
-      case ".svg":
-        res.setHeader("content-type", "image/svg+xml");
-        break;
-    }
-
-    sendFile(res, __dirname, filePath);
-  });
+// The /config route in startServer(), addFileUploadRoutes() and HttpProxy answer these paths
+function hasOwnRoute(url: string): boolean {
+  return (
+    url === "/config" ||
+    url.startsWith("/uploads/") ||
+    url.startsWith("/proxy/")
+  );
 }
+
+httpRoutes.addListener("request", (req, res) => {
+  const url = req.url ?? "/";
+  if (hasOwnRoute(url)) return;
+  // Vite serves the renderer files in development
+  if (process.env.VITE_DEV_SERVER_URL) {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+
+  const filePath = url === "/" ? "/index.html" : url;
+  switch (path.extname(filePath)) {
+    case ".html":
+      res.setHeader("content-type", "text/html");
+      break;
+    case ".js":
+      res.setHeader("content-type", "text/javascript");
+      break;
+    case ".json":
+      res.setHeader("content-type", "application/json");
+      break;
+    case ".svg":
+      res.setHeader("content-type", "image/svg+xml");
+      break;
+  }
+
+  sendFile(res, __dirname, filePath);
+});
 
 const evBus = new EventEmitter();
 

@@ -26,7 +26,8 @@ The entry, the server and the app services, in `main/src/`:
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
-  returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`.
+  returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every
+  path the other routes do not, so no request is left without a response.
   The target `"broadcast"` sends to every client, and `"last-active"` and `"any"` both send to the last active
   client. A new client receives the log history and the current updater state, which the first update check can
   change after the page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and logged unless the client's
@@ -134,7 +135,7 @@ The entry, the server and the app services, in `main/src/`:
 - `file-uploads.ts`: `addFileUploadRoutes(routes, logger)` adds the `/uploads/` routes, which store files in
   `apt-data/files/`. `POST` stores only a file whose URL path ends in an image extension that Chromium shows in an
   `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. A failed
-  write returns 500 and logs `error [uploads] <message>`.
+  write returns 500 and logs `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
 - `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
   returns 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
   one with `..` segments, which Node passes on in `req.url` as sent.
@@ -214,9 +215,10 @@ messages, and sends overlay events with the User-Agent of the overlay window, of
 `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
 key press to the text in the box. `key-log.test.ts` sends key events through the fake global hook of
 `fake-hook.ts` and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of
-modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign origins
-and host names to the HTTP routes and to `/events`. `file-uploads.test.ts` posts
-images and other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
+modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign
+origins and host names to the HTTP routes and to `/events`, and paths and methods that no route serves.
+`file-uploads.test.ts` posts images and other files to the `/uploads/` routes, and an image while a file holds the
+place of the uploads folder.
 `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake
 `net.request` that answers with the request it was given.
 `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a

@@ -24,6 +24,25 @@ export async function post(
   return await send(options, body);
 }
 
+// Resolves the status and the Allow header of a request with this method and no body
+export async function sendMethod(
+  port: number,
+  method: string,
+  urlPath: string,
+): Promise<{ status: number; allow: string | undefined }> {
+  return await new Promise((resolve, reject) => {
+    const options = { host: "127.0.0.1", port, path: urlPath, method };
+    const req = http.request(options, (res) => {
+      res.resume();
+      res.on("end", () => {
+        resolve({ status: res.statusCode ?? 0, allow: res.headers.allow });
+      });
+    });
+    req.on("error", reject);
+    req.end();
+  });
+}
+
 async function send(
   options: http.RequestOptions,
   requestBody?: string,

@@ -64,6 +64,15 @@ export function addFileUploadRoutes(routes: HttpRoutes, logger: Logger) {
       );
     });
   });
+
+  routes.addListener("request", (req, res) => {
+    if (!req.url?.startsWith("/uploads/")) return;
+    if (req.method === "GET" || req.method === "POST") return;
+
+    res.statusCode = 405;
+    res.setHeader("allow", "GET, POST");
+    res.end();
+  });
 }
 
 function imageExtension(url: string): string | undefined {

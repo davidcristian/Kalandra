@@ -2,12 +2,20 @@ import * as fs from "fs";
 import * as path from "path";
 import type { AddressInfo } from "net";
 import { app } from "electron";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { addFileUploadRoutes } from "../src/host-files/file-uploads";
 import { Logger } from "../src/RemoteLogger";
 import { httpRoutes, server } from "../src/server";
 import { FakeServer } from "./fake-server";
-import { get, openSocket } from "./request";
+import { get, openSocket, sendMethod } from "./request";
 
 vi.mock("electron", async () => {
   const fs = await import("node:fs");
@@ -30,6 +38,10 @@ beforeAll(async () => {
     server.listen(0, "127.0.0.1", resolve);
   });
   port = (server.address() as AddressInfo).port;
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 afterAll(() => {
@@ -66,6 +78,30 @@ describe("the static file route", () => {
     const reply = await get(port, "/../package.json");
     expect(reply.status).toBe(404);
     expect(reply.body).not.toContain("kalandra");
+  });
+});
+
+describe("a request that no route serves", () => {
+  it.each(["/configuration.js", "/config?x=1", "/uploads", "/proxy"])(
+    "returns 404 for %s",
+    async (urlPath) => {
+      expect((await get(port, urlPath)).status).toBe(404);
+    },
+  );
+
+  it.each(["PUT", "DELETE", "HEAD"])(
+    "returns 405 and the allowed methods for %s under /uploads/",
+    async (method) => {
+      expect(await sendMethod(port, method, "/uploads/image.png")).toEqual({
+        status: 405,
+        allow: "GET, POST",
+      });
+    },
+  );
+
+  it("returns 404 for a renderer file in development, where Vite serves them", async () => {
+    vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
+    expect((await get(port, "/listen-option.ts")).status).toBe(404);
   });
 });
 
