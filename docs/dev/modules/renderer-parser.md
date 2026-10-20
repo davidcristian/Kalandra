@@ -79,9 +79,9 @@ file and the status when the server does not return it, so a missing index file 
   variables are not reactive, so code that builds lists from them uses `cachePerDataLoad(build)` from `loads.ts`:
   it builds each key's value once per load, and a computed that calls it runs again after the next load.
 - Lookups: `ITEM_BY_REF(namespace, refName)` and `ITEM_BY_TRANSLATED(namespace, name)` return `BaseType[]`, where
-  the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns a
-  `Stat`; `STAT_BY_MATCH_STR(text)` returns every `Stat` with a `StatMatcher` whose text or advanced text is
-  exactly `text`, each with that matcher, in file order;
+  the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns the
+  `Stat` with that ref or `undefined`; `STAT_BY_MATCH_STR(text)` returns every `Stat` with a `StatMatcher` whose
+  text or advanced text is exactly `text`, each with that matcher, in file order;
   `ITEMS_ITERATOR` and `STATS_ITERATOR` scan the raw text for a substring. `TRADE_ITEM_BY_REF`,
   `TRADE_STAT_BY_MATCH_STR` and `TRADE_STAT_BY_STAT_ID` read the trade site lists, for items and stats that the
   game data does not have yet. Both lists come from `www.pathofexile.com` in every app language, so their texts
@@ -110,6 +110,8 @@ The stats matcher index has one row per matcher text, so stats that share a text
 `STAT_BY_MATCH_STR` (`statsByMatcherText` in `stats-by-matcher.ts`) reads the line of each such row once, in file
 order, and keeps each stat with a matcher whose text is exactly the key, which skips a row for another text with the
 same hash.
+The stats ref index has one row per stat. `STAT_BY_REF` (`statByRef` in `stat-by-ref.ts`) reads the line of each
+row with the key's hash in file order and returns the first stat whose `ref` is the key, or `undefined`.
 [make-index-files.mjs](../../../renderer/src/assets/make-index-files.mjs) writes `stats-ref`,
 `stats-matcher`, `items-name` and `items-ref` for each language in its `LANGUAGES` list: `en`, `ru`, `cmn-Hant`,
 `ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.

@@ -13,6 +13,7 @@ import { loadClientStrings } from "../client-string-loader";
 import { fetchData } from "./fetch-data";
 import { lineStartsByHash } from "./hash-index";
 import { markItemDataLoaded } from "./loads";
+import { statByRef } from "./stat-by-ref";
 import { type StatMatch, statsByMatcherText } from "./stats-by-matcher";
 import { useTradeData } from "@/web/background/TradeData";
 import { GEM, ItemCategory } from "@/parser/meta";
@@ -93,28 +94,6 @@ export let TRADE_STAT_BY_STAT_ID: (tradeId: string) => boolean = () => false;
 export let TRADE_STAT_BY_MATCH_STR: (
   name: string,
 ) => { [type: string]: string[] } | undefined = () => undefined;
-
-function dataBinarySearch(
-  data: Uint32Array,
-  value: number,
-  rowOffset: number,
-  rowSize: number,
-) {
-  let left = 0;
-  let right = data.length / rowSize - 1;
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    const midValue = data[mid * rowSize + rowOffset];
-    if (midValue < value) {
-      left = mid + 1;
-    } else if (midValue > value) {
-      right = mid - 1;
-    } else {
-      return mid;
-    }
-  }
-  return -1;
-}
 
 function ndjsonFindLines<T>(ndjson: string) {
   // it's preferable that passed `searchString` has good entropy
@@ -209,7 +188,6 @@ async function loadItems(language: string) {
 async function loadStats(language: string) {
   const ndjson = await (await fetchData(`${language}/stats.ndjson`)).text();
 
-  const INDEX_WIDTH = 2;
   const indexRef = new Uint32Array(
     await (await fetchData(`${language}/stats-ref.index.bin`)).arrayBuffer(),
   );
@@ -219,19 +197,7 @@ async function loadStats(language: string) {
     ).arrayBuffer(),
   );
 
-  STAT_BY_REF = function (ref: string) {
-    let start = dataBinarySearch(
-      indexRef,
-      Number(fnv1a(ref, { size: 32 })),
-      0,
-      INDEX_WIDTH,
-    );
-    if (start === -1) return undefined;
-    start = indexRef[start * INDEX_WIDTH + 1];
-    const end = ndjson.indexOf("\n", start);
-    return JSON.parse(ndjson.slice(start, end));
-  };
-
+  STAT_BY_REF = (ref) => statByRef(ndjson, indexRef, ref);
   STAT_BY_MATCH_STR = (text) => statsByMatcherText(ndjson, indexMatcher, text);
 
   STATS_ITERATOR = ndjsonFindLines<Stat>(ndjson);
