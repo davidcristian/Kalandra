@@ -47,6 +47,14 @@ function savedQuarterstaff(firstMod: string): FetchResult {
   return listing;
 }
 
+/** The saved Swiftstalker Coat listing with its unrevealed modifiers replaced. */
+function savedUnrevealed(veiledMods: string[]): FetchResult {
+  const saved = readJson<FetchResult[]>("../../../docs/fetchResponses2.json");
+  const listing = saved.find((result) => result.id.startsWith("95bcbe83"))!;
+  listing.item.veiledMods = veiledMods;
+  return listing;
+}
+
 describe("tooltipLineText", () => {
   let logged: unknown[];
 
@@ -109,6 +117,26 @@ describe("tooltipLineText", () => {
         "Allocates {Something}",
       );
       expect(logged).toEqual([]);
+    });
+
+    it("names its unrevealed modifiers with the game's text", async () => {
+      const listing = savedUnrevealed(["Prefix05", "Suffix02"]);
+      const lineTexts = (lang: string) =>
+        __testExports
+          .parseFetchResult(listing)!
+          .veiledMods!.map((line) =>
+            tooltipLineText(line.text, createAppI18n(lang)),
+          );
+
+      expect(lineTexts("en")).toEqual([
+        "Desecrated Prefix",
+        "Desecrated Suffix",
+      ]);
+      await init("de");
+      expect(lineTexts("de")).toEqual([
+        "Entweihtes Präfix",
+        "Entweihtes Suffix",
+      ]);
     });
   });
 });

@@ -1514,9 +1514,7 @@ function parseFetchResult(result: FetchResult): PricingResult["displayItem"] {
     veiledMods: result.item.veiledMods?.map((vm) => {
       const text = typeof vm === "string" ? vm : vm.description;
       return {
-        text: text.startsWith("Prefix")
-          ? "Unrevealed Prefix"
-          : "Unrevealed Suffix",
+        text: text.startsWith("Prefix") ? _$.VEILED_PREFIX : _$.VEILED_SUFFIX,
         color: TradeNumberColors.Desecrated,
       };
     }),
