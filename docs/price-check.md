@@ -233,7 +233,7 @@ Open Settings, **Price check** page, or click the price check title bar. Changes
 | **Fill stat values** | 10% | How far from the item's value the minimum (or maximum) starts, from 0 to 50. **Exact value** sets 0. An exact search takes at most 2% ([Filters](#filters)). |
 | **Primary base currency:** | Exalted Orb | Exalted Orb or Chaos Orb, for estimates, the title bar rate and prices in brackets. With Chaos Orb, these show in Exalted Orbs while one Divine Orb costs fewer than 5 Chaos Orbs. |
 | **Remember the Buyout Currency filter** | off | Keeps the currency filter from the previous check. |
-| **Remember listing type** | off | Keeps the listing type from the previous check. |
+| **Remember listing type** | off | Keeps the listing type from the previous check. A currency exchange starts at **Online**, and an item search after **Online in League** starts at **Instant**. |
 | **Always select "Stock" filter** | off | Turns on the **Stock:** filter for a stack of more than one. |
 | **Show Currency Exchange volume per hour:** | **Both** | **None**, **Currency / Hour**, **Items / Hour** or **Both**. |
 | **Show memorized cursor position** | on | Draws a circle where the cursor was when you pressed the hotkey. |

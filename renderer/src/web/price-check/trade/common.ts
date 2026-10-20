@@ -48,6 +48,22 @@ export function tradeTag(item: ParsedItem): string | undefined {
   return item.info.tradeTag;
 }
 
+type ListingType = ItemFilters["trade"]["listingType"];
+
+/** Returns the status an item search sends, since it has no Online in League option. */
+export function searchListingType(
+  type: ListingType,
+): Exclude<ListingType, "onlineleague"> {
+  return type === "onlineleague" ? "securable" : type;
+}
+
+/** Returns the status a currency exchange sends, since it has no Instant options. */
+export function exchangeListingType(
+  type: ListingType,
+): Exclude<ListingType, "securable" | "available"> {
+  return type === "securable" || type === "available" ? "online" : type;
+}
+
 export const RATE_LIMIT_RULES = {
   SEARCH: shallowReactive(new Set([new RateLimiter(1, 5)])),
   EXCHANGE: shallowReactive(new Set([new RateLimiter(1, 5)])),

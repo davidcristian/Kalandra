@@ -1,6 +1,6 @@
 import type { ItemFilters } from "./interfaces";
 import { ParsedItem, ItemCategory, ItemRarity } from "@/parser";
-import { tradeTag } from "../trade/common";
+import { searchListingType, tradeTag } from "../trade/common";
 import { ModifierType } from "@/parser/modifiers";
 import { BaseType, ITEM_BY_REF } from "@/assets/data";
 import { CATEGORY_TO_TRADE_ID } from "../trade/pathofexile-trade";
@@ -47,7 +47,7 @@ export function createFilters(
     trade: {
       offline: false,
       onlineInLeague: false,
-      listingType: opts.listingType ?? "securable",
+      listingType: searchListingType(opts.listingType ?? "securable"),
       listed: undefined,
       currency: opts.currency,
       league: opts.league,

@@ -16,6 +16,7 @@ import {
   adjustRateLimits,
   RATE_LIMIT_RULES,
   preventQueueCreation,
+  searchListingType,
 } from "./common";
 import { STAT_BY_REF, CLIENT_STRINGS as _$ } from "@/assets/data";
 import { RateLimiter } from "./RateLimiter";
@@ -568,17 +569,10 @@ export function createTradeRequest(
   stats: StatFilter[],
   item: ParsedItem,
 ) {
-  if (filters.trade.listingType === "onlineleague") {
-    console.error(
-      "onlineleague is not supported for trade, you shouldn't ever see this",
-    );
-    filters.trade.listingType = "securable";
-  }
-
   const body: TradeRequest = {
     query: {
       status: {
-        option: filters.trade.listingType,
+        option: searchListingType(filters.trade.listingType),
       },
       stats: [{ type: "and", filters: [] }],
       filters: {},
