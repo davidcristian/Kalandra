@@ -196,6 +196,10 @@ Every job runs on `ubuntu-latest` unless the table names other runners, and ever
 - A push that changes only files under `docs/` never packages the app. A push that changes only files under
   `docs/dev/` also deploys nothing.
 - No workflow runs the `dataParser/` tests.
+- Each workflow gives its `GITHUB_TOKEN` only `contents: read`. The Build `package` job has `contents: write`, which
+  electron-builder needs to find the draft release and upload into it, and the Docs `deploy` job adds `pages: write`
+  and `id-token: write` for `actions/deploy-pages`. Every checkout sets `persist-credentials: false`, so the token is
+  not in the git config while `npm ci` runs the install scripts of the dependencies.
 - A push that changes only `docs/dev/` or a markdown file at the repo root runs only Changed paths and Lint & Format
   in `test.yml`.
 

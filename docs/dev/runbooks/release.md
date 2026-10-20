@@ -25,8 +25,9 @@ merged pull request into `master` is a push to `master`. A tag push never starts
 - The `renderer` job keeps `renderer/dist` as the `renderer-dist` workflow artifact for one day.
 - The `package` job runs on `windows-2025`, `ubuntu-22.04` and `macos-14`. Each runs `npm ci` and
   `npm run build` in `main/`, then `npm run package "--" -p onTagOrDraft`, which is electron-builder
-  with `GH_TOKEN` set to the workflow's `GITHUB_TOKEN`. A last step prints `latest.yml`,
-  `latest-linux.yml` or `latest-mac.yml`.
+  with `GH_TOKEN` set to the workflow's `GITHUB_TOKEN`. The job gives that token `contents: write`,
+  because GitHub lists draft releases only to a token with write access. A last step prints
+  `latest.yml`, `latest-linux.yml` or `latest-mac.yml`.
 - `main/electron-builder.yml` sets the targets: an NSIS installer and a portable exe on Windows, an
   AppImage on Linux and a universal dmg on macOS.
 - Nothing is signed. `mac.identity` is `null`, and the workflow gives electron-builder no
@@ -120,12 +121,11 @@ Build run on `master` in the Actions tab and choose Re-run all jobs.
   Set a version whose tag does not exist.
 - **`skipped publishing` although the draft exists.** The draft's tag is not `vX.Y.Z` for the
   version in `main/package.json`, or the token cannot see drafts: GitHub lists draft releases only
-  to a token with write access. `main.yml` has no `permissions` block, so the token has the
-  repository's default (Settings, Actions, General, Workflow permissions). Fix the cause, then
-  choose Re-run all jobs on that Build run. Re-running only `package` needs the `renderer-dist`
-  artifact, which is kept for one day.
-- **An upload fails with HTTP 403.** The token cannot write releases. Set the workflow permissions
-  to Read and write, or add `permissions: contents: write` to the `package` job in its own commit.
+  to a token with write access, which `permissions: contents: write` on the `package` job in
+  `main.yml` gives. Fix the cause, then choose Re-run all jobs on that Build run. Re-running only
+  `package` needs the `renderer-dist` artifact, which is kept for one day.
+- **An upload fails with HTTP 403.** The token cannot write releases. Check that the `package` job
+  in `main.yml` still has `permissions: contents: write`.
 - **`GitHub release not created`.** A published release already has this version, and
   electron-builder uploads nothing into a published release. Set a new version and start again
   from step 2.

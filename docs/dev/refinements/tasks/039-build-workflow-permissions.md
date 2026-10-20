@@ -1,9 +1,9 @@
 # The Build workflow does not set the token permissions a release upload needs
 
-**Status:** open
+**Status:** done 2026-10-20
 **Area:** ci
 **Origin:** [.github/workflows/main.yml](../../../../.github/workflows/main.yml)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-20
 
 The `package` job in `.github/workflows/main.yml` runs `npm run package "--" -p onTagOrDraft` with
 `GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`, and the workflow has no `permissions` key. So the token
@@ -23,3 +23,6 @@ checks it.
 
 - 2026-10-18: Found while the release runbook was written, by reading `main.yml` and how
   electron-builder looks up a draft release.
+- 2026-10-20: Closed. The `package` job in `main.yml` has `permissions: contents: write`, the
+  `renderer` job has `contents: read`, and the release runbook says so. The first release still
+  checks the upload, as [057](057-outside-service-behaviors.md) lists.
