@@ -118,7 +118,9 @@ The entry, the server and the app services, in `main/src/`:
   `Ctrl + W` return to the game, and the overlay key toggles the focus. `updateOpts()` attaches the window to the game window. With `hideOverlayOnBlur`, the window is hidden rather than transparent
   while the overlay is not active and either the game is not active or the page sent
   `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game runs with administrator rights that
-  Kalandra lacks, it shows the error box `PoE2 window - No access`.
+  Kalandra lacks, it shows the error box `PoE2 window - No access`. `watchPage()` in `page-watch.ts` logs a failed
+  load of the page, except `ERR_ABORTED`, which a reload causes, and an exit of its renderer process. After an exit
+  other than `clean-exit` it reloads the page, at most `MAX_RELOADS` (3) times in a run.
 - `overlay-keys.ts`: `pressedHotkey(input)` names a key press in the overlay window with `hotkeyToString()` from
   `ipc/KeyToCode.ts`, the function the Hotkeys settings use to write a hotkey, so every combination of `Ctrl`,
   `Shift` and `Alt` matches the saved overlay key. `overlayKeyCommand(input, overlayKey)` returns `focus-game`,
@@ -213,7 +215,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (54.7% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (55.2% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once. `AppUpdater.test.ts`
@@ -238,7 +240,8 @@ settle. `FileWriter.test.ts` also delays the first file write to check that line
 `GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open with EPERM as
 Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and passes its own
 default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink, fails or
-exits. A test of a module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in
+exits. `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process. A test of a module
+that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in
 `main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build workflow packages
 main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)

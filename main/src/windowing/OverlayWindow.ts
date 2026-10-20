@@ -8,6 +8,7 @@ import type { ServerEvents } from "../server";
 import type { Logger } from "../RemoteLogger";
 import type { GameWindow } from "./GameWindow";
 import { overlayKeyCommand } from "./overlay-keys";
+import { watchPage } from "./page-watch";
 
 export class OverlayWindow {
   public isInteractable = false;
@@ -61,6 +62,7 @@ export class OverlayWindow {
       ]),
     );
 
+    watchPage(this.window.webContents, this.logger);
     this.window.webContents.on("before-input-event", this.handleExtraCommands);
     this.window.webContents.on(
       "did-attach-webview",

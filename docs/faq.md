@@ -19,6 +19,10 @@ empty each time Kalandra starts. Reproduce the problem, then copy the log before
 on the same page to log each key you press while the game window is active and the action each hotkey starts.
 [Settings](/settings#debug) describes the **Debug** page.
 
+When the overlay stays empty, open Kalandra in your browser with the tray menu item **Open in Browser** and read the
+**Debug** page there. Kalandra logs an overlay page that failed to load or stopped, and reloads a stopped overlay page
+up to 3 times while it runs.
+
 ### Where is the settings file?
 
 On Windows it is `%APPDATA%\kalandra\apt-data\config.json`. The tray menu item **Open config folder** opens its
