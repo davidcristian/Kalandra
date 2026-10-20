@@ -5,7 +5,6 @@ import type {
   AugmentDataByAugment,
   AugmentDataByTradeId,
   Stat,
-  StatMatcher,
   TranslationDict,
   AugmentGroup,
   CatalystGroup,
@@ -13,11 +12,13 @@ import type {
 import { loadClientStrings } from "../client-string-loader";
 import { lineStartsByHash } from "./hash-index";
 import { markItemDataLoaded } from "./loads";
+import { type StatMatch, statsByMatcherText } from "./stats-by-matcher";
 import { useTradeData } from "@/web/background/TradeData";
 import { GEM, ItemCategory } from "@/parser/meta";
 import { ItemRarity } from "@/parser/ParsedItem";
 
 export * from "./interfaces";
+export type { StatMatch } from "./stats-by-matcher";
 
 export let ITEM_DROP: DropEntry[];
 export let CLIENT_STRINGS: TranslationDict;
@@ -70,9 +71,7 @@ export let ITEM_NS_NAMES: () => Generator<string> = function* () {};
 
 export let TRADE_TAG_TO_REF = new Map<string, string>();
 
-export let STAT_BY_MATCH_STR: (
-  name: string,
-) => { matcher: StatMatcher; stat: Stat } | undefined = () => undefined;
+export let STAT_BY_MATCH_STR: (text: string) => StatMatch[] = () => [];
 export let STAT_BY_REF: (name: string) => Stat | undefined = () => undefined;
 export let STATS_ITERATOR: (
   includes: string,
@@ -250,27 +249,7 @@ async function loadStats(language: string) {
     return JSON.parse(ndjson.slice(start, end));
   };
 
-  STAT_BY_MATCH_STR = function (matchStr: string) {
-    let start = dataBinarySearch(
-      indexMatcher,
-      Number(fnv1a(matchStr, { size: 32 })),
-      0,
-      INDEX_WIDTH,
-    );
-    if (start === -1) return undefined;
-    start = indexMatcher[start * INDEX_WIDTH + 1];
-    const end = ndjson.indexOf("\n", start);
-    const stat = JSON.parse(ndjson.slice(start, end)) as Stat;
-
-    const matcher = stat.matchers.find(
-      (m) => m.string === matchStr || m.advanced === matchStr,
-    );
-    if (!matcher) {
-      // console.log('fnv1a32 collision')
-      return undefined;
-    }
-    return { stat, matcher };
-  };
+  STAT_BY_MATCH_STR = (text) => statsByMatcherText(ndjson, indexMatcher, text);
 
   STATS_ITERATOR = ndjsonFindLines<Stat>(ndjson);
 }

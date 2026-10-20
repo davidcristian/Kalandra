@@ -116,6 +116,13 @@ and a base type by the defences the item shows: armour, evasion and energy shiel
 the first of the two in its data, which can be the wrong one. Check the item the price check shows before you use
 its prices.
 
+### Why does a stat filter search for another modifier?
+
+In some game languages, Kalandra's game data gives two stats the same text, such as two Sanctum relic stats in
+Spanish. Kalandra picks the stat that the trade site has for the kind of modifier, such as a rune modifier. When both
+stats fit, it takes the first of the two in its data, which can be the wrong one. Check that the listings the search
+finds have the modifier your item has.
+
 ## Updates and downloads
 
 ### How do I turn off automatic updates?

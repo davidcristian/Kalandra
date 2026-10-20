@@ -1535,6 +1535,33 @@ export const TempleTablet = itemWithLine(
 TempleTablet.info.refName = "Temple Tablet";
 // #endregion TempleTablet
 
+// #region SharedStatTexts
+// No copied text with these lines exists here. Each item is a real copied item
+// above with one modifier changed to a line whose text several stats share.
+// From ArmourHighValueRareItem; Iron Reflexes is the rune of Legacy of The
+// Knight-errant, and the item class does not change which stat a line matches
+export const KeystoneRuneLine = itemWithLine(
+  ArmourHighValueRareItem,
+  "54% increased Armour, Evasion and Energy Shield (rune)",
+  "Iron Reflexes (rune)",
+);
+
+// From UniqueItem, its last modifier changed
+export const KeystoneUniqueLine = itemWithLine(
+  UniqueItem,
+  "{ Unique Modifier — Mana }\n40% increased Mana Regeneration Rate\n--------",
+  "{ Unique Modifier }\nEldritch Battery\n--------",
+);
+
+// From UniqueItem, its last modifier changed to the advanced text of the stat
+// that grants a random keystone, which names the range of keystones
+export const RandomKeystoneLine = itemWithLine(
+  UniqueItem,
+  "{ Unique Modifier — Mana }\n40% increased Mana Regeneration Rate\n--------",
+  "{ Unique Modifier }\nEldritch Battery(Ancestral Bond-Zealot's Oath)\n--------",
+);
+// #endregion SharedStatTexts
+
 // No copied text in these languages exists here: each item is a real copied
 // item above with its class, rarity, name, base and property lines replaced by
 // that language's client strings and item names, and other lines left out.

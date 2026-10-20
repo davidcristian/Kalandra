@@ -48,10 +48,11 @@ The other files, each called from `Parser.ts` or from the price check:
 | File | What it does |
 | --- | --- |
 | `advanced-mod-desc.ts` | `parseModInfoLine` reads one `{ ... }` line, `groupLinesByMod` pairs it with its stat lines, `parseModType` reads a suffix such as ` (implicit)`, ` (enchant)` or ` (rune)` |
-| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stat through `STAT_BY_MATCH_STR`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id. That text is English in every app language, so the fallback matches only English item text ([refinement 063](../refinements/tasks/063-trade-lists-english-only.md)) |
+| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stats with that text through `STAT_BY_MATCH_STR`, picks one with `statMatchForLine`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id. That text is English in every app language, so the fallback matches only English item text ([refinement 063](../refinements/tasks/063-trade-lists-english-only.md)) |
 | `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
 | `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
 | `match-records.ts` | `recordsMatchingItem` keeps the records of an item lookup that match the copied item: a unique by its base type, and base types that share a translated name by the armour, evasion and energy shield lines the item shows. `findInDatabase` in `Parser.ts` takes the first record it keeps, or the first of all when none matches ([refinement 059](../refinements/tasks/059-shared-translated-item-names.md)) |
+| `match-stats.ts` | `statMatchForLine` picks the stat of a line among the stats that share its text: one that `statFitsModifier` accepts for the modifier type (it has a trade id of the type, or grants a skill), then one with no other advanced text, because the app copies items with advanced descriptions, else the first in the data ([refinement 064](../refinements/tasks/064-shared-stat-texts.md)) |
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others |
 | `jewellery-quality.ts` | `parseJewelleryQuality` reads the quality line of a ring, amulet, belt or jewel, such as `Quality (Attribute Modifiers): +20% (augmented)`, into `quality`, and sets `qualityType` to the catalyst whose modifier tag in `CATALYST_TO_TAG` the line names. The item editor and the stat filters read `qualityType` |
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
@@ -77,7 +78,8 @@ A module exports the internal functions its tests call as `__testExports` (`Pars
   it builds each key's value once per load, and a computed that calls it runs again after the next load.
 - Lookups: `ITEM_BY_REF(namespace, refName)` and `ITEM_BY_TRANSLATED(namespace, name)` return `BaseType[]`, where
   the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns a
-  `Stat`; `STAT_BY_MATCH_STR(text)` returns the `Stat` and the `StatMatcher` whose text is exactly `text`;
+  `Stat`; `STAT_BY_MATCH_STR(text)` returns every `Stat` with a `StatMatcher` whose text or advanced text is
+  exactly `text`, each with that matcher, in file order;
   `ITEMS_ITERATOR` and `STATS_ITERATOR` scan the raw text for a substring. `TRADE_ITEM_BY_REF`,
   `TRADE_STAT_BY_MATCH_STR` and `TRADE_STAT_BY_STAT_ID` read the trade site lists, for items and stats that the
   game data does not have yet. Both lists come from `www.pathofexile.com` in every app language, so their texts
@@ -101,7 +103,10 @@ starts there. The item index files have one row per namespace and `refName`, so 
 have rows with the same hash. An item lookup reads the line of each such row (`lineStartsByHash` in `hash-index.ts`)
 in file order, and after each line the following lines with the same namespace and name while each record has a
 `unique` or `disc` (variant) field. It returns every item with the name and every variant of each.
-`STAT_BY_MATCH_STR` compares the matcher text after the lookup and returns `undefined` on a hash collision.
+The stats matcher index has one row per matcher text, so stats that share a text have rows with the same hash.
+`STAT_BY_MATCH_STR` (`statsByMatcherText` in `stats-by-matcher.ts`) reads the line of each such row once, in file
+order, and keeps each stat with a matcher whose text is exactly the key, which skips a row for another text with the
+same hash.
 [make-index-files.mjs](../../../renderer/src/assets/make-index-files.mjs) writes `stats-ref`,
 `stats-matcher`, `items-name` and `items-ref` for each language in its `LANGUAGES` list: `en`, `ru`, `cmn-Hant`,
 `ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.
@@ -142,7 +147,7 @@ imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loa
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (46.7% of the lines of `src/` on 19 Oct 2026). The parser suites are
+below the floor in `renderer/vitest.config.ts` (52.7% of the lines of `src/` on 20 Oct 2026). The parser suites are
 `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
 text and the expected fields) and `specs/Parser/mods.ts`; `specs/data/dataLoader.test.ts` covers the loader.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces

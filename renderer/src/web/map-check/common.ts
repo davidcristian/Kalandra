@@ -59,6 +59,6 @@ export function decisionCreate(
 export function isOutdated(profileName: number, stat: MapCheckStat): boolean {
   return (
     decisionHasColor(stat.decision, profileName) &&
-    STAT_BY_MATCH_STR(stat.matcher) == null
+    STAT_BY_MATCH_STR(stat.matcher).length === 0
   );
 }

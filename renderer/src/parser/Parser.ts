@@ -1119,7 +1119,7 @@ function parseLogbookArea(section: string[], item: ParsedItem) {
   if (section.length < 3) return "SECTION_SKIPPED";
 
   // skip Area, parse Faction
-  const faction = STAT_BY_MATCH_STR(section[1]);
+  const faction = STAT_BY_MATCH_STR(section[1])[0];
   if (!faction) return "SECTION_SKIPPED";
 
   const areaMods: ParsedModifier[] = [
@@ -1719,7 +1719,7 @@ function parseAtzoatlRooms(section: string[], item: ParsedItem) {
       continue;
     }
 
-    const found = STAT_BY_MATCH_STR(line);
+    const found = STAT_BY_MATCH_STR(line)[0];
     if (found) {
       item.newMods.push({
         info: { tags: [], type: ModifierType.Pseudo },

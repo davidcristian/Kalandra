@@ -1,6 +1,5 @@
 import {
   CLIENT_STRINGS as _$,
-  CLIENT_STRINGS_REF as _$REF,
   STAT_BY_MATCH_STR,
   StatBetter,
   TRADE_STAT_BY_MATCH_STR,
@@ -8,6 +7,7 @@ import {
 import type { StatMatcher, Stat, BaseType } from "@/assets/data";
 import { ModifierType } from "./modifiers";
 import { ItemCategory } from "./meta";
+import { statFitsModifier, statMatchForLine } from "./match-stats";
 
 // This file is a little messy and scary,
 // but that's how stats translations are parsed :-D
@@ -188,11 +188,7 @@ export function tryParseTranslation(
     });
     const realType =
       modType === ModifierType.AddedAugment ? ModifierType.Augment : modType;
-    if (
-      !found ||
-      ((!found.stat.trade.ids || !(realType in found.stat.trade.ids)) &&
-        !found.stat.ref.startsWith(_$REF.GRANTS_SKILL))
-    ) {
+    if (!found || !statFitsModifier(found.stat, realType)) {
       if (backupParsedStat) {
         continue;
       }
@@ -368,10 +364,8 @@ interface FindResolveParams {
 function findAndResolveTranslation(
   params: FindResolveParams,
 ): { matcher: StatMatcher; stat: Stat } | undefined {
-  const { matchStr } = params;
-  const statOrGroup = STAT_BY_MATCH_STR(matchStr);
-
-  return statOrGroup;
+  const { matchStr, modType } = params;
+  return statMatchForLine(STAT_BY_MATCH_STR(matchStr), matchStr, modType);
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
