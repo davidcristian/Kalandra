@@ -30,18 +30,11 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  PropType,
-  inject,
-  ref,
-  onUnmounted,
-  computed,
-} from "vue";
+import { defineComponent, PropType, inject, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import Widget from "../overlay/Widget.vue";
 import { MainProcess } from "@/web/background/IPC";
-import { Duration } from "luxon";
+import { useStopwatch } from "./stopwatch";
 import {
   WidgetManager,
   StopwatchWidget,
@@ -94,55 +87,15 @@ export default defineComponent({
       hotkeyController.abort();
     });
 
-    const isRunning = ref(false);
-    const millis = ref(0);
-    const prevTick = ref(0);
+    const { isRunning, formatted, start, stop, reset, updateTime } =
+      useStopwatch((hidden) => {
+        wm.setFlag(props.config.wmId, "invisible-on-blur", hidden);
+      });
 
     const timerId = setInterval(updateTime, 1000);
     onUnmounted(() => {
       clearInterval(timerId);
     });
-
-    const formatted = computed(() => {
-      const dur = Duration.fromMillis(millis.value).shiftTo(
-        "hours",
-        "minutes",
-        "seconds",
-      );
-
-      return {
-        h: String(dur.hours).padStart(2, "0"),
-        m: String(dur.minutes).padStart(2, "0"),
-        s: String(Math.floor(dur.seconds)).padStart(2, "0"),
-      };
-    });
-
-    function start() {
-      isRunning.value = true;
-      prevTick.value = Date.now();
-      wm.setFlag(props.config.wmId, "invisible-on-blur", false);
-    }
-    function stop() {
-      updateTime();
-      isRunning.value = false;
-      if (millis.value < 1000) {
-        wm.setFlag(props.config.wmId, "invisible-on-blur", true);
-      }
-    }
-    function reset() {
-      prevTick.value = Date.now();
-      millis.value = isRunning.value ? 1000 : 0;
-      if (!isRunning.value) {
-        wm.setFlag(props.config.wmId, "invisible-on-blur", true);
-      }
-    }
-    function updateTime() {
-      if (isRunning.value) {
-        const now = Date.now();
-        millis.value += now - prevTick.value;
-        prevTick.value = now;
-      }
-    }
 
     const { t } = useI18n();
 
