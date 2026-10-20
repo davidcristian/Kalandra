@@ -2,7 +2,7 @@ import { screen, globalShortcut } from "electron";
 import { uIOhook, UiohookKey, UiohookWheelEvent } from "uiohook-napi";
 import { isModKey, mergeTwoHotkeys } from "../../../ipc/KeyToCode";
 import { typeInChat, stashSearch } from "./text-box";
-import { shortcutToElectron } from "./accelerator";
+import { shortcutToElectron, withKnownKeys } from "./accelerator";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
 import { HostClipboard } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
@@ -112,7 +112,7 @@ export class Shortcuts {
         action: { type: "test-only" },
       });
     }
-
+    actions = withKnownKeys(actions, this.logger);
     const allShortcuts = new Set([
       "Ctrl + C",
       "Ctrl + V",

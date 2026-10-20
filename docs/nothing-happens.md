@@ -43,6 +43,11 @@ time. These lines name a problem and its fix:
 
   Two actions have the same hotkey. Give each action its own hotkey.
 
+- `error [Shortcuts] Hotkey "<keys>" has an unknown key name and will not be registered.`
+
+  The hotkey in `config.json` names a key that Kalandra does not know, for example after the file was edited by
+  hand. Kalandra still registers the other hotkeys. Choose this hotkey again in the settings.
+
 - `error [GameConfig] Failed to find game configuration file in the default location.`
 
   Kalandra cannot find the game's config file, so it does not know the game's advanced item descriptions key. Read

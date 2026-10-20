@@ -70,20 +70,20 @@ The entry, the server and the app services, in `main/src/`:
 
 `shortcuts/`:
 
-- `Shortcuts.ts`: `Shortcuts.create(logger, overlay, poeWindow, gameConfig, server)` starts the OCR worker and
-  returns the shortcuts. `updateActions(actions, stashScroll, logKeys, restoreClipboard, language)` replaces the
-  hotkeys, and `updateDelay(delay)` sets the clipboard's first poll delay. Every hotkey is registered with
-  Electron's `globalShortcut` while the game window is active, and all are unregistered when it is not. It drops,
-  with an `error [Shortcuts]` log line, a hotkey the game uses (`Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`,
-  `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`, `ArrowRight`, `ArrowLeft` and the copy keys) and a hotkey
-  given to two actions, except that a `toggle-overlay` action keeps it. On a press it releases the hotkey's keys
-  through `uiohook-napi` (all but the modifiers when `keepModKeys` is set) and runs the action: `toggle-overlay`,
-  `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item`
-  (presses the copy keys, sends `MAIN->CLIENT::item-text` to the last active client and, with `focusOverlay`,
-  makes the overlay active when the overlay was the last active client) or `ocr-text` (Windows only, sends
-  `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is active (`key-log.ts`). With
-  `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel
-  while the game is active, except over the area `isStashArea()` computes.
+- `Shortcuts.ts`: `Shortcuts.create(logger, overlay, poeWindow, gameConfig, server)` starts the OCR worker and returns
+  the shortcuts. `updateActions(actions, stashScroll, logKeys, restoreClipboard, language)` replaces the hotkeys, and
+  `updateDelay(delay)` sets the clipboard's first poll delay. Every hotkey is registered with Electron's
+  `globalShortcut` while the game window is active, and all are unregistered when it is not. It drops, with an
+  `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a hotkey the
+  game uses (`Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`, `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`,
+  `ArrowRight`, `ArrowLeft` and the copy keys) and a hotkey given to two actions, except that a `toggle-overlay`
+  action keeps it. On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when
+  `keepModKeys` is set) and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts
+  `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses the copy keys, sends `MAIN->CLIENT::item-text`
+  to the last active client and, with `focusOverlay`, makes the overlay active when the overlay was the last active
+  client) or `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game
+  window is active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or
+  `ArrowRight` for `Ctrl` and the mouse wheel while the game is active, except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: `readItemText()` clears the clipboard when it holds item text, then polls every 48 ms
   (`POLL_DELAY`) after the first delay, for at most 500 ms (`POLL_LIMIT`). It resolves with text that starts as
   `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and rejects. On Linux it always
@@ -215,7 +215,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (55.2% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (59.5% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once. `AppUpdater.test.ts`
@@ -227,22 +227,23 @@ of fake clients. `RemoteLogger.test.ts` writes more entries than the history kee
 commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each key press to the text in the box.
 `stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that records
 the window each key press reaches. `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts`
-and reads the log lines. `overlay-keys.test.ts` names a key press with each combination of modifiers and checks which
-presses move the focus. `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the
-HTTP routes and to `/events`, and paths and methods that no route serves. `file-uploads.test.ts` posts images and
-other files to the `/uploads/` routes, and an image while a file holds the place of the uploads folder.
-`proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake `net.request`
-that answers with the request it was given. `ConfigStore.test.ts` saves configs in a temporary folder through fakes
-that write slowly, stop partway through a write or fail the rename as Windows does for a file another program has
-open. `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary folder and send
-client events through the fake server in `fake-server.ts`, whose `emit` settles when the promises the handlers return
-settle. `FileWriter.test.ts` also delays the first file write to check that lines keep their order.
-`GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open with EPERM as
-Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and passes its own
-default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink, fails or
-exits. `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process. A test of a module
-that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in
-`main/` runs `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build workflow packages
-main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
+and reads the log lines. `shortcuts.test.ts` registers hotkeys through the fake `globalShortcut` of
+`fake-global-shortcut.ts`, which throws on a key name it does not know. `overlay-keys.test.ts` names a key press with
+each combination of modifiers and checks which presses move the focus. `server.test.ts` starts the server and sends
+`..` paths, foreign origins and host names to the HTTP routes and to `/events`, and paths and methods that no route
+serves. `file-uploads.test.ts` posts images and other files to the `/uploads/` routes, and an image while a file holds
+the place of the uploads folder. `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy`
+header, through a fake `net.request` that answers with the request it was given. `ConfigStore.test.ts` saves configs
+in a temporary folder through fakes that write slowly, stop partway through a write or fail the rename as Windows does
+for a file another program has open. `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a
+temporary folder and send client events through the fake server in `fake-server.ts`, whose `emit` settles when the
+promises the handlers return settle. `FileWriter.test.ts` also delays the first file write to check that lines keep
+their order. `GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open
+with EPERM as Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and
+passes its own default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through
+Comlink, fails or exits. `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process. A
+test of a module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs
+`tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint; the Build workflow packages main on all
+three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
 lists every host check, and each task's Status line says whether it still has to run.

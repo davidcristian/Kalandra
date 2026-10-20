@@ -41,11 +41,12 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
   Windows.
 - **The config folder** opens from the tray item Open config folder.
 
-Three lines from `main/src/shortcuts/Shortcuts.ts` apply to every key below:
+Four lines from `main/src/shortcuts/` apply to every key below:
 
 - `error [Shortcuts] Failed to register a shortcut "<key>". It is already registered by another application.`
 - `error [Shortcuts] Hotkey "<key>" reserved by the game will not be registered.`
 - `error [Shortcuts] It is not possible to use the same hotkey "<key>" for multiple actions.`
+- `error [Shortcuts] Hotkey "<key>" has an unknown key name and will not be registered.`
 
 ## 1. The overlay attaches to the game
 
