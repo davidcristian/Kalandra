@@ -1,11 +1,8 @@
 import { screen, globalShortcut } from "electron";
 import { uIOhook, UiohookKey, UiohookWheelEvent } from "uiohook-napi";
-import {
-  isModKey,
-  KeyToElectron,
-  mergeTwoHotkeys,
-} from "../../../ipc/KeyToCode";
+import { isModKey, mergeTwoHotkeys } from "../../../ipc/KeyToCode";
 import { typeInChat, stashSearch } from "./text-box";
+import { shortcutToElectron } from "./accelerator";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
 import { HostClipboard } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
@@ -320,11 +317,4 @@ function isStashArea(mouse: UiohookWheelEvent, poeWindow: GameWindow): boolean {
     mouse.y > poeWindow.bounds.y + (poeWindow.bounds.height * 154) / 1600 &&
     mouse.y < poeWindow.bounds.y + (poeWindow.bounds.height * 1192) / 1600
   );
-}
-
-function shortcutToElectron(shortcut: string) {
-  return shortcut
-    .split(" + ")
-    .map((k) => KeyToElectron[k as keyof typeof KeyToElectron])
-    .join("+");
 }
