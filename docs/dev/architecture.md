@@ -138,7 +138,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    `%APPDATA%\kalandra\apt-data\config.json`.
 2. With no file, the renderer uses `defaultConfig()`. Otherwise `upgradeConfig()` runs every upgrade step above
    the file's `configVersion`. A file that is not JSON gives `defaultConfig()` and a temporary save that throws, so
-   the page does not start ([modules/config.md](modules/config.md) says why).
+   the page shows the start error described below instead of starting ([modules/config.md](modules/config.md)
+   says why).
 3. When the overlay mounts, `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with the `HostConfig` that
    `getConfigForHost()` builds: every hotkey as a `ShortcutAction`, and the settings main reads. The handler in
    `main/src/main.ts` passes them to the overlay window, the shortcuts, the clipboard, the log watcher, the game
@@ -171,7 +172,13 @@ A saved config must survive every update: [the one hard rule](../../AGENTS.md#th
 3. At start, `init()` in `renderer/src/assets/data/index.ts` loads the files for the configured language from
    `data/<lang>/`, which main serves with the page, the English client strings as `CLIENT_STRINGS_REF`, and the
    trade site's stat and item lists through the proxy. A change of language loads the other language's files
-   (`loadForLang()`).
+   (`loadForLang()`). A file that the server does not return fails the start with the file's name and status.
+4. `renderer/src/main.ts` runs the start steps (the config, the UI text, the game data and the `/events` socket)
+   through `startApp()` in `renderer/src/web/startup.ts`. When one fails, the page logs the error to the console
+   and shows `Kalandra cannot start` with the error and what to do in place of the app. The text is English only,
+   because `app_i18n.json` is one of the files whose load can fail. Only a browser tab shows it: main attaches the
+   overlay window to the game when the page sends `CLIENT->MAIN::update-host-config`, which a failed start never
+   sends.
 
 ## CI
 

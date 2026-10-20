@@ -32,7 +32,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. With a file that is not JSON it uses
   `defaultConfig()` and calls `saveConfig({ isTemporary: true })` to make main write `config.json.tmp` and keep
   the broken file. That save fails: `renderer/src/main.ts` calls `initConfig()` before `Host.init()` opens the
-  WebSocket, so `Host.sendEvent()` throws and the page does not mount.
+  WebSocket, so `Host.sendEvent()` throws, and the page shows the start error
+  ([architecture.md](../architecture.md#the-game-data-from-patch-to-parser)) instead of mounting.
 - `AppConfig()` returns the current config, and `AppConfig<T>(type)` returns the first widget config whose
   `wmType` is `type`. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
   in place. The settings window edits a deep copy and applies it on Save

@@ -23,6 +23,12 @@ When the overlay stays empty, open Kalandra in your browser with the tray menu i
 **Debug** page there. Kalandra logs an overlay page that failed to load or stopped, and reloads a stopped overlay page
 up to 3 times while it runs.
 
+When the page cannot start, for example because one of its data files is missing, the overlay stays empty and the
+page that **Open in Browser** opens shows a box that starts with **Kalandra cannot start** and names the reason.
+Restart Kalandra. If the box shows again, install the latest version over the current one, which keeps your
+settings. If that does not help, [open an issue](https://github.com/davidcristian/Kalandra/issues) with the text of
+the box.
+
 ### Where is the settings file?
 
 On Windows it is `%APPDATA%\kalandra\apt-data\config.json`. The tray menu item **Open config folder** opens its
