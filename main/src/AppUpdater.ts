@@ -1,5 +1,6 @@
 import { autoUpdater } from "electron-updater";
 import type { ServerEvents } from "./server";
+import type { Logger } from "./RemoteLogger";
 import type { UpdateInfo } from "../../ipc/types";
 
 export class AppUpdater {
@@ -22,7 +23,10 @@ export class AppUpdater {
     });
   }
 
-  constructor(private server: ServerEvents) {
+  constructor(
+    private server: ServerEvents,
+    private logger: Logger,
+  ) {
     setInterval(this.check, 16 * 60 * 60 * 1000);
 
     this.server.onEventAnyClient("CLIENT->MAIN::user-action", ({ action }) => {
@@ -56,7 +60,11 @@ export class AppUpdater {
     autoUpdater.on("update-not-available", () => {
       this.info = { state: "update-not-available", checkedAt: Date.now() };
     });
-    autoUpdater.on("error", () => {
+    autoUpdater.on("error", (error: unknown) => {
+      // electron-updater writes the response headers, which can hold cookies, after the first line
+      const message = error instanceof Error ? error.message : String(error);
+      const reason = message.split("\n")[0];
+      this.logger.write(`error [AppUpdater] Update failed: ${reason}`);
       this.info = { state: "error", checkedAt: Date.now() };
     });
     autoUpdater.on("update-downloaded", (info: { version: string }) => {

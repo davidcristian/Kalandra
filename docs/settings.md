@@ -129,7 +129,7 @@ The page shows the version of Kalandra and two links: **Release notes** opens th
 - "It will be installed automatically on exit" once the download is done, with **Install now**.
 - "You can download it from GitHub" or "You have disabled automatic updates download" when Kalandra does not
   download the update, with **Open the Downloads page**.
-- "Error while checking for updates", with **Open the Downloads page**.
+- "Error while checking for updates", with **Open the Downloads page**. The [Debug](#debug) log names the error.
 
 [Updates](/download#updates) explains which downloads update themselves. The two links at the bottom of the page open
 the Path of Exile 2 subreddit and the pathofexile Discord server. They are not Kalandra support.

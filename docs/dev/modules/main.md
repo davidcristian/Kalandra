@@ -64,7 +64,8 @@ The entry, the server and the app services, in `main/src/`:
   wait for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is
   off for the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with
   `--no-updates`. `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and
-  `disabled-by-flag` for the flag.
+  `disabled-by-flag` for the flag. An `error` event logs `error [AppUpdater] Update failed:` and the first line of
+  the error's message, because electron-updater writes the response headers, which can hold cookies, after it.
 - `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a
   message box that says to press the overlay key; Open in Browser; Open config folder (`apt-data`); and Quit.
 
@@ -212,12 +213,12 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (47.1% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (52.8% of the lines of `src/` on 20 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once.
-`AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version, and
-`start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
+`AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails,
+and `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
 messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, sends
 messages main cannot use, and sends client log entries from the overlay window and a browser tab.
 `client-log-writer.test.ts` picks the writer from lists of fake clients.

@@ -63,7 +63,7 @@ startWhenReady(
     const logger = new Logger(eventPipe);
     const gameConfig = new GameConfig(eventPipe, logger);
     const poeWindow = new GameWindow();
-    const appUpdater = new AppUpdater(eventPipe);
+    const appUpdater = new AppUpdater(eventPipe, logger);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _httpProxy = new HttpProxy(httpRoutes, logger);
     addFileUploadRoutes(httpRoutes, logger);
