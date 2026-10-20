@@ -119,7 +119,7 @@ export async function startServer(
   appUpdater: Pick<AppUpdater, "info">,
   logger: Logger,
 ): Promise<number> {
-  const configStore = new ConfigStore(eventPipe);
+  const configStore = new ConfigStore(eventPipe, logger);
 
   websocketServer.on("connection", (socket, req: IncomingMessage) => {
     lastActiveClient = socket;

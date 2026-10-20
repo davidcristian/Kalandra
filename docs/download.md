@@ -84,7 +84,9 @@ tray menu item **Open config folder**, which opens `apt-data` on every operating
 other files Kalandra saves, such as uploaded images and the OCR files.
 
 Kalandra writes new settings to `config.json.new` first and then renames that file to `config.json`, so a crash or
-a power loss during a save keeps your previous settings.
+a power loss during a save keeps your previous settings. When a save fails, for example because another program
+keeps `config.json` open, Kalandra keeps running and writes the reason to the
+[log](/faq#where-can-i-find-the-logs). The next save writes all your settings again.
 
 ## Moving from Exiled Exchange 2
 

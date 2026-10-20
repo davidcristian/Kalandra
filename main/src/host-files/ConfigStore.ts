@@ -1,4 +1,5 @@
 import type { ServerEvents } from "../server";
+import type { Logger } from "../RemoteLogger";
 import { app } from "electron";
 import fs from "fs/promises";
 import path from "path";
@@ -51,6 +52,7 @@ export class ConfigStore {
 
   constructor(
     server: ServerEvents,
+    private readonly logger: Logger,
     private readonly files: ConfigFiles = diskFiles,
   ) {
     server.onEventAnyClient("CLIENT->MAIN::save-config", (cfg) => {
@@ -97,8 +99,10 @@ export class ConfigStore {
       await fs.mkdir(path.dirname(this.cfgPath), { recursive: true });
       await this.files.writeFile(newFile, contents);
       await renameWithRetry(this.files, newFile, this.cfgPath);
-    } catch {
-      app.exit(1);
+    } catch (err) {
+      this.logger.write(
+        `error [ConfigStore] Failed to save the config: ${(err as Error).message}`,
+      );
     }
   }
 }

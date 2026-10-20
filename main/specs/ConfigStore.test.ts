@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { IpcEvent, IpcEventPayload } from "../../ipc/types";
 import type { ServerEvents } from "../src/server";
 import { ConfigStore, type ConfigFiles } from "../src/host-files/ConfigStore";
+import { Logger } from "../src/RemoteLogger";
 
 const electron = vi.hoisted(() => ({
   userData: "",
@@ -89,11 +90,17 @@ async function saveOnDisk(contents: string) {
 }
 
 let server: FakeServer;
+let logger: Logger;
+
+function createStore(files?: ConfigFiles) {
+  return new ConfigStore(server, logger, files);
+}
 
 beforeEach(async () => {
   electron.userData = await fs.mkdtemp(path.join(os.tmpdir(), "kalandra-cfg-"));
   electron.exitCodes = [];
   server = new FakeServer();
+  logger = new Logger(server);
 });
 
 afterEach(async () => {
@@ -102,13 +109,13 @@ afterEach(async () => {
 
 describe("ConfigStore", () => {
   it("returns null when no config was saved", async () => {
-    const store = new ConfigStore(server);
+    const store = createStore();
     expect(await store.load()).toBeNull();
   });
 
   it("keeps the second of two saves in a row when the first write is slower", async () => {
     const files = new SlowFiles({ [STEP_1]: 50 });
-    const store = new ConfigStore(server, files);
+    const store = createStore(files);
 
     server.saveConfig(STEP_1);
     server.saveConfig(STEP_2);
@@ -121,7 +128,7 @@ describe("ConfigStore", () => {
   });
 
   it("returns the text of a save that is still being written", async () => {
-    const store = new ConfigStore(server, new SlowFiles({ [STEP_1]: 50 }));
+    const store = createStore(new SlowFiles({ [STEP_1]: 50 }));
 
     server.saveConfig(STEP_1);
 
@@ -129,7 +136,7 @@ describe("ConfigStore", () => {
   });
 
   it("sends each saved config to every client", async () => {
-    const store = new ConfigStore(server, new SlowFiles());
+    const store = createStore(new SlowFiles());
 
     server.saveConfig(STEP_1);
     await store.load();
@@ -142,8 +149,8 @@ describe("ConfigStore", () => {
     ]);
   });
 
-  it("exits with status 1 when the write fails", async () => {
-    const store = new ConfigStore(server, {
+  it("logs why a write failed and keeps the app running", async () => {
+    const store = createStore({
       writeFile: () => Promise.reject(new Error("the disk is full")),
       rename: fs.rename,
     });
@@ -151,12 +158,15 @@ describe("ConfigStore", () => {
     server.saveConfig(STEP_1);
 
     expect(await store.load()).toBeNull();
-    expect(electron.exitCodes).toEqual([1]);
+    expect(logger.history).toContain(
+      "error [ConfigStore] Failed to save the config: the disk is full",
+    );
+    expect(electron.exitCodes).toEqual([]);
   });
 
   it("replaces an existing config.json with the saved text", async () => {
     await saveOnDisk(STEP_1);
-    const store = new ConfigStore(server);
+    const store = createStore();
 
     server.saveConfig(STEP_2);
 
@@ -166,7 +176,7 @@ describe("ConfigStore", () => {
 
   it("keeps the saved config when a write stops partway", async () => {
     await saveOnDisk(STEP_1);
-    const store = new ConfigStore(server, {
+    const store = createStore({
       writeFile: async (file, contents) => {
         await fs.writeFile(file, contents.slice(0, contents.length / 2));
         throw new Error("the process stopped during the write");
@@ -177,12 +187,12 @@ describe("ConfigStore", () => {
     server.saveConfig(STEP_2);
 
     expect(await store.load()).toBe(STEP_1);
-    expect(electron.exitCodes).toEqual([1]);
+    expect(logger.history).toContain("the process stopped during the write");
   });
 
   it("replaces config.json once another program closes it", async () => {
     await saveOnDisk(STEP_1);
-    const store = new ConfigStore(server, lockedFiles(2));
+    const store = createStore(lockedFiles(2));
 
     server.saveConfig(STEP_2);
 
@@ -192,11 +202,11 @@ describe("ConfigStore", () => {
 
   it("keeps the saved config when config.json stays open in another program", async () => {
     await saveOnDisk(STEP_1);
-    const store = new ConfigStore(server, lockedFiles(Infinity));
+    const store = createStore(lockedFiles(Infinity));
 
     server.saveConfig(STEP_2);
 
     expect(await store.load()).toBe(STEP_1);
-    expect(electron.exitCodes).toEqual([1]);
+    expect(logger.history).toContain("EPERM: operation not permitted, rename");
   });
 });
