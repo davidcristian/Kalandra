@@ -120,15 +120,19 @@ def exchange_core(response: Json) -> Json:
     if rates is None or not isinstance(primary, str) or not isinstance(secondary, str):
         msg = "exchange core needs rates, primary and secondary"
         raise SnapshotError(msg)
+    # Prices.ts parses the text up to the first '"}', so a string or an object in the rates would end it early
+    numbers = {name: rate for name, rate in rates.items() if _is_number(rate)}
+    if len(numbers) < len(rates):
+        log.warning("exchange core rates %s are not numbers and are left out", sorted(rates.keys() - numbers.keys()))
     if primary != "divine":
         factor = divine_factor(response)
         if factor is None:
             msg = f"exchange core in {primary} has no divine rate"
             raise SnapshotError(msg)
-        converted: Json = {name: rate / factor for name, rate in rates.items() if name != "divine" and _is_number(rate)}
+        converted = {name: rate / factor for name, rate in numbers.items() if name != "divine"}
         converted[primary] = 1 / factor
-        rates, primary, secondary = converted, "divine", primary
-    return {"rates": rates, "primary": primary, "secondary": secondary}
+        numbers, primary, secondary = converted, "divine", primary
+    return {"rates": numbers, "primary": primary, "secondary": secondary}
 
 
 def exchange_lines(response: Json) -> list[Json]:

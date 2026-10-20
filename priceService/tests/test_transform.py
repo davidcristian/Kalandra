@@ -98,6 +98,23 @@ class ExchangeTest(unittest.TestCase):
         self.assertEqual(list(core), ["rates", "primary", "secondary"])
         self.assertEqual(core["primary"], "divine")
 
+    def test_core_keeps_only_the_rates_that_are_numbers(self) -> None:
+        odd: Json = {"flag": True, "tiers": {"high": "x"}, "mirror": "n/a"}
+        cases: list[tuple[str, Json, Json]] = [
+            ("divine", {"exalted": 541.6, "chaos": 8.53}, {"exalted": 541.6, "chaos": 8.53}),
+            ("exalted", {"chaos": 3, "divine": 0.5}, {"chaos": 6.0, "exalted": 2.0}),
+        ]
+        for primary, rates, expected in cases:
+            with self.subTest(primary=primary):
+                response: Json = {"core": {"rates": {**rates, **odd}, "primary": primary, "secondary": "chaos"}}
+                with self.assertLogs("price_service.transform", "WARNING") as logs:
+                    core = exchange_core(response)
+                self.assertEqual(core["rates"], expected)
+                self.assertIn("rates ['flag', 'mirror', 'tiers'] are not numbers", logs.output[0])
+                text = price_file(core, [])
+                start = text.index('{"rates":')
+                self.assertEqual(json.loads(text[start : text.index('"}', start) + 2]), core)
+
     def test_core_requires_rates_and_currencies(self) -> None:
         responses: list[Json] = [
             {},

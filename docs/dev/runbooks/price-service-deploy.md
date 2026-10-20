@@ -129,6 +129,10 @@ that fails with no earlier copy skips the whole league.
 `WARNING using the last good copy of <url> (<reason>)` means a request failed and the service used the response from
 an earlier cycle, so that category's prices are one cycle older. It needs action only when it repeats in every cycle.
 
+`WARNING exchange core rates [<names>] are not numbers and are left out` means a league's `Currency` overview has
+rates the app cannot read, and its file leaves them out. If it repeats in every cycle, poe.ninja's format changed:
+save the new response under `priceService/tests/fixtures/ninja/` and check `exchange_core` in `transform.py`.
+
 ### The app shows no prices
 
 1. Request the league's file: `curl -s -o /dev/null -w '%{http_code}\n' https://kalandra.ashoal.com/prices/<file>`,

@@ -71,7 +71,8 @@ no lines gives an empty category.
 `renderer/src/web/background/Prices.ts` does not parse the whole file. It searches the raw text:
 
 - `parseXchg` takes the text from `{"rates":` to the first `"}`, so `core` keeps `rates`, `primary` and
-  `secondary` in that order, with the string `secondary` last.
+  `secondary` in that order, with the string `secondary` last. A string or an object in `rates` would end the text
+  early, so `exchange_core` keeps only the rates that are numbers and logs the names of the others as a warning.
 - `splitJsonBlob` splits the text at each `{"type":"` and keeps the parts whose type is in `namespaceMap.json`, so
   `type` is the first key of an overview.
 - `findInDatabase` searches a part for `{"name":<name>,"variant":<variant>,"primaryValue":`, without `variant` when
@@ -190,7 +191,7 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 57 tests on 20 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 58 tests on 20 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
 floor in `priceService/.coveragerc`, 97.6% of lines and branches on 20 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
