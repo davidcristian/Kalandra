@@ -120,6 +120,6 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 until main opens its file), `specs/web/client-log.test.ts` (the client log the XP tracker reads, with
 `FullCampaign.txt`), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
-browser tab). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
+browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
 Overlay focus, hiding on blur and the hotkeys need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md).

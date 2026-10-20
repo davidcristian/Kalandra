@@ -14,8 +14,8 @@ In Path of Exile 2, press the overlay key (`Shift + Space` by default) and click
 
 ### Where can I find the logs?
 
-On the **Debug** page of the settings. Kalandra keeps the log in memory only, so the log starts empty each time
-Kalandra starts. Reproduce the problem, then copy the log before you quit Kalandra. Turn on **Record all key presses**
+On the **Debug** page of the settings. Kalandra keeps the last 1000 lines of the log in memory only, so the log starts
+empty each time Kalandra starts. Reproduce the problem, then copy the log before you quit Kalandra. Turn on **Record all key presses**
 on the same page to log each key you press while the game window is active and the action each hotkey starts.
 [Settings](/settings#debug) describes the **Debug** page.
 

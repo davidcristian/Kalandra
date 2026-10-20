@@ -7,6 +7,18 @@ import type {
 import { shallowRef } from "vue";
 import Sockette from "sockette";
 
+/** The number of lines of main's log that `Host.logs` keeps for Settings, Debug. */
+export const LOG_LINES = 1000;
+
+function keepLastLines(text: string, count: number): string {
+  let cut = text.length - 1;
+  for (let i = 0; i < count; i++) {
+    cut = text.lastIndexOf("\n", cut - 1);
+    if (cut === -1) return text;
+  }
+  return text.slice(cut + 1);
+}
+
 class HostTransport {
   private evBus = new EventTarget();
   private socket!: Sockette;
@@ -16,7 +28,10 @@ class HostTransport {
 
   async init() {
     this.onEvent("MAIN->CLIENT::log-entry", (entry) => {
-      this.logs.value += entry.message;
+      this.logs.value = keepLastLines(
+        this.logs.value + entry.message,
+        LOG_LINES,
+      );
     });
     this.onEvent("MAIN->CLIENT::updater-state", (info) => {
       this.updateInfo.value = info;

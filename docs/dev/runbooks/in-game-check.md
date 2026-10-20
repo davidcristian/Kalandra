@@ -25,7 +25,7 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
 
 ## Where the logs are
 
-- **Settings, Debug** shows every line main has written since it started (`Logger` in
+- **Settings, Debug** shows the last 1000 lines main has written since it started (`Logger` in
   `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. To open Settings,
   press the overlay key (Shift + Space) and click the cog icon in the main button bar. The tray item
   Settings/League only shows a message that says this.

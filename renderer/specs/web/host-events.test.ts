@@ -24,10 +24,13 @@ class FakeWebSocket {
 }
 
 let Host: typeof IPC.Host;
+let LOG_LINES: typeof IPC.LOG_LINES;
 
 // Vue reads document on import when window exists, so the stubs come after the import
 beforeAll(async () => {
-  ({ Host } = await vi.importActual<typeof IPC>("@/web/background/IPC"));
+  ({ Host, LOG_LINES } = await vi.importActual<typeof IPC>(
+    "@/web/background/IPC",
+  ));
   vi.stubGlobal("window", { location: { host: "localhost:4000" } });
   vi.stubGlobal("WebSocket", FakeWebSocket);
   await Host.init();
@@ -61,5 +64,45 @@ describe("Host.sendEvent", () => {
     expect(namesSentFrom(BROWSER_USER_AGENT)).toEqual([
       "CLIENT->MAIN::used-recently",
     ]);
+  });
+});
+
+// main sends its history in one message when the page connects, then one message per entry
+function receiveLog(...messages: string[]): string[] {
+  Host.logs.value = "";
+  for (const message of messages) {
+    Host.selfDispatch({
+      name: "MAIN->CLIENT::log-entry",
+      payload: { message },
+    });
+  }
+  return Host.logs.value.split("\n").filter((line) => line !== "");
+}
+
+const entries = (count: number) =>
+  Array.from({ length: count }, (_, i) => `[12:00:00] info entry ${i}\n`);
+
+describe("Host.logs", () => {
+  it("keeps every line of main's log up to the limit", () => {
+    const lines = receiveLog(
+      entries(LOG_LINES - 1).join(""),
+      "[12:00:01] info last\n",
+    );
+
+    expect(lines).toHaveLength(LOG_LINES);
+    expect(lines[0]).toBe("[12:00:00] info entry 0");
+    expect(lines.at(-1)).toBe("[12:00:01] info last");
+  });
+
+  it("drops the oldest lines past the limit", () => {
+    const lines = receiveLog(
+      entries(LOG_LINES).join(""),
+      "[12:00:01] info first new\n",
+      "[12:00:02] info second new\n",
+    );
+
+    expect(lines).toHaveLength(LOG_LINES);
+    expect(lines[0]).toBe("[12:00:00] info entry 2");
+    expect(lines.at(-1)).toBe("[12:00:02] info second new");
   });
 });
