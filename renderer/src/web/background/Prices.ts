@@ -111,7 +111,7 @@ export const DivCurrency: CoreCurrency = {
   abbrev: "div",
   ref: "Divine Orb",
   text: "Divine Orb",
-  icon: "/images/div.png",
+  icon: "/images/divine.png",
 };
 
 export const usePoeninja = createGlobalState(() => {

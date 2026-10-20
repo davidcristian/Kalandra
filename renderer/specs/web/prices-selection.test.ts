@@ -7,7 +7,7 @@ import { init } from "@/assets/data";
 import { AppConfig } from "@/web/Config";
 import { Host } from "@/web/background/IPC";
 import { useLeagues } from "@/web/background/Leagues";
-import { usePoeninja } from "@/web/background/Prices";
+import { DivCurrency, usePoeninja } from "@/web/background/Prices";
 import { PriceCheckWidget } from "@/web/overlay/widgets";
 import { HeldRequests, settle } from "./held-requests";
 
@@ -30,6 +30,7 @@ const PRICE_FILE = fs.readFileSync(
   "utf-8",
 );
 const EXALTED_ORB = { ns: "ITEM", name: "Exalted Orb" };
+const PUBLIC_DIR = path.resolve(__dirname, "../../public");
 
 let widget: PriceCheckWidget;
 let warnings: string[];
@@ -133,5 +134,21 @@ describe("usePoeninja with Chaos Orb as the core currency", () => {
     expect(prices.comparePrice(price, "<", prices.autoCurrency(0.6))).toBe(
       true,
     );
+  });
+});
+
+describe("usePoeninja currencies", () => {
+  it("name an image file that the app serves for each currency icon", async () => {
+    const prices = usePoeninja();
+    servePriceFile(PRICE_FILE);
+    await selectLeague("Fixture League F");
+
+    const icons = [...prices.availableCoreCurrencies.value, DivCurrency].map(
+      (currency) => currency.icon,
+    );
+    expect(icons).toHaveLength(3);
+    expect(
+      icons.filter((icon) => !fs.existsSync(path.join(PUBLIC_DIR, icon))),
+    ).toEqual([]);
   });
 });
