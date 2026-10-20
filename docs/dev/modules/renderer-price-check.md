@@ -40,7 +40,8 @@ that the route needs ([main.md](main.md)).
   normal item, a non-unique item that is not craftable, and the non-unique categories listed there get one exact
   preset (`filters.preset_exact`). A unique in `PRESET_UNIQUES` gets `createUniquePresets`. Every other item gets
   "Pseudo" (`filters.preset_pseudo`), plus "Base item" (`filters.preset_base_item`) when `hasCraftingValue` is
-  true and `likelyFinishedItem` is false.
+  true and `likelyFinishedItem` is false. `hasCraftingValue` (`filters/common.ts`) skips the item level test for
+  a category whose `maxUsefulItemLevel` is 1: tablets, jewels and waystones.
 - `createFilters` (`create-item-filters.ts`) returns the `ItemFilters`: name, base type, rarity, sockets,
   quality, levels, the corrupted and other states, and the `trade` options (league, listing type, currency).
   A unique's base type comes from the item data through `uniqueBaseTradeName` in `filters/common.ts`, or is

@@ -38,6 +38,8 @@ export function likelyFinishedItem(item: ParsedItem) {
 }
 
 export function hasCraftingValue(item: ParsedItem) {
+  // A cap of 1 marks a category whose item level does not matter.
+  const itemLevelCap = maxUsefulItemLevel(item.category);
   return (
     itemIsModifiable(item) &&
     // Base useful crafting item (synth and influence not in poe2 yet though)
@@ -50,7 +52,7 @@ export function hasCraftingValue(item: ParsedItem) {
       (item.category === ItemCategory.Jewel &&
         item.rarity === ItemRarity.Magic) ||
       // High ilvl (minus 15, seems like low ilevel ones still kinda sell?)
-      item.itemLevel! >= maxUsefulItemLevel(item.category) - 15 ||
+      (itemLevelCap !== 1 && item.itemLevel! >= itemLevelCap - 15) ||
       // is exceptional item
       (item.augmentSockets &&
         item.augmentSockets.current > item.augmentSockets.normal) ||

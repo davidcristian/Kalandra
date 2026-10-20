@@ -1499,6 +1499,50 @@ export const HybridDefenceRing = itemWithLine(
 );
 // #endregion HybridDefenceRing
 
+// #region RareJewel
+// Built from RareWithImplicit, not copied from the game: the item class and base
+// type name a jewel, and the requirement and implicit sections are left out.
+export const RareJewel = new TestItem(`Item Class: Jewels
+Rarity: Rare
+Rune Loop
+Ruby
+--------
+Item Level: 79
+--------
+{ Prefix Modifier "Vaporous" (Tier: 3) — Defences }
++143(124-151) to Evasion Rating
+{ Suffix Modifier "of the Wrestler" (Tier: 7) — Attribute }
++12(9-12) to Strength
+{ Suffix Modifier "of Warmth" (Tier: 3) — Mana }
+8(8-12)% increased Mana Regeneration Rate
+5% increased Light Radius
+{ Suffix Modifier "of the Penguin" (Tier: 7) — Elemental, Cold, Resistance }
++15(11-15)% to Cold Resistance
+`);
+RareJewel.category = ItemCategory.Jewel;
+RareJewel.rarity = ItemRarity.Rare;
+RareJewel.itemLevel = 79;
+// #endregion RareJewel
+
+// #region MagicJewel
+// Built from RareJewel, not copied from the game: magic, with its first prefix and
+// suffix and the name they give.
+export const MagicJewel = new TestItem(`Item Class: Jewels
+Rarity: Magic
+Vaporous Ruby of the Wrestler
+--------
+Item Level: 79
+--------
+{ Prefix Modifier "Vaporous" (Tier: 3) — Defences }
++143(124-151) to Evasion Rating
+{ Suffix Modifier "of the Wrestler" (Tier: 7) — Attribute }
++12(9-12) to Strength
+`);
+MagicJewel.category = ItemCategory.Jewel;
+MagicJewel.rarity = ItemRarity.Magic;
+MagicJewel.itemLevel = 79;
+// #endregion MagicJewel
+
 // #region UniqueOnUnknownBase
 // Its name and base type lines name a unique and a base that the item data does
 // not have; tradeItemFallback.test.ts adds them to the trade site's item list.

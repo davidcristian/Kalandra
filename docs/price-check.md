@@ -78,8 +78,8 @@ The filters set what the trade search looks for. Kalandra turns some on by defau
 - The stats button (for example **4 of 8, stats**) counts the stat filters that are on and hides or shows the stat
   list. It reads **Stats ignored** when none is on.
 - **Pseudo** and **Base item** tabs appear above the stats for an item that has value as a crafting base, for
-  example one with a high item level, extra sockets or more than 20% quality. **Pseudo** is the default. **Base item**
-  searches for the exact base type and its modifiers.
+  example a magic jewel, or one with extra sockets, more than 20% quality or a high item level (not for a jewel or
+  waystone). **Pseudo** is the default. **Base item** searches for the exact base type and its modifiers.
 
 Each stat row has:
 
