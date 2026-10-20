@@ -46,6 +46,12 @@ export const categoryCatalysts = cachePerDataLoad(
     })),
 );
 
+/** Returns the modifiers that have a tag of the catalyst, each once even when several of its tags match. */
+function catalysedMods(item: ParsedItem, qualityType: string) {
+  const tags = new Set(CATALYST_TO_TAG[qualityType]);
+  return item.newMods.filter((mod) => mod.info.tags.some((t) => tags.has(t)));
+}
+
 export function applyCatalyst(
   item: ParsedItem,
   catalyst: BaseType,
@@ -54,43 +60,22 @@ export function applyCatalyst(
   // deep copy
   const oldItem = JSON.parse(JSON.stringify(item)) as ParsedItem;
 
-  // remove old catalyst increases
   if (item.qualityType) {
     if (!item.qualityType.endsWith("_catalyst")) {
       throw new Error("Invalid quality type");
     }
     const oldQuality = item.quality ?? 0;
-    const oldTag = new Set(CATALYST_TO_TAG[item.qualityType]);
-    for (const mod of item.newMods) {
-      if (mod.info.tags.some((tag) => oldTag.has(tag))) {
-        if (mod.info.rollIncr) {
-          mod.info.rollIncr -= oldQuality;
-        } else {
-          // probably?
-          mod.info.rollIncr = -oldQuality;
-        }
-        mod.info.addedIncr = undefined;
-      }
+    for (const mod of catalysedMods(item, item.qualityType)) {
+      mod.info.rollIncr = (mod.info.rollIncr ?? 0) - oldQuality;
+      mod.info.addedIncr = undefined;
     }
   }
 
-  // add new catalyst
   item.quality = quality;
   item.qualityType = catalyst.tags[1];
-
-  const translatedTags = CATALYST_TO_TAG[catalyst.tags[1]];
-
-  for (const tag of translatedTags) {
-    for (const mod of item.newMods) {
-      if (mod.info.tags.includes(tag)) {
-        if (mod.info.rollIncr) {
-          mod.info.rollIncr += quality;
-        } else {
-          mod.info.rollIncr = quality;
-        }
-        mod.info.addedIncr = true;
-      }
-    }
+  for (const mod of catalysedMods(item, item.qualityType)) {
+    mod.info.rollIncr = (mod.info.rollIncr ?? 0) + quality;
+    mod.info.addedIncr = true;
   }
 
   item.statsByType = sumStatsByModType(item.newMods);

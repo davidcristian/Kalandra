@@ -1489,6 +1489,16 @@ CatalysedRing.qualityType = "attribute_catalyst";
 CatalysedRing.sectionCount = 6;
 // #endregion CatalysedRing
 
+// #region HybridDefenceRing
+// Built from RareWithImplicit, not copied from the game: its Evasion prefix has two
+// tags of the Carapace Catalyst, Armour and Evasion, in place of Defences.
+export const HybridDefenceRing = itemWithLine(
+  RareWithImplicit,
+  '{ Prefix Modifier "Vaporous" (Tier: 3) — Defences }',
+  '{ Prefix Modifier "Vaporous" (Tier: 3) — Armour, Evasion }',
+);
+// #endregion HybridDefenceRing
+
 // #region UniqueOnUnknownBase
 // Its name and base type lines name a unique and a base that the item data does
 // not have; tradeItemFallback.test.ts adds them to the trade site's item list.
