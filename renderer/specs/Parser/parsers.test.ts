@@ -4,7 +4,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import {
   ArmourHighValueRareItem,
+  BowThreeAugments,
   CatalysedRing,
+  CharmQuality,
   HighDamageRareItem,
   MagicItem,
   NormalItem,
@@ -136,6 +138,32 @@ describe("parseArmour", () => {
     expect(parsedItem.armourES).toBe(ArmourHighValueRareItem.armourES);
     expect(parsedItem.quality).toBe(ArmourHighValueRareItem.quality);
     expect(parsedItem.armourBLOCK).toBe(ArmourHighValueRareItem.armourBLOCK);
+  });
+});
+
+describe("parseFlask", () => {
+  beforeEach(async () => {
+    setupTests();
+    await init("en");
+  });
+  it("reads the quality of the section with the charges", () => {
+    const sections = __testExports.itemTextToSections(CharmQuality.rawText);
+    const parsedItem = {} as ParsedItem;
+
+    const res = __testExports.parseFlask(sections[1], parsedItem);
+
+    expect(res).toBe("SECTION_PARSED");
+    expect(parsedItem.quality).toBe(CharmQuality.quality);
+  });
+  it("skips a section without charges and leaves its quality line unread", () => {
+    const sections = __testExports.itemTextToSections(BowThreeAugments.rawText);
+    const parsedItem = {} as ParsedItem;
+
+    const res = __testExports.parseFlask(sections[1], parsedItem);
+
+    expect(sections[1][0]).toBe("Quality: +20% (augmented)");
+    expect(res).toBe("SECTION_SKIPPED");
+    expect(parsedItem.quality).toBeUndefined();
   });
 });
 

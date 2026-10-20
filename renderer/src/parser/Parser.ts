@@ -1415,7 +1415,6 @@ function parseFlask(section: string[], item: ParsedItem) {
   performance.mark("parseFlask");
   // the purpose of this parser is to "consume" flask buffs
   // so they are not recognized as modifiers
-
   let isParsed: SectionParseResult = "SECTION_SKIPPED";
 
   for (const line of section) {
@@ -1425,7 +1424,7 @@ function parseFlask(section: string[], item: ParsedItem) {
     }
   }
 
-  if (isParsed) {
+  if (isParsed === "SECTION_PARSED") {
     parseQualityNested(section, item);
   }
 
@@ -2222,6 +2221,7 @@ export const __testExports = {
   isItemMissingItemClass,
   parseWeapon,
   parseArmour,
+  parseFlask,
   parseModifiers,
   parseWaystone,
   parseRequirements,
