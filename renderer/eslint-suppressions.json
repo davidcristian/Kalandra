@@ -34,11 +34,6 @@
       "count": 11
     }
   },
-  "specs/web/library/libraryChaos.test.ts": {
-    "no-restricted-syntax": {
-      "count": 2
-    }
-  },
   "specs/web/price-check/filters/create-stat-filters.test.ts": {
     "no-restricted-syntax": {
       "count": 1

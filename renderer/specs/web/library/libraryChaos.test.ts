@@ -1,4 +1,4 @@
-import { ParsedModifier } from "@/parser/advanced-mod-desc";
+import { ModifierInfo, ParsedModifier } from "@/parser/advanced-mod-desc";
 import { ModifierType } from "@/parser/modifiers";
 import { ItemRarity, ParsedItem } from "@/parser/ParsedItem";
 import {
@@ -10,43 +10,68 @@ import {
 import { createTestItem } from "@specs/helper";
 import { describe, expect, it } from "vitest";
 
+function mod(
+  type: ModifierType,
+  generation?: ModifierInfo["generation"],
+): ParsedModifier {
+  return { info: { type, generation, tags: [] }, stats: [] };
+}
+
+const MODS: Record<string, ParsedModifier> = {
+  prefix: mod(ModifierType.Explicit, "prefix"),
+  suffix: mod(ModifierType.Explicit, "suffix"),
+  mutated: mod(ModifierType.Explicit, "mutated"),
+  desecrated: mod(ModifierType.Desecrated),
+  fractured: mod(ModifierType.Fractured),
+  crafted: mod(ModifierType.Crafted),
+  implicit: mod(ModifierType.Implicit),
+  enchant: mod(ModifierType.Enchant),
+  augment: mod(ModifierType.Augment),
+};
+const EXPLICIT_KINDS = [
+  "prefix",
+  "suffix",
+  "mutated",
+  "desecrated",
+  "fractured",
+  "crafted",
+];
+
+function keep(kinds: Partial<ColumnOpts["keep"]>): ColumnOpts["keep"] {
+  return {
+    explicit: false,
+    implicit: false,
+    enchant: false,
+    augment: false,
+    ...kinds,
+  };
+}
+
 describe("modFilter", () => {
   it.each([
-    [{ explicit: true, implicit: false, enchant: false, augment: false }, [0]],
+    ["nothing", keep({}), []],
+    ["explicit", keep({ explicit: true }), EXPLICIT_KINDS],
+    ["implicit", keep({ implicit: true }), ["implicit"]],
+    ["enchant", keep({ enchant: true }), ["enchant"]],
+    ["augment", keep({ augment: true }), ["augment"]],
     [
-      { explicit: true, implicit: false, enchant: true, augment: false },
-      [0, 2],
+      "explicit and enchant",
+      keep({ explicit: true, enchant: true }),
+      [...EXPLICIT_KINDS, "enchant"],
     ],
     [
-      { explicit: true, implicit: false, enchant: false, augment: true },
-      [0, 3],
-    ],
-    [
-      { explicit: true, implicit: false, enchant: true, augment: true },
-      [0, 2, 3],
-    ],
-    [
-      { explicit: true, implicit: true, enchant: false, augment: false },
-      [0, 1],
+      "every kind",
+      keep({ explicit: true, implicit: true, enchant: true, augment: true }),
+      Object.keys(MODS),
     ],
   ])(
-    "Returns correct mods",
-    (filter: Record<string, boolean>, expected: number[]) => {
-      const mods = [
-        { info: { generation: "suffix" }, stats: [] },
-        { info: { type: ModifierType.Implicit }, stats: [] },
-        { info: { type: ModifierType.Enchant }, stats: [] },
-        { info: { type: ModifierType.Augment }, stats: [] },
-      ];
-      const set = new Set(expected);
-      for (let i = 0; i < expected.length; i++) {
-        expect(
-          __testExports.modFilter(
-            mods[i] as unknown as ParsedModifier,
-            filter as unknown as ColumnOpts["keep"],
-          ),
-        ).toBe(set.has(i));
-      }
+    "keeps only the mods of the kinds a profile keeps: %s",
+    (_name, kinds, expected) => {
+      const kept = Object.entries(MODS)
+        .filter(([, modifier]) => __testExports.modFilter(modifier, kinds))
+        .map(([name]) => name);
+
+      expect(kept).toEqual(expected);
     },
   );
 });

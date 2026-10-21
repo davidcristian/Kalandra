@@ -1,121 +1,66 @@
-import { FilterTag } from "@/web/price-check/filters/interfaces";
+import { FilterTag, StatFilter } from "@/web/price-check/filters/interfaces";
 import { applyRules as applyMissingFracturedRules } from "@/web/price-check/filters/pseudo/missing-fractured-rules";
 import { describe, expect, it } from "vitest";
 
+function filter(tag: FilterTag, statRef: string): StatFilter {
+  return {
+    tradeId: [],
+    statRef,
+    text: statRef,
+    tag,
+    sources: [],
+    disabled: false,
+  };
+}
+
 describe("applyMissingFracturedRules", () => {
-  it("Should do nothing if item is not fractured", () => {
-    const filters = [
-      {
-        tradeId: [],
-        statRef: "",
-        text: "",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-    ];
-    applyMissingFracturedRules(filters, filters);
+  it.each([
+    ["only a fractured filter", () => [filter(FilterTag.Fractured, "a")]],
+    [
+      "a fractured and an explicit filter",
+      () => [filter(FilterTag.Fractured, "a"), filter(FilterTag.Explicit, "b")],
+    ],
+  ])("adds nothing when the filters have %s", (_name, createFilters) => {
+    const filters = createFilters();
 
-    expect(filters).toEqual(JSON.parse(JSON.stringify(filters)));
+    applyMissingFracturedRules(filters, [filter(FilterTag.Explicit, "c")]);
+
+    expect(filters).toEqual(createFilters());
   });
 
-  it("Should do nothing if fractured and a modifier is fractured", () => {
+  it("appends a fractured copy of each explicit stat", () => {
     const filters = [
-      {
-        tradeId: [],
-        statRef: "",
-        text: "",
-        tag: FilterTag.Fractured,
-        sources: [],
-        disabled: false,
-      },
+      filter(FilterTag.Explicit, "a"),
+      filter(FilterTag.Explicit, "b"),
+    ];
+    const explicitStats = [
+      filter(FilterTag.Explicit, "a"),
+      filter(FilterTag.Explicit, "b"),
     ];
 
-    const explicitFilters = [
-      {
-        tradeId: [],
-        statRef: "",
-        text: "",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-    ];
-    applyMissingFracturedRules(filters, explicitFilters);
+    applyMissingFracturedRules(filters, explicitStats);
 
-    expect(filters).toEqual(JSON.parse(JSON.stringify(filters)));
+    expect(filters).toEqual([
+      filter(FilterTag.Explicit, "a"),
+      filter(FilterTag.Explicit, "b"),
+      filter(FilterTag.Fractured, "a"),
+      filter(FilterTag.Fractured, "b"),
+    ]);
+    expect(explicitStats).toEqual([
+      filter(FilterTag.Explicit, "a"),
+      filter(FilterTag.Explicit, "b"),
+    ]);
   });
 
-  it("Should do nothing if fractured and item has some fractured mod and non fractured mods", () => {
-    const filters = [
-      {
-        tradeId: [],
-        statRef: "",
-        text: "",
-        tag: FilterTag.Fractured,
-        sources: [],
-        disabled: false,
-      },
-      {
-        tradeId: [],
-        statRef: "",
-        text: "",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-    ];
-    applyMissingFracturedRules(
-      filters,
-      filters.filter((f) => f.tag === FilterTag.Explicit),
-    );
+  it("copies only the stats whose tag is explicit", () => {
+    const filters: StatFilter[] = [];
 
-    expect(filters).toEqual(JSON.parse(JSON.stringify(filters)));
-  });
+    applyMissingFracturedRules(filters, [
+      filter(FilterTag.Implicit, "a"),
+      filter(FilterTag.Explicit, "b"),
+      filter(FilterTag.Enchant, "c"),
+    ]);
 
-  it("Should append explicit stats, as fractured mods to filters", () => {
-    const filters = [
-      {
-        tradeId: [],
-        statRef: "a",
-        text: "a",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-      {
-        tradeId: [],
-        statRef: "b",
-        text: "b",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-    ];
-
-    const explicitFilters = [
-      {
-        tradeId: [],
-        statRef: "a",
-        text: "a",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-      {
-        tradeId: [],
-        statRef: "b",
-        text: "b",
-        tag: FilterTag.Explicit,
-        sources: [],
-        disabled: false,
-      },
-    ];
-    applyMissingFracturedRules(filters, explicitFilters);
-
-    expect(filters.filter((f) => f.tag === FilterTag.Fractured)).toHaveLength(
-      2,
-    );
-    expect(filters).toHaveLength(4);
+    expect(filters).toEqual([filter(FilterTag.Fractured, "b")]);
   });
 });

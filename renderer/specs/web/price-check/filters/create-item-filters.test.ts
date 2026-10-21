@@ -49,24 +49,27 @@ describe("unidentified item tests", () => {
     [ItemRarity.Magic, true],
     [ItemRarity.Rare, true],
     [ItemRarity.Unique, false],
-  ])("#. Should be enabled by default only on uniques", (rarity, disabled) => {
-    const item: ParsedItem = {
-      ...createTestItem(),
-      isUnidentified: true,
-      rarity,
-    };
+  ])(
+    "Should be enabled by default only on uniques, rarity %s",
+    (rarity, disabled) => {
+      const item: ParsedItem = {
+        ...createTestItem(),
+        isUnidentified: true,
+        rarity,
+      };
 
-    const res = createFilters(item, createTestCreateOptions());
+      const res = createFilters(item, createTestCreateOptions());
 
-    expect(res.unidentified?.disabled).toBe(disabled);
-  });
+      expect(res.unidentified?.disabled).toBe(disabled);
+    },
+  );
 
   it.each([
     [2, true],
     [3, true],
     [4, true],
     [5, false],
-  ])("#. Should be enabled by default only on T5", (tier, disabled) => {
+  ])("Should be enabled by default only on T5, tier %d", (tier, disabled) => {
     const item: ParsedItem = {
       ...createTestItem(),
       isUnidentified: true,
