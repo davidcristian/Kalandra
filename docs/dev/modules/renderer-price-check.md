@@ -94,7 +94,9 @@ that the route needs ([main.md](main.md)).
   `buildRelatedItems` in `related-items/related-items.ts` lists the `item-drop.json` group that contains the
   item, and leaves out each ref that the item data does not contain, such as an item from a newer game patch.
   A ref is `<namespace>::<refName>` from the English `items.ndjson`, and a unique adds ` // <base item>`.
-  `specs/data/itemDrop.test.ts` checks that the item data contains every ref in `item-drop.json`.
+  The source of the groups is `item-drop.jsonc`, the same list with `//#region` comment lines. A change is made
+  there and copied to `item-drop.json`, the file the app loads, without the comments. `specs/data/itemDrop.test.ts`
+  checks that the two files hold the same groups and that the item data contains every ref in them.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again and shows how many of their entries are new. The lists are English, so they help only an English

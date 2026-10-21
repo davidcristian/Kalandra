@@ -1,3 +1,4 @@
+// The source of item-drop.json, which the app loads: copy each change there, without the comments.
 [
   //#region Fragments
   {
@@ -355,12 +356,12 @@
   //#region Uniques
   {
     "query": [
-      "UNIQUE::Berek's Grip",
-      "UNIQUE::Berek's Respite",
-      "UNIQUE::Berek's Pass"
+      "UNIQUE::Berek's Grip // Two-Stone Ring",
+      "UNIQUE::Berek's Respite // Two-Stone Ring",
+      "UNIQUE::Berek's Pass // Two-Stone Ring"
     ],
     "items": [
-      "UNIQUE::The Taming"
+      "UNIQUE::The Taming // Prismatic Ring"
     ]
   },
   //#endregion Uniques

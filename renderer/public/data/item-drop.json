@@ -329,6 +329,16 @@
   },
   {
     "query": [
+      "UNIQUE::Berek's Grip // Two-Stone Ring",
+      "UNIQUE::Berek's Respite // Two-Stone Ring",
+      "UNIQUE::Berek's Pass // Two-Stone Ring"
+    ],
+    "items": [
+      "UNIQUE::The Taming // Prismatic Ring"
+    ]
+  },
+  {
+    "query": [
       "ITEM::Chaos Orb",
       "ITEM::Greater Chaos Orb",
       "ITEM::Perfect Chaos Orb"
