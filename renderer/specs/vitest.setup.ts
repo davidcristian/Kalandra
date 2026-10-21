@@ -41,7 +41,7 @@ export const setupClientStringLoaderMock = () => {
 
 // Mock fetch
 export const setupFetchMock = () => {
-  // @ts-expect-error - fetch is not defined in vitest
+  // @ts-expect-error: the fake returns part of a Response, with node-fetch's Headers in place of the DOM's
   global.fetch = vi.fn(async (url) => {
     const basePath = path.resolve(__dirname, "../public/");
     const filePath = path.join(
