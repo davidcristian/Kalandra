@@ -97,7 +97,8 @@ game. Click the magnifier in the main button bar to show it.
    selected when Kalandra starts.
 2. Type the name in `Search by name…`. The widget lists the matches when there are five or fewer. Until you type
    three characters, and while more than five items match, it shows this message:
-   `Too many items found, enter the name more precisely.`
+   `Too many items found, enter the name more precisely.` When three or more characters match no item, it shows
+   `No items found.`
 3. Click `Select` on a match. Kalandra adds the item to the row at the top of the widget, with its price from
    Kalandra's price service when the price file has one.
 4. Click an item in the row to open the price check for it. A skill gem is checked at gem level 1.

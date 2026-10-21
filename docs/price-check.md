@@ -124,22 +124,22 @@ next to it (a clock icon with **Instant**, **Online** or **Offline**) opens when
 - the league to search,
 - currency: **Any Currency**, **Exalted Orbs**, **Chaos Orb**, **Divine Orb** or **Ex/Div Orbs**.
 
-The menu turns orange when a currency or a listed time of one week or less is set, and shows the league name when it
-is not your selected league.
+The menu turns orange when a currency or a listed time of a week or less is set, and names a league other than yours.
 
-The table lists up to 20 listings, cheapest first. Columns: **Price**, **Stock** for stackable items, **iLvl** when the
-item level filter exists, **Level** and **Sockets** for gems, **Sockets** (most of any socketed gem) for a staff, wand
-or sceptre, **Quality** when the quality filter is on, **Listed**, and **Seller** when **Show seller** is set.
+The table lists up to 20 listings, cheapest first. Columns: **Price**, **Stock** for stackable items, **iLvl** when
+the item level filter exists, **Level** for gems and uncut gems, **Sockets** for gems and for a staff, wand or sceptre
+(most of any socketed gem), **Quality** for gems or when the quality filter is on, **Listed**, and **Seller** when
+**Show seller** is set.
 
 - A price in a currency other than your primary base currency or Divine Orbs is followed by its value in brackets,
   in your primary base currency or, for a large amount, in Divine Orbs.
 - `× N` after a price means the same seller has N listings, grouped into this row. It shows for 3 or more, and only
   with **Show indication on collapsed listings** on.
-- `?` after a price means the item has no price note of its own: the price comes from the name of the seller's stash
-  tab.
+- `?` after a price means the item has no price note of its own: the price comes from the seller's stash tab name.
 - The dot before the listed time shows the seller's status: pink for online, orange for away, red for offline.
   Listings you can buy at once have no dot.
-- **You** marks your own listings, found by **Account name**. **Gone** marks a listing the trade site reports as gone.
+- **You** marks your own listings, found by **Account name**, **in demand** a listing the trade site flags as in
+  demand, and **Gone** a listing it reports as gone. They follow the listed time, or the seller when **Seller** shows.
 - Hold `Shift` and point at a listing to see the listed item, as set by **Show item when hovering over price**.
 
 When more than 15 listings show and fewer than 5 of them ask for Chaos, Exalted or Divine Orbs (or for fewer than 30
