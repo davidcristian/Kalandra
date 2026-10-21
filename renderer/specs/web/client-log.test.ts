@@ -792,29 +792,24 @@ describe("clientLog", () => {
     expect(Host.sendEvent).toHaveBeenCalled();
   });
 
-  it("Timestamp should be correct format", () => {
+  it("sends the time of each line read in the local time zone", () => {
     const { handleLine } = useClientLog();
 
     for (const line of log1.split("\n")) {
       handleLine(line);
     }
-    vi.mocked(Host.sendEvent).mock.calls.forEach((call) => {
-      const arg = call[0];
-      expect(arg.name).toBe("CLIENT->MAIN::write-data");
 
-      if (
-        arg.name !== "CLIENT->MAIN::write-data" ||
-        arg.payload.action !== "client-log-event"
-      ) {
-        return;
-      }
-
-      const d = new Date(arg.payload.data.ts);
-
-      expect(d.getUTCFullYear()).toBe(2025);
-      expect(d.getUTCMonth()).toBe(8); // because zero indexed for some reason
-      expect(d.getUTCDate()).toBe(11);
-    });
+    const times = vi
+      .mocked(Host.sendEvent)
+      .mock.calls.flatMap(([event]) =>
+        event.name === "CLIENT->MAIN::write-data" &&
+        event.payload.action === "client-log-event"
+          ? [event.payload.data.ts]
+          : [],
+      );
+    expect(times).toHaveLength(12);
+    expect(times[0]).toBe(Date.parse("2025-09-11T18:21:43"));
+    expect(times[11]).toBe(Date.parse("2025-09-11T18:29:16"));
   });
 
   it.each([
