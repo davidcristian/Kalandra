@@ -101,6 +101,7 @@ import { useI18n } from "vue-i18n";
 import { MainProcess } from "@/web/background/IPC";
 import { pushHostConfig } from "@/web/Config";
 import type { WidgetManager } from "../overlay/interfaces.js";
+import { newWidgetEntries } from "./widget.js";
 
 import Widget from "../overlay/Widget.vue";
 import UiToggle from "@/web/ui/UiToggle.vue";
@@ -119,14 +120,7 @@ if (props.config.wmFlags[0] === "uninitialized") {
     y: Math.random() * (40 - 20) + 20,
   };
   props.config.enableHotkeys = true;
-  props.config.entries = [
-    {
-      id: 1,
-      text: "Currency",
-      name: "",
-      hotkey: null,
-    },
-  ];
+  props.config.entries = newWidgetEntries();
   wm.show(props.config.wmId);
 }
 

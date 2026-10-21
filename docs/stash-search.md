@@ -15,7 +15,8 @@ default) and click one of them in the main button bar to show it. [Widgets](/wid
 `hide`, `edit`, `move` and `delete` buttons.
 
 To add another Stash search widget, hover over the three dots in the main button bar and click `Stash search`. A new
-widget has no title, shows `Untitled`, and starts with one search, `Currency`. You can add as many as you want.
+widget has no title, shows `Untitled`, and starts with one search: the name of the Currency rarity in the language of
+the **Language** setting, such as `Currency` in English or `Währung` in German. You can add as many as you want.
 
 ![The add widget menu with Stash search circled](/reference-images/StashSearchAdd.png)
 

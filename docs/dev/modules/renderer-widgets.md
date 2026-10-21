@@ -136,7 +136,8 @@ shows the strip's red message when main does not store it), `specs/web/widget-co
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
 `specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
 `specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
-share in the edited config) and
+share in the edited config), `specs/web/stash-search.test.ts` (`stash-search/widget.ts`, the search of a new
+Stash search widget in three languages) and
 `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
