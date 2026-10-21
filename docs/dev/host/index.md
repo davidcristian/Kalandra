@@ -37,6 +37,9 @@ behavior. [ADR-0008](../adr/ADR-0008-developer-docs-layout.md) gives the layout.
 6. **Add a new task to this list by hand**, with its number, title and link, in the same commit as
    its file. `scripts/backlogcheck.py` checks that the list and the task files match: each file
    listed once, in number order, with its heading as the title and one status from the list below.
+   It also checks each file against the template below: one of each `**Name:**` line, a Needs line
+   that starts as the template's does, a link as the Origin, a date as Verified, and a History of
+   `- <date>: ` lines.
 
 ## Statuses
 

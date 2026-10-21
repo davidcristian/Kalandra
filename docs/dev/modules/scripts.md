@@ -54,7 +54,11 @@ another copy of the repo.
   each space a hyphen, and `-1`, `-2` added to a repeated heading. A link to another site is not followed.
 - **`backlogcheck.py`** reads `docs/dev/refinements/` and `docs/dev/host/`. Each line under `## Tasks` in the
   `index.md` must be `- NNN: [title](tasks/NNN-slug.md)`, in number order, and every task file must be listed once,
-  with its first line `# <title>` and exactly one `**Status:**` line whose value the index defines.
+  with its first line `# <title>` and exactly one `**Status:**` line whose value the index defines. A task file
+  also follows its index's template: exactly one `**Origin:**` line with a markdown link and one `**Verified:**`
+  line with a date, one `**Area:**` line from `AREAS` in a refinement, which a test compares with the template's
+  list, and one `**Needs:**` line that starts with `Path of Exile 2 on Windows` in a host task. One `## History`
+  heading follows, and each list line under it starts with `- <date>: `.
 
 ### ci_paths.py
 
@@ -99,11 +103,11 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 57 tests on 20 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 61 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 92.8% of lines and branches on 20 Oct 2026.
+floor in `scripts/.coveragerc`, 93.2% of lines and branches on 21 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

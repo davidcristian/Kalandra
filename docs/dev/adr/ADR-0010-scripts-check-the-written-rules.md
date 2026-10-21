@@ -1,6 +1,6 @@
 # ADR-0010: Scripts check the written rules
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-21)
 
 ## Context
 
@@ -53,7 +53,8 @@ Exchange 2 does not follow these rules.
 
 **8. The backlog indexes and the links the docs build does not read are checked.** `scripts/backlogcheck.py`
 compares each index in `docs/dev/` with its task files: every file listed once, in number order, with its heading as
-the title and one status the index defines. `scripts/linkcheck.py` checks that every relative link in the developer
+the title, one status the index defines, and the other lines and the History section of the index's template.
+`scripts/linkcheck.py` checks that every relative link in the developer
 docs and in the markdown outside `docs/` names a file in the repo, and a heading that file has. Reason: the indexes
 are kept by hand ([ADR-0008](ADR-0008-developer-docs-layout.md)), and VitePress checks only the user pages.
 

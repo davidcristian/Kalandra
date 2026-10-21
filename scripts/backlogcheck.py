@@ -1,4 +1,4 @@
-"""Fails when a backlog index and its task files disagree, or a task file has no valid status."""
+"""Fails when a backlog index and its task files disagree, or a task file does not follow its index's template."""
 
 import argparse
 import re
@@ -8,14 +8,44 @@ from pathlib import Path
 from typing import NamedTuple
 
 DATE = r"\d{4}-\d{2}-\d{2}"
-BACKLOGS = {
-    "docs/dev/refinements": re.compile(rf"open|done {DATE}|declined {DATE}"),
-    "docs/dev/host": re.compile(rf"never attempted|attempted {DATE}(?:, inconclusive: .+)?|done {DATE}"),
-}
+AREAS = re.compile("config|main|renderer|parser|trade|docs|data|dataparser|priceservice|ci|release|repo|rules")
 TASKS_HEADING = "## Tasks"
+HISTORY_HEADING = "## History"
 _ENTRY = re.compile(r"- (?P<number>\d{3}): \[(?P<title>.+)\]\(tasks/(?P<file>(?P<prefix>\d{3})-[a-z0-9-]+\.md)\)")
 _FILE = re.compile(r"\d{3}-[a-z0-9-]+\.md")
-_STATUS = re.compile(r"^\*\*Status:\*\* (.*)$", re.MULTILINE)
+_HISTORY_LINE = re.compile(rf"- {DATE}: \S")
+
+
+class Field(NamedTuple):
+    """One `**Name:** value` line that an index's template asks of every task file, and the values it accepts."""
+
+    name: str
+    value: re.Pattern[str]
+    expected: str
+
+
+_ORIGIN = Field("Origin", re.compile(r"\[[^\]]+\]\([^)\s]+\)"), "a markdown link")
+_VERIFIED = Field("Verified", re.compile(DATE), "a date")
+BACKLOGS = {
+    "docs/dev/refinements": (
+        Field("Status", re.compile(rf"open|done {DATE}|declined {DATE}"), "a status the index lists"),
+        Field("Area", AREAS, "an area the index's template lists"),
+        _ORIGIN,
+        _VERIFIED,
+    ),
+    "docs/dev/host": (
+        Field(
+            "Status",
+            re.compile(rf"never attempted|attempted {DATE}(?:, inconclusive: .+)?|done {DATE}"),
+            "a status the index lists",
+        ),
+        Field(
+            "Needs", re.compile(r"Path of Exile 2 on Windows.*"), "a line that starts with 'Path of Exile 2 on Windows'"
+        ),
+        _ORIGIN,
+        _VERIFIED,
+    ),
+}
 
 
 class Problem(NamedTuple):
@@ -56,21 +86,43 @@ def read_entries(index: str, text: str) -> tuple[list[Entry], list[Problem]]:
     return entries, problems
 
 
-def check_task(path: str, text: str, title: str, status: re.Pattern[str]) -> list[Problem]:
-    """Returns what is wrong with one task file: its heading against the index, and its status line."""
+def check_history(path: str, lines: Sequence[str]) -> list[Problem]:
+    """Returns what is wrong with the History section: it is missing, repeated, empty or has an undated line."""
+    if lines.count(HISTORY_HEADING) != 1:
+        count = lines.count(HISTORY_HEADING)
+        return [Problem(path, f"has {count} {HISTORY_HEADING!r} headings, and needs exactly one")]
+    section: list[str] = []
+    for line in lines[lines.index(HISTORY_HEADING) + 1 :]:
+        if line.startswith("#"):
+            break
+        section.append(line)
+    entries = [line for line in section if line.startswith("- ")]
+    if not entries:
+        return [Problem(path, f"has no '- <date>: <what happened>' line under {HISTORY_HEADING!r}")]
+    return [
+        Problem(path, f"has a History line that does not start with '- <date>: ': {line[:60]!r}")
+        for line in entries
+        if not _HISTORY_LINE.match(line)
+    ]
+
+
+def check_task(path: str, text: str, title: str, fields: Sequence[Field]) -> list[Problem]:
+    """Returns what is wrong with one task file: its heading against the index, and the lines its template asks."""
     problems: list[Problem] = []
-    heading = text.splitlines()[0] if text else ""
+    lines = text.splitlines()
+    heading = lines[0] if lines else ""
     if heading != f"# {title}":
         problems.append(Problem(path, f"its heading is {heading!r}, and the index lists it as {title!r}"))
-    statuses = _STATUS.findall(text)
-    if len(statuses) != 1:
-        problems.append(Problem(path, f"has {len(statuses)} **Status:** lines, and needs exactly one"))
-    elif not status.fullmatch(statuses[0]):
-        problems.append(Problem(path, f"has the status {statuses[0]!r}, which the index does not list"))
-    return problems
+    for field in fields:
+        values = re.findall(rf"^\*\*{field.name}:\*\* (.*)$", text, re.MULTILINE)
+        if len(values) != 1:
+            problems.append(Problem(path, f"has {len(values)} **{field.name}:** lines, and needs exactly one"))
+        elif not field.value.fullmatch(values[0]):
+            problems.append(Problem(path, f"has the {field.name} {values[0]!r}, which is not {field.expected}"))
+    return problems + check_history(path, lines)
 
 
-def check_backlog(root: Path, folder: str, status: re.Pattern[str]) -> list[Problem]:
+def check_backlog(root: Path, folder: str, fields: Sequence[Field]) -> list[Problem]:
     """Compares one index with the task files in its tasks folder."""
     index = f"{folder}/index.md"
     entries, problems = read_entries(index, (root / index).read_text(encoding="utf-8"))
@@ -92,7 +144,7 @@ def check_backlog(root: Path, folder: str, status: re.Pattern[str]) -> list[Prob
         if entry.file not in files:
             problems.append(Problem(f"{index}:{entry.line}", f"lists {entry.file}, which is not in {folder}/tasks/"))
         else:
-            problems.extend(check_task(path, (root / path).read_text(encoding="utf-8"), entry.title, status))
+            problems.extend(check_task(path, (root / path).read_text(encoding="utf-8"), entry.title, fields))
     return problems
 
 
@@ -103,7 +155,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     root: Path = args.root
     try:
-        problems = [problem for folder, status in BACKLOGS.items() for problem in check_backlog(root, folder, status)]
+        problems = [problem for folder, fields in BACKLOGS.items() for problem in check_backlog(root, folder, fields)]
     except OSError as error:
         print(f"backlogcheck: {error}", file=sys.stderr)
         return 2
