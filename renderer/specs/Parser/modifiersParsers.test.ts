@@ -170,7 +170,7 @@ describe("[unit] parseModifiers", () => {
 Adds 10(1-16) to 273(239-300) Lightning Damage
 { Prefix Modifier "Razor-sharp" (Tier: 3) — Damage, Physical, Attack }
 Adds 24(23-35) to 51(39-59) Physical Damage
-{ Master Crafted Prefix Modifier "Overpowering" (Tier: 2) — Damage, Elemental, Attack }
+{ Crafted Prefix Modifier "Overpowering" (Tier: 2) — Damage, Elemental, Attack }
 109(100-119)% increased Elemental Damage with Attacks
 { Suffix Modifier "of the Drought" (Tier: 1) — Mana, Physical, Attack }
 Leeches 7.59(7-7.9)% of Physical Damage as Mana
@@ -182,6 +182,22 @@ Gain 21(21-27) Mana per enemy killed
 
     const res = __testExports.parseModifiers(section.split("\n"), parsedItem);
     expect(res).toBe("SECTION_PARSED");
+    expect(parsedItem.unknownModifiers).toEqual([]);
+    expect(
+      parsedItem.newMods.map(({ info }) => [
+        info.type,
+        info.generation,
+        info.name,
+        info.tier,
+      ]),
+    ).toEqual([
+      [ModifierType.Fractured, "prefix", "Electrocuting", 2],
+      [ModifierType.Explicit, "prefix", "Razor-sharp", 3],
+      [ModifierType.Crafted, "prefix", "Overpowering", 2],
+      [ModifierType.Explicit, "suffix", "of the Drought", 1],
+      [ModifierType.Desecrated, "suffix", "of Siphoning", 3],
+      [ModifierType.Explicit, "suffix", "of Acclaim", 1],
+    ]);
   });
 
   it("Should parse implicit modifiers", () => {
@@ -225,6 +241,12 @@ Gain 24 Mana per enemy killed (rune)
 
     const res = __testExports.parseModifiers(section.split("\n"), parsedItem);
     expect(res).toBe("SECTION_PARSED");
+    expect(parsedItem.unknownModifiers).toEqual([]);
+    expect(parsedItem.newMods).toHaveLength(1);
+    expect(parsedItem.newMods[0].info.type).toBe(ModifierType.Enchant);
+    expect(parsedItem.newMods[0].stats.map(({ stat }) => stat.ref)).toEqual([
+      "#% increased Elemental Damage with Attacks",
+    ]);
   });
 
   it("Should parse new enchant modifiers", () => {
