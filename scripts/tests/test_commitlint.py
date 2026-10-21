@@ -57,8 +57,15 @@ class CommitLintTest(unittest.TestCase):
         self.assertEqual(self.check(GOOD), [])
 
     def test_reports_the_header_rules(self) -> None:
-        problems = self.check(f"docs(docs): Add a page that is long enough to pass {'x' * 30}.\n")
-        self.assertEqual(len(problems), 4, problems)
+        self.assertEqual(
+            self.check(f"docs(docs): Add a page that is long enough to pass {'x' * 30}.\n"),
+            [
+                "the first line has 82 characters, at most 72",
+                "the subject starts with a capital letter",
+                "the subject ends with a period",
+                "the scope repeats the type (docs)",
+            ],
+        )
 
     def test_reports_width_words_and_the_missing_blank_line(self) -> None:
         body = " ".join(["word"] * 51)
@@ -99,8 +106,17 @@ class CommitLintTest(unittest.TestCase):
         )
 
     def test_reports_pointers_into_documents_that_change(self) -> None:
-        text = "fix: a subject\n\nAs ADR-0009 says.\nAs rule 9 says.\nThis closes #12.\nSee task 056.\n"
-        self.assertEqual(len(self.check(text)), 4, self.check(text))
+        text = "fix: a subject\n\nAs ADR-0009 says.\nAs rule 9 says.\nThis closes #12.\nSee task 056.\nFixes PR 12.\n"
+        self.assertEqual(
+            self.check(text),
+            [
+                "line 3 has a decision record number",
+                "line 4 has a numbered pointer into a document",
+                "line 5 has an issue or pull request number",
+                "line 6 has a numbered pointer into a document",
+                "line 7 has an issue or pull request number",
+            ],
+        )
 
     def test_reports_a_hash_only_when_it_names_a_commit(self) -> None:
         with repo({"a.txt": "a\n"}) as root:
