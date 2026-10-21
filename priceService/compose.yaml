@@ -7,7 +7,7 @@ services:
       dockerfile: priceService/Dockerfile
     restart: unless-stopped
     environment:
-      PRICE_CONTACT: ${PRICE_CONTACT:-https://github.com/davidcristian/Kalandra/issues}
+      PRICE_CONTACT: ${PRICE_CONTACT:-}
     volumes:
       - prices:/srv/prices
     healthcheck:

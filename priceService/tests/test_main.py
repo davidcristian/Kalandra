@@ -85,6 +85,12 @@ class ReadSettingsTest(unittest.TestCase):
     def test_accepts_no_pause_between_requests(self) -> None:
         self.assertEqual(read_settings({"PRICE_REQUEST_DELAY_SECONDS": "0"}).delay_seconds, 0.0)
 
+    def test_an_empty_contact_sends_the_default_contact(self) -> None:
+        self.assertEqual(
+            read_settings({"PRICE_CONTACT": ""}).user_agent,
+            "kalandra-price-service/1 (+https://github.com/davidcristian/Kalandra/issues)",
+        )
+
 
 class MainTest(unittest.TestCase):
     def setUp(self) -> None:

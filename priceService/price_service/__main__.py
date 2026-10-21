@@ -48,7 +48,8 @@ def read_number(environ: Mapping[str, str], name: str, default: str, *, zero_all
 
 def read_settings(environ: Mapping[str, str]) -> Settings:
     """Reads the settings from environment variables, with the default of each one that is missing."""
-    contact = environ.get("PRICE_CONTACT", DEFAULT_CONTACT)
+    # compose.yaml passes an empty PRICE_CONTACT when the shell and .env do not set it
+    contact = environ.get("PRICE_CONTACT") or DEFAULT_CONTACT
     return Settings(
         output=Path(environ.get("PRICE_OUTPUT_DIR", "/srv/prices")),
         namespace_map=Path(environ.get("PRICE_NAMESPACE_MAP", "/app/namespaceMap.json")),

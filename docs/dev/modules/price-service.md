@@ -113,7 +113,7 @@ deploy with `--build`. A `schemaVersion` other than 1 stops the service at start
 | `PRICE_NAMESPACE_MAP` | `/app/namespaceMap.json` | the categories to fetch |
 | `PRICE_INTERVAL_MINUTES` | `60` | time between the starts of two cycles, above 0; a cycle longer than this starts the next at once |
 | `PRICE_REQUEST_DELAY_SECONDS` | `1` | pause after every request, a failed one included; 0 or more |
-| `PRICE_CONTACT` | `https://github.com/davidcristian/Kalandra/issues` | the contact sent in the User-Agent |
+| `PRICE_CONTACT` | `DEFAULT_CONTACT` in `__main__.py`, Kalandra's GitHub issues page | the contact sent in the User-Agent; an empty value also uses the default |
 | `PRICE_LOG_LEVEL` | `INFO` | the Python logging level |
 
 An interval or a delay that is not a finite number in its range stops the service at start, before its first
