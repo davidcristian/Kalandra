@@ -119,11 +119,9 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_1);
     server.saveConfig(STEP_2);
-    await vi.waitFor(() => {
-      expect(files.finished).toBe(2);
-    });
 
     expect(await store.load()).toBe(STEP_2);
+    expect(files.finished).toBe(2);
     expect(electron.exitCodes).toEqual([]);
   });
 
