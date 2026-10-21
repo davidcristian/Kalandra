@@ -15,7 +15,7 @@ height), between 154/1600 and 1192/1600 of the window height. [docs/faq.md](../.
 
 - The arrow keys move the stash one tab per wheel step.
 - The game also zooms the camera on the mouse wheel, so **Mousewheel Zoom** must be off, in the
-  **UI** tab of the game's options. The app's tip `tip_23` says the same.
+  **UI** tab of the game's options. The app's tip `tip_20` says the same.
 - The camera zoom key bindings, Control + Page Up and Control + Page Down, still work. The FAQ page
   shows the option in `mousewheel-zoom.png` and the bindings in `zoom-keybinds.png`. Nothing in the
   repo says which game those two screenshots show.
