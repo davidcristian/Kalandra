@@ -50,6 +50,7 @@ describe("startApp", () => {
   });
 
   it("shows a failure that is not an Error as text", async () => {
+    // eslint-disable-next-line prefer-promise-reject-errors -- the test checks a reason that is not an Error
     await startApp(() => Promise.reject("no socket"), show);
 
     expect(shown[0]).toContain("Kalandra cannot start: no socket");

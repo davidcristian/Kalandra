@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Headers } from "node-fetch"; // Assuming you are using node-fetch
 import { Config, TipsFrequency } from "@/web/Config";
+import type { Widget } from "@/web/overlay/widgets";
 
 vi.mock("@/web/Config", async () => {
   return {
@@ -140,7 +141,6 @@ export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
     preferredTradeSite: "default",
     realm: "pc-ggg",
     widgets: [
-      /* eslint-disable @typescript-eslint/no-explicit-any */
       {
         wmId: 2,
         wmType: "price-check",
@@ -149,8 +149,7 @@ export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
         wmZorder: "exclusive",
         wmFlags: ["hide-on-blur", "menu::skip"],
         savedAugments: {},
-      } as any,
-      /* eslint-enable */
+      } as Widget,
     ],
     fontSize: 12,
     showAttachNotification: true,

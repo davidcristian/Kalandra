@@ -7,7 +7,9 @@ import { startWhenReady } from "../src/startup";
 class FakeApp extends EventEmitter {
   quitRequested = false;
   private readonly ready = new Promise<void>((resolve) => {
-    this.once("ready", () => resolve());
+    this.once("ready", () => {
+      resolve();
+    });
   });
 
   async whenReady() {

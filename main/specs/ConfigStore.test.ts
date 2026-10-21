@@ -151,7 +151,9 @@ describe("ConfigStore", () => {
 
   it("logs why a write failed and keeps the app running", async () => {
     const store = createStore({
-      writeFile: () => Promise.reject(new Error("the disk is full")),
+      writeFile: async () => {
+        throw new Error("the disk is full");
+      },
       rename: fs.rename,
     });
 

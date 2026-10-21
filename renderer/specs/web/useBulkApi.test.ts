@@ -104,7 +104,7 @@ describe("useBulkApi", () => {
     held[0].resolve(withoutExalted());
     await current;
 
-    bulk.result.value?.xchgExalted.load();
+    void bulk.result.value?.xchgExalted.load();
     held[1].resolve([offers("exalted", 12)]);
     await settle();
 
@@ -116,7 +116,7 @@ describe("useBulkApi", () => {
     held[0].resolve([null, offers("chaos", 7)]);
     await current;
 
-    bulk.result.value?.xchgExalted.load();
+    void bulk.result.value?.xchgExalted.load();
     held[1].resolve([offers("exalted", 12)]);
     await settle();
 
@@ -133,7 +133,7 @@ describe("useBulkApi", () => {
       const older = search(bulk, "older");
       held[0].resolve(withoutExalted());
       await older;
-      bulk.result.value?.xchgExalted.load();
+      void bulk.result.value?.xchgExalted.load();
 
       const newer = search(bulk, "newer");
       held[2].resolve(withoutExalted());

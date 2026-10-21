@@ -38,8 +38,8 @@ async function readText(file: string): Promise<string> {
   }
 }
 
-function sendEntry(ts: number) {
-  return server.emit("CLIENT->MAIN::write-data", {
+async function sendEntry(ts: number) {
+  await server.emit("CLIENT->MAIN::write-data", {
     action: "client-log-event",
     data: { ts, ms: 0, type: "log" },
     close: false,
@@ -54,14 +54,14 @@ function entryLines(...stamps: number[]): string {
 
 // Sends every entry before main has opened client-log.ndjson, then checks that each one is written
 async function writeEntries(dir: string, ...stamps: number[]) {
-  await Promise.all(stamps.map((ts) => sendEntry(ts)));
+  await Promise.all(stamps.map(sendEntry));
   expect(await readText(path.join(dir, "client-log.ndjson"))).toBe(
     entryLines(...stamps),
   );
 }
 
-function sendSessionStart(name: string) {
-  return server.emit("CLIENT->MAIN::write-data", {
+async function sendSessionStart(name: string) {
+  await server.emit("CLIENT->MAIN::write-data", {
     action: "session",
     start: true,
     name,

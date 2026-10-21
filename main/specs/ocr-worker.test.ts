@@ -12,7 +12,7 @@ vi.mock("electron", async () => {
   return { app: { getPath: () => os.tmpdir() } };
 });
 
-const never = () => new Promise<never>(() => {});
+const never = async () => await new Promise<never>(() => {});
 
 const GEMS = {
   elapsed: 12,

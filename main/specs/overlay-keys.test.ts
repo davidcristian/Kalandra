@@ -20,7 +20,7 @@ function press(code: string, modifiers: Modifiers = {}, type = "keyDown") {
   };
 }
 
-const everyModifierCombination: [Modifiers, string][] = [
+const everyModifierCombination: Array<[Modifiers, string]> = [
   [{ control: true, shift: true, alt: true }, "Ctrl + Shift + Alt + X"],
   [{ shift: true, alt: true }, "Shift + Alt + X"],
   [{ control: true, shift: true }, "Ctrl + Shift + X"],

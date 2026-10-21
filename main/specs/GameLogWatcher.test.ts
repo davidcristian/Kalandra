@@ -95,7 +95,7 @@ describe("GameLogWatcher.restart", () => {
     await fs.writeFile(file, "a line\n".repeat(100_000));
     await watcher.restart(file, true);
 
-    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    void server.emit("CLIENT->MAIN::re-parse-log", undefined);
     await watcher.restart(file, false);
 
     expect(logger.history).not.toContain("Failed to read");
@@ -111,7 +111,7 @@ describe("GameLogWatcher reads", () => {
     const file = path.join(folder, "Client.txt");
     await fs.writeFile(file, content);
     await watcher.restart(file, true);
-    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    void server.emit("CLIENT->MAIN::re-parse-log", undefined);
   }
 
   it("sends a line that the end of a read cuts in two as one line", async () => {
@@ -120,7 +120,9 @@ describe("GameLogWatcher reads", () => {
       "2026/10/19 05:00:00 1 abc [INFO Client 1] : You have entered Clearfell.";
     await reparse(`${first}\n${cut}\n`);
 
-    await vi.waitFor(() => expect(server.gameLogLines()).toEqual([first, cut]));
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual([first, cut]);
+    });
   });
 
   it("decodes a character that the end of a read cuts in two", async () => {
@@ -128,15 +130,17 @@ describe("GameLogWatcher reads", () => {
     const cut = "€ starts one byte before the end of the first read";
     await reparse(`${first}\n${cut}\n`);
 
-    await vi.waitFor(() => expect(server.gameLogLines()).toEqual([first, cut]));
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual([first, cut]);
+    });
   });
 
   it("skips a line longer than the longest line it keeps", async () => {
     await reparse(`${"x".repeat(MAX_LINE_BYTES * 2)}\nthe next line\n`);
 
-    await vi.waitFor(() =>
-      expect(server.gameLogLines()).toEqual(["the next line"]),
-    );
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual(["the next line"]);
+    });
     expect(logger.history).toContain(
       `Skipped a line longer than ${MAX_LINE_BYTES} bytes`,
     );
@@ -144,14 +148,14 @@ describe("GameLogWatcher reads", () => {
 
   it("drops the partial last line when the log is read again", async () => {
     await reparse("a whole line\nhalf a li");
-    await vi.waitFor(() =>
-      expect(server.gameLogLines()).toEqual(["a whole line"]),
-    );
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual(["a whole line"]);
+    });
 
     // A re-parse sent while the last one still reads is skipped, so the test sends it until one runs
     await vi.waitFor(
       () => {
-        server.emit("CLIENT->MAIN::re-parse-log", undefined);
+        void server.emit("CLIENT->MAIN::re-parse-log", undefined);
         expect(server.gameLogLines().length).toBeGreaterThan(1);
       },
       { interval: 100 },
@@ -176,10 +180,14 @@ describe("GameLogWatcher after the log changes on disk", () => {
     const file = path.join(folder, "Client.txt");
     await fs.writeFile(file, `${"an old line\n".repeat(20)}half of an old li`);
     await watcher.restart(file, true);
-    server.emit("CLIENT->MAIN::re-parse-log", undefined);
-    await vi.waitFor(() => expect(server.gameLogLines()).toHaveLength(20));
+    void server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toHaveLength(20);
+    });
 
-    await untilSent("a new line", () => fs.writeFile(file, "a new line\n"));
+    await untilSent("a new line", async () => {
+      await fs.writeFile(file, "a new line\n");
+    });
     expect(logger.history).toContain("The log file got shorter");
   });
 
@@ -203,11 +211,11 @@ describe("GameLogWatcher after the log changes on disk", () => {
     await watcher.restart(file, true);
 
     await fs.rm(file);
-    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    void server.emit("CLIENT->MAIN::re-parse-log", undefined);
 
-    await vi.waitFor(() =>
-      expect(server.gameLogLines()).toEqual(["an old line"]),
-    );
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual(["an old line"]);
+    });
     expect(logger.history).not.toContain("Failed to read");
   });
 
@@ -225,7 +233,7 @@ describe("GameLogWatcher after the log changes on disk", () => {
       if (openError) throw openError;
       return await open(...args);
     });
-    server.emit("CLIENT->MAIN::re-parse-log", undefined);
+    void server.emit("CLIENT->MAIN::re-parse-log", undefined);
   }
 
   function epermError(): Error {
@@ -236,9 +244,9 @@ describe("GameLogWatcher after the log changes on disk", () => {
   it("reads the file it has open when the new log is deleted before it opens", async () => {
     await reparseWhileNewLogIsDeleted();
 
-    await vi.waitFor(() =>
-      expect(server.gameLogLines()).toEqual(["an old line"]),
-    );
+    await vi.waitFor(() => {
+      expect(server.gameLogLines()).toEqual(["an old line"]);
+    });
     expect(logger.history).not.toContain("Failed to read");
   });
 
@@ -247,9 +255,9 @@ describe("GameLogWatcher after the log changes on disk", () => {
     async () => {
       await reparseWhileNewLogIsDeleted(epermError());
 
-      await vi.waitFor(() =>
-        expect(server.gameLogLines()).toEqual(["an old line"]),
-      );
+      await vi.waitFor(() => {
+        expect(server.gameLogLines()).toEqual(["an old line"]);
+      });
       expect(logger.history).not.toContain("Failed to read");
     },
   );
@@ -259,9 +267,9 @@ describe("GameLogWatcher after the log changes on disk", () => {
     async () => {
       await reparseWhileNewLogIsDeleted(epermError());
 
-      await vi.waitFor(() =>
-        expect(logger.history).toContain("Failed to read the log file: EPERM"),
-      );
+      await vi.waitFor(() => {
+        expect(logger.history).toContain("Failed to read the log file: EPERM");
+      });
     },
   );
 });

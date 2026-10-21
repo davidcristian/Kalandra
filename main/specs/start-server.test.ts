@@ -24,7 +24,7 @@ const OVERLAY_USER_AGENT =
 const BROWSER_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 const logger = new Logger(new FakeServer());
-const handled: IpcEvent["name"][] = [];
+const handled: Array<IpcEvent["name"]> = [];
 const clientLogEntries: number[] = [];
 let lastEventHandled = () => {};
 let port = 0;
@@ -92,7 +92,7 @@ function clientLogEntry(ms: number): string {
 // Sends two overlay events, and resolves those main handled
 async function sendOverlayEvents(
   userAgent?: string,
-): Promise<IpcEvent["name"][]> {
+): Promise<Array<IpcEvent["name"]>> {
   handled.length = 0;
   const events: IpcEvent[] = [
     { name: "OVERLAY->MAIN::focus-game", payload: undefined },

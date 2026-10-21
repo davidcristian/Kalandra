@@ -49,6 +49,7 @@ const server = createServer((req, res) => routes.emit("request", req, res));
 let port = 0;
 
 beforeAll(async () => {
+  // eslint-disable-next-line no-new -- the proxy adds its route to the emitter it receives
   new HttpProxy(
     routes,
     new Logger({
