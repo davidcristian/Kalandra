@@ -133,3 +133,4 @@ layout and its reasons.
 - 069: [The Settings window does not show the hotkeys that main cannot register](tasks/069-unregistered-hotkeys-in-settings.md)
 - 070: [Existing code in main and the renderer leaves promises floating](tasks/070-floating-promises-in-existing-code.md)
 - 071: [Existing code breaks the any, cast and empty catch checks of rule 7](tasks/071-type-and-catch-rules-in-existing-code.md)
+- 072: [The preset Stash search widgets search English text](tasks/072-stash-search-presets-in-english.md)

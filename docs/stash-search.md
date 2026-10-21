@@ -14,6 +14,9 @@ Kalandra includes two Stash search widgets, `Map rolling` and `Dump sorting`. Op
 default) and click one of them in the main button bar to show it. [Widgets](/widgets) explains the overlay and the
 `hide`, `edit`, `move` and `delete` buttons.
 
+The searches of both widgets are English text, written for a game client in English. With the game in another
+language, edit them to the words that its item text shows, as [Change the searches](#change-the-searches) explains.
+
 To add another Stash search widget, hover over the three dots in the main button bar and click `Stash search`. A new
 widget has no title, shows `Untitled`, and starts with one search: the name of the Currency rarity in the language of
 the **Language** setting, such as `Currency` in English or `Währung` in German. You can add as many as you want.
