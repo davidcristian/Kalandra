@@ -1,6 +1,6 @@
 # ADR-0011: CI runs the test jobs a change can affect
 
-**Status:** Accepted (2026-10-19)
+**Status:** Accepted (2026-10-21)
 
 ## Context
 
@@ -20,10 +20,12 @@ Python with a unit test, not a list inside the workflow that nothing checks. `--
 its old and its new path, because git otherwise prints only the new one, and a file moved out of `main/` must still
 run the main tests.
 
-**2. The first matching rule applies, and every job runs when no rule matches or no diff can be read.** A file rule
-comes before the rule for its folder, and `test_ci_paths.py` fails when an earlier rule hides a later one. The first
-push of a branch, or a force push whose `before` commit is gone, has no diff, so every job runs. Reason: a path that
-nobody listed, such as a new top-level folder, must not skip the tests it can break.
+**2. The first matching rule applies, and every job runs when no rule matches, no diff can be read or Changed paths
+fails.** A file rule comes before the rule for its folder, and `test_ci_paths.py` fails when an earlier rule hides a
+later one. The first push of a branch, or a force push whose `before` commit is gone, has no diff, so every job runs.
+Each job's `if` starts with `!cancelled()` and runs the job when `needs.changes.result` is not `success`. Reason: a
+path that nobody listed, such as a new top-level folder, must not skip the tests it can break, and a failed Changed
+paths job must not skip the jobs that a required check names.
 
 **3. A change to a workflow or to `scripts/` runs every job.** Reason: those files decide what CI runs, including
 this script.
@@ -48,6 +50,8 @@ counts a skipped job as passed.
   the repo tests those.
 - **A `paths` filter on the whole workflow.** A workflow that does not run leaves its required checks waiting, so a
   pull request could not merge.
+- **A last job that fails when a job it needs failed.** The required checks would have to change to its name, in the
+  repository settings, which the repo files do not show.
 
 ## Related
 

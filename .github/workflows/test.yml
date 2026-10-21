@@ -1,5 +1,6 @@
-# Lint & Format runs on every push. scripts/ci_paths.py picks the other jobs from the changed paths, and every job
-# runs when there is no diff to read or a path no rule there names.
+# Lint & Format runs on every push. scripts/ci_paths.py picks the other jobs from the changed paths. Every job runs
+# when there is no diff to read, when a path matches no rule there, or when the Changed paths job fails, since GitHub
+# counts a skipped job as passed.
 on:
   push:
     branches:
@@ -70,7 +71,7 @@ jobs:
   test:
     name: Tests
     needs: changes
-    if: needs.changes.outputs.renderer == 'true' || needs.changes.outputs.main == 'true'
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.renderer == 'true' || needs.changes.outputs.main == 'true') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -80,24 +81,24 @@ jobs:
       with:
         node-version: 24
     - run: npm ci
-      if: needs.changes.outputs.renderer == 'true'
+      if: needs.changes.result != 'success' || needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
     - run: npm run make-index-files
-      if: needs.changes.outputs.renderer == 'true'
+      if: needs.changes.result != 'success' || needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
     - run: npx vitest run --coverage
-      if: needs.changes.outputs.renderer == 'true'
+      if: needs.changes.result != 'success' || needs.changes.outputs.renderer == 'true'
       working-directory: ./renderer
     - run: npm ci
-      if: needs.changes.outputs.main == 'true'
+      if: needs.changes.result != 'success' || needs.changes.outputs.main == 'true'
       working-directory: ./main
     - run: npm test -- --coverage
-      if: needs.changes.outputs.main == 'true'
+      if: needs.changes.result != 'success' || needs.changes.outputs.main == 'true'
       working-directory: ./main
   price-service:
     name: Price service
     needs: changes
-    if: needs.changes.outputs.price_service == 'true'
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.price_service == 'true') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -114,7 +115,7 @@ jobs:
   scripts:
     name: Scripts
     needs: changes
-    if: needs.changes.outputs.scripts == 'true'
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.scripts == 'true') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -131,7 +132,7 @@ jobs:
   docs:
     name: Docs
     needs: changes
-    if: needs.changes.outputs.docs == 'true'
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.docs == 'true') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
