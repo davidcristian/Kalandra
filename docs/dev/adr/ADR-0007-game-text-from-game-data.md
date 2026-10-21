@@ -1,6 +1,6 @@
 # ADR-0007: Game text comes from generated game data
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-22)
 
 ## Context
 
@@ -26,11 +26,11 @@ parser code then reads all nine languages.
 generator or its inputs, followed by a new run. Reason: the next run overwrites a hand edit, and a hand edit in one
 language does not reach the other eight.
 
-**3. This copy of `dataParser/` is the only source of the data, and it can be older than the data.** On 18 Oct 2026
-the last change to the tool before the rename commit is dated 8 May 2026, and the last data update is dated
-5 Sep 2026. `git log -2 --format="%ad %an %s" --date=short -- dataParser`, and the same command for
-`renderer/public/data/en/stats.ndjson`, show both again. When the copy here cannot produce a fix, the contributor
-stops and asks the maintainer. Reason: Exiled Exchange 2 developed the tool in a private repo, so the committed data
+**3. This copy of `dataParser/` is the only source of the data, and it can be older than the data.** On 22 Oct 2026
+the last change to the tool by Kvan7, the author of Exiled Exchange 2, is dated 8 May 2026, and the last data update
+is dated 5 Sep 2026. `git log -1 -i --author=kvan7 --format="%ad %an %s" --date=short -- dataParser` shows the first,
+and `git log -1 --format="%ad %an %s" --date=short -- renderer/public/data/en/stats.ndjson` the second. When the copy
+here cannot produce a fix, the contributor stops and asks the maintainer. Reason: Exiled Exchange 2 developed the tool in a private repo, so the committed data
 can come from a newer version of the tool than this copy, and a hand edit is lost at the next run (decision 2).
 
 **4. The `*.index.bin` files are built, not stored.** `npm run make-index-files` in `renderer/` writes
