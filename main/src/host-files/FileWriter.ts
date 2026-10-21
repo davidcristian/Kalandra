@@ -26,7 +26,7 @@ function isValidFileName(name: string): boolean {
 }
 
 export class FileWriter {
-  // NOTE: not just for csv now, but keeping for back combat
+  // The folder holds more than CSV files, but keeps its name so existing output stays in it
   private defaultUploadsPath = path.join(
     app.getPath("userData"),
     "apt-data",
@@ -245,11 +245,8 @@ export class FileWriter {
   }
 
   /**
-   * Opens a channel, 'w' if file doesn't exist, 'a' if it does
-   * @param filePath path to file
-   * @param channel Which channel to open
-   * @param overwrite if it should open in 'w' always
-   * @returns true if a file was created, false if it already existed
+   * Opens the channel's file to write when the file is new or `overwrite` is set, or else to append.
+   * Returns true when it opens the file to write.
    */
   private async openChannel(
     filePath: string,

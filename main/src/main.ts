@@ -35,7 +35,7 @@ async function ensureAccessibilityPermission(): Promise<boolean> {
   // Trigger the system prompt
   systemPreferences.isTrustedAccessibilityClient(true);
 
-  const maxWaitTime = 15000; // 15 seconds
+  const maxWaitTime = 15000;
   const startTime = Date.now();
 
   return await new Promise((resolve) => {
@@ -45,7 +45,6 @@ async function ensureAccessibilityPermission(): Promise<boolean> {
         resolve(true);
       }
 
-      // Stop waiting if time runs out
       if (Date.now() - startTime > maxWaitTime) {
         clearInterval(interval);
         resolve(false);
@@ -133,7 +132,6 @@ startWhenReady(
           app.quit();
           return;
         }
-        // TODO: move up (currently crashes)
         logger.write(`info ${os.type()} ${os.release} / v${app.getVersion()}`);
         overlay.loadAppPage(port);
         tray.serverPort = port;

@@ -72,7 +72,6 @@ export class GameLogWatcher {
   ) {
     this.server.onEventAnyClient("CLIENT->MAIN::re-parse-log", async () => {
       if (this._state) {
-        // so have file and user set allow client-log to true
         if (!this._state.isReading) {
           this.fileWriter.flushClientLogFile();
           this._state.offset = 0;

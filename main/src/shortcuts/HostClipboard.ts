@@ -4,10 +4,8 @@ import type { Logger } from "../RemoteLogger";
 const POLL_DELAY = 48;
 const POLL_LIMIT = 500;
 
-// PoE must read clipboard within this timeframe,
-// after that we restore clipboard.
-// If game lagged for some reason, it will read
-// wrong content (= restored clipboard, potentially containing password).
+// The game must read the clipboard within this time, after which it is restored. A game that lags
+// reads the restored text instead, which can be a password.
 const RESTORE_AFTER = 120;
 
 export class HostClipboard {

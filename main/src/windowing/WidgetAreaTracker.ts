@@ -18,7 +18,6 @@ export class WidgetAreaTracker {
       if (process.platform === "win32") {
         this.closeThreshold = opts.closeThreshold * opts.dpr;
         this.from = screen.dipToScreenPoint(opts.from);
-        // NOTE: bug in electron accepting only integers
         this.area = screen.dipToScreenRect(null, roundRect(opts.area));
       } else if (process.platform === "linux") {
         this.closeThreshold = opts.closeThreshold * opts.dpr;
@@ -39,7 +38,6 @@ export class WidgetAreaTracker {
             display.scaleFactor,
           );
 
-        // scale coordinates using the display scale factor.
         this.from = {
           x: scaleX(opts.from.x),
           y: scaleY(opts.from.y),
@@ -105,7 +103,7 @@ function isPointInsideRect(point: Point, rect: Rectangle) {
 }
 
 function roundRect(rect: Rectangle) {
-  // NOTE: bug in electron accepting only integers
+  // Electron's screen methods accept only integer coordinates
   return {
     x: Math.round(rect.x),
     y: Math.round(rect.y),

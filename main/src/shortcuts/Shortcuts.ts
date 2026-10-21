@@ -280,12 +280,8 @@ function pressKeysToCopyItemText(
   let keys = mergeTwoHotkeys("Ctrl + C", showModsKey).split(" + ");
   keys = keys.filter((key) => key !== "C");
   if (process.platform !== "darwin") {
-    // On non-Mac platforms, don't toggle keys that are already being pressed.
-    //
-    // For unknown reasons, we need to toggle pressed keys on Mac for advanced
-    // mod descriptions to be copied. You can test this by setting the shortcut
-    // to "Alt + any letter". They'll work with this line, but not if it's
-    // commented out.
+    // On macOS the held keys are pressed again too: without that, a shortcut such as
+    // "Alt + any letter" does not copy the advanced mod descriptions.
     keys = keys.filter((key) => !pressedModKeys.includes(key));
   }
 
@@ -293,7 +289,6 @@ function pressKeysToCopyItemText(
     uIOhook.keyToggle(UiohookKey[key as UiohookKeyT], "down");
   }
 
-  // finally press `C` to copy text
   uIOhook.keyTap(UiohookKey.C);
 
   // Timeout to enforce release of keys

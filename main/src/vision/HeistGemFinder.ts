@@ -171,7 +171,6 @@ export class HeistGemFinder {
       linesMax: Math.max(...linesWeight),
       recognized: recognizedLines,
     };
-    // console.log(results)
     return results;
   }
 }

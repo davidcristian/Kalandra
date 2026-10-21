@@ -167,7 +167,6 @@ export class OverlayWindow {
 
       dialog.showErrorBox(
         "PoE2 window - No access",
-        // ----------------------
         "Path of Exile 2 is running with administrator rights.\n" +
           "\n" +
           "You need to restart Kalandra with administrator rights.",
