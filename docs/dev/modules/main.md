@@ -244,7 +244,7 @@ with EPERM as Windows does during a delete. `GameConfig.test.ts` writes game con
 passes its own default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through
 Comlink, fails or exits. `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process. A
 test of a module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs
-`tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint on `src/` and `specs/`; the Build workflow
-packages main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
+`tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint on `src/`, `specs/` and `build/`; the Build
+workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
 lists every host check, and each task's Status line says whether it still has to run.

@@ -22,7 +22,7 @@ repos:
         entry: npm run fix --prefix ./main
         language: system
         pass_filenames: false
-        files: ^main/.*\.(ts|js|jsx|tsx)$
+        files: ^main/.*\.(ts|js|mjs|jsx|tsx)$
 
     -   id: lint-fix-renderer
         name: Lint Fix Renderer Project
@@ -36,7 +36,7 @@ repos:
         entry: npm run format --prefix ./main
         language: system
         pass_filenames: false
-        files: ^main/.*\.(ts|js|jsx|tsx|vue|json|md)$
+        files: ^main/.*\.(ts|js|mjs|jsx|tsx|vue|json|md)$
 
     -   id: format-renderer
         name: Format Renderer Project

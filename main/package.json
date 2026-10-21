@@ -7,8 +7,8 @@
     "dev": "node build/script.mjs",
     "build": "tsc --noEmit && node build/script.mjs --prod",
     "package": "electron-builder build",
-    "lint": "eslint src specs",
-    "fix": "eslint src specs --fix",
+    "lint": "eslint --ext .ts,.mjs src specs build",
+    "fix": "eslint --ext .ts,.mjs src specs build --fix",
     "check-types": "tsc --noemit",
     "test": "vitest run",
     "format": "prettier . --write "
