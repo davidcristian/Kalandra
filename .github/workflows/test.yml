@@ -10,6 +10,13 @@ on:
     branches:
     - master
     - dev
+  # Build calls this workflow with all_jobs before it packages the app.
+  workflow_call:
+    inputs:
+      all_jobs:
+        description: Run every job, whatever the changed paths
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -35,6 +42,7 @@ jobs:
         EVENT: ${{ github.event_name }}
         BASE_REF: ${{ github.base_ref }}
         BEFORE: ${{ github.event.before }}
+        ALL_JOBS: ${{ inputs.all_jobs }}
       run: |
         set -euo pipefail
         range=""
@@ -45,11 +53,11 @@ jobs:
           range="$BEFORE..HEAD"
         fi
         # --no-renames lists a moved file under its old and its new path, so the jobs of its old folder run too.
-        if [ -n "$range" ] && git diff --name-only --no-renames "$range" > changed.txt; then
+        if [ "$ALL_JOBS" != "true" ] && [ -n "$range" ] && git diff --name-only --no-renames "$range" > changed.txt; then
           cat changed.txt
           python3 scripts/ci_paths.py < changed.txt | tee -a "$GITHUB_OUTPUT"
         else
-          echo "No diff range to read, so every job runs"
+          echo "No diff range to read, or the caller asked for every job, so every job runs"
           printf 'renderer=true\nmain=true\nprice_service=true\nscripts=true\ndocs=true\n' >> "$GITHUB_OUTPUT"
         fi
   lint-and-format:

@@ -19,6 +19,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The test.yml run that this push starts is not linked to this run, so Build runs every test job itself.
+  tests:
+    uses: ./.github/workflows/test.yml
+    with:
+      all_jobs: true
+
   renderer:
     runs-on: ubuntu-latest
     steps:
@@ -43,7 +49,7 @@ jobs:
         retention-days: 1
 
   package:
-    needs: renderer
+    needs: [tests, renderer]
     permissions:
       contents: write
     strategy:

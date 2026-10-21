@@ -37,6 +37,11 @@ repo (line limits, dashes, prose, links and the backlog indexes), so no path is 
 each half runs only for its own paths. Reason: a required status check named Tests keeps working, and GitHub
 counts a skipped job as passed.
 
+**6. Build runs every job of `test.yml` before it packages.** The Build workflow calls `test.yml` as a reusable
+workflow with `all_jobs: true`, which skips `ci_paths.py`, and its `package` job needs that call. Reason: `package`
+uploads into the draft release, so its files come from a commit on which every job passed, and the paths of one push
+do not show what an earlier push broke.
+
 ## Consequences
 
 - A push that changes only `docs/dev/` or a markdown file at the repo root runs Changed paths and Lint & Format.
@@ -44,6 +49,8 @@ counts a skipped job as passed.
 - A new folder runs every job until a rule names it. A change to `ipc/` runs both halves of Tests, and a change to
   `namespaceMap.json` or the price service's fixtures runs the renderer tests and the price service.
 - The Build and Docs workflows keep their own `paths` filters ([architecture.md](../architecture.md#ci)).
+- A push to `master` that starts Build runs the jobs of `test.yml` twice: the affected ones in `test.yml`'s own run
+  and all of them inside Build.
 
 ## Alternatives rejected
 
@@ -51,6 +58,9 @@ counts a skipped job as passed.
   the repo tests those.
 - **A `paths` filter on the whole workflow.** A workflow that does not run leaves its required checks waiting, so a
   pull request could not merge.
+- **Starting Build with `workflow_run` when `test.yml` completes.** Build would run the workflow file of the default
+  branch, check out the tested commit by hand and lose its `paths-ignore` filter.
+- **Copying the test steps into Build.** Two copies of the same steps can differ after a later change.
 - **A last job that fails when a job it needs failed.** The required checks would have to change to its name, in the
   repository settings, which the repo files do not show.
 

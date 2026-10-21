@@ -13,7 +13,8 @@ them:
   with write access; a new release for an existing tag uses that tag's commit; Re-run all jobs on a
   Build run uploads the files again and replaces the files with the same names; the matrix's
   default `fail-fast` cancels the other `package` jobs when one fails; a new Build run waits for
-  the running one in its `concurrency` group, and a newer push cancels a run that still waits.
+  the running one in its `concurrency` group, and a newer push cancels a run that still waits;
+  the `package` jobs wait for every job of the called `test.yml` and are skipped when one fails.
 - [runbooks/docs-site.md](../../runbooks/docs-site.md): `configure-pages` or `deploy-pages` fails
   when the Pages source is not GitHub Actions, or when the branch rule of the `github-pages`
   environment does not allow the branch.
@@ -35,3 +36,4 @@ in the sentence. Close this task when all four runbooks are checked, or split it
 
 - 2026-10-18: Collected from the writers of the four runbooks, who could not observe these
   services.
+- 2026-10-21: Added the wait of the Build `package` jobs for the called `test.yml`.

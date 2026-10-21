@@ -22,12 +22,15 @@ its commit. So the first release sets a version whose tag does not exist, such a
 merged pull request into `master` is a push to `master`. A tag push never starts Build
 (`tags-ignore: '**'`), so pushing a tag releases nothing.
 
+- The `tests` job calls `test.yml` as a reusable workflow with `all_jobs: true`, so every job of
+  that workflow runs on the pushed commit, whatever the changed paths.
 - The `renderer` job keeps `renderer/dist` as the `renderer-dist` workflow artifact for one day.
-- The `package` job runs on `windows-2025`, `ubuntu-22.04` and `macos-14`. Each runs `npm ci` and
-  `npm run build` in `main/`, then `npm run package "--" -p onTagOrDraft`, which is electron-builder
-  with `GH_TOKEN` set to the workflow's `GITHUB_TOKEN`. The job gives that token `contents: write`,
-  because GitHub lists draft releases only to a token with write access. A last step prints
-  `latest.yml`, `latest-linux.yml` or `latest-mac.yml`.
+- The `package` job starts only after `tests` and `renderer` pass, so a commit on which a job of
+  `test.yml` fails uploads nothing. It runs on `windows-2025`, `ubuntu-22.04` and `macos-14`. Each
+  runs `npm ci` and `npm run build` in `main/`, then `npm run package "--" -p onTagOrDraft`, which
+  is electron-builder with `GH_TOKEN` set to the workflow's `GITHUB_TOKEN`. The job gives that
+  token `contents: write`, because GitHub lists draft releases only to a token with write access. A
+  last step prints `latest.yml`, `latest-linux.yml` or `latest-mac.yml`.
 - `main/electron-builder.yml` sets the targets: an NSIS installer and a portable exe on Windows, an
   AppImage on Linux and a universal dmg on macOS.
 - Nothing is signed. `mac.identity` is `null`, and the workflow gives electron-builder no
@@ -91,8 +94,8 @@ main returns on `/config`. The pre-commit hook runs `versionCheck.py` when a `.j
    the parts changed since the last release, and `pre-commit run --all-files` for the bump itself.
 5. **Commit the bump on its own**, for example `chore: set the version to X.Y.Z`.
 6. **Push to master.** You should see:
-   - a Build run, whose three `package` jobs each log `uploading` once per file, and whose Hash step
-     prints a `latest*.yml` with `version: X.Y.Z`;
+   - a Build run, whose `tests` jobs pass, whose three `package` jobs each log `uploading` once per
+     file, and whose Hash step prints a `latest*.yml` with `version: X.Y.Z`;
    - a run of the Docs workflow (`pages.yml`), because the bump changes
      `docs/.vitepress/config.js`. The site then links to the `vX.Y.Z` files, which return 404
      until step 8, so do not wait long between the push and publishing.
@@ -123,6 +126,9 @@ Build run on `master` in the Actions tab and choose Re-run all jobs.
 - **`git ls-remote --tags origin vX.Y.Z` prints a tag in step 2.** The tag exists on `origin`, from
   Exiled Exchange 2 or from an earlier release, and a release made now would point at its commit.
   Set a version whose tag does not exist.
+- **The `package` jobs are skipped.** A job under `tests` failed on that commit, so nothing was
+  uploaded. Its log names the failed step. Fix the cause on `master` and push, and the new Build
+  run uploads.
 - **`skipped publishing` although the draft exists.** The draft's tag is not `vX.Y.Z` for the
   version in `main/package.json`, or the token cannot see drafts: GitHub lists draft releases only
   to a token with write access, which `permissions: contents: write` on the `package` job in
