@@ -209,7 +209,7 @@ banned-word rules; read your own diff for the rest.
 - **Credit stays.** Kalandra is under the AGPL v3 (`LICENSE`). The code inherited from Awakened PoE Trade and
   Exiled Exchange 2 is under the MIT License, whose notice must stay with it in `LICENSES/MIT.txt`; a fix
   cherry-picked from there is under the same notice ([ADR-0002](docs/dev/adr/ADR-0002-agpl-with-mit-notice.md)). The
-  README credits both projects, and the Patreon links to Awakened PoE Trade's author stay.
+  README credits both projects, and `.github/FUNDING.yml` keeps the Patreon account of Awakened PoE Trade's author.
 
 ## Safety
 

@@ -139,3 +139,4 @@ layout and its reasons.
 - 075: [Hybrid armour bases start with every defence filter enabled](tasks/075-hybrid-armour-defence-filters.md)
 - 076: [Two main test files wait for real timers](tasks/076-main-tests-wait-for-real-timers.md)
 - 077: [Item icons load from web.poecdn.com outside the proxy](tasks/077-item-icons-outside-proxy.md)
+- 078: [Decide whether the app shows the Patreon links to Awakened PoE Trade's author](tasks/078-patreon-links-in-comments.md)

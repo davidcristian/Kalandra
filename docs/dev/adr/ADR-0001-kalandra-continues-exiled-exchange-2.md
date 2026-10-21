@@ -1,6 +1,6 @@
 # ADR-0001: Kalandra continues Exiled Exchange 2 as its own project
 
-**Status:** Accepted (2026-10-21)
+**Status:** Accepted (2026-10-22)
 
 ## Context
 
@@ -44,11 +44,12 @@ commit hashes ([AGENTS.md](../../../AGENTS.md), Commits).
 `Kvan7/Exiled-Exchange-2`, and a pull request an agent opens targets `origin`. Reason: that project's contribution
 policy asks contributors not to use agents.
 
-**6. Credit stays.** The README credits both projects. The Patreon links to Awakened PoE Trade's author stay: the
-links in `renderer/src/web/price-check/CheckedItem.vue` and `renderer/src/web/settings/SettingsWindow.vue`, and the
-account in `.github/FUNDING.yml`. The settings window shows Awakened PoE Trade's patrons from
-`renderer/public/data/patrons.json` under a label that names that project. Reason: Kalandra is built on their code.
-The license side of this, the MIT notice, is [ADR-0002](ADR-0002-agpl-with-mit-notice.md).
+**6. Credit stays.** The README credits both projects, and `.github/FUNDING.yml` keeps the Patreon account of Awakened
+PoE Trade's author. The settings window shows Awakened PoE Trade's patrons from `renderer/public/data/patrons.json`
+under a label that names that project. The Patreon links in `renderer/src/web/price-check/CheckedItem.vue` and
+`renderer/src/web/settings/SettingsWindow.vue` are inside HTML comments, which Exiled Exchange 2 added before the
+fork, so the app shows neither. Reason: Kalandra is built on their code. The license side of this, the MIT notice, is
+[ADR-0002](ADR-0002-agpl-with-mit-notice.md).
 
 ## Consequences
 
