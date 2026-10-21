@@ -101,7 +101,9 @@ General, sets another path), and uses Alt when the file does not set it
 - **See:** the pasted text starts with `Item Class: `, and each modifier has a line above it such
   as `{ Prefix Modifier "Crackling" (Tier: 7) — Damage, Elemental, Lightning, Attack }` (this line
   is from `renderer/specs/Parser/items.ts`). After Ctrl + D the clipboard holds the item's text.
-  With "Restore clipboard" ticked in Settings, General, it holds what it held before.
+  With "Restore clipboard" ticked in Settings, General, it is empty, since it held item text
+  before Ctrl + D. Copy a word in the text editor and press Ctrl + D again: the clipboard then
+  holds that word.
 - **Logs:**
   - `warn [ClipboardPoller] No item text found.` when no item text reaches the clipboard within
     about half a second (`POLL_LIMIT` in `main/src/shortcuts/HostClipboard.ts`). Another program

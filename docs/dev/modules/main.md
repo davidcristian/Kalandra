@@ -91,11 +91,11 @@ The entry, the server and the app services, in `main/src/`:
   (`POLL_DELAY`) after the first delay, for at most 500 ms (`POLL_LIMIT`). It resolves with text that starts as
   `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and rejects. On Linux it always
   writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard" feature and a Proton 10 bug
-  (linked in the code). With Restore clipboard on it writes the previous text back. On Linux it also does so after a
-  failed read that leaves the marker, unless the previous text was empty or item text. `restoreShortly(cb)` runs `cb`
-  and, with Restore clipboard on, restores the clipboard after 120 ms (`RESTORE_AFTER`). It drops a call that comes
-  within those 120 ms, to avoid the game's "Too many actions" disconnects. `LANGUAGE_DETECTOR` holds the first line of
-  copied item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
+  (linked in the code). With Restore clipboard on it writes the previous text back, or empty text when that was item
+  text. On Linux it also writes that text back after a failed read that leaves the marker, unless it is empty.
+  `restoreShortly(cb)` runs `cb`, restores the clipboard after 120 ms (`RESTORE_AFTER`) with Restore clipboard on, and
+  drops a call within those 120 ms to avoid the game's "Too many actions" disconnects. `LANGUAGE_DETECTOR` holds the
+  first line of item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
 - `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. It presses `Enter`, then
   `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
   When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses

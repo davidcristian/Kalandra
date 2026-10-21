@@ -110,7 +110,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    `poe2_production_Config.ini` (`Alt` when the file sets none). The game copies the item text to the clipboard.
 3. `HostClipboard` polls the clipboard every 48 ms, starting after the price check's `initialDelay` (48 ms by
    default) and stopping after 500 ms of polling, until the text starts the way copied item text starts in one of
-   the game's languages. With Restore clipboard on, it then writes the previous clipboard text back.
+   the game's languages. With Restore clipboard on, it then writes the previous clipboard text back, or empty
+   text when that text was item text.
 4. main sends `MAIN->CLIENT::item-text` to the last active client, with the text, the cursor position and the
    target `price-check`. The other item hotkeys (item info, wiki, poedb and the rest) follow steps 1 to 4 with
    their own target.

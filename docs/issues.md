@@ -42,8 +42,8 @@ Try these steps in order when Kalandra does not work. The sections after them co
 ### A price check sends an old whisper to chat again
 
 Turn off **Restore clipboard** on the **General** settings page. It is off by default. When it is on, Kalandra writes
-the previous clipboard text back after each price check. If that text is a whisper copied from the trade site, a trade
-tool that watches the clipboard for whispers sends it again.
+the previous clipboard text back after each price check, unless that text was item text. If that text is a whisper
+copied from the trade site, a trade tool that watches the clipboard for whispers sends it again.
 
 ## Overlay and tray
 
