@@ -3,6 +3,15 @@ import path from "path";
 
 export const DATA_DIR = path.resolve(__dirname, "../../public/data");
 
+/** The languages other than English that have an app_i18n.json. */
+export const TRANSLATIONS = fs
+  .readdirSync(DATA_DIR)
+  .filter(
+    (lang) =>
+      lang !== "en" &&
+      fs.existsSync(path.join(DATA_DIR, lang, "app_i18n.json")),
+  );
+
 interface Messages {
   [key: string]: string | Messages;
 }

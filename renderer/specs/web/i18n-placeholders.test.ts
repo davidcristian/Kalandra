@@ -1,29 +1,19 @@
-import fs from "fs";
-import path from "path";
 import { describe, expect, it } from "vitest";
-import { DATA_DIR, readMessages } from "./app-i18n";
+import { readMessages, TRANSLATIONS } from "./app-i18n";
 
 function placeholders(text: string): string[] {
   return [...new Set(text.match(/\{[^{}]*\}/g) ?? [])].sort();
 }
-
-const translations = fs
-  .readdirSync(DATA_DIR)
-  .filter(
-    (lang) =>
-      lang !== "en" &&
-      fs.existsSync(path.join(DATA_DIR, lang, "app_i18n.json")),
-  );
 
 describe("the placeholders in translated UI text", () => {
   const english = readMessages("en");
 
   it("reads every translated UI text file", () => {
     const known = ["cmn-Hant", "de", "es", "fr", "ja", "ko", "pt", "ru", "th"];
-    expect(translations).toEqual(expect.arrayContaining(known));
+    expect(TRANSLATIONS).toEqual(expect.arrayContaining(known));
   });
 
-  it.each(translations)("match the English text in %s", (lang) => {
+  it.each(TRANSLATIONS)("match the English text in %s", (lang) => {
     const mismatched: Record<string, { en: string[]; translated: string[] }> =
       {};
     for (const [key, text] of readMessages(lang)) {

@@ -191,7 +191,7 @@
     "hide_revives": "Selecione somente se for diferente de 0 e não quiser exaltá-lo?",
     "tag_implicit": "implícito",
     "tag_fractured": "trincado",
-    "tag_crafts": "fabricado",
+    "tag_crafted": "fabricado",
     "tag_scourge": "flagelo",
     "tag_enchant": "encantado",
     "tag_variant": "variante",
@@ -284,7 +284,6 @@
     "reset": "Reiniciar itens",
     "heist_target": "Alvo de assalto:",
     "target_gem": "Gema de habilidade",
-    "target_replica": "Réplicas",
     "too_many_": "Muitos itens encontrados, insira o nome de forma mais precisa.",
     "not_found": "Nenhum item encontrado.",
     "ocr_gems_key": "Realizar um OCR para uma gema de habilidade"

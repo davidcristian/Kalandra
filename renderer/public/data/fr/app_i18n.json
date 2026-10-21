@@ -299,7 +299,6 @@
     "reset": "Réinitialiser les objets",
     "heist_target": "Cible du casse :",
     "target_gem": "Gemme de compétence",
-    "target_replica": "Répliques",
     "too_many_": "Trop d'objets trouvés, saisissez le nom plus précisément.",
     "not_found": "Aucun objet trouvé.",
     "ocr_gems_key": "Effectuer un OCR pour une gemme de compétence"
@@ -324,7 +323,6 @@
     "fulfill": "Compléter",
     "listed": "Listé",
     "seller": "Vendeur",
-    "travel": "Voyager",
     "item_level": "Niveau d'objet",
     "rank": "Rang",
     "gem_level": "Niveau",
@@ -427,11 +425,7 @@
     "remember_ratio": "Mémoriser le ratio de devise",
     "open_editor_above": "Ouvrir le sélecteur d'emplacement de rune vers le haut",
     "core_currency": "Devise de base principale :",
-    "show_volume": "Afficher le volume d'échange de devises par heure :",
-    "travel_to_hideout": "Se rendre au repaire pour les annonces. Nécessite de se connecter via le navigateur intégré, gardez à l'esprit les risques associés.",
-    "travel_option_disabled": "Désactivé",
-    "travel_option_button": "Bouton",
-    "travel_option_row": "Ctrl‑clic"
+    "show_volume": "Afficher le volume d'échange de devises par heure :"
   },
   "poe2_new": {
     "beta_warning": "Ceci est en BETA pour POE2, les choses ne fonctionneront pas toujours comme prévu.",

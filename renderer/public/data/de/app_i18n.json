@@ -294,7 +294,6 @@
     "reset": "Gegenstände zurücksetzen",
     "heist_target": "Heist-Ziel:",
     "target_gem": "Skill-Gem",
-    "target_replica": "Repliken",
     "too_many_": "Zu viele Gegenstände gefunden, geben Sie den Namen präziser ein.",
     "not_found": "Keine Gegenstände gefunden.",
     "ocr_gems_key": "Optische Texterkennung für eine Skill-Gem durchführen"
@@ -334,7 +333,6 @@
     "results_warn_title": "Preis wahrscheinlich zu hoch",
     "results_warn_message": "Handelsseite blendet Ergebnisse zwischen {0} und {1} Ex aus",
     "fix_complex_query": "Deaktiviere \"Pseudo-Mods verwenden\" in den Einstellungen oder melde dich mit dem integrierten Browser an",
-    "travel": "Reise",
     "likely_price_fixed": "Überwiegend nicht standardmäßige Währung ",
     "filter_exalt_divine": "Filtern nach Erhabener/Göttlicher Kugel",
     "highest_volume": "Höchstes Volumen:"
@@ -421,10 +419,7 @@
     "remember_ratio": "Währungs-Verhältnis merken",
     "open_editor_above": "Runen‑Sockel-Auswahl nach oben öffnen",
     "show_volume": "Währungsumtausch-Volumen pro Stunde anzeigen:",
-    "travel_to_hideout": "Reise zum Versteck für Listings. Erfordert Anmeldung über den eingebauten Browser; bedenke die damit verbundenen Risiken.",
-    "core_currency": "Primäre Basiswährung:",
-    "travel_option_button": "Schaltfläche",
-    "travel_option_row": "Strg-Klick"
+    "core_currency": "Primäre Basiswährung:"
   },
   "poe2_new": {
     "beta_warning": "Dies ist eine BETA für POE2, es wird nicht immer wie erwartet funktionieren.",

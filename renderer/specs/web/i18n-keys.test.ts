@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
-import { readMessages } from "./app-i18n";
+import { readMessages, TRANSLATIONS } from "./app-i18n";
 
 const SRC_DIR = path.resolve(__dirname, "../../src");
 
@@ -52,6 +52,9 @@ const LISTED_MISSING = [
   "show type",
 ];
 
+// Texts of task 019 that t() gets through an expression, which literalKeys() does not read
+const COMPUTED_MISSING = ["Offline"];
+
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(dir, entry.name);
@@ -96,6 +99,22 @@ describe("the literal keys passed to t()", () => {
     const outdated = LISTED_MISSING.filter(
       (key) => !used.has(key) || english.has(key),
     );
-    expect(outdated).toEqual([]);
+    const defined = COMPUTED_MISSING.filter((key) => english.has(key));
+    expect([...outdated, ...defined]).toEqual([]);
   });
+});
+
+describe("the keys of a translation", () => {
+  const english = readMessages("en");
+  const listed = new Set([...LISTED_MISSING, ...COMPUTED_MISSING]);
+
+  it.each(TRANSLATIONS)(
+    "are keys of the English file, or listed as missing, in %s",
+    (lang) => {
+      const unknown = [...readMessages(lang).keys()].filter(
+        (key) => !english.has(key) && !listed.has(key),
+      );
+      expect(unknown).toEqual([]);
+    },
+  );
 });

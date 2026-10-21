@@ -145,7 +145,7 @@
     "accessory_trinket": "เครื่องประดับเล็ก",
     "sanctum_relic": "โบราณวัตถุ",
     "tincture": "ทิงเจอร์",
-    "azmeri_charm": "เครื่องราง",
+    "flask_charm": "เครื่องราง",
     "weapon_crossbow": "หน้าไม้",
     "armour_focus": "โฟกัส",
     "weapon_spear": "หอก",
@@ -283,7 +283,6 @@
     "reset": "รีเซ็ตไอเทม",
     "heist_target": "ประเภทไอเทม:",
     "target_gem": "สกิลเจม",
-    "target_replica": "Replicas",
     "too_many_": "พบไอเทมมากเกินไป กรุณาระบุชื่อให้ชัดเจนขึ้น",
     "not_found": "ไม่พบไอเทม",
     "ocr_gems_key": "ทำ OCR สำหรับสกิลเจม"
