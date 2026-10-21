@@ -68,29 +68,35 @@ class OverviewTest(unittest.TestCase):
         self.assertEqual(sleeps, [0.5, 0.5])
 
     def test_revalidates_with_the_etag_and_reuses_the_body_on_304(self) -> None:
+        sleeps: list[float] = []
         get = FakeGet({"type=Currency": [ok({"lines": [1]}, etag='"v1"'), Reply(304, b"", '"v1"')]})
-        client = client_for(get)
+        client = client_for(get, sleeps)
         first = client.overview("Standard", CURRENCY)
         second = client.overview("Standard", CURRENCY)
         self.assertNotIn("If-None-Match", get.calls[0][1])
         self.assertEqual(get.calls[1][1]["If-None-Match"], '"v1"')
         self.assertEqual(second, first)
+        self.assertEqual(sleeps, [0.5, 0.5])
 
     def test_falls_back_to_the_last_good_copy_when_a_request_fails(self) -> None:
         for failure in FAILURES:
             with self.subTest(failure=repr(failure)[:80]):
+                sleeps: list[float] = []
                 get = FakeGet({"type=Currency": [ok({"lines": [1]}), failure]})
-                client = client_for(get)
+                client = client_for(get, sleeps)
                 client.overview("Standard", CURRENCY)
                 with self.assertLogs("price_service.ninja", "WARNING"):
                     self.assertEqual(client.overview("Standard", CURRENCY), {"lines": [1]})
+                self.assertEqual(sleeps, [0.5, 0.5])
 
     def test_raises_when_a_request_fails_and_nothing_is_cached(self) -> None:
         for failure in [*FAILURES, ok([1])]:
             with self.subTest(failure=repr(failure)[:80]):
-                client = client_for(FakeGet({"type=Currency": [failure]}))
+                sleeps: list[float] = []
+                client = client_for(FakeGet({"type=Currency": [failure]}), sleeps)
                 with self.assertRaises(NinjaError):
                     client.overview("Standard", CURRENCY)
+                self.assertEqual(sleeps, [0.5])
 
 
 class StopCycleTest(unittest.TestCase):

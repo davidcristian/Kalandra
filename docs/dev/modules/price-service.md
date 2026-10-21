@@ -191,9 +191,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 58 tests on 20 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 63 tests on 21 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 97.6% of lines and branches on 20 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 99.5% of lines and branches on 21 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
 `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.

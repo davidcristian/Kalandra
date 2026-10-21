@@ -1,4 +1,5 @@
 import json
+import re
 import unittest
 
 from support import FIXTURES, NAMESPACE_MAP, fixture
@@ -29,6 +30,25 @@ class LoadCategoriesTest(unittest.TestCase):
     def test_rejects_an_unknown_schema_version(self) -> None:
         with self.assertRaises(SnapshotError):
             load_categories('{"schemaVersion": 2, "map": []}')
+
+    def test_rejects_a_map_that_is_not_a_list(self) -> None:
+        document = json.loads(NAMESPACE_MAP.read_text("utf-8"))
+        for value in ({"Currency": True}, None, "Currency"):
+            with self.subTest(map=value), self.assertRaisesRegex(SnapshotError, "^namespaceMap.json has no map list$"):
+                load_categories(json.dumps({**document, "map": value}))
+        with self.assertRaisesRegex(SnapshotError, "has no map list"):
+            load_categories('{"schemaVersion": 1}')
+
+    def test_rejects_an_entry_without_a_text_type_or_cx(self) -> None:
+        entries: list[object] = [{"type": "Currency"}, {"cx": True}, {"type": 3, "cx": True}, "Currency", None]
+        for entry in entries:
+            document = json.loads(NAMESPACE_MAP.read_text("utf-8"))
+            document["map"].append(entry)
+            with (
+                self.subTest(entry=entry),
+                self.assertRaisesRegex(SnapshotError, f"has an entry without type and cx: {re.escape(repr(entry))}$"),
+            ):
+                load_categories(json.dumps(document))
 
 
 class LeagueFileNameTest(unittest.TestCase):
@@ -160,7 +180,13 @@ class DivineConversionTest(unittest.TestCase):
         with self.assertRaisesRegex(SnapshotError, "^core in exalted has no divine rate to convert its lines$"):
             exchange_lines(self.response)
         lines = [{"name": "Rune", "primaryValue": 4}]
-        cores: list[object] = [{"primary": "chaos", "rates": {}}, {"primary": "chaos", "rates": {"divine": 0}}, None]
+        cores: list[object] = [
+            {"primary": "chaos", "rates": {}},
+            {"primary": "chaos", "rates": {"divine": 0}},
+            {"primary": "chaos", "rates": {"divine": -0.5}},
+            {"primary": "chaos", "rates": {"divine": "0.5"}},
+            None,
+        ]
         for core in cores:
             with self.subTest(core=core), self.assertRaises(SnapshotError):
                 stash_lines({"core": core, "lines": lines})
@@ -183,6 +209,20 @@ class StashTest(unittest.TestCase):
     def test_prefers_the_variant_field_when_there_is_one(self) -> None:
         lines = stash_lines(json.loads(fixture("stash_precursor_tablets.json")))
         self.assertEqual([line["variant"] for line in lines], ["Normal", "Magic"])
+
+    def test_skips_lines_without_a_text_name_or_a_numeric_value(self) -> None:
+        response = json.loads(fixture("stash_unique_weapons.json"))
+        names = [line["name"] for line in stash_lines(response)]
+        response["lines"].extend(
+            [
+                {"name": None, "primaryValue": 2},
+                {"primaryValue": 2},
+                {"name": "Rune", "primaryValue": "2"},
+                {"name": "Rune", "primaryValue": True},
+                {"name": "Rune"},
+            ]
+        )
+        self.assertEqual([line["name"] for line in stash_lines(response)], names)
 
     def test_reads_null_lines_as_empty(self) -> None:
         with self.assertLogs("price_service.transform", "WARNING"):
