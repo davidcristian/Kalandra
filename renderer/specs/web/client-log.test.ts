@@ -748,6 +748,14 @@ const logStartThroughRedVale = `
 2026/04/26 12:56:41 1797745406 f4ab5a9a [INFO Client 366640] Successfully allocated passive skill id: elemental8_, name: Elemental Damage
 `;
 
+function zoneLine(time: string, level: number, area: string) {
+  return `2026/04/26 ${time} 1786598671 2caa22d2 [DEBUG Client 443804] Generating level ${level} area "${area}" with seed 1`;
+}
+
+function levelUpLine(time: string, level: number) {
+  return `2026/04/26 ${time} 1786661875 3ef232c2 [INFO Client 443804] : kvanClientLogTestOne (Mercenary) is now level ${level}`;
+}
+
 describe("clientLog", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -755,39 +763,106 @@ describe("clientLog", () => {
     await init("en");
   });
 
-  it("should parse first log", () => {
-    const { handleLine } = createClientLog();
+  it.each([
+    ["log1", log1, 17, 16, "g2_1"],
+    ["logStartThroughRedVale", logStartThroughRedVale, 5, 5, "g1_5"],
+  ])(
+    "ends %s with its last player level, area level and zone",
+    (_name, log, level, area, zone) => {
+      const { handleLine, playerLevel, areaLevel, zoneName } =
+        createClientLog();
 
-    for (const line of log1.split("\n")) {
-      expect(() => {
+      for (const line of log.split("\n")) {
         handleLine(line);
-      }).not.toThrow();
-    }
-    expect(Host.sendEvent).toHaveBeenCalled();
-  });
+      }
 
-  it("should parse second log", () => {
-    const { handleLine } = createClientLog();
+      expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
+        level,
+        area,
+        zone,
+      ]);
+    },
+  );
 
-    for (const line of logStartThroughRedVale.split("\n")) {
-      expect(() => {
-        handleLine(line);
-      }).not.toThrow();
-    }
-    expect(Host.sendEvent).toHaveBeenCalled();
-  });
-
-  it("Should parse full campaign client log", () => {
-    const { handleLine } = createClientLog();
-
+  it("reads each event and the last level and area of the full campaign", () => {
+    const { handleLine, playerLevel, areaLevel, zoneName } = createClientLog();
     const filePath = path.join(__dirname, "FullCampaign.txt");
-    const lines = fs.readFileSync(filePath, "utf-8").split("\n");
 
-    for (const line of lines) {
+    for (const line of fs.readFileSync(filePath, "utf-8").split("\n")) {
       handleLine(line);
     }
 
-    expect(Host.sendEvent).toHaveBeenCalled();
+    const counts: Record<string, number> = {};
+    for (const [event] of vi.mocked(Host.sendEvent).mock.calls) {
+      if (
+        event.name === "CLIENT->MAIN::write-data" &&
+        event.payload.action === "client-log-event"
+      ) {
+        const type = event.payload.data.type;
+        counts[type] = (counts[type] ?? 0) + 1;
+      }
+    }
+    expect(counts).toEqual({
+      "game-version": 15,
+      "game-start": 15,
+      "map-nav": 921,
+      "load-zone": 319,
+      "npc": 48,
+      "level-up": 60,
+      "passive-tree": 95,
+      "player-death": 49,
+      "permanent-bonus": 15,
+      "afk": 4,
+      "skill-point": 25,
+    });
+    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
+      61,
+      65,
+      "mapspiderwoods",
+    ]);
+  });
+
+  it("sets the area level and zone of each new area and keeps the player level", () => {
+    const { handleLines, playerLevel, areaLevel, zoneName } = createClientLog();
+
+    handleLines([levelUpLine("09:50:00", 3), zoneLine("09:50:55", 4, "G1_4")]);
+    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
+      3,
+      4,
+      "g1_4",
+    ]);
+    handleLines([zoneLine("09:52:17", 6, "G1_6")]);
+    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
+      3,
+      6,
+      "g1_6",
+    ]);
+  });
+
+  it.each(["G1_town", "G_Endgame_Town", "HideoutSummit"])(
+    "keeps the area level and zone of the area before %s",
+    (area) => {
+      const { handleLines, areaLevel, zoneName } = createClientLog();
+
+      handleLines([
+        zoneLine("09:50:55", 4, "G1_4"),
+        zoneLine("09:51:13", 65, area),
+      ]);
+
+      expect([areaLevel.value, zoneName.value]).toEqual([4, "g1_4"]);
+    },
+  );
+
+  it("sets the player level to 1 on The Riverbank", () => {
+    const { handleLines, playerLevel, areaLevel, zoneName } = createClientLog();
+
+    handleLines([levelUpLine("09:51:58", 3), zoneLine("09:52:17", 1, "G1_1")]);
+
+    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
+      1,
+      1,
+      "g1_1",
+    ]);
   });
 
   it("sends the time of each line read in the local time zone", () => {

@@ -128,7 +128,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 `vitest.config.ts` lists `*.vue` under `coverage.exclude`. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
-until main opens its file), `specs/web/client-log.test.ts` (the client log the XP tracker reads, with
+until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP tracker reads, with
 `FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
 German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
