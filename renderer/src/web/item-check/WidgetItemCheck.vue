@@ -39,16 +39,10 @@ export default {
           profile: 1,
           showNewStats: false,
           selectedStats: [
-            { matcher: "#% maximum Player Resistances", decision: "w--" },
-            {
-              matcher: "Monsters reflect #% of Physical Damage",
-              decision: "d--",
-            },
-            {
-              matcher: "Monsters reflect #% of Elemental Damage",
-              decision: "d--",
-            },
-            { matcher: "Area contains two Unique Bosses", decision: "g--" },
+            { ref: "#% maximum Player Resistances", decision: "w--" },
+            { ref: "Monsters reflect #% of Physical Damage", decision: "d--" },
+            { ref: "Monsters reflect #% of Elemental Damage", decision: "d--" },
+            { ref: "Area contains two Unique Bosses", decision: "g--" },
           ],
         },
       };

@@ -18,7 +18,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 36. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 37. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -34,6 +34,11 @@ old one and keep that file, so a saved config must survive every update: this is
   keeps the first library widget, which the settings window and the hotkeys read, and removes the others: a v0.14.0
   install saved version 29 with its library widget, so the `< 30` step added a second one. When neither the library
   nor the XP tracker follows item search, as in some configs from before version 12, it moves both there.
+- `nameDefaultMarksByRef(config)` in `renderer/src/web/map-check/saved-marks.ts` is what the `< 37` step runs. Map
+  check marks name a modifier by its stat ref from version 37 on, and older ones by its text in the language of that
+  time. The step names the four default marks of earlier versions, which are English text, by ref. The other marks
+  need the game data, which loads after `upgradeConfig()`, so `renderer/src/main.ts` converts them after each data
+  load ([renderer-widgets.md](renderer-widgets.md#invariants)).
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no file it uses
   `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. With a file that is not JSON it uses
   `defaultConfig()` and calls `saveConfig({ isTemporary: true })` to make main write `config.json.tmp` and keep
@@ -87,8 +92,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 36, so the next step is `if (config.configVersion < 37)`, ending with
-  `config.configVersion = 37`, and `defaultConfig()` then returns 37. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 37, so the next step is `if (config.configVersion < 38)`, ending with
+  `config.configVersion = 38`, and `defaultConfig()` then returns 38. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -115,6 +120,7 @@ returns the config `defaultConfigMock()` builds, a typed `Config` literal with `
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it. No test runs
 `defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against
 the steps before it and against the type. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
-on the widget lists that the `< 29` and `< 30` steps left in saved configs. `main/specs/ConfigStore.test.ts` checks
+on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
+`renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, and a rename
 that fails while another program has the file open, with the log line of each failed save.

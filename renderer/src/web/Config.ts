@@ -9,6 +9,7 @@ import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
 import { repairSavedConfig } from "./config-repair";
+import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 
 const _config = shallowRef<Config | null>(null);
@@ -160,7 +161,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 36,
+  configVersion: 37,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -692,6 +693,11 @@ function upgradeConfig(_config: Config): Config {
     repairSavedConfig(config);
 
     config.configVersion = 36;
+  }
+
+  if (config.configVersion < 37) {
+    nameDefaultMarksByRef(config);
+    config.configVersion = 37;
   }
   /* eslint-enable */
 

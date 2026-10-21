@@ -18,6 +18,7 @@
 import { computed, useCssModule } from "vue";
 import { PreparedStat } from "./prepare-map-stats";
 import { nextDecision, decisionCreate, type MapCheckConfig } from "./common.js";
+import { findMark, newMark } from "./mark-target";
 
 import ItemModifierText from "../ui/ItemModifierText.vue";
 
@@ -29,9 +30,7 @@ const props = defineProps<{
 const $style = useCssModule();
 
 const entry = computed(() =>
-  props.config.selectedStats.find(
-    ({ matcher }) => matcher === props.stat.matcher,
-  ),
+  findMark(props.config.selectedStats, props.stat.target),
 );
 
 const decision = computed<string>({
@@ -46,10 +45,7 @@ const decision = computed<string>({
       entry.value?.decision,
     );
     if (!entry.value) {
-      props.config.selectedStats.push({
-        matcher: props.stat.matcher,
-        decision: newSet,
-      });
+      props.config.selectedStats.push(newMark(props.stat.target.key, newSet));
     } else {
       entry.value.decision = newSet;
     }

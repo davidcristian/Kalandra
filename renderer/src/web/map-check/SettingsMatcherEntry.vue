@@ -58,6 +58,7 @@ import {
   decisionCreate,
   MapCheckStat,
 } from "./common.js";
+import { findMark, newMark } from "./mark-target";
 
 export default defineComponent({
   emits: [],
@@ -80,9 +81,7 @@ export default defineComponent({
     const { t } = useI18n();
 
     const entry = computed(() =>
-      props.selectedStats.find(
-        ({ matcher }) => matcher === props.matcher.matchStr,
-      ),
+      findMark(props.selectedStats, props.matcher.target),
     );
 
     const decision = computed<string>({
@@ -97,10 +96,8 @@ export default defineComponent({
           entry.value?.decision,
         );
         if (!entry.value) {
-          props.selectedStats.push({
-            matcher: props.matcher.matchStr,
-            decision: newSet,
-          });
+          const { key } = props.matcher.target;
+          if (key) props.selectedStats.push(newMark(key, newSet));
         } else {
           entry.value.decision = newSet;
         }

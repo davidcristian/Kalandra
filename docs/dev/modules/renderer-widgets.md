@@ -109,6 +109,12 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
   one saved, and does nothing while an `exclusive` widget is shown.
 - **The manager needs one widget with a numeric `wmZorder`** to find the topmost widget; the menu has
   `wmZorder: 1`.
+- **A Map check mark names its modifier in every language**: the stat `ref`, with the `negate` and `value` of the
+  wording (`MapStatKey` in `map-check/mark-target.ts`). `findMark()` returns the first mark with the key of a row or
+  of a modifier on the item. A mark saved before config version 37 has `matcher`, its text in the language of that
+  time, and matches any wording of its modifier in that language. After each game data load, `renderer/src/main.ts`
+  passes the marks to `convertTextMarks()` in `map-check/saved-marks.ts`, which names each one it finds by key, drops
+  one whose key an earlier mark has and keeps one the loaded language does not have.
 
 **Dependencies.** Vue 3 and vue-i18n; `Config.ts` (`AppConfig`, `saveConfig`, `pushHostConfig`, `defaultConfig`,
 [config.md](config.md)); the `IpcEvent` messages in `ipc/types.ts` ([ipc.md](ipc.md)); the background state in
@@ -119,7 +125,8 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
 until main opens its file), `specs/web/client-log.test.ts` (the client log the XP tracker reads, with
-`FullCampaign.txt`, and a line that fails), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
+`FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
+German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again

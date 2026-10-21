@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** data
 **Origin:** [renderer/src/assets/data/index.ts](../../../../renderer/src/assets/data/index.ts)
-**Verified:** 2026-10-20
+**Verified:** 2026-10-21
 
 A stat's `ref` is its English text, which code uses to name the stat in every language through
 `STAT_BY_REF` and `stat()`. The committed `stats.ndjson` files are generated per language, and
@@ -35,8 +35,10 @@ comparing each file's refs and trade ids (`stat_<number>`) with the 2526 English
   English keystone names, such as `Vaal Pact`, as its matchers in all eight other languages, so
   its line in another language matches no stat.
 
-No code names a ref of the first group through `STAT_BY_REF` or `stat()`, so those differences
-have no effect yet. Whether the cmn-Hant gap comes from the generator or from a Traditional Chinese
+Map check marks name a modifier by its ref, so a mark of one of the first group does not match in a
+language with the other ref, and shows as outdated there. The default mark
+`#% maximum Player Resistances` is one of them. No other code names a ref of the first group through
+`STAT_BY_REF` or `stat()`. Whether the cmn-Hant gap comes from the generator or from a Traditional Chinese
 source that lags is not known.
 
 Done looks like: a `dataParser` run that writes every language from the same English stat list,
@@ -47,3 +49,5 @@ also [064](064-shared-stat-texts.md) for stats that share a text.
 ## History
 
 - 2026-10-20: Found while checking which stats share a matcher text in each language.
+- 2026-10-21: Map check marks started to name modifiers by ref, which makes the first group matter
+  for them.

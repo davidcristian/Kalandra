@@ -50,7 +50,9 @@ import {
   StatTag,
   decisionHasColor,
   isOutdated,
+  outdatedRow,
 } from "./common.js";
+import { findMark, statTargets } from "./mark-target";
 
 export default {
   name: "map_check.name",
@@ -79,8 +81,8 @@ function findAllAreaMods(): StatMatcher[] {
           ? StatTag.UberMapExclusive
           : undefined;
 
-    for (const c of stat.matchers) {
-      out.push({ matchStr: c.string, tag });
+    for (const { text, target } of statTargets(stat)) {
+      out.push({ matchStr: text, tag, target });
     }
   }
   out.sort(
@@ -108,22 +110,17 @@ const widget = computed(
   () => findWidget<ItemCheckWidget>("item-check", props.config)!,
 );
 
-const selectedProfileMatchers = computed(() => {
-  const { profile } = widget.value.maps;
-  const matchers = new Set<string>();
-  for (const entry of widget.value.maps.selectedStats) {
-    if (decisionHasColor(entry.decision, profile)) {
-      matchers.add(entry.matcher);
-    }
-  }
-  return matchers;
-});
+function isSelected(row: StatMatcher): boolean {
+  const { profile, selectedStats } = widget.value.maps;
+  const entry = findMark(selectedStats, row.target);
+  return entry != null && decisionHasColor(entry.decision, profile);
+}
 
 const outdatedTranslationList = computed<StatMatcher[]>(() => {
   const { profile } = widget.value.maps;
   return widget.value.maps.selectedStats
     .filter((entry) => isOutdated(profile, entry))
-    .map((entry) => ({ matchStr: entry.matcher, tag: StatTag.Outdated }));
+    .map(outdatedRow);
 });
 
 const areaStatsDb = computed(() => findAllAreaMods());
@@ -133,10 +130,13 @@ const filteredStats = computed<StatMatcher[]>(() => {
   const q = search.value.toLowerCase().split(" ");
 
   const filtered = areaStatsDb.value.filter((stat) => {
-    const searchStr = stat.matchStr.toLowerCase();
-    if (!q.every((part) => searchStr.includes(part))) return false;
+    const found = stat.target.texts.some((text) => {
+      const searchStr = text.toLowerCase();
+      return q.every((part) => searchStr.includes(part));
+    });
+    if (!found) return false;
     if (onlySelected.value) {
-      return selectedProfileMatchers.value.has(stat.matchStr);
+      return isSelected(stat);
     }
     return true;
   });

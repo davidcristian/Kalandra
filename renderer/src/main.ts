@@ -5,17 +5,29 @@ import * as Data from "./assets/data";
 import { initConfig, AppConfig } from "./web/Config";
 import { Host } from "./web/background/IPC";
 import { startApp } from "./web/startup";
+import { convertTextMarks } from "./web/map-check/saved-marks";
+import type { ItemCheckWidget } from "./web/item-check/widget";
+
+// Map check marks saved before version 37 are stat text, and only the game data of the
+// text's language finds its stat, so each data load converts the marks it can
+function convertMapCheckMarks() {
+  const itemCheck = AppConfig<ItemCheckWidget>("item-check");
+  if (!itemCheck) return;
+  convertTextMarks(itemCheck.maps.selectedStats, Data.STAT_BY_MATCH_STR);
+}
 
 async function start() {
   await initConfig();
   const i18nPlugin = await I18n.init(AppConfig().language);
   await Data.init(AppConfig().language);
+  convertMapCheckMarks();
   await Host.init();
 
   watch(
     () => AppConfig().language,
     async () => {
       await Data.loadForLang(AppConfig().language);
+      convertMapCheckMarks();
       await I18n.loadLang(AppConfig().language);
     },
   );
