@@ -35,7 +35,8 @@
         class="py-1 px-8"
       >
         <span class="text-orange-400"
-          >{{ t("Not recognized modifier") }} &mdash;</span
+          >{{ t("Not recognized modifier") }}
+          <span><!-- dashcheck: allow, a UI separator -->&mdash;</span></span
         >
         {{ stat.text }}
       </div>

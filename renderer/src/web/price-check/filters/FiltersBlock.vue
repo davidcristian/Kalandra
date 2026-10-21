@@ -215,7 +215,8 @@
             </div>
             <div class="ml-5 text-xs leading-none">
               <span class="text-gray-600"
-                >{{ t("filters.tag_explicit") }} &mdash;
+                >{{ t("filters.tag_explicit") }}
+                <span><!-- dashcheck: allow, a UI separator -->&mdash; </span>
               </span>
               <a
                 target="_blank"

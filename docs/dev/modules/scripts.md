@@ -37,8 +37,9 @@ another copy of the repo.
   is not a test or game data, and of every markdown file. A source file over 300 lines fails unless
   `long-files.txt` lists it, and a listed file fails unless it has exactly its listed count. The message says which
   way to change the count. A markdown file over 250 lines fails.
-- **`dashcheck.py`** reports every line with an em dash or an en dash, in every text file. In markdown it skips code
-  spans and fenced code. `EXEMPTIONS` names the folders and files of game text (the game data, the copied item text
+- **`dashcheck.py`** reports every line with an em dash or an en dash, in every text file, written as the character
+  or as an HTML character reference that renders it (`&mdash;`, `&ndash;`, `&#8212;`, `&#x2013;`). In markdown it
+  skips code spans and fenced code. `EXEMPTIONS` names the folders and files of game text (the game data, the copied item text
   and client log lines in `renderer/specs/`, and one comment that quotes item text), each with its reason. An
   exemption that covers no dash fails. A line that contains `dashcheck: allow` is skipped.
 - **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. `prosesources.py` finds the prose:
@@ -103,7 +104,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 61 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 62 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

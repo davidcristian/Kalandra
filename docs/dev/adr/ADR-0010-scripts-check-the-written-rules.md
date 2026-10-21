@@ -26,8 +26,9 @@ in `scripts/long-files.txt`, and each must have exactly the count written there.
 change to a long file visible in its diff. A file that grows fails, so new code goes into a new module, or the count
 goes up with its reason in the commit body.
 
-**4. No text file has an em dash or an en dash.** `scripts/dashcheck.py` reads every text file, and in markdown it
-skips code spans and fenced code, which show game text. `EXEMPTIONS` in the script names the folders and files that
+**4. No text file has an em dash or an en dash.** `scripts/dashcheck.py` reads every text file for both characters
+and the HTML character references that render them, and in markdown it skips code spans and fenced code, which show
+game text. `EXEMPTIONS` in the script names the folders and files that
 keep game text as the game writes it, each with its reason, and an exemption that covers no dash fails. Any other
 dash that stays has `dashcheck: allow` and its reason on its line. Reason: the game's text uses both dashes, and the
 parser matches that text exactly.

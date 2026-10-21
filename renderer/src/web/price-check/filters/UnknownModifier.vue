@@ -15,7 +15,8 @@
       </div>
       <div class="ml-5 text-xs leading-none">
         <span class="text-gray-600"
-          >{{ t(modTypeKey(stat.type)) }} &mdash;
+          >{{ t(modTypeKey(stat.type)) }}
+          <span><!-- dashcheck: allow, a UI separator -->&mdash; </span>
         </span>
         <span class="text-orange-400">{{ t("Not recognized modifier") }}</span>
       </div>

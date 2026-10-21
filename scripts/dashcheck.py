@@ -11,7 +11,12 @@ from prosesources import markdown_prose
 from repofiles import RepoError, read_text, repo_files, under
 
 ALLOW = "dashcheck: allow"
-DASHES = {chr(0x2014): "em dash", chr(0x2013): "en dash"}
+# Each dash as a character, and as the HTML character references that render it:
+# https://html.spec.whatwg.org/multipage/syntax.html#character-references
+DASHES = {
+    "em dash": re.compile(chr(0x2014) + r"|&(?:mdash|#0*8212|#[xX]0*2014);"),
+    "en dash": re.compile(chr(0x2013) + r"|&(?:ndash|#0*8211|#[xX]0*2013);"),
+}
 _CODE_SPAN = re.compile(r"`[^`\n]*`")
 
 # Each exemption keeps game text as the game writes it, and must still cover a dash
@@ -52,8 +57,8 @@ def find_dashes(name: str, text: str) -> list[Problem]:
         Problem(name, number, f"{kind}: {line.strip()[:100]}")
         for number, line in checked_lines(name, text)
         if ALLOW not in line
-        for dash, kind in DASHES.items()
-        if dash in line
+        for kind, dash in DASHES.items()
+        if dash.search(line)
     ]
 
 

@@ -15,6 +15,19 @@ class DashCheckTest(unittest.TestCase):
         self.assertIn("a.ts:1: em dash", output)
         self.assertIn("a.ts:2: en dash", output)
 
+    def test_reports_the_html_references_of_both_dashes(self) -> None:
+        em_refs = ["mdash;", "#8212;", "#08212;", "#x2014;", "#X2014;"]
+        en_refs = ["ndash;", "#8211;", "#x2013;"]
+        other_refs = ["amp;mdash;", "minus;", "#8208;", "Mdash;", "mdash"]
+        lines = [f"<span>a &{ref} b</span>" for ref in em_refs + en_refs + other_refs]
+        with repo({"a.vue": "\n".join(lines) + "\n", "b.md": "Text &mdash in `&" + "mdash;` code.\n"}) as root:
+            code, output = run(lambda argv: dashcheck.main(argv, {}), root)
+        self.assertEqual(code, 1)
+        reported = [line.split(": <span>")[0] for line in output.splitlines() if line.startswith("a.vue:")]
+        expected = [f"a.vue:{number}: em dash" for number in range(1, 6)]
+        self.assertEqual(reported, expected + [f"a.vue:{number}: en dash" for number in range(6, 9)])
+        self.assertNotIn("b.md", output)
+
     def test_passes_markdown_code_an_allow_comment_and_binary_files(self) -> None:
         files = {
             "a.md": f"Text with `{EM}` in code.\n\n```\n{EM}\n```\n",
