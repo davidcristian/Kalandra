@@ -130,7 +130,9 @@ until main opens its file), `specs/web/client-log.test.ts` (the client log the X
 German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/settings/menu.test.ts` (`settings/menu.ts`,
-the pages the Settings menu lists for each widget) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
+the pages the Settings menu lists for each widget), `specs/web/settings/hotkey-conflicts.test.ts`
+(`settings/hotkey-conflicts.ts`, the hotkeys that two actions share in the edited config) and
+`specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
 Overlay focus, hiding on blur and the hotkeys need the game:

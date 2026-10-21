@@ -362,6 +362,7 @@
     "chat_cmd_send": "press Enter",
     "no_key": "Not Set",
     "clear_hotkey": "You can clear hotkey by pressing Backspace",
+    "hotkey_duplicate": "Another action uses this hotkey. Give each action its own hotkey.",
     "overlay": "Overlay",
     "stash_scroll": "Stash tab scrolling",
     "delve_grid": "Grid for Delve Chart",

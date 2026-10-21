@@ -35,6 +35,7 @@
         v-model="schema.config.nonModKey.value"
         class="w-20"
         :required="schema.required"
+        :shortcut="`${schema.config.modKey.value} + ${schema.config.nonModKey.value}`"
         no-mod-keys
       />
     </div>

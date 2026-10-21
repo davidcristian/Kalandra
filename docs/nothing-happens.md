@@ -41,7 +41,8 @@ time. These lines name a problem and its fix:
 
 - `error [Shortcuts] It is not possible to use the same hotkey "<keys>" for multiple actions.`
 
-  Two actions have the same hotkey. Give each action its own hotkey.
+  Two actions have the same hotkey. Give each action its own hotkey. The settings window outlines both hotkey fields
+  in red.
 
 - `error [Shortcuts] Hotkey "<keys>" has an unknown key name and will not be registered.`
 

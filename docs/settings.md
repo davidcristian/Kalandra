@@ -31,8 +31,10 @@ does not accept a key combination that contains `F12`.
 Kalandra does not register a key that the game uses: `Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`,
 `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`, `ArrowRight`, `ArrowLeft`, and `Ctrl + C` together with the
 game's advanced item descriptions key (`Ctrl + Alt + C` with the game's default `Alt`). When two actions use the
-same key, Kalandra registers neither of them, except the **Overlay** key. When another program already uses a key,
-Kalandra cannot register it. In each case Kalandra writes an error to the [Debug](#debug) log.
+same key, Kalandra registers neither of them, except the **Overlay** key. The settings window shows such a key in
+red with a red outline, in the field of each action that uses it on any page, and the field's tooltip says that
+another action uses the key. When another program already uses a key, Kalandra cannot register it. In each case
+Kalandra writes an error to the [Debug](#debug) log.
 
 More hotkeys are set on the Chat and Item info pages and in the settings of the Stash search, Stopwatch, Item search
 and Library widgets.
