@@ -142,6 +142,24 @@ import SettingsLeveling from "../leveling/settings-leveling.vue";
 import SettingsLibrary from "../library/settings-library.vue";
 import { disableWidget, enableWidget, findWidget } from "./utils";
 import { settingsDraft } from "./draft";
+import { menuPages, type SettingsPage } from "./menu";
+
+const PAGES: Record<SettingsPage, Component> = {
+  "hotkeys": SettingsHotkeys,
+  "chat": SettingsChat,
+  "general": SettingsGeneral,
+  "price-check": SettingsPricecheck,
+  "maps": SettingsMaps,
+  "item-check": SettingsItemcheck,
+  "leveling": SettingsLeveling,
+  "help": SettingsHelp,
+  "debug": SettingsDebug,
+  "about": SettingsAbout,
+  "stash-search": SettingsStashSearch,
+  "stopwatch": SettingsStopwatch,
+  "item-search": SettingsItemSearch,
+  "library": SettingsLibrary,
+};
 
 function shuffle<T>(array: T[]): T[] {
   let currentIndex = array.length;
@@ -335,28 +353,7 @@ export default defineComponent({
 });
 
 function menuByType(type?: string) {
-  switch (type) {
-    case "stash-search":
-      return [[SettingsStashSearch]];
-    case "timer":
-      return [[SettingsStopwatch]];
-    case "item-check":
-      return [[SettingsItemcheck, SettingsMaps]];
-    case "price-check":
-      return [[SettingsPricecheck]];
-    case "item-search":
-      return [[SettingsItemSearch]];
-    case "library":
-      return [[SettingsLibrary]];
-    default:
-      return [
-        [SettingsHotkeys, SettingsChat],
-        [SettingsGeneral],
-        [SettingsPricecheck, SettingsMaps, SettingsItemcheck],
-        [SettingsLeveling],
-        [SettingsHelp, SettingsDebug, SettingsAbout],
-      ];
-  }
+  return menuPages(type).map((group) => group.map((page) => PAGES[page]));
 }
 
 function flatJoin<T, J>(arr: T[][], joinEl: () => J) {

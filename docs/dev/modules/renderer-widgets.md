@@ -91,8 +91,9 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 5. A hotkey goes into `getConfigForHost()` in `Config.ts` as a `ShortcutAction`, such as `trigger-event` with a
    target, as the stopwatch and the Delve grid have. The component handles `MAIN->CLIENT::widget-action` with that
    target.
-6. A settings page is a component in the widget's folder and a `case "<type>"` in `menuByType` in
-   `settings/SettingsWindow.vue`. Its frame sets `inline-edit` to `false`, so "edit" opens that page.
+6. A settings page is a component in the widget's folder, a name in `SettingsPage` and a `case "<type>"` in
+   `menuPages()` in `settings/menu.ts`, and an entry in `PAGES` in `settings/SettingsWindow.vue`. Its frame sets
+   `inline-edit` to `false`, so "edit" opens that page.
 7. Put its UI text in `renderer/public/data/en/app_i18n.json` under the widget's key. A multi widget names its
    menu entry with `trNameKey`.
 8. Describe it on a user page in `docs/`, add the page to the sidebar in `docs/.vitepress/config.js`, and add a row
@@ -128,7 +129,8 @@ until main opens its file), `specs/web/client-log.test.ts` (the client log the X
 `FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
 German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
-shows the strip's red message when main does not store it) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
+shows the strip's red message when main does not store it), `specs/web/settings/menu.test.ts` (`settings/menu.ts`,
+the pages the Settings menu lists for each widget) and `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
 Overlay focus, hiding on blur and the hotkeys need the game:
