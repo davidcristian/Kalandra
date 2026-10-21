@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "check-types": "tsc --noemit",
-    "lint": "eslint --ext .ts,.vue src",
-    "lint-fix": "eslint --ext .ts,.vue src --fix",
+    "lint": "eslint --ext .ts,.vue src specs",
+    "lint-fix": "eslint --ext .ts,.vue src specs --fix",
     "format": "prettier . --write ",
     "build": "vue-tsc --noEmit && vite build",
     "make-index-files": "node src/assets/make-index-files.mjs",

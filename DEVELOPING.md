@@ -99,6 +99,8 @@ part alone:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
   `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
   uncovered.
+- `npm run lint` in `renderer/` or `main/` runs ESLint on `src/` and `specs/`, and the
+  pre-commit hooks run the same files with `--fix`.
 - An ESLint rule turned on after code broke it skips only that code. In `renderer/`,
   `eslint-suppressions.json` holds how many violations of each such rule each file had, and the
   lint fails when a file has more or fewer; `npm run lint -- --prune-suppressions` lowers a count
