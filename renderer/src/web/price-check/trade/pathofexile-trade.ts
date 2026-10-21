@@ -7,7 +7,7 @@ import {
   ItemIsElementalModifier,
   FilterTag,
 } from "../filters/interfaces";
-import { setProperty as propSet } from "dot-prop";
+import { propSet } from "./prop-set";
 import { DateTime } from "luxon";
 import { Host } from "@/web/background/IPC";
 import {
@@ -276,7 +276,7 @@ interface TradeRequest {
       type_filters?: {
         filters: {
           rarity?: {
-            option?: "nonunique" | "uniquefoil";
+            option?: "normal" | "magic" | "nonunique" | "uniquefoil";
           };
           category?: {
             option?: string;
@@ -313,6 +313,7 @@ interface TradeRequest {
           spirit?: FilterRange;
           // reload time
           reload_time?: FilterRange;
+          ward?: FilterRange;
         };
       };
       req_filters?: {
@@ -332,6 +333,7 @@ interface TradeRequest {
           map_rare_monsters?: FilterRange;
           map_bonus?: FilterRange;
           map_iir?: FilterRange;
+          map_gold?: FilterRange;
           ultimatum_hint?: {
             option?: "Victorious" | "Cowardly" | "Deadly";
           };
@@ -583,11 +585,7 @@ export function createTradeRequest(
   }
 
   if (filters.trade.collapseListings === "api") {
-    propSet(
-      query.filters,
-      "trade_filters.filters.collapse.option",
-      String(true),
-    );
+    propSet(query.filters, "trade_filters.filters.collapse.option", "true");
   }
 
   if (filters.trade.listed) {
@@ -762,11 +760,7 @@ export function createTradeRequest(
   }
 
   if (filters.unidentified && !filters.unidentified.disabled) {
-    propSet(
-      query.filters,
-      "misc_filters.filters.identified.option",
-      String(false),
-    );
+    propSet(query.filters, "misc_filters.filters.identified.option", "false");
   }
 
   if (filters.unidentifiedTier && !filters.unidentifiedTier.disabled) {
@@ -785,7 +779,7 @@ export function createTradeRequest(
     propSet(
       query.filters,
       "misc_filters.filters.corrupted.option",
-      String(filters.corrupted.value),
+      filters.corrupted.value ? "true" : "false",
     );
   }
 
@@ -793,28 +787,20 @@ export function createTradeRequest(
     propSet(
       query.filters,
       "misc_filters.filters.fractured_item.option",
-      String(false),
+      "false",
     );
   }
 
   if (filters.mirrored) {
     if (filters.mirrored.disabled) {
-      propSet(
-        query.filters,
-        "misc_filters.filters.mirrored.option",
-        String(false),
-      );
+      propSet(query.filters, "misc_filters.filters.mirrored.option", "false");
     }
   } else if (
     item.rarity === ItemRarity.Normal ||
     item.rarity === ItemRarity.Magic ||
     item.rarity === ItemRarity.Rare
   ) {
-    propSet(
-      query.filters,
-      "misc_filters.filters.mirrored.option",
-      String(false),
-    );
+    propSet(query.filters, "misc_filters.filters.mirrored.option", "false");
   }
 
   if (
@@ -822,22 +808,14 @@ export function createTradeRequest(
     (filters.corrupted?.value === true && !filters.corrupted?.exact)
   ) {
     if (filters.sanctified?.disabled) {
-      propSet(
-        query.filters,
-        "misc_filters.filters.sanctified.option",
-        String(false),
-      );
+      propSet(query.filters, "misc_filters.filters.sanctified.option", "false");
     }
   } else if (
     item.rarity === ItemRarity.Normal ||
     item.rarity === ItemRarity.Magic ||
     item.rarity === ItemRarity.Rare
   ) {
-    propSet(
-      query.filters,
-      "misc_filters.filters.sanctified.option",
-      String(false),
-    );
+    propSet(query.filters, "misc_filters.filters.sanctified.option", "false");
   }
 
   // TRADE FILTERS
@@ -1194,7 +1172,7 @@ export function createTradeRequest(
   }
 
   if (filters.veiled && !filters.veiled.disabled) {
-    propSet(query.filters, "misc_filters.filters.veiled.option", String(true));
+    propSet(query.filters, "misc_filters.filters.veiled.option", "true");
     const veiledCount = filters.veiled.veiledCount;
 
     // HACK: add pseudo stat for veiled count(dont want on my ui though)
@@ -1307,18 +1285,16 @@ export async function requestResults(
       normalizedCurrency?.currency !== "div"
         ? xchgRateCurrency.value
         : DivCurrency;
+    const prop = (type: TradePropType) =>
+      result.item.properties?.find((p) => p.type === type)?.values[0][0];
 
     return {
       id: result.id,
-      itemLevel:
-        result.item.properties?.find((prop) => prop.type === 78)
-          ?.values[0][0] ?? String(result.item.ilvl),
+      itemLevel: prop(TradePropType.ItemLevel) ?? String(result.item.ilvl),
       stackSize: result.item.stackSize,
       corrupted: result.item.corrupted,
-      quality: result.item.properties?.find((prop) => prop.type === 6)
-        ?.values[0][0],
-      level: result.item.properties?.find((prop) => prop.type === 5)
-        ?.values[0][0],
+      quality: prop(TradePropType.Quality),
+      level: prop(TradePropType.GemLevel),
       gemSockets: result.item.gemSockets?.length
         ? result.item.gemSockets?.length
         : result.item.socketedItems

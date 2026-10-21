@@ -68,6 +68,7 @@ that the route needs ([main.md](main.md)).
 | File | What it does |
 | --- | --- |
 | `pathofexile-trade.ts` | `createTradeRequest(filters, stats, item)` builds the search body without changing the filters; `requestTradeResultList(body, leagueId)` posts it to `/api/trade2/search/<league>`; `requestResults(queryId, ids, opts)` gets the listings from `/api/trade2/fetch/<ids>?query=<queryId>`, values each price by its currency's trade tag, and returns a short label such as `G. chaos` for a greater or perfect orb (`CONVERT_CURRENCY`) without changing the cached listing |
+| `prop-set.ts` | `propSet(object, path, value)` sets the value at a dot path, such as `misc_filters.filters.corrupted.option`. Its types accept only a path of the object's type and a value of that path's type, so `createTradeRequest` sets only the filters that its `TradeRequest` type declares |
 | `trade-api.ts` | `useTradeApi()`: one search, then the listings 10 ids per request, the first two requests at once and the rest one by one until the grouped list has 10 rows (`MIN_GROUPED`) with 7 of them listed at most twice (`MIN_NOT_GROUPED`), or until 100 results or all of them are read |
 | `pathofexile-bulk.ts`, `bulk-api.ts` | `execBulkSearch` posts one exchange request to `/api/trade2/exchange/<league>` and keeps at most 8 offers per currency; `useBulkApi()` searches once with Divine, Exalted and Chaos Orbs as the payment currencies (without the item's own currency). A tab's `load()` searches again for its currency when the first response did not include it. Its total is then subtracted from the estimated total of the Divine Orb tab (of the Exalted Orb tab when the Divine Orb tab loads), if that tab has a result. `useShownRows(result, selected, ready)` returns the 8 rows of the selected tab once the results show, and calls its `load()` after the window updates |
 | `common.ts` | `RATE_LIMIT_RULES`, `adjustRateLimits`, `preventQueueCreation`, `apiToSatisfySearch`, `searchListingType` and `exchangeListingType`, which return the status each request sends for a listing type the other offers, and `getTradeEndpoint`, which is `poeWebApi()` in `Config.ts`: the trade host for the language and realm settings, or `www.pathofexile.com` when the trade site setting is `www` |
@@ -210,6 +211,8 @@ with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header t
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
 `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing and restrictions with fake
 timers. `listing-markers.test.ts` there checks which column shows a listing's markers, and `trade-response.test.ts`
-reads hand-written responses with `readTradeData` and answers each trade site request with a web page. No test
-calls a live site.
+reads hand-written responses with `readTradeData` and answers each trade site request with a web page.
+`listing-properties.test.ts` there reads a listing's item level, quality and gem level by property type, and
+`prop-set.test.ts` checks the paths `propSet` accepts with `expectTypeOf`, which `tsc` checks. No test calls a live
+site.
 `Leagues.ts` and `poeprices.ts` have no test file of their own.

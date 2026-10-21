@@ -31,7 +31,7 @@ export interface ItemFilters {
     trade: string;
   };
   rarity?: {
-    value: string;
+    value: "normal" | "magic" | "nonunique";
   };
   socketNumber?: FilterNumeric;
   augmentSockets?: FilterNumeric;
@@ -174,7 +174,7 @@ export const _INTERNAL_TRADE_IDS = [
   "item.duplicates",
 ] as const;
 
-export type InternalTradeId = (typeof INTERNAL_TRADE_IDS)[number];
+export type InternalTradeId = (typeof _INTERNAL_TRADE_IDS)[number];
 export const INTERNAL_TRADE_IDS = _INTERNAL_TRADE_IDS as readonly string[];
 
 export enum ItemHasEmptyModifier {
