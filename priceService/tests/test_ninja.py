@@ -151,10 +151,15 @@ class LeaguesTest(unittest.TestCase):
         client = client_for(FakeGet({"/leagues": [ok(fixture("leagues.json"))]}))
         self.assertEqual(client.leagues()[:2], ["Forbidden Rites", "Runes of Aldur"])
 
-    def test_skips_malformed_entries_and_caps_the_count(self) -> None:
-        entries = [{"id": f"League {n}"} for n in range(MAX_LEAGUES + 5)] + [{"id": 7}, "x"]
+    def test_skips_entries_without_a_text_id(self) -> None:
+        entries = [{"id": 7}, "x", {"id": None}, {"name": "Hardcore"}, {"id": "Standard"}, [{"id": "Nested"}]]
         client = client_for(FakeGet({"/leagues": [ok(entries)]}))
-        self.assertEqual(len(client.leagues()), MAX_LEAGUES)
+        self.assertEqual(client.leagues(), ["Standard"])
+
+    def test_caps_the_count_after_skipping_malformed_entries(self) -> None:
+        entries = [{"id": 7}, "x", *({"id": f"League {n}"} for n in range(MAX_LEAGUES + 5))]
+        client = client_for(FakeGet({"/leagues": [ok(entries)]}))
+        self.assertEqual(client.leagues(), [f"League {n}" for n in range(MAX_LEAGUES)])
 
     def test_rejects_a_league_list_that_is_not_a_list(self) -> None:
         with self.assertRaises(NinjaError):
