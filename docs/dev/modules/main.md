@@ -40,6 +40,9 @@ The entry, the server and the app services, in `main/src/`:
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
   address, and an `Origin` that matches it with the `http:` scheme; a WebSocket must send `Origin`, plain HTTP may
   leave it out ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
+- `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
+  returns 404 for a missing file or a path outside the folder, such as one with `..` segments, which Node passes on
+  in `req.url` as sent. `resolveInside()` checks the path with the platform's `path` module, or one a test passes.
 - `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
   brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
   defaults and an `error` text, which `startServer()` writes to the log. `listenWithFallback(server, address,
@@ -54,10 +57,10 @@ The entry, the server and the app services, in `main/src/`:
   session's cookies and `app.userAgentFallback` as the User-Agent, and drops `content-encoding` from the response. It
   removes the `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and
   `net.request` cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
-- `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the
-  last 1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start each message with
-  its level (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. The Debug settings page
-  shows the log.
+- `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the last
+  1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start a message with its level
+  (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
+  `GameLogWatcher` writes after its `Found 2 log files` error have no level. The Debug settings page shows the log.
 - `AppUpdater.ts`: `AppUpdater` wraps electron-updater. Setting `info` broadcasts `MAIN->CLIENT::updater-state`. It
   checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not
   wait for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is
@@ -146,9 +149,6 @@ The entry, the server and the app services, in `main/src/`:
   `apt-data/files/`. `POST` stores only a file whose URL path ends in an image extension that Chromium shows in an
   `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. A failed
   write returns 500 and logs `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
-- `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
-  returns 404 for a missing file or a path outside the folder, such as one with `..` segments, which Node passes on
-  in `req.url` as sent. `resolveInside()` checks the path with the platform's `path` module, or one a test passes.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on

@@ -213,7 +213,8 @@ working on the docs site in [runbooks/docs-site.md](runbooks/docs-site.md).
 
 ```
 main/              the Electron main process: TypeScript bundled by esbuild, packaged by electron-builder
-  src/             main.ts (entry), server.ts, proxy.ts, AppUpdater.ts, AppTray.ts, RemoteLogger.ts
+  src/             main.ts (entry), startup.ts, server.ts, request-origin.ts, listen-option.ts, served-file.ts,
+                   client-log-writer.ts, proxy.ts, AppUpdater.ts, AppTray.ts, RemoteLogger.ts
     shortcuts/     hotkeys, key presses, reading item text, typing chat commands and stash searches
     windowing/     the overlay window, the game window, overlay visibility, the widget area tracker
     host-files/    config.json, uploads, the Client.txt watcher, the game config, the data file writer
