@@ -64,9 +64,6 @@ const OPTION_STAT = {
 describe("tryParseTranslation", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
-    // prob don't need these?
-    // setupTests();
-    // await init("en");
   });
 
   it("should return undefined if no translation is found", () => {

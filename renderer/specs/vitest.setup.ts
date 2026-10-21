@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import fs from "fs";
 import path from "path";
-import { Headers } from "node-fetch"; // Assuming you are using node-fetch
+import { Headers } from "node-fetch";
 import { Config, TipsFrequency } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
 
@@ -21,7 +21,6 @@ vi.mock("@/web/Config", async () => {
   };
 });
 let mockConfig: Config;
-// Mock client-string-loader
 export const setupClientStringLoaderMock = () => {
   vi.mock("@/assets/client-string-loader", () => ({
     loadClientStrings: vi.fn(async (lang) => {
@@ -39,7 +38,6 @@ export const setupClientStringLoaderMock = () => {
   }));
 };
 
-// Mock fetch
 export const setupFetchMock = () => {
   // @ts-expect-error: the fake returns part of a Response, with node-fetch's Headers in place of the DOM's
   global.fetch = vi.fn(async (url) => {
@@ -93,7 +91,6 @@ export const setupFetchMock = () => {
   });
 };
 
-// Mock Host.Proxy calls
 vi.mock("@/web/background/IPC", () => ({
   Host: {
     proxy: vi.fn(async (url: string, init?: RequestInit) => {
@@ -137,7 +134,7 @@ export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
     logKeys: false,
     accountName: "TestAccount",
     stashScroll: false,
-    language: "en", // Default language
+    language: "en",
     preferredTradeSite: "default",
     realm: "pc-ggg",
     widgets: [
@@ -164,9 +161,8 @@ export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
   mockConfig = { ...defaultConfig, ...overrides };
 };
 
-// Consolidate setup
 export const setupTests = (configOverrides: Partial<Config> = {}) => {
-  defaultConfigMock(configOverrides); // Pass overrides here
+  defaultConfigMock(configOverrides);
   setupClientStringLoaderMock();
   setupFetchMock();
 };
