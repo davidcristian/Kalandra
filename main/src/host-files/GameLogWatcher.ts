@@ -78,7 +78,7 @@ export class GameLogWatcher {
           this._state.offset = 0;
           this._state.lines.reset();
           this._state.isReading = true;
-          void this.readToEOF(this._state);
+          await this.readToEOF(this._state);
         } else {
           this.logger.write(
             "warn [GameLogWatcher] Asked to re-parse log but currently reading, skipping",

@@ -166,7 +166,7 @@ The entry, the server and the app services, in `main/src/`:
   its new file is deleted before it opens, it reads the open file. A restart with the same `logFile` keeps the open
   file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again.
   `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read in
-  progress after its current chunk, and a failed read is logged.
+  progress after its current chunk, and a failed read is logged. The re-parse handler settles when its read ends.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection on,
   in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv` between a
