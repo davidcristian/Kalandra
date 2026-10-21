@@ -78,9 +78,13 @@ Four lines from `main/src/shortcuts/` apply to every key below:
   - Hotkeys work only while the game has focus: main registers them when the game window becomes
     active and removes them when it loses focus. With another window focused, Ctrl + D reaches that
     window.
-  - With "Fully hide overlay when it loses focus instead of making it transparent." ticked in
-    Settings, General, switching to another window hides the overlay window. Unticked, the default,
-    the overlay window stays open and turns transparent, as the label says.
+  - Switching to another window hides the overlay window, and returning to the game shows it
+    again, whether "Fully hide overlay when it loses focus instead of making it transparent." in
+    Settings, General is ticked or not: `electron-overlay-window` hides the window while neither
+    the game nor the overlay has the focus. Ticked, main also hides the window while the game has
+    the focus and no widget is shown (`syncWindowVisibility` in
+    `main/src/windowing/OverlayWindow.ts`). Unticked, the default, the window stays open over
+    the game and draws nothing.
   - With Record all key presses ticked, type in another program, such as a text editor, and in the
     overlay's Item search: Settings, Debug shows no `Keydown` line for those keys. Keys pressed in
     the game do show.

@@ -111,20 +111,20 @@ The entry, the server and the app services, in `main/src/`:
 `windowing/`:
 
 - `OverlayWindow.ts`: `OverlayWindow` creates the overlay `BrowserWindow` with `OVERLAY_WINDOW_OPTS` from
-  `electron-overlay-window` and the `webview` tag on, for the price check's built-in browser; links the page opens
-  go to the default browser. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server
-  in development, or with `--no-overlay` (no window) opens it in the default browser. `assertOverlayActive()`,
-  `assertGameActive()` and `toggleActiveState()` move the focus between the overlay and the game, and
-  `isInteractable` is true while the overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns
-  whether the game window has the focus, and logs `warn [Overlay] Skipped <action>` when it does not, since keys go
-  to the window with the focus, such as a browser. While the overlay has focus the hotkeys are not registered,
-  so the window's `before-input-event` handler checks each key press with `overlayKeyCommand()`: `Escape` and
-  `Ctrl + W` return to the game, and the overlay key toggles the focus. `updateOpts()` attaches the window to the game window. With `hideOverlayOnBlur`, the window is hidden rather than transparent
-  while the overlay is not active and either the game is not active or the page sent
-  `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game runs with administrator rights that
-  Kalandra lacks, it shows the error box `PoE2 window - No access`. `watchPage()` in `page-watch.ts` logs a failed
-  load of the page, except `ERR_ABORTED`, which a reload causes, and an exit of its renderer process. After an exit
-  other than `clean-exit` it reloads the page, at most `MAX_RELOADS` (3) times in a run.
+  `electron-overlay-window` and the `webview` tag on, for the price check's built-in browser; links the page opens go
+  to the default browser. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
+  development, or with `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
+  and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
+  overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns whether the game window has the focus,
+  and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.
+  While the overlay has focus the hotkeys are not registered, so the window's `before-input-event` handler checks each
+  key press with `overlayKeyCommand()`: `Escape` and `Ctrl + W` return to the game, and the overlay key toggles the
+  focus. `updateOpts()` attaches the window to the game window. The library hides the window while neither the game
+  nor the overlay has the focus. With `hideOverlayOnBlur` main also hides it while the overlay is not active and
+  either the game is not active or the page sent `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game
+  has administrator rights that Kalandra lacks, it shows the error `PoE2 window - No access`. `watchPage()` in
+  `page-watch.ts` logs a failed page load, except `ERR_ABORTED`, which a reload causes, and an exit of its renderer
+  process. After an exit other than `clean-exit` it reloads the page, at most `MAX_RELOADS` (3) times in a run.
 - `overlay-keys.ts`: `pressedHotkey(input)` names a key press in the overlay window with `hotkeyToString()` from
   `ipc/KeyToCode.ts`, the function the Hotkeys settings use to write a hotkey, so every combination of `Ctrl`,
   `Shift` and `Alt` matches the saved overlay key. `overlayKeyCommand(input, overlayKey)` returns `focus-game`,

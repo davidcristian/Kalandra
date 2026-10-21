@@ -24,12 +24,12 @@
   `invisible-on-blur`, such as Stash search and Item search, are drawn only while the overlay has
   focus. The Settings window (`ignore-ui-visibility`) stays drawn while Alt hides the focused
   overlay.
-- With "Fully hide overlay when it loses focus instead of making it transparent." ticked in
-  Settings, General, main hides the overlay window while the overlay is not active and either no
-  widget is shown or another program is active (`syncWindowVisibility` in
-  `main/src/windowing/OverlayWindow.ts`). The runbook says that unticked, the default, the window
-  stays and turns transparent. But `electron-overlay-window` 4.0.2 hides the window itself when the
-  game loses focus to another program, whatever the setting.
+- With "Fully hide overlay when it loses focus instead of making it transparent." in Settings,
+  General ticked or not, `electron-overlay-window` 4.0.2 hides the overlay window while neither the
+  game nor the overlay has the focus, and shows it when the game gets the focus back. This is read
+  from the library's JavaScript, not from its native focus events. Ticked, main also hides the
+  window while the game has the focus and no widget is shown (`syncWindowVisibility` in
+  `main/src/windowing/OverlayWindow.ts`). Unticked, the window stays and draws nothing.
 - In a packaged build, Ctrl + Shift + I with the overlay focused opens the developer tools: the
   overlay window's menu has the `toggleDevTools` role, which Electron binds to that key on Windows.
   The window is frameless, and the run shows whether the key works there.
