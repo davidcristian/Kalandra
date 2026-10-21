@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -154,3 +155,29 @@ class CommitLintTest(unittest.TestCase):
 
     def test_reports_a_fence_nothing_closes(self) -> None:
         self.assertIn("line 3 opens a code fence that nothing closes", self.check("fix: a subject\n\n```\npasted\n"))
+
+    def test_reports_a_scope_outside_the_list(self) -> None:
+        listed = ", ".join(commitlint.SCOPES)
+        self.assertEqual(self.check("fix(kitchen): a subject\n"), [f"the scope 'kitchen' is not one of {listed}"])
+        self.assertEqual(
+            self.check("fix(main,renderer): a subject\n"), [f"the scope 'main,renderer' is not one of {listed}"]
+        )
+        self.assertEqual(self.check("fix(Main): a subject\n"), [f"the scope 'Main' is not one of {listed}"])
+        self.assertEqual(self.check("fix(dataparser): a subject\n"), [])
+
+    def test_reports_a_breaking_change_without_both_the_bang_and_the_footer(self) -> None:
+        bang = "the first line marks a breaking change with !, and no BREAKING CHANGE: footer says what breaks"
+        footer = "a BREAKING CHANGE: footer needs a ! before the colon of the first line"
+        self.assertEqual(self.check("feat!: a subject\n\nThe settings move.\n"), [bang])
+        self.assertEqual(self.check("feat(main)!: a subject\n\nBREAKING CHANGE: the settings move.\n\nMore.\n"), [bang])
+        self.assertEqual(self.check("feat: a subject\n\nA body.\n\nBREAKING CHANGE: the settings move.\n"), [footer])
+        self.assertEqual(self.check("feat!: a subject\n\nA body.\n\nRefs: settings\nBREAKING-CHANGE: they move.\n"), [])
+
+    def test_leaves_a_first_line_outside_the_form_to_conventional_pre_commit(self) -> None:
+        self.assertEqual(self.check("Update the readme.\n\nA body.\n\nBREAKING CHANGE: the settings move.\n"), [])
+
+    def test_the_scopes_are_the_list_in_the_real_rules(self) -> None:
+        text = " ".join(commitlint.RULES.read_text(encoding="utf-8").split())
+        found = re.search(r"name one area: ((?:`[a-z]+`, )*`[a-z]+`)\.", text)
+        self.assertIsNotNone(found, "AGENTS.md names no scope list")
+        self.assertEqual(tuple(re.findall(r"`([a-z]+)`", found.group(1) if found else "")), commitlint.SCOPES)

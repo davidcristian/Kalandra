@@ -203,7 +203,7 @@ Every job runs on `ubuntu-latest` unless the table names other runners, and ever
   not in the git config while `npm ci` runs the install scripts of the dependencies.
 - A push that changes only `docs/dev/` or a markdown file at the repo root other than `AGENTS.md` runs only Changed
   paths and Lint & Format in `test.yml`. A change to `AGENTS.md` also runs Scripts, whose tests read its banned words
-  table.
+  table and its scope list.
 
 The package job's upload outcomes and the release steps are in [runbooks/release.md](runbooks/release.md), and
 working on the docs site in [runbooks/docs-site.md](runbooks/docs-site.md).

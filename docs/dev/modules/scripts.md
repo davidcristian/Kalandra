@@ -67,8 +67,8 @@ The Changed paths job of `.github/workflows/test.yml` passes the changed paths o
 `python3 scripts/ci_paths.py`, with both the old and the new path of a moved file. The script prints `renderer=`,
 `main=`, `price_service=`, `scripts=` and `docs=` with `true` or `false` for `GITHUB_OUTPUT`. `RULES` maps a file,
 or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies. `AGENTS.md` affects the
-Scripts job, because `test_bannedwords.py` reads its banned words table. Any other markdown file at the repo root
-affects no job, and any other path that no rule matches affects every job
+Scripts job, because `test_bannedwords.py` and `test_commitlint.py` read its banned words table and its scope list.
+Any other markdown file at the repo root affects no job, and any other path that no rule matches affects every job
 ([ADR-0011](../adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)).
 
 ### commitlint.py
@@ -81,7 +81,9 @@ git then removes. A message given with `-m` or `-F` keeps them under git's defau
 breaks and exits with 1, or exits with 0.
 
 - The first line: at most 72 characters, a lowercase first letter, no period at the end, and no scope that repeats
-  the type (`docs(docs)`).
+  the type (`docs(docs)`). A scope is one of `SCOPES`, which a test compares with the list in AGENTS.md.
+- A `!` before the colon of the first line comes with a `BREAKING CHANGE: ` or `BREAKING-CHANGE: ` line in the
+  footers, and such a footer comes with the `!`.
 - The body: a blank second line, at most 72 characters a line unless the line is one long word, and at most 50
   words. The word count leaves out the footers: the last paragraph, when its first line starts with
   `BREAKING CHANGE: ` or a Conventional Commits footer token such as `Refs: ` or `Refs #`. Every other rule checks
@@ -104,11 +106,11 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 62 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 66 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 93.2% of lines and branches on 21 Oct 2026.
+floor in `scripts/.coveragerc`, 93.5% of lines and branches on 21 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

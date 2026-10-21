@@ -15,8 +15,10 @@ RULES = Path(__file__).resolve().parent.parent / "AGENTS.md"
 MAX_HEADER = 72
 MAX_WIDTH = 72
 MAX_WORDS = 50
+SCOPES = ("main", "renderer", "parser", "trade", "ipc", "data", "dataparser", "docs", "ci")
 
-_HEADER = re.compile(r"^(?P<type>[a-z]+)(?:\((?P<scope>[^)]*)\))?!?: (?P<subject>.+)$")
+_HEADER = re.compile(r"^(?P<type>[a-z]+)(?:\((?P<scope>[^)]*)\))?(?P<breaking>!)?: (?P<subject>.+)$")
+_BREAKING = re.compile(r"^BREAKING[ -]CHANGE: \S")
 _EXEMPT = ("Merge ", "fixup! ", "squash! ", "amend! ")
 _FENCE = re.compile(r"^\s*(```|~~~)")
 _PROMPT = re.compile(r"^\s*\$ \S")
@@ -58,8 +60,11 @@ def check_header(header: str) -> list[str]:
         problems.append("the subject starts with a capital letter")
     if subject.endswith("."):
         problems.append("the subject ends with a period")
-    if match.group("scope") == match.group("type"):
+    scope = match.group("scope")
+    if scope == match.group("type"):
         problems.append(f"the scope repeats the type ({match.group('type')})")
+    if scope is not None and scope not in SCOPES:
+        problems.append(f"the scope {scope!r} is not one of {', '.join(SCOPES)}")
     return problems
 
 
@@ -90,6 +95,19 @@ def footer_start(classified: Sequence[Line]) -> int:
     if not paragraph or not _FOOTER.match(paragraph[0].text):
         return len(classified) + 1
     return paragraph[0].number
+
+
+def check_breaking(header: str, classified: Sequence[Line]) -> list[str]:
+    """Returns a problem unless the first line's `!` and a BREAKING CHANGE footer come together."""
+    match = _HEADER.match(header)
+    if match is None:
+        return []
+    explained = any(_BREAKING.match(line.text) for line in classified[footer_start(classified) - 1 :])
+    if match.group("breaking") and not explained:
+        return ["the first line marks a breaking change with !, and no BREAKING CHANGE: footer says what breaks"]
+    if explained and not match.group("breaking"):
+        return ["a BREAKING CHANGE: footer needs a ! before the colon of the first line"]
+    return []
 
 
 def commit_exists(token: str, repo: Path) -> bool:
@@ -159,7 +177,12 @@ def check_message(text: str, repo: Path, rules: Path = RULES, *, from_editor: bo
     if header.startswith(_EXEMPT):
         return []
     classified, opened = classify(lines)
-    return check_header(header) + check_body(classified, opened, repo) + check_words(classified, rules)
+    return (
+        check_header(header)
+        + check_breaking(header, classified)
+        + check_body(classified, opened, repo)
+        + check_words(classified, rules)
+    )
 
 
 def main(argv: Sequence[str] | None = None, environ: Mapping[str, str] = os.environ) -> int:
