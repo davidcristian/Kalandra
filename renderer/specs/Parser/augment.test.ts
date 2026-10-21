@@ -257,17 +257,41 @@ describe("BFS", () => {
     },
   );
 
-  it("should not infinite loop", () => {
-    const result = __testExports.modifiedBfs(100, [], Array(100).fill(0));
+  // A working combination array that throws once the search adds more values to it than the budget
+  function budgetedCombo(budget: number): number[] {
+    let added = 0;
+    return new Proxy<number[]>([], {
+      get(target, key, receiver) {
+        if (key === "push" && ++added > budget) {
+          throw new Error(`the search added more than ${budget} values`);
+        }
+        return Reflect.get(target, key, receiver);
+      },
+    });
+  }
+
+  // A full search pushes once for each sequence of 1 to maxValues of the options
+  function fullSearchSize(options: number, maxValues: number): number {
+    let size = 0;
+    for (let length = 1; length <= maxValues; length++) {
+      size += options ** length;
+    }
+    return size;
+  }
+
+  it("searches nothing when there are more than 8 options", () => {
+    const combo = budgetedCombo(0);
+    const result = __testExports.modifiedBfs(100, combo, Array(100).fill(0));
 
     expect(result).toHaveLength(0);
-  }, 50);
+  });
 
-  it("should not infinite loop2", () => {
-    const result = __testExports.modifiedBfs(15.5, [], Array(4).fill(1));
+  it("stops at 7 values when no combination reaches the target", () => {
+    const combo = budgetedCombo(fullSearchSize(4, 7));
+    const result = __testExports.modifiedBfs(15.5, combo, Array(4).fill(1));
 
     expect(result).toHaveLength(0);
-  }, 50);
+  });
 });
 
 describe("parseAugmentSockets", () => {
