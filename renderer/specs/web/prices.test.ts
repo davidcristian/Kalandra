@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { __testExports, NinjaSchema } from "@/web/background/Prices";
 import { leagueFileName } from "@/web/background/price-source";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
 
@@ -12,11 +12,24 @@ const SERVICE_FIXTURES = path.resolve(
 );
 const readText = (file: string) => fs.readFileSync(file, "utf-8");
 
-describe("useTradeApi", () => {
+/** The app's namespace map, read as the app reads it, after an optional edit of its text. */
+function readSchema(edit = (text: string) => text): NinjaSchema {
+  return JSON.parse(
+    edit(
+      readText(path.resolve(__dirname, "../../public/data/namespaceMap.json")),
+    ),
+  );
+}
+
+describe("the price file reader", () => {
   beforeEach(async () => {
     setupTests();
     await init("en");
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("parseXchg", () => {
@@ -55,9 +68,7 @@ describe("useTradeApi", () => {
   });
 
   it("reads the price file the price service writes", () => {
-    const schema: NinjaSchema = JSON.parse(
-      readText(path.resolve(__dirname, "../../public/data/namespaceMap.json")),
-    );
+    const schema = readSchema();
     const blob = readText(path.join(SERVICE_FIXTURES, "price_file.json"));
     const { findInDatabase, parseXchg, splitJsonBlob } = __testExports;
 
@@ -92,6 +103,51 @@ describe("useTradeApi", () => {
     ).toBe(0.193);
     expect(
       findInDatabase(database, { ns: "UNIQUE", name: "Exalted Orb" }),
+    ).toBeNull();
+  });
+
+  it("throws on a file without rates", () => {
+    const blob = readText(path.join(SERVICE_FIXTURES, "price_file.json"));
+
+    expect(() =>
+      __testExports.parseXchg(blob.replace('{"rates":', '{"values":')),
+    ).toThrow(SyntaxError);
+  });
+
+  it("reads no overview with a namespace map of another schema version and warns", () => {
+    const blob = readText(path.join(SERVICE_FIXTURES, "price_file.json"));
+    const warnings: unknown[][] = [];
+    vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+      warnings.push(args);
+    });
+
+    const schema = readSchema((text) =>
+      text.replace('"schemaVersion": 1', '"schemaVersion": 2'),
+    );
+
+    expect(schema.schemaVersion).toBe(2);
+    expect(__testExports.splitJsonBlob(blob, schema)).toEqual([]);
+    expect(warnings).toEqual([["Unsupported ninja schema version", 2]]);
+  });
+
+  it("leaves out an overview whose type the namespace map does not list", () => {
+    const blob = readText(path.join(SERVICE_FIXTURES, "price_file.json"));
+    const renamed = blob.replace(
+      '{"type":"UniqueWeapons"',
+      '{"type":"UniqueSwords"',
+    );
+    const database = __testExports.splitJsonBlob(renamed, readSchema());
+
+    expect(database.map(({ url }) => url)).toEqual([
+      "currency",
+      "precursor-tablets",
+    ]);
+    expect(
+      __testExports.findInDatabase(database, {
+        ns: "UNIQUE",
+        name: "Redbeak",
+        variant: "Shortsword",
+      }),
     ).toBeNull();
   });
 

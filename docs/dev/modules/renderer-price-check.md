@@ -202,13 +202,15 @@ unique rolls, the fixed stats of a unique, negated stats and the values that the
 filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
-`specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
+`specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
+into their titles, name blocks, tags and affix tiers, and gets a listing it cannot read from a fake trade site,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
 file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks, and
 `specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` that answers when
 the test says.
-`specs/web/prices.test.ts` reads the price service's fixtures, and `specs/web/prices-load.test.ts` loads the price
+`specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
+schema version and an overview type that the map does not list, and `specs/web/prices-load.test.ts` loads the price
 file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
 with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
