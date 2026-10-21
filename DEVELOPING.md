@@ -106,6 +106,10 @@ part alone:
   lint fails when a file has more or fewer; `npm run lint -- --prune-suppressions` lowers a count
   after a fix. main's ESLint 8 has no such file, so `existingOffenders` in `main/.eslintrc.cjs`
   turns a rule off for the files listed; remove a file once it passes. Both lists only shrink.
+- ESLint checks rule 7 of AGENTS.md in both processes: `no-explicit-any`, `ban-ts-comment` for
+  `@ts-ignore` and an `@ts-expect-error` without a reason, `no-empty` for an empty `catch`, and
+  `no-restricted-syntax` for a cast through `unknown` and an empty `.catch()` handler. No installed
+  plugin checks the reason on an `eslint-disable` line, so reading the diff checks it.
 - `check.py` leaves out the data tool, whose tests need files the repo does not have
   ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
 

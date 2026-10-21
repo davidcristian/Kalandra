@@ -205,7 +205,7 @@ with code <code>`, and rejects each call that waits for a reply or comes later, 
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
 - Some existing code drops errors in empty `catch` blocks: `ConfigStore.load()`, `guessFileLocation()`,
   `OcrWorker` and the `copy-item` and `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of
-  [AGENTS.md](../../../AGENTS.md) says.
+  [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on a new empty `catch` block or `.catch()` handler.
 
 **Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time `electron-overlay-window`
 4.0.2 and `uiohook-napi` 1.5.x, native modules the bundle leaves out with `electron`; bundled: `electron-updater`,

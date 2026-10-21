@@ -1,6 +1,66 @@
 {
+  "specs/Parser/augment.test.ts": {
+    "no-restricted-syntax": {
+      "count": 5
+    }
+  },
+  "specs/Parser/fractureParsers.test.ts": {
+    "no-restricted-syntax": {
+      "count": 2
+    }
+  },
+  "specs/Parser/items.ts": {
+    "no-restricted-syntax": {
+      "count": 2
+    }
+  },
+  "specs/Parser/modifiersParsers.test.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "specs/Parser/sectionUnit.test.ts": {
+    "no-restricted-syntax": {
+      "count": 3
+    }
+  },
+  "specs/helper.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "specs/web/client-log.test.ts": {
+    "no-restricted-syntax": {
+      "count": 11
+    }
+  },
+  "specs/web/library/libraryChaos.test.ts": {
+    "no-restricted-syntax": {
+      "count": 2
+    }
+  },
+  "specs/web/price-check/filters/create-stat-filters.test.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/filters/pseudo/index.test.ts": {
+    "no-restricted-syntax": {
+      "count": 3
+    }
+  },
+  "specs/web/useTradeApi.test.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
   "src/main.ts": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/Config.ts": {
+    "no-restricted-syntax": {
       "count": 1
     }
   },
@@ -29,6 +89,11 @@
       "count": 1
     }
   },
+  "src/web/overlay/widget-registry.ts": {
+    "no-restricted-syntax": {
+      "count": 12
+    }
+  },
   "src/web/price-check/CheckedItem.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 2
@@ -42,6 +107,11 @@
   "src/web/price-check/filters/FilterModifier.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 3
+    }
+  },
+  "src/web/price-check/filters/create-stat-filters.ts": {
+    "no-restricted-syntax": {
+      "count": 1
     }
   },
   "src/web/price-check/price-prediction/FeedbackOption.vue": {
@@ -66,6 +136,11 @@
   },
   "src/web/settings/SettingsWindow.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/settings/utils.ts": {
+    "no-restricted-syntax": {
       "count": 1
     }
   }

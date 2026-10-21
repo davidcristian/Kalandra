@@ -16,6 +16,29 @@ const existingOffenders = {
     "src/main.ts",
     "src/server.ts",
   ],
+  "@typescript-eslint/no-explicit-any": [
+    "src/vision/HeistGemFinder.ts",
+    "src/vision/utils.ts",
+    "src/vision/wasm-bindings.ts",
+  ],
+  "no-empty": [
+    "src/host-files/ConfigStore.ts",
+    "src/host-files/utils.ts",
+    "src/vision/link-main.ts",
+  ],
+};
+
+const castThroughUnknown = {
+  selector:
+    ":matches(TSAsExpression, TSTypeAssertion) > :matches(TSAsExpression, TSTypeAssertion).expression > TSUnknownKeyword.typeAnnotation",
+  message:
+    "A cast through unknown skips the type check, so fix the types instead.",
+};
+const emptyCatchHandler = {
+  selector:
+    'CallExpression[callee.property.name="catch"] > :function.arguments[body.type="BlockStatement"][body.body.length=0]',
+  message:
+    "An empty .catch() handler drops the error, so log it or pass it on.",
 };
 
 module.exports = {
@@ -50,6 +73,9 @@ module.exports = {
     "import/first": "off",
     "import/no-duplicates": "off",
     "func-call-spacing": "off",
+    "@typescript-eslint/no-explicit-any": "error",
+    "no-empty": ["error", { allowEmptyCatch: false }],
+    "no-restricted-syntax": ["error", castThroughUnknown, emptyCatchHandler],
     // TODO: refactor IPC and enable
     "@typescript-eslint/consistent-type-assertions": "off",
   },
@@ -64,5 +90,14 @@ module.exports = {
       files,
       rules: { [rule]: "off" },
     })),
+    // Files that broke one restricted pattern when it was turned on, checked for the other; this list only shrinks too
+    {
+      files: ["src/proxy.ts"],
+      rules: { "no-restricted-syntax": ["error", emptyCatchHandler] },
+    },
+    {
+      files: ["src/shortcuts/Shortcuts.ts"],
+      rules: { "no-restricted-syntax": ["error", castThroughUnknown] },
+    },
   ],
 };

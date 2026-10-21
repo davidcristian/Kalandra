@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** rules
 **Origin:** [renderer/src/web/overlay/widget-registry.ts](../../../../renderer/src/web/overlay/widget-registry.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-21
 
 The widget rule in [AGENTS.md](../../../../AGENTS.md#architecture-rules) says a widget is added by
 one `registry.widgets.push` line in `widget-registry.ts`. All 12 such lines there cast the component
@@ -24,3 +24,6 @@ Or an exception for this one cast, written in AGENTS.md and in
 
 - 2026-10-18: Found while the renderer widgets module doc was written, by counting the casts in
   `widget-registry.ts`.
+- 2026-10-21: ESLint now reports a cast through `unknown`. `renderer/eslint-suppressions.json`
+  exempts the 12 in `widget-registry.ts`, so a 13th fails `npm run lint` until this task is done
+  ([071](071-type-and-catch-rules-in-existing-code.md)).

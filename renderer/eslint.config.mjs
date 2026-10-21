@@ -6,6 +6,19 @@ import {
 import { standard } from "@vue/eslint-config-standard-with-typescript";
 import prettier from "eslint-config-prettier";
 
+const castThroughUnknown = {
+  selector:
+    ":matches(TSAsExpression, TSTypeAssertion) > :matches(TSAsExpression, TSTypeAssertion).expression > TSUnknownKeyword.typeAnnotation",
+  message:
+    "A cast through unknown skips the type check, so fix the types instead.",
+};
+const emptyCatchHandler = {
+  selector:
+    'CallExpression[callee.property.name="catch"] > :function.arguments[body.type="BlockStatement"][body.body.length=0]',
+  message:
+    "An empty .catch() handler drops the error, so log it or pass it on.",
+};
+
 // https://github.com/vuejs/eslint-config-standard/pull/71
 standard[standard.length - 1].files = ["**/*.ts", "**/*.vue"];
 
@@ -48,6 +61,8 @@ export default defineConfigWithVueTs(
       "object-shorthand": "off",
       // A void statement marks a promise left to run on its own, which no-floating-promises accepts
       "no-void": ["error", { allowAsStatement: true }],
+      "no-empty": ["error", { allowEmptyCatch: false }],
+      "no-restricted-syntax": ["error", castThroughUnknown, emptyCatchHandler],
 
       // TODO: refactor IPC and enable
       "@typescript-eslint/consistent-type-assertions": "off",

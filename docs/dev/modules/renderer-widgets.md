@@ -83,7 +83,9 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
    `initInstance()`. A multi widget sets its fields in `setup` when `wmFlags[0]` is `uninitialized`, as
    `WidgetTimer.vue` does, because `create()` adds a bare `Widget` with only that flag.
 3. Add one `registry.widgets.push` line to `widget-registry.ts`. The existing lines cast with
-   `as unknown as WidgetComponent`, a cast that AGENTS.md rule 7 does not allow in new code.
+   `as unknown as WidgetComponent`, a cast that AGENTS.md rule 7 does not allow in new code. The lint
+   exempts only the 12 existing casts, so a new one fails it until
+   [044](../refinements/tasks/044-widget-registry-cast.md) is done.
 4. Follow [the one hard rule](../../../AGENTS.md#the-one-hard-rule) for the new config type. For a single widget,
    the new upgrade step inserts `defaultConfig()`'s entry with a new `wmId`, as the `< 29` step does for
    `experience-tracker` and the `< 30` step for `library`; without it an existing config has no entry for the type.
