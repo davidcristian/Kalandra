@@ -1,3 +1,23 @@
+// The files that broke a rule when it was turned on, by rule. The lists only shrink: fix a file, then remove it.
+const existingOffenders = {
+  "@typescript-eslint/no-floating-promises": [
+    "src/AppTray.ts",
+    "src/AppUpdater.ts",
+    "src/host-files/ConfigStore.ts",
+    "src/host-files/GameLogWatcher.ts",
+    "src/main.ts",
+    "src/shortcuts/Shortcuts.ts",
+    "src/windowing/OverlayWindow.ts",
+  ],
+  "@typescript-eslint/no-misused-promises": [
+    "src/AppUpdater.ts",
+    "src/host-files/FileWriter.ts",
+    "src/host-files/GameLogWatcher.ts",
+    "src/main.ts",
+    "src/server.ts",
+  ],
+};
+
 module.exports = {
   root: true,
   env: {
@@ -24,8 +44,6 @@ module.exports = {
     "@typescript-eslint/prefer-nullish-coalescing": "off",
     "@typescript-eslint/prefer-optional-chain": "off",
     "@typescript-eslint/prefer-readonly": "off",
-    "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/prefer-reduce-type-parameter": "off",
     "@typescript-eslint/no-invalid-void-type": "off",
     "@typescript-eslint/consistent-indexed-object-style": "off",
@@ -37,20 +55,14 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["src/main/**/*"],
-      env: {
-        node: true,
-      },
-    },
-    {
       files: ["*.ts"],
       parserOptions: {
         project: "./tsconfig.json",
       },
     },
+    ...Object.entries(existingOffenders).map(([rule, files]) => ({
+      files,
+      rules: { [rule]: "off" },
+    })),
   ],
-  parserOptions: {
-    parser: "@typescript-eslint/parser",
-    extraFileExtensions: [".vue"],
-  },
 };

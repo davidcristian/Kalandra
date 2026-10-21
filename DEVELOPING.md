@@ -99,6 +99,11 @@ part alone:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
   `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
   uncovered.
+- An ESLint rule turned on after code broke it skips only that code. In `renderer/`,
+  `eslint-suppressions.json` holds how many violations of each such rule each file had, and the
+  lint fails when a file has more or fewer; `npm run lint -- --prune-suppressions` lowers a count
+  after a fix. main's ESLint 8 has no such file, so `existingOffenders` in `main/.eslintrc.cjs`
+  turns a rule off for the files listed; remove a file once it passes. Both lists only shrink.
 - `check.py` leaves out the data tool, whose tests need files the repo does not have
   ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
 

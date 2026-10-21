@@ -1,0 +1,72 @@
+{
+  "src/main.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/background/Prices.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 3
+    }
+  },
+  "src/web/background/TradeData.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/item-search/WidgetItemSearch.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/overlay/OverlayWindow.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 3
+    }
+  },
+  "src/web/overlay/WidgetImageStrip.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/CheckedItem.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/PriceCheckWindow.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/filters/FilterModifier.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/price-prediction/FeedbackOption.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trade/RateLimiter.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trade/TradeBulk.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trade/TradeListing.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/settings/SettingsWindow.vue": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  }
+}

@@ -18,13 +18,6 @@ export default defineConfigWithVueTs(
   prettier,
 
   {
-    files: ["src/main/**/*"],
-    languageOptions: {
-      globals: { node: true },
-    },
-  },
-
-  {
     files: ["**/*.vue"],
     rules: {
       "import-x/first": "off",
@@ -48,16 +41,24 @@ export default defineConfigWithVueTs(
       "@typescript-eslint/prefer-nullish-coalescing": "off",
       "@typescript-eslint/prefer-optional-chain": "off",
       "@typescript-eslint/prefer-readonly": "off",
-      "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/no-misused-promises": "off",
       "@typescript-eslint/prefer-reduce-type-parameter": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
       "@typescript-eslint/consistent-indexed-object-style": "off",
       "func-call-spacing": "off",
       "object-shorthand": "off",
+      // A void statement marks a promise left to run on its own, which no-floating-promises accepts
+      "no-void": ["error", { allowAsStatement: true }],
 
       // TODO: refactor IPC and enable
       "@typescript-eslint/consistent-type-assertions": "off",
+    },
+  },
+
+  {
+    files: ["**/*.ts", "**/*.vue"],
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
     },
   },
 );

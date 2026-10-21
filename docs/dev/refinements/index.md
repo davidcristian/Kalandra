@@ -131,3 +131,4 @@ layout and its reasons.
 - 067: [An event the page sends while the events socket reopens is lost](tasks/067-events-sent-while-socket-reopens.md)
 - 068: [The listing tooltip names an unidentified item's tier in English](tasks/068-unidentified-tier-tag.md)
 - 069: [The Settings window does not show the hotkeys that main cannot register](tasks/069-unregistered-hotkeys-in-settings.md)
+- 070: [Existing code in main and the renderer leaves promises floating](tasks/070-floating-promises-in-existing-code.md)
