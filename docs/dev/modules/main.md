@@ -147,8 +147,8 @@ The entry, the server and the app services, in `main/src/`:
   `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. A failed
   write returns 500 and logs `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
 - `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
-  returns 404 for a missing file or a path that `resolveInside(folder, urlPath)` finds outside the folder, such as
-  one with `..` segments, which Node passes on in `req.url` as sent.
+  returns 404 for a missing file or a path outside the folder, such as one with `..` segments, which Node passes on
+  in `req.url` as sent. `resolveInside()` checks the path with the platform's `path` module, or one a test passes.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on

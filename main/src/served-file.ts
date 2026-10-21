@@ -6,15 +6,16 @@ import type { ServerResponse } from "http";
 export function resolveInside(
   folder: string,
   urlPath: string,
+  paths: path.PlatformPath = path,
 ): string | undefined {
   if (urlPath.includes("\0")) return undefined;
-  const root = path.resolve(folder);
-  const target = path.join(root, urlPath);
-  const relative = path.relative(root, target);
+  const root = paths.resolve(folder);
+  const target = paths.join(root, urlPath);
+  const relative = paths.relative(root, target);
   if (
     !relative ||
-    relative.split(path.sep)[0] === ".." ||
-    path.isAbsolute(relative)
+    relative.split(paths.sep)[0] === ".." ||
+    paths.isAbsolute(relative)
   ) {
     return undefined;
   }
