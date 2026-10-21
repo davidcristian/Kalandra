@@ -78,6 +78,64 @@ class BacklogCheckTest(unittest.TestCase):
         self.assertIn("lists a task number twice, or out of order", output)
         self.assertIn("is not '- NNN: [title](tasks/NNN-slug.md)'", output)
 
+    def test_reports_an_index_without_the_tasks_heading(self) -> None:
+        index = INDEX.replace("## Tasks", "## Open tasks")
+        with repo({**backlogs(), "docs/dev/refinements/index.md": index}) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(),
+            [
+                "docs/dev/refinements/index.md: has no '## Tasks' heading",
+                f"{TASKS}001-first-task.md: is not listed in docs/dev/refinements/index.md",
+                f"{TASKS}002-second-task.md: is not listed in docs/dev/refinements/index.md",
+            ],
+        )
+
+    def test_reports_an_entry_whose_number_is_not_its_files_number(self) -> None:
+        index = INDEX.replace("- 002: [The second task]", "- 003: [The second task]")
+        with repo({**backlogs(), "docs/dev/refinements/index.md": index}) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(),
+            [
+                "docs/dev/refinements/index.md:6: has a number that is not its file's number",
+                f"{TASKS}002-second-task.md: is not listed in docs/dev/refinements/index.md",
+            ],
+        )
+
+    def test_reads_the_task_list_only_up_to_the_next_heading(self) -> None:
+        index = INDEX + "\n## Ideas\n\n- 009: [Not a task yet](tasks/009-not-a-task-yet.md)\n"
+        with repo({**backlogs(), "docs/dev/refinements/index.md": index}) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 0, output)
+
+    def test_reports_two_status_lines_and_a_file_that_is_not_a_task(self) -> None:
+        twice = task("The first task", "open").replace("**Status:** open\n", "**Status:** open\n**Status:** open\n")
+        files = {**backlogs(), f"{TASKS}001-first-task.md": twice, f"{TASKS}notes.txt": "A note.\n"}
+        with repo(files) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(),
+            [
+                f"{TASKS}notes.txt: is not a NNN-slug.md task file",
+                f"{TASKS}notes.txt: is not listed in docs/dev/refinements/index.md",
+                f"{TASKS}001-first-task.md: has 2 **Status:** lines, and needs exactly one",
+            ],
+        )
+
+    def test_exits_2_when_an_index_or_its_tasks_folder_is_missing(self) -> None:
+        without_index = {name: text for name, text in backlogs().items() if name != "docs/dev/host/index.md"}
+        without_tasks = {name: text for name, text in backlogs().items() if not name.startswith(HOST_TASKS)}
+        for files in (without_index, without_tasks):
+            with self.subTest(files=sorted(files)), repo(files) as root:
+                code, output = run(backlogcheck.main, root)
+                self.assertEqual(code, 2)
+                self.assertTrue(output.startswith("backlogcheck: "), output)
+                self.assertIn("docs", output)
+
     def test_reports_template_lines_that_are_missing_or_have_a_wrong_value(self) -> None:
         wrong = task("The first task", "open", "**Area:** kitchen\n").replace("2026-10-18\n", "soon\n", 1)
         files = {

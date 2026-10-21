@@ -1,6 +1,6 @@
 import unittest
 
-from support import repo, run
+from support import broken_repo, repo, run
 
 import dashcheck
 
@@ -77,3 +77,16 @@ class DashCheckTest(unittest.TestCase):
         self.assertEqual(code, 1)
         problems = [line.split(": ")[0] for line in output.splitlines() if line.startswith("renderer/")]
         self.assertEqual(problems, ["renderer/specs/Parser/new.test.ts:1", "renderer/specs/web/notes.txt:1"])
+
+    def test_exits_2_when_no_file_is_utf8_text(self) -> None:
+        files = {"c.png": f"\0{EM}".encode(), "notes.txt": f"caf\xe9 {EN} au lait\n".encode("cp1252")}
+        with repo(files) as root:
+            code, output = run(lambda argv: dashcheck.main(argv, {}), root)
+        self.assertEqual(code, 2)
+        self.assertIn("dashcheck: no text file under", output)
+
+    def test_exits_2_when_git_cannot_list_the_files(self) -> None:
+        with broken_repo() as root:
+            code, output = run(dashcheck.main, root)
+        self.assertEqual(code, 2)
+        self.assertTrue(output.startswith("dashcheck: git ls-files failed in "), output)

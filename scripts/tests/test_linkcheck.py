@@ -1,6 +1,6 @@
 import unittest
 
-from support import repo, run
+from support import broken_repo, repo, run
 
 import linkcheck
 from markdownlinks import anchors, links, slug
@@ -55,3 +55,28 @@ class LinkCheckTest(unittest.TestCase):
         self.assertIn("README.md:1: gone.md names gone.md, which is not in the repo", output)
         self.assertIn("README.md:2: AGENTS.md#gone names the heading #gone", output)
         self.assertIn("README.md:3: ../outside.md points outside the repo", output)
+
+    def test_resolves_dot_and_dot_dot_inside_the_repo(self) -> None:
+        files = {
+            "docs/dev/a.md": "[a](../page.md), [b](./b.md#b), [c](.././dev/b.md)\n[d](../dev/./gone.md)\n",
+            "docs/dev/b.md": "# B\n",
+            "docs/page.md": "A page.\n",
+        }
+        with repo(files) as root:
+            code, output = run(linkcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(), ["docs/dev/a.md:2: ../dev/./gone.md names docs/dev/gone.md, which is not in the repo"]
+        )
+
+    def test_exits_2_when_no_file_has_a_link(self) -> None:
+        with repo({"README.md": "No link here.\n", "docs/page.md": "[the site checks this one](gone.md)\n"}) as root:
+            code, output = run(linkcheck.main, root)
+        self.assertEqual(code, 2)
+        self.assertIn("linkcheck: no link under", output)
+
+    def test_exits_2_when_git_cannot_list_the_files(self) -> None:
+        with broken_repo() as root:
+            code, output = run(linkcheck.main, root)
+        self.assertEqual(code, 2)
+        self.assertTrue(output.startswith("linkcheck: git ls-files failed in "), output)

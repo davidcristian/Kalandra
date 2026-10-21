@@ -151,6 +151,37 @@ class CommitLintTest(unittest.TestCase):
         self.assertEqual((without_editor, with_editor, unset), (1, 0, 0))
         self.assertIn("commitlint: line 3 has an issue or pull request number", output.getvalue())
 
+    def test_main_looks_up_hashes_in_the_repo_its_option_names(self) -> None:
+        with repo({"a.txt": "a\n"}) as root, repo({}) as other:
+            git = ["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t"]
+            subprocess.run([*git, "add", "a.txt"], check=True)  # noqa: S603 a fixed git command
+            subprocess.run([*git, "commit", "-q", "-m", "a"], check=True)  # noqa: S603 a fixed git command
+            head = subprocess.run([*git, "rev-parse", "HEAD"], capture_output=True, text=True, check=True)  # noqa: S603 a fixed git command
+            message = other / "COMMIT_EDITMSG"
+            message.write_text(f"fix: a subject\n\nThis follows {head.stdout.strip()}.\n", encoding="utf-8")
+            output = io.StringIO()
+            with redirect_stderr(output):
+                in_root = commitlint.main([str(message), "--repo", str(root)], {})
+                in_other = commitlint.main([str(message), "--repo", str(other)], {})
+        self.assertEqual((in_root, in_other), (1, 0))
+        self.assertEqual(
+            output.getvalue().splitlines(),
+            [
+                f"commitlint: line 3 names commit {head.stdout.strip()}, which a rebase changes",
+                "commitlint: the rules are in AGENTS.md, Commits",
+            ],
+        )
+
+    def test_reports_a_rules_file_it_cannot_read_or_without_the_table(self) -> None:
+        missing = self.rules.parent / "missing.md"
+        problems = commitlint.check_message("fix: a subject\n", Path(), missing)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertTrue(problems[0].startswith(f"cannot read {missing}: "), problems)
+        self.rules.write_text("# Rules\n", encoding="utf-8")
+        self.assertEqual(
+            self.check("fix: a subject\n"), [f"{self.rules} has no table whose first column is headed 'Do not write'"]
+        )
+
     def test_checks_the_lines_that_git_keeps_as_a_commit_msg_hook(self) -> None:
         with repo({"a.txt": "a\n", "message.txt": COMMENT_LINE}) as root:
             hook = root / "hooks" / "commit-msg"

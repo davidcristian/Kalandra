@@ -56,3 +56,16 @@ class ProseCheckTest(unittest.TestCase):
             code, output = run(prosecheck.main, root)
         self.assertEqual(code, 2)
         self.assertIn("no table", output)
+
+    def test_fails_without_the_rules_file(self) -> None:
+        with repo({"docs/page.md": "A page that checks the price.\n"}) as root:
+            code, output = run(prosecheck.main, root)
+        self.assertEqual(code, 2)
+        self.assertTrue(output.startswith("prosecheck: cannot read "), output)
+
+    def test_exits_2_when_no_file_has_prose(self) -> None:
+        table = RULES_TABLE[RULES_TABLE.index("|") :]
+        with repo({"AGENTS.md": table, "main/a.ts": "const price = 1;\n", "data.json": "{}\n"}) as root:
+            code, output = run(prosecheck.main, root)
+        self.assertEqual(code, 2)
+        self.assertIn("prosecheck: no prose under", output)

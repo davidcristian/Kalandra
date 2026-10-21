@@ -1,6 +1,6 @@
 import unittest
 
-from support import repo, run
+from support import broken_repo, repo, run
 
 import linecap
 
@@ -50,3 +50,30 @@ class LineCapTest(unittest.TestCase):
             code, output = run(linecap.main, root)
         self.assertEqual(code, 2)
         self.assertIn("expected '<lines> <path>'", output)
+
+    def test_reports_a_listed_file_that_grew(self) -> None:
+        files = {linecap.LONG_FILES: LIST_HEADER + "301 main/long.ts\n", "main/long.ts": lines(302), "a.md": "x\n"}
+        with repo(files) as root:
+            code, output = run(linecap.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(len(output.splitlines()), 1, output)
+        self.assertTrue(output.startswith("main/long.ts: grew from 301 to 302 lines;"), output)
+
+    def test_exits_2_without_the_long_file_list(self) -> None:
+        with repo({"main/a.ts": "x\n", "a.md": "x\n"}) as root:
+            code, output = run(linecap.main, root)
+        self.assertEqual(code, 2)
+        self.assertTrue(output.startswith("linecap: cannot read "), output)
+
+    def test_exits_2_when_there_is_no_source_or_no_markdown_file(self) -> None:
+        for name in ("main/a.ts", "a.md"):
+            with self.subTest(name=name), repo({linecap.LONG_FILES: LIST_HEADER, name: "x\n"}) as root:
+                code, output = run(linecap.main, root)
+                self.assertEqual(code, 2)
+                self.assertIn("no source or no markdown file", output)
+
+    def test_exits_2_when_git_cannot_list_the_files(self) -> None:
+        with broken_repo() as root:
+            code, output = run(linecap.main, root)
+        self.assertEqual(code, 2)
+        self.assertTrue(output.startswith("linecap: git ls-files failed in "), output)

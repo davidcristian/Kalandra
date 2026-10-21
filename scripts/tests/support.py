@@ -32,6 +32,16 @@ def repo(files: Mapping[str, str | bytes]) -> Generator[Path, None, None]:
         yield root
 
 
+@contextmanager
+def broken_repo() -> Generator[Path, None, None]:
+    """Yields a folder with a markdown file and a .git file that names no repo, so git fails in it."""
+    with tempfile.TemporaryDirectory() as folder:
+        root = Path(folder)
+        (root / ".git").write_text("gitdir: missing\n", encoding="utf-8")
+        (root / "README.md").write_text("[a](README.md)\n", encoding="utf-8")
+        yield root
+
+
 def run(main: Callable[[Sequence[str]], int], root: Path) -> tuple[int, str]:
     """Runs a check's main() on ``root`` and returns its exit code and everything it printed."""
     output = io.StringIO()
