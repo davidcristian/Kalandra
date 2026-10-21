@@ -84,9 +84,9 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 - **English is the source of UI text.** A new UI string goes into `renderer/public/data/en/app_i18n.json`. No
   translation service is connected to this project, so other languages get the string only when someone who speaks
   them adds it, and until then a missing key falls back to English. The product name is not translated.
-- **One version, five places.** `versionCheck.py` fails unless `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml`,
-  `docs/.vitepress/config.js`, `main/package.json` and `main/package-lock.json` have the same version. Releasing
-  follows [docs/dev/runbooks/release.md](docs/dev/runbooks/release.md) and is the maintainer's job.
+- **One version, five places.** `scripts/versioncheck.py` fails unless `README.md`, `docs/.vitepress/config.js`,
+  `.github/ISSUE_TEMPLATE/bug-report.yml`, `main/package.json` and `main/package-lock.json` have the same version.
+  Releasing follows [docs/dev/runbooks/release.md](docs/dev/runbooks/release.md) and is the maintainer's job.
 
 ## What every change must pass
 
@@ -94,10 +94,10 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 `npm ci` in `renderer/`, `main/` and `docs/`, before calling a change done. [DEVELOPING.md](DEVELOPING.md#checks)
 gives each step's own command. CI runs the same steps on Node 24, each job only for a change that can affect it.
 
-1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, `versionCheck.py`,
-   ESLint, Prettier and `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`,
-   and the checks of line limits, dashes, prose, links and the backlog indexes. The fixers rewrite files, so stage
-   the result and run again until it passes. Never pass `--no-verify` unless the user asks.
+1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, ESLint, Prettier and
+   `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`, and the checks of the
+   version, line limits, dashes, prose, links and the backlog indexes. The fixers rewrite files, so stage the result
+   and run again until it passes. Never pass `--no-verify` unless the user asks.
 2. **The renderer**: lint, Vitest and the build, after `npm run make-index-files` writes the index files they need.
    Write them again after any data change.
 3. **The main process**: Vitest and the build. CI packages it on Windows, Linux and macOS, so platform-specific code

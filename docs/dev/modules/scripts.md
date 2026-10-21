@@ -3,7 +3,8 @@
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
 [AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
 `prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py` check
-the developer docs, `commitlint.py` checks a commit message, and `ci_paths.py` picks the CI jobs a change affects.
+the developer docs, `versioncheck.py` checks that the five version places match, `commitlint.py` checks a commit
+message, and `ci_paths.py` picks the CI jobs a change affects.
 The scripts are Python, use only the standard library, and run from the repo root. The decision is
 [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
@@ -66,6 +67,19 @@ the repo.
   list, and one `**Needs:**` line that starts with `Path of Exile 2 on Windows` in a host task. One `## History`
   heading follows, and each list line under it starts with `- <date>: `.
 
+### versioncheck.py
+
+The pre-commit hook runs `python scripts/versioncheck.py` when a `.js`, `.md`, `.yml` or `.json` file or the script
+itself changes. It passes the changed files, which the script does not read. The script reads the version from the
+five files that [the release runbook](../runbooks/release.md#the-five-version-places) lists, two of them from
+`main/package-lock.json`, and `--root <folder>` reads them from another copy of the repo.
+
+- When all six match, it prints `Version check passed. All versions are consistent.` and exits with 0.
+- Otherwise it prints `Version mismatch detected:` and one line per version, with `None` for a text file in which it
+  finds no version, and exits with 1.
+- A file that is missing or is not UTF-8, a JSON file that does not parse, or a package file with no version string
+  where npm writes one prints `versioncheck: <problem>` and exits with 2.
+
 ### ci_paths.py
 
 The Changed paths job of `.github/workflows/test.yml` passes the changed paths on stdin to
@@ -112,11 +126,11 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 69 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 77 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 93.5% of lines and branches on 21 Oct 2026.
+floor in `scripts/.coveragerc`, 93.8% of lines and branches on 21 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

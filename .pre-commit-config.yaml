@@ -13,9 +13,9 @@ repos:
     hooks:
     -   id: check-version-consistency
         name: Check Version Consistency
-        entry: python ./versionCheck.py
+        entry: python scripts/versioncheck.py
         language: python
-        files: \.(js|md|yml|json)$
+        files: ^scripts/versioncheck\.py$|\.(js|md|yml|json)$
 
     -   id: lint-fix-main
         name: Lint Fix Main Project

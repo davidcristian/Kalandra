@@ -5,7 +5,7 @@
 **Origin:** [docs/dev/runbooks/release.md](../../runbooks/release.md)
 **Verified:** 2026-10-18
 
-The five version places that `versionCheck.py` compares read `0.16.3`: `main/package.json`,
+The five version places that `scripts/versioncheck.py` compares read `0.16.3`: `main/package.json`,
 `main/package-lock.json`, `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml` and `appVersion` in
 `docs/.vitepress/config.js`. `origin` holds 90 tags inherited from Exiled Exchange 2
 (`git ls-remote --tags --refs origin`). Its tag `v0.16.3` points at `cca30662`, Kvan7's merge of

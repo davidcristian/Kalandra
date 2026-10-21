@@ -55,10 +55,12 @@ commit uploads last, and no run is cancelled in the middle of its uploads.
 
 ## The five version places
 
-`versionCheck.py` fails unless these have the same version. It prints `Version mismatch detected:` and the version
-it read from each place, or `Version check passed. All versions are consistent.`
+`scripts/versioncheck.py` fails unless these have the same version. It prints `Version mismatch detected:` and the
+version it read from each place, and exits with 1, or prints `Version check passed. All versions are consistent.`
+It exits with 2 when it cannot read a file or a package file has no version string
+([scripts.md](../modules/scripts.md#versioncheckpy)).
 
-| File | What `versionCheck.py` reads |
+| File | What `versioncheck.py` reads |
 | --- | --- |
 | `README.md` | The first `Kalandra-Setup-X.Y.Z`, in the downloads badge |
 | `.github/ISSUE_TEMPLATE/bug-report.yml` | The first list line that is a version: the top option of the Version dropdown |
@@ -67,8 +69,8 @@ it read from each place, or `Version check passed. All versions are consistent.`
 | `main/package-lock.json` | The top `version` and `packages[""].version` |
 
 `renderer/package.json` stays at `0.0.0`. Nothing reads it: the About page shows the version that
-main returns on `/config`. The pre-commit hook runs `versionCheck.py` when a `.js`, `.md`, `.yml` or
-`.json` file changes, and the Lint & Format job of `test.yml` runs every hook
+main returns on `/config`. The pre-commit hook runs `versioncheck.py` when a `.js`, `.md`, `.yml` or
+`.json` file or the script itself changes, and the Lint & Format job of `test.yml` runs every hook
 ([architecture.md](../architecture.md#ci)).
 
 ## Steps
@@ -88,7 +90,7 @@ main returns on `/config`. The pre-commit hook runs `versionCheck.py` when a `.j
      increased by one so it still selects `Change me`;
    - in `docs/.vitepress/config.js`, `appVersion`.
 
-   From the repo root, `python versionCheck.py` prints
+   From the repo root, `python scripts/versioncheck.py` prints
    `Version check passed. All versions are consistent.`
 4. **Run the checks** that [AGENTS.md](../../../AGENTS.md#what-every-change-must-pass) lists for
    the parts changed since the last release, and `pre-commit run --all-files` for the bump itself.
@@ -122,7 +124,7 @@ Build run on `master` in the Actions tab and choose Re-run all jobs.
 ## When it fails
 
 - **`Version mismatch detected:`** The lines after it name each file and the version read there.
-  Fix the file that differs and run `python versionCheck.py` again.
+  Fix the file that differs and run `python scripts/versioncheck.py` again.
 - **`git ls-remote --tags origin vX.Y.Z` prints a tag in step 2.** The tag exists on `origin`, from
   Exiled Exchange 2 or from an earlier release, and a release made now would point at its commit.
   Set a version whose tag does not exist.

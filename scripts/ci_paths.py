@@ -38,7 +38,6 @@ RULES = (
     Rule("LICENSES/", NONE),
     Rule(".pre-commit-config.yaml", NONE),
     Rule("pyrightconfig.json", NONE),
-    Rule("versionCheck.py", NONE),
     Rule(".gitignore", NONE),
     Rule("LICENSE", NONE),
     Rule("crowdin.yml", NONE),
