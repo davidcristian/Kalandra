@@ -217,22 +217,16 @@ export async function init(lang: string) {
 
   await loadForLang(lang);
 
-  let failed = false;
   const missing = [];
 
   for (const text of DELAYED_STAT_VALIDATION) {
     if (STAT_BY_REF(text) == null) {
-      // throw new Error(`Cannot find stat: ${text}`);
       missing.push(text);
-      failed = true;
     }
   }
-  if (failed) {
-    // throw new Error(
-    //   `Cannot find stat${missing.length > 1 ? "s" : ""}: ${missing.join("\n")}`,
-    // );
+  if (missing.length) {
     console.log(
-      "Cannot find stat" + (missing.length > 1 ? "s" : "") + missing.join("\n"),
+      `Cannot find stat${missing.length > 1 ? "s" : ""}: ${missing.join("\n")}`,
     );
   }
   DELAYED_STAT_VALIDATION.clear();

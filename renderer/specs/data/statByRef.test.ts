@@ -82,4 +82,22 @@ describe("STAT_BY_REF", () => {
 
     expect(logged.join(" ")).toContain(SAME_HASH_AS_PARRY_DAMAGE);
   });
+
+  it("logs the missing refs after a colon, one per line", async () => {
+    const logged: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((text: string) => {
+      logged.push(text);
+    });
+
+    stat("No stat has this ref");
+    await init("en");
+    stat("No stat has this ref");
+    stat("Nor this one");
+    await init("en");
+
+    expect(logged).toEqual([
+      "Cannot find stat: No stat has this ref",
+      "Cannot find stats: No stat has this ref\nNor this one",
+    ]);
+  });
 });

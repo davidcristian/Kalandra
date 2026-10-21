@@ -89,8 +89,8 @@ relative times such as the listing ages are written in it.
   game data does not have yet. Both lists come from `www.pathofexile.com` in every app language, so their texts
   are English, and `TRADE_ITEM_BY_REF` and `TRADE_STAT_BY_MATCH_STR` find only the names and stats of an English
   item.
-- `stat(text)` records a stat ref that code depends on. After loading, `init` logs `Cannot find stat` with the
-  list of recorded refs that `stats.ndjson` does not contain.
+- `stat(text)` records a stat ref that code depends on. After loading, `init` logs `Cannot find stats: ` and then
+  the recorded refs that `stats.ndjson` does not contain, one per line, to the DevTools console (`stat:` for one).
 
 The files, per language under `renderer/public/data/<lang>/`:
 

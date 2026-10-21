@@ -7,7 +7,7 @@
 317 dataParser/src/stores/helpers/description.py
 344 ipc/types.ts
 315 main/src/shortcuts/Shortcuts.ts
-547 renderer/src/assets/data/index.ts
+541 renderer/src/assets/data/index.ts
 351 renderer/src/assets/data/interfaces.ts
 2220 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
