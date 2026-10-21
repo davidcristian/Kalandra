@@ -68,7 +68,7 @@ Windows). [Client log file](/client-log-parser) describes the file.
 
 The widget first opens near the bottom of the screen, right of center. Use its `move` button to place it elsewhere.
 It stays on screen after you close the overlay. Hide it with its `hide` button. The `edit` button opens the Settings
-window, where the XP tracker settings are on the `Leveling` page. The widget has no `delete` button. See
+window with only the `Leveling` page, which holds the XP tracker settings. The widget has no `delete` button. See
 [Widgets](/widgets) for the buttons.
 
 ## The formula

@@ -30,6 +30,8 @@ export function menuPages(type?: string): SettingsPage[][] {
       return [["item-search"]];
     case "library":
       return [["library"]];
+    case "experience-tracker":
+      return [["leveling"]];
     default:
       return [
         ["hotkeys", "chat"],

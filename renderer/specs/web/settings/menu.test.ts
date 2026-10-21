@@ -21,6 +21,10 @@ describe("the pages the Settings window menu lists", () => {
     expect(menuPages("library")).toEqual([["library"]]);
   });
 
+  it("lists only the Leveling page for the XP tracker", () => {
+    expect(menuPages("experience-tracker")).toEqual([["leveling"]]);
+  });
+
   it("lists every page for a widget without its own settings", () => {
     expect(menuPages("delve-grid")).toEqual(menuPages());
   });

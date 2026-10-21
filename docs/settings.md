@@ -146,6 +146,8 @@ The **edit** button of these widgets opens the settings window with only that wi
   [Extra widgets](/extra-widgets#item-search) documents it.
 - **Library**: the hotkey that logs an item, the output folder and which mods a recording keeps.
   [Item data](/item-data) documents it.
+- **XP tracker**: the **Leveling** page, with **PoE log file**, **Allow reading of Client.txt file** and
+  **Show experience gain percentage**. [XP tracker](/xp-tracker) documents it.
 
 The **edit** button of the Map check and Item info window opens the **Item info** and **Map check** pages. A click on
 the title of the price check window opens the **Price check** page.
