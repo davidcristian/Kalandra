@@ -11,6 +11,9 @@ or **Cancel** to close the window without them. Kalandra stores the settings in 
 The menu on the left lists the pages in this order: Hotkeys, Chat, General, Price check, Map check, Item info,
 Leveling, Help, Debug and About. The **Quit** button under the menu closes Kalandra.
 
+A bar under the window scrolls the names of Awakened PoE Trade's patrons, as thanks to the project that Kalandra is
+built on. Move the mouse over the bar to see all the names at once.
+
 ## Hotkeys
 
 A hotkey works only while the Path of Exile 2 window is active, so Kalandra does not take keys from other programs.

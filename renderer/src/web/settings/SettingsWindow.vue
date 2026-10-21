@@ -24,7 +24,7 @@
       <div
         class="bg-gray-800 rounded p-1 justify-center text-center w-44 shrink-0 flex items-center"
       >
-        {{ t("settings.thank_you") }}
+        {{ t("settings.apt_patrons") }}
       </div>
       <div class="overflow-x-hidden whitespace-nowrap p-1 text-base">
         <span :class="$style.patronsLine">{{ patronsString[0] }}</span
