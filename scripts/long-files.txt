@@ -11,7 +11,7 @@
 351 renderer/src/assets/data/interfaces.ts
 2236 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
-845 renderer/src/web/Config.ts
+852 renderer/src/web/Config.ts
 567 renderer/src/web/background/Prices.ts
 308 renderer/src/web/client-log/client-log-parser.ts
 452 renderer/src/web/item-search/WidgetItemSearch.vue

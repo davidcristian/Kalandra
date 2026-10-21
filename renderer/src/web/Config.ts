@@ -8,6 +8,7 @@ import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
+import { repairSavedConfig } from "./config-repair";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 
 const _config = shallowRef<Config | null>(null);
@@ -159,7 +160,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 35,
+  configVersion: 36,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -685,6 +686,12 @@ function upgradeConfig(_config: Config): Config {
     config.hideOverlayOnBlur = false;
 
     config.configVersion = 35;
+  }
+
+  if (config.configVersion < 36) {
+    repairSavedConfig(config);
+
+    config.configVersion = 36;
   }
   /* eslint-enable */
 
