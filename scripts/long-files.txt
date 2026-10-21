@@ -13,7 +13,6 @@
 374 renderer/src/parser/stat-translations.ts
 729 renderer/src/web/Config.ts
 566 renderer/src/web/background/Prices.ts
-308 renderer/src/web/client-log/client-log-parser.ts
 452 renderer/src/web/item-search/WidgetItemSearch.vue
 402 renderer/src/web/overlay/OverlayWindow.vue
 425 renderer/src/web/overlay/Widget.vue

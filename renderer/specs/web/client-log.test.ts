@@ -1152,11 +1152,33 @@ describe("clientLog", () => {
     }
   });
 
+  it("sends the game version of a line without a patch number", () => {
+    const { handleLine } = useClientLog();
+
+    handleLine(
+      "2026/10/20 09:00:00 1800000000 a1e2d252 [INFO Client 443804] [HTTP2] User agent: PoE poe2_production/tags/0.4 Windows x64",
+    );
+
+    const versions = vi
+      .mocked(Host.sendEvent)
+      .mock.calls.flatMap(([event]) =>
+        event.name === "CLIENT->MAIN::write-data" &&
+        event.payload.action === "client-log-event" &&
+        event.payload.data.type === "game-version"
+          ? [event.payload.data.version]
+          : [],
+      );
+    expect(versions).toEqual(["0.4"]);
+  });
+
   it("logs a line that fails and handles the lines after it", () => {
-    const versionWithoutPatch =
-      "2026/10/20 09:00:00 1800000000 a1e2d252 [INFO Client 443804] [HTTP2] User agent: PoE poe2_production/tags/0.4 Windows x64";
+    const gameVersion =
+      "2026/10/20 09:00:00 1800000000 a1e2d252 [INFO Client 443804] [HTTP2] User agent: PoE poe2_production/tags/4.4.0j Windows x64";
     const levelUp = (level: number) =>
       `2026/10/20 09:00:01 1800000100 3ef232c2 [INFO Client 443804] : kvanClientLogTestOne (Mercenary) is now level ${level}`;
+    vi.mocked(Host.sendEvent).mockImplementationOnce(() => {
+      throw new Error("The connection to main closed");
+    });
     const logged: unknown[][] = [];
     const consoleError = vi
       .spyOn(console, "error")
@@ -1166,7 +1188,7 @@ describe("clientLog", () => {
     const { handleLines, playerLevel } = useClientLog();
 
     try {
-      handleLines([versionWithoutPatch, levelUp(30)]);
+      handleLines([gameVersion, levelUp(30)]);
       expect(playerLevel.value).toBe(30);
       handleLines([levelUp(31)]);
       expect(playerLevel.value).toBe(31);
@@ -1174,7 +1196,16 @@ describe("clientLog", () => {
       consoleError.mockRestore();
     }
     expect(logged).toHaveLength(1);
-    expect(logged[0]).toContain(versionWithoutPatch);
+    expect(logged[0]).toContain(gameVersion);
+  });
+
+  it("sets the player level and ignores an empty value", () => {
+    const { setPlayerLevel, playerLevel } = useClientLog();
+
+    setPlayerLevel(42);
+    expect(playerLevel.value).toBe(42);
+    setPlayerLevel("");
+    expect(playerLevel.value).toBe(42);
   });
 });
 

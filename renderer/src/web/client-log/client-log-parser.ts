@@ -48,7 +48,7 @@ const MAP_NAV_REGEX = /Set Source \[(?<map_name>.+)\]/;
 const AFK_MODE_ON = 'AFK mode is now ON. Autoreply "This player is AFK."';
 const AFK_MODE_OFF = "AFK mode is now OFF.";
 
-function parseLogVersion0(
+export function parseClientLogText(
   text: string,
   datetime: string,
   millis: number,
@@ -256,53 +256,4 @@ function parseLogVersion0(
     }
   }
   return data;
-}
-
-export function parseClientLogText(
-  text: string,
-  datetime: string,
-  millis: number,
-  logParseVersion: number,
-): ClientLogEvent {
-  if (logParseVersion === 0) {
-    return parseLogVersion0(text, datetime, millis);
-  }
-
-  return parseLogVersion0(text, datetime, millis);
-}
-
-export function getClientLogParseVersion(version: string) {
-  if (lessThanVersion(version, "0.4.0j")) {
-    return 0;
-  }
-
-  return 0;
-}
-
-function lessThanVersion(vLeft: string, vRight: string): boolean {
-  const [leftMajor, leftMinor, leftPatch] = vLeft.split(".");
-  const [rightMajor, rightMinor, rightPatch] = vRight.split(".");
-
-  if (leftMajor !== rightMajor) {
-    return Number.parseInt(leftMajor, 10) < Number.parseInt(rightMajor, 10);
-  } else if (leftMinor !== rightMinor) {
-    return Number.parseInt(leftMinor, 10) < Number.parseInt(rightMinor, 10);
-  } else {
-    const leftPatchNum = Number.parseInt(
-      leftPatch.slice(0, leftPatch.length - 1),
-      10,
-    );
-    const leftPatchSuffix = leftPatch.slice(leftPatch.length - 1);
-    const rightPatchNum = Number.parseInt(
-      rightPatch.slice(0, leftPatch.length - 1),
-      10,
-    );
-    const rightPatchSuffix = rightPatch.slice(rightPatch.length - 1);
-
-    if (leftPatchNum !== rightPatchNum) {
-      return leftPatchSuffix < rightPatchSuffix;
-    } else {
-      return leftPatchSuffix < rightPatchSuffix;
-    }
-  }
 }
