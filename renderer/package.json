@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "check-types": "tsc --noemit",
+    "check-types": "tsc --noemit && tsc --noemit -p tsconfig.node.json",
     "lint": "eslint --ext .ts,.vue src specs",
     "lint-fix": "eslint --ext .ts,.vue src specs --fix",
     "format": "prettier . --write ",

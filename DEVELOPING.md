@@ -95,6 +95,9 @@ part alone:
   `npx vitest run` there.
 - `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle. Only `npm run dev`
   imports `electron`, so the build works without the Electron binary.
+- `npm run check-types` in `renderer/`, which a pre-commit hook runs, checks `src/` and `specs/`
+  with `tsconfig.json`, then `vite.config.mts` and `vitest.config.ts` with `tsconfig.node.json`.
+  `npm run build` there checks only `src/` and `specs/`.
 - `--coverage` and `coverage report` fail when a suite covers less than the floor in its config:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
   `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
