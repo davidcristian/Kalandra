@@ -164,6 +164,6 @@ Right-click the Kalandra icon in the system tray (the menu bar on macOS) for the
 | Item | What it does |
 | --- | --- |
 | **Settings/League** | Shows a message that tells you to open Path of Exile 2, press the overlay key and click the button with the cog icon. |
-| **Open in Browser** | Opens Kalandra's page in your default web browser, at `http://localhost` and the port of Kalandra's local server. See [Command-line options](/cmd-flags). |
+| **Open in Browser** | Opens Kalandra's page in your default web browser, at `http://localhost` and the port of Kalandra's local server. See [Command-line options](/cmd-flags). The price check then opens in that page until the overlay has the focus again, as [The price check opens in a browser page](/nothing-happens#the-price-check-opens-in-a-browser-page) explains. |
 | **Open config folder** | Opens the `apt-data` folder that holds `config.json`. |
 | **Quit** | Closes Kalandra. |
