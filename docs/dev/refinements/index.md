@@ -136,3 +136,4 @@ layout and its reasons.
 - 072: [The preset Stash search widgets search English text](tasks/072-stash-search-presets-in-english.md)
 - 073: [The client log parser matches most chat lines with English text](tasks/073-client-log-chat-lines-in-english.md)
 - 074: [The parser reads modifier suffixes, separators and the socket letter with literals](tasks/074-parser-separators-and-suffixes.md)
+- 075: [Hybrid armour bases start with every defence filter enabled](tasks/075-hybrid-armour-defence-filters.md)

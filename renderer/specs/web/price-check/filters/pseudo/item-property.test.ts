@@ -1,12 +1,19 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
-import { HighDamageRareItem, ReloadSpeedCrossbow } from "@specs/Parser/items";
+import {
+  ArmourHighValueRareItem,
+  HighDamageRareItem,
+  NormalItem,
+  NormalShield,
+  ReloadSpeedCrossbow,
+  RequiresOneAttribute,
+} from "@specs/Parser/items";
 import { init } from "@/assets/data";
 import { parseClipboard } from "@/parser";
 import { FiltersCreationContext } from "@/web/price-check/filters/create-stat-filters";
 import { filterItemProp } from "@/web/price-check/filters/pseudo/item-property";
 
-function reloadTimeFilter(rawText: string) {
+function itemPropFilters(rawText: string) {
   const item = parseClipboard(rawText)._unsafeUnwrap();
   const ctx: FiltersCreationContext = {
     item,
@@ -15,7 +22,12 @@ function reloadTimeFilter(rawText: string) {
     statsByType: item.statsByType,
   };
   filterItemProp(ctx);
-  const filter = ctx.filters.find((f) => f.tradeId[0] === "item.reload_time");
+  return { item, filters: ctx.filters };
+}
+
+function reloadTimeFilter(rawText: string) {
+  const { item, filters } = itemPropFilters(rawText);
+  const filter = filters.find((f) => f.tradeId[0] === "item.reload_time");
   return { item, filter };
 }
 
@@ -46,4 +58,39 @@ describe("Reload Time filter", () => {
     ]);
     expect(filter?.roll?.goodness).toBe(1);
   });
+});
+
+describe("Armour, Evasion Rating and Energy Shield filters", () => {
+  const DEFENCES = ["item.armour", "item.evasion_rating", "item.energy_shield"];
+
+  beforeEach(async () => {
+    setupTests();
+    await init("en");
+  });
+
+  it.each([
+    [
+      "Armour and Energy Shield helmet",
+      NormalItem,
+      ["item.armour", "item.energy_shield"],
+    ],
+    [
+      "Armour and Evasion Rating shield",
+      NormalShield,
+      ["item.armour", "item.evasion_rating"],
+    ],
+    ["Armour body armour", ArmourHighValueRareItem, ["item.armour"]],
+    ["Energy Shield boots", RequiresOneAttribute, ["item.energy_shield"]],
+  ])(
+    "starts every defence filter enabled on the %s",
+    (_, testItem, expected) => {
+      const { filters } = itemPropFilters(testItem.rawText);
+      const defences = filters.filter((f) => DEFENCES.includes(f.tradeId[0]));
+
+      expect(defences.map((f) => f.tradeId[0])).toEqual(expected);
+      expect(defences.map((f) => f.disabled)).toEqual(
+        expected.map(() => false),
+      );
+    },
+  );
 });

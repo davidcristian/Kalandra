@@ -76,7 +76,7 @@ function armourProps(ctx: FiltersCreationContext) {
           tradeId: "item.armour",
           roll: totalQ20.roll,
           sources: totalQ20.sources,
-          disabled: !isSingleAttrArmour(item),
+          disabled: false,
         },
         ctx,
       ),
@@ -97,7 +97,7 @@ function armourProps(ctx: FiltersCreationContext) {
           tradeId: "item.evasion_rating",
           roll: totalQ20.roll,
           sources: totalQ20.sources,
-          disabled: !isSingleAttrArmour(item),
+          disabled: false,
         },
         ctx,
       ),
@@ -118,7 +118,7 @@ function armourProps(ctx: FiltersCreationContext) {
           tradeId: "item.energy_shield",
           roll: totalQ20.roll,
           sources: totalQ20.sources,
-          disabled: !isSingleAttrArmour(item),
+          disabled: false,
         },
         ctx,
       ),
@@ -632,18 +632,6 @@ function mapProps(ctx: FiltersCreationContext) {
 
 function removeUsedStats(ctx: FiltersCreationContext, stats: Set<string>) {
   ctx.statsByType = ctx.statsByType.filter((m) => !stats.has(m.stat.ref));
-}
-
-function isSingleAttrArmour(item: ParsedItem) {
-  return (
-    [item.armourAR, item.armourEV, item.armourES].filter(
-      (value) => value != null,
-    ).length === 1 ||
-    // TODO: figure out if people are actually using hybrid in 2
-    // originally this method was for 1 where people don't touch hybrid,
-    // or when they do they only care about one type
-    true
-  );
 }
 
 function isPdpsImportant(item: ParsedItem) {
