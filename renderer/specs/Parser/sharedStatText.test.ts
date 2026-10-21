@@ -56,7 +56,7 @@ describe("parsing a line whose text several stats share", () => {
     );
 
     expect(stats.map(({ stat }) => stat.ref)).toEqual(["Iron Reflexes"]);
-    expect(stats[0].stat.trade.ids.rune).toEqual(["rune.stat_326965591"]);
+    expect(stats[0].stat.trade.ids?.rune).toEqual(["rune.stat_326965591"]);
     expect(unknown).toEqual([]);
   });
 
@@ -65,7 +65,7 @@ describe("parsing a line whose text several stats share", () => {
 
     const last = stats[stats.length - 1];
     expect(last.stat.ref).toBe("Eldritch Battery");
-    expect(last.stat.trade.ids.explicit).toEqual(["explicit.stat_2262736444"]);
+    expect(last.stat.trade.ids?.explicit).toEqual(["explicit.stat_2262736444"]);
   });
 
   it("picks the random keystone stat for its advanced text", () => {

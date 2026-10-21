@@ -100,7 +100,7 @@ function createNewStatFilter(
     statsByType: newItem.statsByType.map((calc) => {
       if (
         calc.type === ModifierType.Fractured &&
-        calc.stat.trade.ids[ModifierType.Explicit]
+        calc.stat.trade.ids?.[ModifierType.Explicit]
       ) {
         return { ...calc, type: ModifierType.Explicit };
       } else {

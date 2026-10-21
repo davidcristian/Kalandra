@@ -18,7 +18,7 @@ import {
   preventQueueCreation,
   searchListingType,
 } from "./common";
-import { STAT_BY_REF, CLIENT_STRINGS as _$ } from "@/assets/data";
+import { STAT_BY_REF, CLIENT_STRINGS as _$, type Stat } from "@/assets/data";
 import { RateLimiter } from "./RateLimiter";
 import { readTradeData } from "./trade-response";
 import { ModifierType } from "@/parser/modifiers";
@@ -850,7 +850,7 @@ export function createTradeRequest(
       const TARGET_ID = {
         EMPTY_MODIFIERS: STAT_BY_REF(
           TOTAL_MODS_TEXT.EMPTY_MODIFIERS[stat.option!.value],
-        )!.trade.ids[ModifierType.Pseudo][0],
+        )!.trade.ids![ModifierType.Pseudo][0],
       };
       const emptyRoll = stat.roll!;
       query.stats.push({
@@ -871,7 +871,7 @@ export function createTradeRequest(
       stat.statRef === "#% increased Charge Recovery" &&
       !stats.some((s) => s.statRef === "#% increased effect")
     ) {
-      const reducedEffectId = STAT_BY_REF("#% increased effect")!.trade.ids[
+      const reducedEffectId = STAT_BY_REF("#% increased effect")!.trade.ids![
         ModifierType.Explicit
       ][0];
       query.stats.push({
@@ -888,8 +888,8 @@ export function createTradeRequest(
         console.error("Elemental damage filter applied to non-elemental dps");
         return;
       }
-      const mapIds = (ids: { [type: string]: string[] }) =>
-        Object.values(ids)
+      const mapIds = (ids: Stat["trade"]["ids"]) =>
+        Object.values(ids ?? {})
           .flat()
           .map((id) => ({ id }));
       const fireIds = mapIds(STAT_BY_REF("Adds # to # Fire Damage")!.trade.ids);

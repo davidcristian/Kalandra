@@ -107,7 +107,7 @@ describe("tryParseTranslation", () => {
   it("should give simple parsed stat if match string fails but trade stat works", () => {
     vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      PHYS_DAMAGE_STAT.trade.ids,
+      PHYS_DAMAGE_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -152,7 +152,7 @@ describe("tryParseTranslation", () => {
     vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockImplementation((name) => {
       if (!name.startsWith("#")) return;
-      return PHYS_DAMAGE_STAT.trade.ids;
+      return PHYS_DAMAGE_STAT.trade.ids!;
     });
 
     const result = __testExports.tryParseTranslation(
@@ -207,7 +207,7 @@ describe("tryParseTranslation", () => {
       },
     ]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids,
+      EXACT_MATCH_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -228,7 +228,7 @@ describe("tryParseTranslation", () => {
   it("should handle exact match with trade stat", () => {
     vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids,
+      EXACT_MATCH_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -252,7 +252,7 @@ describe("tryParseTranslation", () => {
       },
     ]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      OPTION_STAT.trade.ids,
+      OPTION_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -285,7 +285,7 @@ describe("tryParseTranslation", () => {
     expect(result).toBeDefined();
     expect(result?.stat).not.toBe(OPTION_STAT);
     expect(result?.stat.trade.ids).toHaveProperty("explicit");
-    expect(result?.stat.trade.ids.explicit).toHaveLength(1);
+    expect(result?.stat.trade.ids?.explicit).toHaveLength(1);
 
     expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
     expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalledOnce();
@@ -294,7 +294,7 @@ describe("tryParseTranslation", () => {
   it("should not use a trade stat without a rune id for a rune line", () => {
     vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids,
+      EXACT_MATCH_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -309,7 +309,7 @@ describe("tryParseTranslation", () => {
   it("should use a trade stat with a rune id for an added rune line", () => {
     vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
     vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      PHYS_DAMAGE_STAT.trade.ids,
+      PHYS_DAMAGE_STAT.trade.ids!,
     );
 
     const result = __testExports.tryParseTranslation(
@@ -318,8 +318,8 @@ describe("tryParseTranslation", () => {
       undefined,
     );
 
-    expect(result?.stat.trade.ids.rune).toEqual(
-      PHYS_DAMAGE_STAT.trade.ids.rune,
+    expect(result?.stat.trade.ids?.rune).toEqual(
+      PHYS_DAMAGE_STAT.trade.ids!.rune,
     );
   });
 });

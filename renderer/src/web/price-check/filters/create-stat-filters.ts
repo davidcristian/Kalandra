@@ -238,7 +238,7 @@ export function initUiModFilters(
         (calc.type === ModifierType.Fractured ||
           calc.type === ModifierType.Desecrated ||
           calc.type === ModifierType.Crafted) &&
-        calc.stat.trade.ids[ModifierType.Explicit]
+        calc.stat.trade.ids?.[ModifierType.Explicit]
       ) {
         return { ...calc, type: ModifierType.Explicit };
       } else {
@@ -357,6 +357,9 @@ export function calculatedStatToFilter(
   disabled: boolean = true,
 ): StatFilter {
   const { stat, sources, type } = calc;
+  const tradeId = (stat.trade.ids ?? {})[
+    type === ModifierType.AddedAugment ? ModifierType.Augment : type
+  ];
   let filter: StatFilter;
 
   const roll = statSourcesTotal(
@@ -367,10 +370,7 @@ export function calculatedStatToFilter(
 
   if (stat.trade.option) {
     filter = {
-      tradeId:
-        stat.trade.ids[
-          type === ModifierType.AddedAugment ? ModifierType.Augment : type
-        ],
+      tradeId,
       statRef: stat.ref,
       text:
         roll?.option === roll?.value
@@ -388,10 +388,7 @@ export function calculatedStatToFilter(
   }
 
   filter ??= {
-    tradeId:
-      stat.trade.ids[
-        type === ModifierType.AddedAugment ? ModifierType.Augment : type
-      ],
+    tradeId,
     statRef: stat.ref,
     text: translation.string,
     tag: FILTER_TAG_BY_MODIFIER_TYPE[type],
@@ -553,7 +550,7 @@ export function calculatedStatToFilter(
 
     let usedBetter = calc.stat.better;
     if (
-      stat.trade.ids.pseudo?.length === 1 &&
+      stat.trade.ids?.pseudo?.length === 1 &&
       stat.trade.ids.pseudo[0] === "item.reload_time"
     ) {
       usedBetter = StatBetter.NegativeRoll;
@@ -705,7 +702,7 @@ export function finalFilterTweaks(ctx: FiltersCreationContext) {
       const mod = ctx.item.statsByType.find(
         (mod) => mod.stat.ref === filter.statRef,
       )!;
-      if (mod.stat.trade.ids[ModifierType.Explicit]) {
+      if (mod.stat.trade.ids?.[ModifierType.Explicit]) {
         // hide only if fractured or desecrated mod has corresponding explicit variant
         filter.hidden = "filters.hide_for_crafting";
       }

@@ -46,7 +46,7 @@ export interface Stat {
     count?: true;
     ids: {
       [type: string]: string[];
-    };
+    } | null;
   };
 }
 

@@ -197,6 +197,7 @@ covers item filters, stat filters, the missing fractured rules, the pseudo stats
 `filters/util.ts`. `text-keys.test.ts` there checks that the English `app_i18n.json` names each modifier type,
 filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
+`null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
 file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
