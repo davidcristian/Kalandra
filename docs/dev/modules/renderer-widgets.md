@@ -22,9 +22,12 @@ that a saved config survives every update covers it ([config.md](config.md),
 - `WidgetSpec` is the static `widget` option of a widget component: `type` (its `wmType`), `instances`
   (`single` or `multi`), `trNameKey` (the i18n key of its name in the menu's "add widget…" list), `initInstance()`
   (the config of a single widget) and `defaultInstances()` (the instances of a multi widget in a new config).
+  [widget-component.ts](../../../renderer/src/web/overlay/widget-component.ts) adds `widget` to Vue's component
+  options with this type, so the type check covers the option in every component.
 - `registry` ([widget-registry.ts](../../../renderer/src/web/overlay/widget-registry.ts)) holds the array
-  `widgets`, filled by one `registry.widgets.push` line per component, and `getWidgetComponent(wmType)`, which
-  returns the component whose `widget.type` is `wmType`. `defaultConfig()` in `Config.ts` builds a new config's
+  `widgets`, filled by one `registerWidget` line per component, and `getWidgetComponent(wmType)`, which
+  returns the component whose `widget.type` is `wmType`. `registerWidget` throws when the component has no
+  `widget` option. `defaultConfig()` in `Config.ts` builds a new config's
   `widgets` in registry order: `initInstance()` of each single widget, `defaultInstances()` of each multi widget,
   `wmId` counting from 1.
 - [OverlayWindow.vue](../../../renderer/src/web/overlay/OverlayWindow.vue) renders the component of each entry in
@@ -82,10 +85,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
    widgets, in a `widget.ts` in the widget's own folder. A single widget sets every field in
    `initInstance()`. A multi widget sets its fields in `setup` when `wmFlags[0]` is `uninitialized`, as
    `WidgetTimer.vue` does, because `create()` adds a bare `Widget` with only that flag.
-3. Add one `registry.widgets.push` line to `widget-registry.ts`. The existing lines cast with
-   `as unknown as WidgetComponent`, a cast that AGENTS.md rule 7 does not allow in new code. The lint
-   exempts only the 12 existing casts, so a new one fails it until
-   [044](../refinements/tasks/044-widget-registry-cast.md) is done.
+3. Add one `registerWidget` line with the component to `widget-registry.ts`. It needs no cast.
 4. Follow [the one hard rule](../../../AGENTS.md#the-one-hard-rule) for the new config type. For a single widget,
    the new upgrade step inserts `defaultConfig()`'s entry with a new `wmId`, as the `< 29` step does for
    `experience-tracker` and the `< 30` step for `library`; without it an existing config has no entry for the type.
@@ -131,9 +131,11 @@ until main opens its file), `specs/web/client-log.test.ts` (the client log the X
 `FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
 German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
 image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
-shows the strip's red message when main does not store it), `specs/web/settings/menu.test.ts` (`settings/menu.ts`,
-the pages the Settings menu lists for each widget), `specs/web/settings/hotkey-conflicts.test.ts`
-(`settings/hotkey-conflicts.ts`, the hotkeys that two actions share in the edited config) and
+shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
+(`overlay/widget-component.ts`, which throws for a component without a `widget` option),
+`specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
+`specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
+share in the edited config) and
 `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, and `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.

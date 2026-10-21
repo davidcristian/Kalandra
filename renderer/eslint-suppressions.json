@@ -89,11 +89,6 @@
       "count": 1
     }
   },
-  "src/web/overlay/widget-registry.ts": {
-    "no-restricted-syntax": {
-      "count": 12
-    }
-  },
   "src/web/price-check/CheckedItem.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 2

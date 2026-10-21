@@ -1,6 +1,6 @@
 # Adding a widget needs a cast that AGENTS.md rule 7 forbids
 
-**Status:** open
+**Status:** done 2026-10-21
 **Area:** rules
 **Origin:** [renderer/src/web/overlay/widget-registry.ts](../../../../renderer/src/web/overlay/widget-registry.ts)
 **Verified:** 2026-10-21
@@ -27,3 +27,6 @@ Or an exception for this one cast, written in AGENTS.md and in
 - 2026-10-21: ESLint now reports a cast through `unknown`. `renderer/eslint-suppressions.json`
   exempts the 12 in `widget-registry.ts`, so a 13th fails `npm run lint` until this task is done
   ([071](071-type-and-catch-rules-in-existing-code.md)).
+- 2026-10-21: Done in `refactor(renderer): register widgets without a cast`. `widget-component.ts`
+  adds `widget` to Vue's component options as a `WidgetSpec`, and each line calls `registerWidget`,
+  which throws for a component without the option. The 12 suppressions are gone.

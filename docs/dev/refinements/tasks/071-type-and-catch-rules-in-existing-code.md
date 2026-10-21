@@ -17,9 +17,8 @@ were turned on is exempt:
   `guessFileLocation()` and `OcrWorker` ([010](010-ocr-errors-dropped.md)); 2 casts in `proxy.ts`;
   and the empty `.catch()` handlers of the `copy-item` and `ocr-text` keys in
   `shortcuts/Shortcuts.ts`, the second also in [010](010-ocr-errors-dropped.md).
-- the renderer, in `renderer/eslint-suppressions.json`: 47 casts through `unknown`, 15 in 4 files
-  under `src/`, of which 12 are in `widget-registry.ts` ([044](044-widget-registry-cast.md)), and
-  32 in 11 files under `specs/`.
+- the renderer, in `renderer/eslint-suppressions.json`: 35 casts through `unknown`, 3 in 3 files
+  under `src/` and 32 in 11 files under `specs/`.
 
 No installed ESLint plugin checks the reason on an `eslint-disable` line, so that ban is checked
 only by reading the diff. 23 such comments under `src/` and `specs/` have no reason.
@@ -32,3 +31,5 @@ in a comment on the line. Then its file leaves the main lists, and
 
 - 2026-10-21: Filed when the rule 7 checks were turned on in both ESLint configs, with the files
   that broke them at that point.
+- 2026-10-21: The 12 casts in `widget-registry.ts` were removed
+  ([044](044-widget-registry-cast.md)).

@@ -70,7 +70,7 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
   test suites, and a format change updates the service, the app and that file in one commit
   ([ADR-0006](docs/dev/adr/ADR-0006-own-price-service.md)).
 - **Widgets register in one place.** A widget is a Vue component with a static `widget: WidgetSpec`, added by one
-  `registry.widgets.push` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
+  `registerWidget` line in `renderer/src/web/overlay/widget-registry.ts`. Its config type goes in
   `renderer/src/web/overlay/widgets.ts` or in a `widget.ts` in its own folder, and its defaults follow the hard rule
   above ([docs/dev/modules/renderer-widgets.md](docs/dev/modules/renderer-widgets.md)).
 - **Game text comes from the game data, never from string literals.** The app supports every language listed in
