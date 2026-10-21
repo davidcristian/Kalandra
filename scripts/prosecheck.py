@@ -13,6 +13,7 @@ from repofiles import GAME_DATA, RepoError, read_text, repo_files, under
 
 RULES = "AGENTS.md"
 SPACED_DASH = re.compile(r"(?<=\S)\s--\s(?=\S)")
+_DIRECTIVE_REASON = re.compile(r"^(\s*eslint-(?:disable|enable)(?:-next-line|-line)?\b.*?\s)--(?=\s)")
 
 
 class Problem(NamedTuple):
@@ -31,6 +32,11 @@ class Scan(NamedTuple):
     problems: list[Problem]
 
 
+def without_directive_separator(text: str) -> str:
+    """Blanks the `--` before the reason of an `eslint-disable` or `eslint-enable` comment, which ESLint needs."""
+    return _DIRECTIVE_REASON.sub(lambda found: f"{found.group(1)}  ", text)
+
+
 def check_prose(path: str, lines: Sequence[Line], pattern: re.Pattern[str]) -> list[Problem]:
     """Returns the banned words and spaced dashes in one file's prose."""
     problems = [
@@ -40,7 +46,7 @@ def check_prose(path: str, lines: Sequence[Line], pattern: re.Pattern[str]) -> l
     problems.extend(
         Problem(path, number, "a spaced `--` used as a dash; restructure the sentence")
         for number, text in lines
-        if SPACED_DASH.search(bannedwords.mask(text))
+        if SPACED_DASH.search(without_directive_separator(bannedwords.mask(text)))
     )
     return sorted(problems)
 

@@ -45,10 +45,12 @@ the repo.
   skips code spans and fenced code. `EXEMPTIONS` names the other files of game text (the spec files that hold copied
   item text and client log lines, and one comment that quotes item text), each with its reason. An exemption that
   covers no dash fails. A line that contains `dashcheck: allow` is skipped.
-- **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. `prosesources.py` finds the prose:
-  markdown outside fenced code; the comments of TypeScript, JavaScript, Vue, YAML, TOML and shell files; the
-  docstrings and comments of Python; and the strings passed to `console.*`, `logger.write`, `new ...Error` and
-  `throw new` calls, or in Python to `print`, a logging method, a `raise`, or a variable named `msg`.
+- **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. The first spaced `--` of a comment that
+  starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
+  `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, Vue,
+  YAML, TOML and shell files; the docstrings and comments of Python; and the strings passed to `console.*`,
+  `logger.write`, `new ...Error` and `throw new` calls, or in Python to `print`, a logging method, a `raise`, or a
+  variable named `msg`.
   `bannedwords.py` reads the words from the table in AGENTS.md, skips code spans, link targets and URLs, finds a
   phrase across one line break, and skips the `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's
   capitals. The rows of the table itself are not checked.
@@ -110,7 +112,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 68 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 69 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

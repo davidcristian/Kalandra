@@ -149,9 +149,9 @@ banned-word rules; read your own diff for the rest.
   so say what it does. Define a technical term once, where it first appears. No metaphors, idioms, wordplay or
   invented terms. Game terms are exempt (Spell Damage, the Delve grid), and so is anything in backticks.
 - **No dash as punctuation.** No em dash, en dash or spaced `--` in anything written here: restructure the sentence
-  rather than swapping in another mark. Hyphenated words and CLI flags are fine. Text the app matches or parses from
-  the game or a trade site keeps its characters exactly as written there, and so do fixtures copied from it. Any
-  other dash that stays, such as a symbol in the UI, has `dashcheck: allow` and a reason on its line.
+  rather than swapping in another mark. Hyphenated words, CLI flags and the `--` before an `eslint-disable` reason
+  are fine. Text the app matches or parses from the game or a trade site, and fixtures copied from it, keep their
+  characters exactly. Any other dash that stays, such as a UI symbol, has `dashcheck: allow` and a reason on its line.
 - **Banned words.** Do not write the words on the left, in any capitalization. The list is a minimum: rewrite any
   other figurative word the same way.
 

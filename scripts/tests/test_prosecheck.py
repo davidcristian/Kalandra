@@ -29,6 +29,22 @@ class ProseCheckTest(unittest.TestCase):
         self.assertIn("main/a.ts:1: a spaced `--` used as a dash", output)
         self.assertNotIn("main/a.ts:2", output)
 
+    def test_allows_only_the_dashes_that_start_the_reason_of_an_eslint_directive(self) -> None:
+        lines = [
+            "// eslint-disable-next-line no-new -- the proxy adds its route",
+            "new Proxy(); // eslint-disable-line no-new -- the same reason",
+            "/* eslint-disable @typescript-eslint/no-explicit-any -- a reason -- and a dash */",
+            "/* eslint-enable -- the end of the block */",
+            "// a note -- with a dash",
+            "// see eslint-disable-next-line -- in a sentence",
+            "// eslint-disabled -- a word that is not a directive",
+        ]
+        with repo({"AGENTS.md": RULES_TABLE, "main/a.ts": "\n".join(lines) + "\n"}) as root:
+            code, output = run(prosecheck.main, root)
+        self.assertEqual(code, 1)
+        dashes = [line for line in output.splitlines() if "a spaced `--` used as a dash" in line]
+        self.assertEqual([line.split(":")[1] for line in dashes], ["3", "5", "6", "7"])
+
     def test_reports_a_python_file_it_cannot_parse(self) -> None:
         with repo({"AGENTS.md": RULES_TABLE, "a.py": "def broken(:\n"}) as root:
             code, output = run(prosecheck.main, root)
