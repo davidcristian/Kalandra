@@ -64,8 +64,8 @@ startWhenReady(
     const gameConfig = new GameConfig(eventPipe, logger);
     const poeWindow = new GameWindow();
     const appUpdater = new AppUpdater(eventPipe, logger);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _httpProxy = new HttpProxy(httpRoutes, logger);
+    // eslint-disable-next-line no-new -- the proxy adds its route to the emitter it receives
+    new HttpProxy(httpRoutes, logger);
     addFileUploadRoutes(httpRoutes, logger);
     const fileWriter = new FileWriter(eventPipe, logger);
     const gameLogWatcher = new GameLogWatcher(eventPipe, logger, fileWriter);
@@ -89,7 +89,7 @@ startWhenReady(
     setTimeout(
       async () => {
         const overlay = new OverlayWindow(eventPipe, logger, poeWindow);
-        // eslint-disable-next-line no-new
+        // eslint-disable-next-line no-new -- the instance listens to key events from its constructor
         new OverlayVisibility(eventPipe, overlay, gameConfig);
         const shortcuts = await Shortcuts.create(
           logger,

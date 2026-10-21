@@ -7,8 +7,10 @@ import { Logger } from "../src/RemoteLogger";
 import type { HttpRoutes } from "../src/server";
 import { get } from "./request";
 
-// net.request answers every request with the options it was given, in place of the remote host
+// net.request answers every request with the options it was given, in place of the remote host.
+// For a path that ends in /plain-request or /plain-response, that object is not a stream.
 vi.mock("electron", async () => {
+  const { EventEmitter } = await import("node:events");
   const { Readable, Writable } = await import("node:stream");
   return {
     app: { userAgentFallback: "kalandra-test" },
@@ -16,17 +18,18 @@ vi.mock("electron", async () => {
       defaultSession: { webRequest: { onHeadersReceived: () => undefined } },
     },
     net: {
-      request: (options: object) => {
+      request: (options: { url: string }) => {
+        if (options.url.endsWith("/plain-request")) return new EventEmitter();
         const request = new Writable({
           write: (_chunk, _encoding, done) => {
             done();
           },
         });
         request.on("finish", () => {
-          const response = Object.assign(
-            Readable.from([JSON.stringify(options)]),
-            { statusCode: 200, statusMessage: "OK", headers: {} },
-          );
+          const head = { statusCode: 200, statusMessage: "OK", headers: {} };
+          const response = options.url.endsWith("/plain-response")
+            ? Object.assign(new EventEmitter(), head)
+            : Object.assign(Readable.from([JSON.stringify(options)]), head);
           request.emit("response", response);
         });
         return request;
@@ -46,17 +49,15 @@ const routes: HttpRoutes = new EventEmitter<{
   request: [IncomingMessage, ServerResponse];
 }>();
 const server = createServer((req, res) => routes.emit("request", req, res));
+const logger = new Logger({
+  onEventAnyClient: () => undefined,
+  sendEventTo: () => undefined,
+});
 let port = 0;
 
 beforeAll(async () => {
   // eslint-disable-next-line no-new -- the proxy adds its route to the emitter it receives
-  new HttpProxy(
-    routes,
-    new Logger({
-      onEventAnyClient: () => undefined,
-      sendEventTo: () => undefined,
-    }),
-  );
+  new HttpProxy(routes, logger);
   await new Promise<void>((resolve) => {
     server.listen(0, "127.0.0.1", resolve);
   });
@@ -111,5 +112,27 @@ describe("the /proxy route", () => {
     await expect(
       get(port, "/proxy/evil.example/api", { [PROXY_HEADER]: "1" }),
     ).rejects.toThrow();
+  });
+
+  it("closes the response and logs it when net.request returns no writable stream", async () => {
+    await expect(
+      get(port, "/proxy/www.pathofexile.com/plain-request", {
+        [PROXY_HEADER]: "1",
+      }),
+    ).rejects.toThrow();
+    expect(logger.history).toContain(
+      "error [proxy] the request is not a writable stream (www.pathofexile.com)",
+    );
+  });
+
+  it("closes the response and logs it when the remote response is no readable stream", async () => {
+    await expect(
+      get(port, "/proxy/www.pathofexile.com/plain-response", {
+        [PROXY_HEADER]: "1",
+      }),
+    ).rejects.toThrow();
+    expect(logger.history).toContain(
+      "error [proxy] the response is not a readable stream (www.pathofexile.com)",
+    );
   });
 });

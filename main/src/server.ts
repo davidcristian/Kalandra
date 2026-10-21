@@ -159,7 +159,7 @@ export async function startServer(
     const isOverlay = isOverlayWindow(req.headers);
     if (isOverlay) overlayClients.add(socket);
     socket.on("message", (bytes) => {
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string -- the socket keeps the default nodebuffer binary type, so bytes is a Buffer
       const message = readClientMessage(bytes.toString("utf-8"));
       if ("problem" in message) {
         logger.write(`warn [server] Ignored ${message.problem}`);

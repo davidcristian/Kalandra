@@ -17,7 +17,6 @@ const existingOffenders = {
     "src/server.ts",
   ],
   "@typescript-eslint/no-explicit-any": [
-    "src/vision/HeistGemFinder.ts",
     "src/vision/utils.ts",
     "src/vision/wasm-bindings.ts",
   ],
@@ -91,10 +90,6 @@ module.exports = {
       rules: { [rule]: "off" },
     })),
     // Files that broke one restricted pattern when it was turned on, checked for the other; this list only shrinks too
-    {
-      files: ["src/proxy.ts"],
-      rules: { "no-restricted-syntax": ["error", emptyCatchHandler] },
-    },
     {
       files: ["src/shortcuts/Shortcuts.ts"],
       rules: { "no-restricted-syntax": ["error", castThroughUnknown] },

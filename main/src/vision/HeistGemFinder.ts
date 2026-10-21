@@ -26,11 +26,17 @@ interface OcrResult {
   recognized: Array<{ text: string; confidence: number }>;
 }
 
+// The fields of an OpenCV.js Mat that this class reads
+interface Mat {
+  rows: number;
+  cols: number;
+}
+
 export class HeistGemFinder {
   private constructor(
-    private readonly needleMat: any,
-    private readonly hsvMin: any,
-    private readonly hsvMax: any,
+    private readonly needleMat: Mat,
+    private readonly hsvMin: Mat,
+    private readonly hsvMax: Mat,
   ) {}
 
   static async create(binDir: string): Promise<HeistGemFinder> {
@@ -114,13 +120,11 @@ export class HeistGemFinder {
     const recognizedLines: OcrResult["recognized"] = [];
     for (const line of lines) {
       const topLeft = new cv.Point(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         (Math.min(line[0].x, line[1].x) + needleMat.cols) * scale,
         (Math.min(line[0].y, line[1].y) - 1) * scale,
       );
       const bottomRight = new cv.Point(
         Math.max(line[0].x, line[1].x) * scale,
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         (Math.max(line[0].y, line[1].y) + needleMat.rows) * scale,
       );
 

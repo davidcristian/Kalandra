@@ -1,5 +1,6 @@
 import type { HttpRoutes } from "./server";
 import { app, net, session } from "electron";
+import { Readable, Writable } from "stream";
 import type { Logger } from "./RemoteLogger";
 
 const PROXY_HOSTS = [
@@ -21,7 +22,7 @@ const PROXY_HOSTS = [
 // CORS preflight, which the Origin check rejects, and an image, a script or a link sends none
 const PROXY_HEADER = "x-kalandra-proxy";
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- the class only adds the proxy route in its constructor
 export class HttpProxy {
   constructor(routes: HttpRoutes, logger: Logger) {
     routes.addListener("request", (req, res) => {
@@ -46,7 +47,7 @@ export class HttpProxy {
           key === "content-length" ||
           key === PROXY_HEADER
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- the loop removes the headers the remote host must not receive
           delete req.headers[key];
         }
       }
@@ -61,8 +62,19 @@ export class HttpProxy {
         useSessionCookies: true,
         referrerPolicy: "no-referrer-when-downgrade",
       });
+      // Electron's request and response extend Node's streams, which its types do not declare
+      if (!(proxyReq instanceof Writable)) {
+        logger.write(
+          `error [proxy] the request is not a writable stream (${host})`,
+        );
+        res.destroy();
+        return;
+      }
       proxyReq.addListener("response", (proxyRes) => {
         try {
+          if (!(proxyRes instanceof Readable)) {
+            throw new Error("the response is not a readable stream");
+          }
           const resHeaders = { ...proxyRes.headers };
           delete resHeaders["content-encoding"];
           res.writeHead(
@@ -70,7 +82,7 @@ export class HttpProxy {
             proxyRes.statusMessage,
             resHeaders,
           );
-          (proxyRes as unknown as NodeJS.ReadableStream).pipe(res);
+          proxyRes.pipe(res);
         } catch (error) {
           logger.write(`error [proxy] ${(error as Error).message} (${host})`);
           res.destroy();
@@ -81,7 +93,7 @@ export class HttpProxy {
         res.destroy(err);
       });
 
-      req.pipe(proxyReq as unknown as NodeJS.WritableStream);
+      req.pipe(proxyReq);
     });
     session.defaultSession.webRequest.onHeadersReceived((details, next) => {
       // Cloudflare sets cookies with Partitioned attribute, however `net.request` API
