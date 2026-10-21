@@ -372,7 +372,6 @@ export default defineComponent({
         return checkPosition.value.x > window.screenX + window.innerWidth / 2
           ? "inventory"
           : "stash";
-        // or {chat, vendor, center of screen}
       }
     });
 

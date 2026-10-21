@@ -82,8 +82,5 @@ export function useAugment(
   }
   item.statsByType = sumStatsByModType(item.newMods);
 
-  // augment now added to item, yay
-  // need to fix the filters now
-
   recalculateItemProperties(item, oldItem);
 }

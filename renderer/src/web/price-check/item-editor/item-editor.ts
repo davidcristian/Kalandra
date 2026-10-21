@@ -10,12 +10,7 @@ import type { DbQuery } from "@/web/background/Prices";
 export function getItemEditorType(item: ParsedItem): ItemEditorType {
   if (!item.category) return ItemEditorType.None;
 
-  // TODO: add uniques where this should be allowed here
-  // should probably have a set and check it, so we can not hide the augments
-
   if (item.rarity === ItemRarity.Unique) return ItemEditorType.None;
-
-  // TODO: add special cases here
 
   if (
     item.category === ItemCategory.Ring ||

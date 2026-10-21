@@ -160,7 +160,6 @@ export default defineComponent({
       }
     });
 
-    // update selected options when user changes settings for profiles or switches profiles
     watch(
       props.config.profiles,
       () => {

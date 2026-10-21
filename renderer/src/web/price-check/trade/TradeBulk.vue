@@ -1,6 +1,5 @@
 <template>
   <div v-if="!error" class="layout-column min-h-0" style="height: auto">
-    <!-- @TODO: fix "Matched" text jumping (min-height: 22px) -->
     <div
       class="mb-2 flex pl-2 justify-between items-baseline"
       style="min-height: 1.375rem"
@@ -223,7 +222,6 @@ export default defineComponent({
     );
 
     watch(result, () => {
-      // TODO: If we start having more than just ex & c, this is not scalable
       const stableTotal = result.value?.xchgStable.listed.value?.total;
       const exaltedTotal = result.value?.xchgExalted.listed.value?.total;
       const chaosTotal = result.value?.xchgChaos.listed.value?.total;

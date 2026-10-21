@@ -224,7 +224,6 @@ function findItems(opts: {
         lcName.split(/\s+/).some((part) => part.startsWith(lcLongestWord)))
     ) {
       const match = ITEM_BY_TRANSLATED(opts.namespace, itemName);
-      // facebreakers duplicated here cause we get 2 from by translated, then find another from generator
       out.push(...(match ?? []));
       if (out.length > MAX_RESULTS) return false;
     }

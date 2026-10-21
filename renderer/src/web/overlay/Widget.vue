@@ -298,7 +298,6 @@ export default defineComponent({
       widgetPosition,
       actionsPosition,
       handleMouseDown() {
-        // @TODO: why null check?
         if (props.config.wmId != null) {
           wm.bringToTop(props.config.wmId);
         }
@@ -395,8 +394,6 @@ export default defineComponent({
 
 .mover {
   position: absolute;
-  /* top: max(0%, min(calc(y% - (1rem/2)), calc(100% - 1rem))); */
-  /* left: max(0%, min(calc(x% - (1rem/2)), calc(100% - 1rem))); */
   width: 1rem;
   height: 1rem;
   border: 0.25rem solid rgba(0, 0, 0, 0.6);

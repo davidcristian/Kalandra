@@ -50,7 +50,6 @@ export function createClientLog() {
     currentDateTime = data.ts;
 
     if (data.type !== ClientLogInfoType.Log) {
-      // skip everything we dont care about
       Host.sendEvent({
         name: "CLIENT->MAIN::write-data",
         payload: {

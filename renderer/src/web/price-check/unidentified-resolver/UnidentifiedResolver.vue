@@ -44,7 +44,7 @@ export default defineComponent({
       const possible: BaseType[] = [];
       for (const match of ITEMS_ITERATOR(JSON.stringify(baseType))) {
         if (match.namespace === "UNIQUE" && match.unique!.base === baseType) {
-          // TODO currently ignoring variants
+          // A unique with variants is listed once
           if (!possible.some((unique) => unique.refName === match.refName)) {
             possible.push(match);
           }

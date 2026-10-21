@@ -73,7 +73,6 @@ import { Widget, WidgetManager } from "./interfaces";
 import { registry } from "./widget-registry.js";
 import { AppConfig, saveConfig, pushHostConfig } from "@/web/Config";
 import LoadingAnimation from "./LoadingAnimation.vue";
-// ---
 import { usePoeninja } from "@/web/background/Prices";
 import { useLeagues } from "@/web/background/Leagues";
 import { useClientLog } from "@/web/client-log/client-log";
@@ -302,7 +301,7 @@ export default defineComponent({
       topmostOrExclusiveWidget,
       (widget, wasWidget) => {
         showEditingNotification.value = widget.wmType === "settings";
-        // TODO: hack, should find a better way to save config
+        // saveConfig skips saves while an exclusive widget is shown, so save when one closes
         if (
           wasWidget &&
           wasWidget.wmZorder === "exclusive" &&

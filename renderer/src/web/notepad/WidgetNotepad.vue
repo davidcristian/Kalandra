@@ -114,7 +114,7 @@ export default defineComponent({
   @apply resize-none whitespace-pre-wrap break-words font-mono;
   @apply outline-none;
 
-  /* TODO: swap to tw-class on updating tailwind v4 */
+  /* Tailwind 3 has no class for field-sizing; Tailwind 4 adds field-sizing-content */
   field-sizing: content;
 
   &:focus {

@@ -286,7 +286,6 @@ export default defineComponent({
             // is a common currency
             /chaos|exalted|divine/i.test(res.priceCurrency) ||
             // is a common very low value currency (but not enhanced versions)
-            // NOTE: BECAUSE WE CANT HAVE NICE THINGS HERE
             ((res.priceCurrency === "aug" ||
               res.priceCurrency === "regal" ||
               res.priceCurrency === "transmute") &&

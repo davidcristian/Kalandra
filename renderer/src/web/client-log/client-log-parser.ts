@@ -104,12 +104,7 @@ export function parseClientLogText(
     }
   } else if (namespace === LogNamespace.Scene) {
     if ((match = text.match(MAP_NAV_REGEX))) {
-      // when opening the 'Map' or the 'Atlas' or closing it
-      // could be timing menuing time
-      // Set Source [(null)] is for closing
-      // Set Source [(unknown)] is logging out probably
-      // Set Source [Atlas] is for atlas
-      // Set Source [Act \d] typical "map"
+      // Logged when the Map or Atlas panel opens or closes; the source is (null) on close
 
       data = {
         ...data,
@@ -119,7 +114,7 @@ export function parseClientLogText(
     }
   } else if (namespace === LogNamespace.None) {
     if (text[0] === ":") {
-      // we are an info(local??) message shown to the player in chat
+      // A local message shown to the player in chat
       const colonLess = text.slice(1).trim();
 
       if (colonLess === AFK_MODE_ON || colonLess === AFK_MODE_OFF) {
@@ -198,8 +193,6 @@ export function parseClientLogText(
           pointType,
         };
       } else if ((match = text.match(SLAIN_REGEX))) {
-        // ded
-
         data = {
           ...data,
           type: ClientLogInfoType.PlayerDeath,

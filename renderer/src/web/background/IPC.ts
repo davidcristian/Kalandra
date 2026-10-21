@@ -87,7 +87,6 @@ class HostTransport {
   async getConfig(): Promise<string | null> {
     const response = await fetch("/config");
     const config = (await response.json()) as HostState;
-    // TODO: refactor this
     this.version.value = config.version;
     this.updateInfo.value = config.updater;
     return config.contents;

@@ -113,7 +113,6 @@ export default defineComponent({
           {
             key: "explicitMods",
             content: [
-              // ? maybe keep
               ...(item.fracturedMods ?? []),
               ...(item.explicitMods ?? []),
               ...(item.desecratedMods ?? []),

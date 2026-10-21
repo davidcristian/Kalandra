@@ -199,7 +199,6 @@ export default defineComponent({
     const saveButtonState = shallowRef<"save" | "confirm">("save");
 
     const selectedAugment = shallowRef<EditorItem | undefined>();
-    // TODO: see if this can be better
     function resetSelectedAugment() {
       selectedAugment.value = buildEditorItems(
         [ITEM_BY_REF("ITEM", "Greater Iron Rune")![0]],

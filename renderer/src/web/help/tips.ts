@@ -3,7 +3,6 @@ import { TipsFrequency } from "../Config";
 export const TIP_COUNT = 26;
 
 export function randomTip(): number {
-  // random from 1 to TIP_COUNT
   return Math.floor(Math.random() * TIP_COUNT) + 1;
 }
 
