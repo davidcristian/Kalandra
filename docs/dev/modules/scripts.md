@@ -71,6 +71,7 @@ The Changed paths job of `.github/workflows/test.yml` passes the changed paths o
 `main=`, `price_service=`, `scripts=` and `docs=` with `true` or `false` for `GITHUB_OUTPUT`. `RULES` maps a file,
 or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies. `AGENTS.md` affects the
 Scripts job, because `test_bannedwords.py` and `test_commitlint.py` read its banned words table and its scope list.
+`docs/dev/refinements/index.md` affects it too, because `test_backlogcheck.py` reads its task template.
 Any other markdown file at the repo root affects no job, and any other path that no rule matches affects every job
 ([ADR-0011](../adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)).
 

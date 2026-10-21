@@ -16,6 +16,8 @@ class ClassifyTest(unittest.TestCase):
             "priceService/price_service/ninja.py": {"price_service"},
             "docs/faq.md": {"docs"},
             "docs/dev/index.md": set(),
+            "docs/dev/refinements/index.md": {"scripts"},
+            "docs/dev/refinements/tasks/001-a-task.md": set(),
             "AGENTS.md": {"scripts"},
             "DEVELOPING.md": set(),
             ".github/ISSUE_TEMPLATE/bug-report.yml": set(),

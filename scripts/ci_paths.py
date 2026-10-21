@@ -29,6 +29,8 @@ RULES = (
     Rule("priceService/", frozenset({"price_service"})),
     Rule("renderer/", frozenset({"renderer"})),
     Rule("main/", frozenset({"main"})),
+    # test_backlogcheck.py reads the task template in the backlog index.
+    Rule("docs/dev/refinements/index.md", frozenset({"scripts"})),
     Rule("docs/dev/", NONE),
     Rule("docs/", frozenset({"docs"})),
     Rule("dataParser/", NONE),

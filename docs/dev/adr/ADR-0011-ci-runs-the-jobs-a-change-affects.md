@@ -46,6 +46,7 @@ do not show what an earlier push broke.
 
 - A push that changes only `docs/dev/` or a markdown file at the repo root runs Changed paths and Lint & Format.
   `AGENTS.md` is the exception: it also runs Scripts, whose tests read its banned words table and its scope list.
+  So does `docs/dev/refinements/index.md`, whose task template a Scripts test reads.
 - A new folder runs every job until a rule names it. A change to `ipc/` runs both halves of Tests, and a change to
   `namespaceMap.json` or the price service's fixtures runs the renderer tests and the price service.
 - The Build and Docs workflows keep their own `paths` filters ([architecture.md](../architecture.md#ci)).
