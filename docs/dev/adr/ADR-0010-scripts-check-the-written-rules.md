@@ -1,6 +1,6 @@
 # ADR-0010: Scripts check the written rules
 
-**Status:** Accepted (2026-10-21)
+**Status:** Accepted (2026-10-22)
 
 ## Context
 
@@ -62,10 +62,11 @@ docs and in the markdown outside `docs/` names a file in the repo, and a heading
 are kept by hand ([ADR-0008](ADR-0008-developer-docs-layout.md)), and VitePress checks only the user pages.
 
 **9. Each test suite has a coverage floor that CI checks.** The renderer and main set it in `vitest.config.ts`, over
-every file under `src/`, and the price service and the scripts in `.coveragerc`, over lines and branches. Each floor
-is the suite's coverage on 18 Oct 2026, and a change that raises coverage raises its floor. Reason: AGENTS.md asks
-that no change lower coverage, and a floor turns that into a check. Counting every source file, rather than only the
-files a test loads, keeps a deleted test from raising the number.
+every `.ts` file under `src/`, so the renderer's `.vue` components are not counted. The price service and the scripts
+set it in `.coveragerc`, over lines and branches. Each floor started at the suite's coverage on 18 Oct 2026, and a
+change that raises coverage raises its floor. Reason: AGENTS.md asks that no change lower coverage, and a floor turns
+that into a check. Counting every `.ts` file, rather than only the files a test loads, keeps a deleted test from
+raising the number.
 
 ## Consequences
 

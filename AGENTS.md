@@ -92,7 +92,8 @@ reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the
 
 `python scripts/check.py` runs every step below but the data tool's and names each one that failed: run it, after
 `npm ci` in `renderer/`, `main/` and `docs/`, before calling a change done. [DEVELOPING.md](DEVELOPING.md#checks)
-gives each step's own command. CI runs the same steps on Node 24, each job only for a change that can affect it.
+gives each step's own command. CI runs the same steps on Node 24, each job only for a change that can affect it,
+except the renderer and main builds, which run only on a push to `master`.
 
 1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, file sizes, ESLint, Prettier and
    `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`, and the checks of the
@@ -111,10 +112,10 @@ gives each step's own command. CI runs the same steps on Node 24, each job only 
    through fakes (working stand-ins such as `FakeGet` in `priceService/tests/support.py`) rather than mocks that
    assert calls, and a test written only to run a line is a defect. CI fails when a suite's coverage drops below the
    floor in its `vitest.config.ts` or `.coveragerc`: raise a floor when tests cover more, and never lower one.
-6. **File size.** A source file is at most 300 lines and a markdown file at most 250, as `scripts/linecap.py` checks.
-   The files already over 300 lines are in `scripts/long-files.txt` with their exact counts: put new, separable code
-   in a new module rather than growing one, and lower its count when it shrinks. Splitting an existing file is its
-   own commit, never a side effect of another change.
+6. **File size.** A source file that is not a test or game data is at most 300 lines, and a markdown file at most 250,
+   as `scripts/linecap.py` checks. The files already over 300 lines are in `scripts/long-files.txt` with their exact
+   counts: put new, separable code in a new module rather than growing one, and lower its count when it shrinks.
+   Splitting an existing file is its own commit, never a side effect of another change.
 7. **Types and quality.** TypeScript is `strict` in both processes. New code adds no `any`, no `as unknown as` cast
    and no `@ts-ignore`, `@ts-expect-error` or `eslint-disable` without its reason on the same line. Errors are
    handled or passed on with a type, never dropped by an empty `catch`. Python has type annotations, raises typed
@@ -190,8 +191,7 @@ banned-word rules; read your own diff for the rest.
   `split`, `rename`) and write a subject that reads correctly to someone who has not seen the diff. The body is two
   or three sentences and at most 50 words outside a code fence, the problem first and then what the change does
   about it, wrapped at 72. A code fence, or a line that starts with a `$ ` prompt, is pasted text, which the width,
-  word count, dash and banned-word rules skip.
-  Write no body when the subject says everything.
+  word count, dash and banned-word rules skip. Write no body when the subject says everything.
 - **Self-contained.** No issue or PR numbers, commit hashes, or pointers into documents that change. Name the
   behavior instead. Link an issue in the PR description, where the link can be edited.
 - **No banned word and no dash as punctuation**, as in [Prose](#prose).

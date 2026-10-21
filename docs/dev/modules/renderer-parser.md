@@ -154,11 +154,11 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
 imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loader reads the trade site lists
 through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
-**Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails
-below the floor in `renderer/vitest.config.ts` (65.9% of the lines of `src/` on 22 Oct 2026). The parser suites are
-`renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem` has the
-text and the expected fields) and `specs/Parser/mods.ts`; the suites in `specs/data/` cover the loader and its lookups,
-and `specs/data/fetchData.test.ts` a data file that the server does not return.
+**Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
+the floor in `renderer/vitest.config.ts` (65.9% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
+suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
+has the text and the expected fields) and `specs/Parser/mods.ts`; the suites in `specs/data/` cover the loader and its
+lookups, and `specs/data/fetchData.test.ts` a data file that the server does not return.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces
 `@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` returns the trade site's
 `data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no test

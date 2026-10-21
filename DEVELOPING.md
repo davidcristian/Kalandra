@@ -100,8 +100,8 @@ part alone:
   `npm run build` there checks only `src/` and `specs/`.
 - `--coverage` and `coverage report` fail when a suite covers less than the floor in its config:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
-  `scripts/`. Vitest counts every file under `src/`, so a source file no test loads counts as
-  uncovered.
+  `scripts/`. Vitest counts every `.ts` file under `src/`, so a `.ts` file no test loads counts
+  as uncovered. The renderer's `.vue` components are not counted.
 - `npm run lint` in `renderer/` or `main/` runs ESLint on `src/` and `specs/`, and in `main/`
   on `build/script.mjs` too. The pre-commit hooks run the same files with `--fix`.
 - An ESLint rule turned on after code broke it skips only that code. In `renderer/`,

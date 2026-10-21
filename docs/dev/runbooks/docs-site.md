@@ -79,9 +79,10 @@ request's checks ([architecture.md](../architecture.md#ci) lists what each workf
 
 `srcExclude: ['dev/**']` in `docs/.vitepress/config.js` keeps `docs/dev/` out of the build. A
 developer doc is plain GitHub markdown: one H1, no frontmatter, relative links to other developer
-docs and to repo files. The dead link check does not cover `docs/dev/`, so check those links in the
-pull request's file view on GitHub, where a relative link to a source file opens that file. The
-developer index is [docs/dev/index.md](../index.md).
+docs and to repo files. The build's dead link check does not read `docs/dev/`. The `linkcheck`
+pre-commit hook, `scripts/linkcheck.py`, checks those links instead: each relative link must name a
+file in the repo, and a heading that file has. It does not open web addresses, so check those by
+hand. The developer index is [docs/dev/index.md](../index.md).
 
 ## Deploy
 
