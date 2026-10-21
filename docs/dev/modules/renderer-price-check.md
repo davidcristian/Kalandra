@@ -192,7 +192,8 @@ neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. `specs/web/price-check/filters/`
 covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
 `filters/util.ts`. `text-keys.test.ts` there checks that the English `app_i18n.json` names each modifier type,
-filter tag and trade category.
+filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
+changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
 file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.

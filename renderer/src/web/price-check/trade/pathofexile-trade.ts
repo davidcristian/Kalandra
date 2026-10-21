@@ -96,15 +96,6 @@ const TOTAL_MODS_TEXT = {
   TOTAL_MODIFIERS: ["# Modifiers", "# Prefix Modifiers", "# Suffix Modifiers"],
 };
 
-// const INFLUENCE_PSEUDO_TEXT = {
-//   [ItemInfluence.Shaper]: 'Has Shaper Influence',
-//   [ItemInfluence.Crusader]: 'Has Crusader Influence',
-//   [ItemInfluence.Hunter]: 'Has Hunter Influence',
-//   [ItemInfluence.Elder]: 'Has Elder Influence',
-//   [ItemInfluence.Redeemer]: 'Has Redeemer Influence',
-//   [ItemInfluence.Warlord]: 'Has Warlord Influence'
-// }
-
 const CONVERT_CURRENCY: Record<string, string> = {
   "greater-orb-of-transmutation": "G. transmute",
   "perfect-orb-of-transmutation": "P. transmute",
@@ -1167,21 +1158,6 @@ export function createTradeRequest(
   }
 
   stats = stats.filter((stat) => !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]));
-
-  // if (filters.influences) {
-  //   for (const influence of filters.influences) {
-  //     stats.push({
-  //       disabled: influence.disabled,
-  //       statRef: undefined!,
-  //       text: undefined!,
-  //       tag: undefined!,
-  //       sources: undefined!,
-  //       tradeId: STAT_BY_REF(INFLUENCE_PSEUDO_TEXT[influence.value])!.trade.ids[
-  //         ModifierType.Pseudo
-  //       ]
-  //     })
-  //   }
-  // }
 
   const qAnd = query.stats[0];
   for (const stat of stats) {

@@ -8,11 +8,6 @@
           :name="t('item.gem_sockets')"
         />
         <filter-btn-numeric
-          v-if="filters.linkedSockets"
-          :filter="filters.linkedSockets"
-          :name="t('item.linked_sockets')"
-        />
-        <filter-btn-numeric
           v-if="filters.mapTier"
           :filter="filters.mapTier"
           :name="t('item.map_tier')"
@@ -26,22 +21,6 @@
           v-if="filters.areaLevel"
           :filter="filters.areaLevel"
           :name="t('item.area_level')"
-        />
-        <filter-btn-numeric
-          v-if="filters.heistWingsRevealed"
-          :filter="filters.heistWingsRevealed"
-          :name="t('item.heist_wings_revealed')"
-        />
-        <filter-btn-numeric
-          v-if="filters.sentinelCharge"
-          :filter="filters.sentinelCharge"
-          :name="t('item.sentinel_charge')"
-        />
-        <filter-btn-logical
-          v-if="filters.mapBlighted"
-          readonly
-          :filter="{ disabled: false }"
-          :text="filters.mapBlighted.value"
         />
         <filter-btn-logical
           v-if="filters.rarity?.value === 'magic'"
@@ -77,11 +56,6 @@
           :name="t('item.stock')"
         />
         <filter-btn-numeric
-          v-if="filters.whiteSockets"
-          :filter="filters.whiteSockets"
-          :name="t('item.white_sockets')"
-        />
-        <filter-btn-numeric
           v-if="filters.augmentSockets"
           :filter="filters.augmentSockets"
           :name="t('item.augment_sockets')"
@@ -96,15 +70,6 @@
           :filter="filters.quality"
           :name="t('item.quality')"
         />
-        <template v-if="filters.influences">
-          <filter-btn-logical
-            v-for="influence of filters.influences"
-            :key="influence.value"
-            :filter="influence"
-            :text="influence.value"
-            :img="`/images/influence-${influence.value}.png`"
-          />
-        </template>
         <!-- Implicitly should only be tier or plain unid from create-item-filters -->
         <filter-btn-numeric
           v-if="filters.unidentifiedTier"

@@ -151,10 +151,6 @@ export function createFilters(
       };
     }
 
-    if (item.mapBlighted) {
-      filters.mapBlighted = { value: item.mapBlighted };
-    }
-
     filters.mapTier = {
       value: item.mapTier!,
       disabled: false,
@@ -184,13 +180,6 @@ export function createFilters(
       value: item.areaLevel!,
       disabled: false,
     };
-
-    if (item.heist?.wingsRevealed) {
-      filters.heistWingsRevealed = {
-        value: item.heist.wingsRevealed,
-        disabled: false,
-      };
-    }
   } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
     filters.searchExact = {
       name: item.info.name,
@@ -219,13 +208,6 @@ export function createFilters(
     }
   }
 
-  if (item.sentinelCharge != null) {
-    filters.sentinelCharge = {
-      value: item.sentinelCharge,
-      disabled: false,
-    };
-  }
-
   if (item.quality) {
     if (item.quality >= 20 && item.category === ItemCategory.Flask) {
       // show if 20 but only enable if greater than 20
@@ -250,20 +232,6 @@ export function createFilters(
         disabled: item.quality < 10,
       };
     }
-  }
-
-  if (item.gemSockets?.linked) {
-    filters.linkedSockets = {
-      value: item.gemSockets.linked,
-      disabled: false,
-    };
-  }
-
-  if (item.gemSockets?.white) {
-    filters.whiteSockets = {
-      value: item.gemSockets.white,
-      disabled: false,
-    };
   }
 
   if (item.augmentSockets) {
@@ -367,13 +335,6 @@ export function createFilters(
 
   if (item.isFoil) {
     filters.foil = { disabled: true };
-  }
-
-  if (item.influences.length && item.influences.length <= 2) {
-    filters.influences = item.influences.map((influence) => ({
-      value: influence,
-      disabled: !opts.exact,
-    }));
   }
 
   if (item.itemLevel) {

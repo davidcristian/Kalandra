@@ -1,7 +1,6 @@
 import { BaseType } from "@/assets/data";
-import type { ItemInfluence, ItemCategory } from "@/parser";
+import type { ItemCategory } from "@/parser";
 import type { StatCalculated } from "@/parser/modifiers";
-import type { ParsedItem } from "@/parser/ParsedItem";
 
 export interface FilterPreset {
   id: string;
@@ -35,8 +34,6 @@ export interface ItemFilters {
     value: string;
   };
   socketNumber?: FilterNumeric;
-  linkedSockets?: FilterNumeric;
-  whiteSockets?: FilterNumeric;
   augmentSockets?: FilterNumeric;
   itemEditorSelection?: { disabled: boolean; editing: boolean; value: string };
   corrupted?: {
@@ -55,16 +52,9 @@ export interface ItemFilters {
   foil?: {
     disabled: boolean;
   };
-  influences?: Array<{
-    value: ItemInfluence;
-    disabled: boolean;
-  }>;
   quality?: FilterNumeric;
   gemLevel?: FilterNumeric;
   mapTier?: FilterNumeric;
-  mapBlighted?: {
-    value: NonNullable<ParsedItem["mapBlighted"]>;
-  };
   itemLevel?: FilterNumeric;
   stackSize?: FilterNumeric;
   unidentified?: {
@@ -86,8 +76,6 @@ export interface ItemFilters {
     disabled: boolean;
   };
   areaLevel?: FilterNumeric;
-  heistWingsRevealed?: FilterNumeric;
-  sentinelCharge?: FilterNumeric;
   trade: {
     offline: boolean;
     onlineInLeague: boolean;
