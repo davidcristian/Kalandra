@@ -10,7 +10,7 @@ class ProseCheckTest(unittest.TestCase):
         files = {
             "AGENTS.md": RULES_TABLE,
             "docs/page.md": "A page that checks the price.\n",
-            "renderer/public/data/en/notes.md": "the gate of the game data\n",
+            "renderer/public/data/en/client_strings.js": "// the gate of the game data\n",
         }
         with repo(files) as root:
             code, output = run(prosecheck.main, root)

@@ -45,3 +45,35 @@ class DashCheckTest(unittest.TestCase):
             found = dashcheck.scan(root, ["fixtures/item.txt", "gone.ts"], exemptions)
         self.assertEqual([(problem.path, problem.line) for problem in found.problems], [("gone.ts", 0)])
         self.assertIn("covers no dash", found.problems[0].message)
+
+    def test_skips_the_game_data_and_checks_the_other_data_files(self) -> None:
+        files = {
+            "dataParser/data/json/en/stats.json": f'{{"text": "Life {EM} Mana"}}\n',
+            "dataParser/output/en/stats.ndjson": f'{{"text": "Life {EM} Mana"}}\n',
+            "renderer/public/data/en/client_strings.js": f'export default {{ "a": "x {EM} y" }};\n',
+            "renderer/public/data/en/stats.ndjson": f'{{"text": "Life {EN} Mana"}}\n',
+            "renderer/public/data/de/app_i18n.json": f'{{"output_folder": "{EM}Ausgabeordner"}}\n',
+            "renderer/public/data/en/old/client_strings.js": f'export default {{ "a": "x {EM} y" }};\n',
+            "renderer/public/data/item-drop.json": f'{{"name": "a {EN} b"}}\n',
+        }
+        with repo(files) as root:
+            found = dashcheck.scan(root, sorted(files), {})
+        self.assertEqual(found.files, 3)
+        self.assertEqual(
+            [problem.path for problem in found.problems],
+            [
+                "renderer/public/data/de/app_i18n.json",
+                "renderer/public/data/en/old/client_strings.js",
+                "renderer/public/data/item-drop.json",
+            ],
+        )
+
+    def test_reports_a_dash_in_a_spec_file_that_no_exemption_names(self) -> None:
+        files = {name + ("item.txt" if name.endswith("/") else ""): f"{EM}\n" for name in dashcheck.EXEMPTIONS}
+        files["renderer/specs/Parser/new.test.ts"] = f"// one {EM} two\n"
+        files["renderer/specs/web/notes.txt"] = f"one {EN} two\n"
+        with repo(files) as root:
+            code, output = run(dashcheck.main, root)
+        self.assertEqual(code, 1)
+        problems = [line.split(": ")[0] for line in output.splitlines() if line.startswith("renderer/")]
+        self.assertEqual(problems, ["renderer/specs/Parser/new.test.ts:1", "renderer/specs/web/notes.txt:1"])

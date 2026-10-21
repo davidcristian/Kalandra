@@ -18,7 +18,7 @@ class LineCapTest(unittest.TestCase):
             "main/long.ts": lines(301),
             "main/ok.ts": lines(300),
             "main/specs/big.test.ts": lines(400),
-            "renderer/public/data/en/big.js": lines(400),
+            "renderer/public/data/en/client_strings.js": lines(400),
             "docs/page.md": lines(250),
         }
         with repo(files) as root:

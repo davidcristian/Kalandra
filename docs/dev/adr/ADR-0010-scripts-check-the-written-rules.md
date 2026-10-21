@@ -28,10 +28,10 @@ goes up with its reason in the commit body.
 
 **4. No text file has an em dash or an en dash.** `scripts/dashcheck.py` reads every text file for both characters
 and the HTML character references that render them, and in markdown it skips code spans and fenced code, which show
-game text. `EXEMPTIONS` in the script names the folders and files that
-keep game text as the game writes it, each with its reason, and an exemption that covers no dash fails. Any other
-dash that stays has `dashcheck: allow` and its reason on its line. Reason: the game's text uses both dashes, and the
-parser matches that text exactly.
+game text. It skips the game data that dataParser writes or pulls, as the other file checks do, and `EXEMPTIONS` in
+the script names the other files that keep game text as the game writes it, each with its reason. An exemption that
+covers no dash fails. Any other dash that stays has `dashcheck: allow` and its reason on its line. Reason: the game's
+text uses both dashes, and the parser matches that text exactly.
 
 **5. Prose has no banned word and no spaced `--`.** `scripts/prosecheck.py` reads the banned words from the table in
 AGENTS.md, so the table is the only list. Prose is markdown outside code, the comments and docstrings of the code,

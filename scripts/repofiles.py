@@ -2,10 +2,17 @@
 
 import subprocess
 from collections.abc import Iterable
+from fnmatch import fnmatchcase
 from pathlib import Path
 
-# Folders of game data that dataParser writes or reads, which keep the game's text as it is
-GAME_DATA = ("renderer/public/data/", "dataParser/output/", "dataParser/data/")
+# The game data that dataParser writes or reads, which keeps the game's text as it is
+GAME_DATA = (
+    "renderer/public/data/*/client_strings.js",
+    "renderer/public/data/*/items.ndjson",
+    "renderer/public/data/*/stats.ndjson",
+    "dataParser/output/",
+    "dataParser/data/",
+)
 
 
 class RepoError(Exception):
@@ -38,6 +45,13 @@ def read_text(path: Path) -> str | None:
         return None
 
 
+def matches(name: str, prefix: str) -> bool:
+    """Returns whether ``name`` is ``prefix``, is inside it when it ends with `/`, or matches it with `*` as a name."""
+    if prefix.endswith("/"):
+        return name.startswith(prefix)
+    return name.count("/") == prefix.count("/") and fnmatchcase(name, prefix)
+
+
 def under(name: str, prefixes: Iterable[str]) -> bool:
-    """Returns whether ``name`` is one of ``prefixes`` or inside a folder among them."""
-    return any(name == prefix or (prefix.endswith("/") and name.startswith(prefix)) for prefix in prefixes)
+    """Returns whether ``name`` matches one of ``prefixes``: a file, a folder that ends with `/`, or a pattern."""
+    return any(matches(name, prefix) for prefix in prefixes)

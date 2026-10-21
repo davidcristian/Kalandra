@@ -480,7 +480,7 @@
     "name": "Bibliothek",
     "output_file": "Ausgabe-CSV-Pfad",
     "output_file_help": "Ein paar Informationen",
-    "output_folder": "—Ausgabeordner",
+    "output_folder": "Ausgabeordner",
     "record_count": "Sitzungswürfe:"
   }
 }

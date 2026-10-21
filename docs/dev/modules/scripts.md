@@ -30,8 +30,11 @@ folder.
 
 Each one prints one line per problem, starting with the file's path, and exits with 1 when it finds a problem, 0
 when it finds none, and 2 when it cannot read what it needs or reads nothing. All but `backlogcheck.py` read the
-files that `git ls-files --cached --others --exclude-standard` lists (`repofiles.py`). `--root <folder>` checks
-another copy of the repo.
+files that `git ls-files --cached --others --exclude-standard` lists (`repofiles.py`), and skip the game data that
+`GAME_DATA` there names (`linecap.py` only for the source file limit): the `client_strings.js`, `items.ndjson` and
+`stats.ndjson` of each language in `renderer/public/data/`, and `dataParser/output/` and `dataParser/data/`. A `*`
+in a `GAME_DATA` or `EXEMPTIONS` entry stands for one file or folder name. `--root <folder>` checks another copy of
+the repo.
 
 - **`linecap.py`** counts the lines of every source file (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.vue`, `.py`) that
   is not a test or game data, and of every markdown file. A source file over 300 lines fails unless
@@ -39,9 +42,9 @@ another copy of the repo.
   way to change the count. A markdown file over 250 lines fails.
 - **`dashcheck.py`** reports every line with an em dash or an en dash, in every text file, written as the character
   or as an HTML character reference that renders it (`&mdash;`, `&ndash;`, `&#8212;`, `&#x2013;`). In markdown it
-  skips code spans and fenced code. `EXEMPTIONS` names the folders and files of game text (the game data, the copied item text
-  and client log lines in `renderer/specs/`, and one comment that quotes item text), each with its reason. An
-  exemption that covers no dash fails. A line that contains `dashcheck: allow` is skipped.
+  skips code spans and fenced code. `EXEMPTIONS` names the other files of game text (the spec files that hold copied
+  item text and client log lines, and one comment that quotes item text), each with its reason. An exemption that
+  covers no dash fails. A line that contains `dashcheck: allow` is skipped.
 - **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. `prosesources.py` finds the prose:
   markdown outside fenced code; the comments of TypeScript, JavaScript, Vue, YAML, TOML and shell files; the
   docstrings and comments of Python; and the strings passed to `console.*`, `logger.write`, `new ...Error` and
@@ -106,7 +109,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 66 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 68 tests on 21 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

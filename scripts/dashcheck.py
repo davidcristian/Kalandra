@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 from prosesources import markdown_prose
-from repofiles import RepoError, read_text, repo_files, under
+from repofiles import GAME_DATA, RepoError, read_text, repo_files, under
 
 ALLOW = "dashcheck: allow"
 # Each dash as a character, and as the HTML character references that render it:
@@ -19,12 +19,15 @@ DASHES = {
 }
 _CODE_SPAN = re.compile(r"`[^`\n]*`")
 
-# Each exemption keeps game text as the game writes it, and must still cover a dash
+# Each exemption keeps game text as the game writes it, and must still cover a dash. GAME_DATA is skipped as in the
+# other file checks: dataParser writes or pulls it, and a data update can add or remove its dashes.
 EXEMPTIONS = {
-    "renderer/public/data/": "game data that dataParser writes",
-    "dataParser/output/": "game data that dataParser writes",
-    "renderer/specs/Parser/": "item text copied from the game",
-    "renderer/specs/web/": "client log lines copied from the game",
+    "renderer/specs/Parser/items.ts": "item text copied from the game",
+    "renderer/specs/Parser/mods.ts": "modifier text copied from the game",
+    "renderer/specs/Parser/modifiersParsers.test.ts": "item text copied from the game",
+    "renderer/specs/Parser/sectionUnit.test.ts": "item text copied from the game",
+    "renderer/specs/web/FullCampaign.txt": "client log lines copied from the game",
+    "renderer/specs/web/client-log.test.ts": "client log lines copied from the game",
     "renderer/src/web/price-check/filters/create-unique-filters.ts": "a comment quotes copied item text",
 }
 
@@ -68,7 +71,7 @@ def scan(root: Path, names: Sequence[str], exemptions: dict[str, str]) -> Scan:
     problems: list[Problem] = []
     used: set[str] = set()
     for name in names:
-        text = read_text(root / name)
+        text = None if under(name, GAME_DATA) else read_text(root / name)
         if text is None:
             continue
         files += 1
