@@ -232,12 +232,7 @@ type IpcWriteToFile = Event<
       action: "log-item";
       text: string;
     }
-  | {
-      action: "session";
-      start: boolean;
-      name?: string;
-      header?: string;
-    }
+  | import("./library").LibrarySessionWrite
   | {
       action: "client-log-event";
       data: ClientLogEvent;

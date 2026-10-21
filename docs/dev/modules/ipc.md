@@ -28,7 +28,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
-| `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start`, `name?`, `header?`; `client-log-event` with `data` and `close` | `WidgetLibrary.vue`, `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
+| `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` and `close` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `CLIENT->MAIN::re-parse-log` | none | `settings-leveling.vue` | `GameLogWatcher` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
 | `MAIN->CLIENT::ocr-text` | `target`, `pressTime`, `ocrTime`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
@@ -100,8 +100,9 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 
 `library.ts`:
 
-- `IpcLibrarySession` is the `MAIN->CLIENT::library-session` member of `IpcEvent`, kept out of `types.ts` because
-  that file is over the line limit. `LibrarySessionFailure` is its `result` when no session starts.
+- `IpcLibrarySession` is the `MAIN->CLIENT::library-session` member of `IpcEvent`, and `LibrarySessionWrite` the
+  `session` action of `CLIENT->MAIN::write-data`, both kept out of `types.ts` because that file is over the line
+  limit. `LibrarySessionFailure` is the `result` of `IpcLibrarySession` when no session starts.
 
 ## Invariants
 

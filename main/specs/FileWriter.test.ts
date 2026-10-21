@@ -5,6 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FileWriter } from "../src/host-files/FileWriter";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
+import type { LibrarySessionWrite } from "../../ipc/library";
+
+type StartPayload = Extract<LibrarySessionWrite, { start: true }>;
 
 vi.mock("electron", async () => {
   const os = await import("node:os");
@@ -249,6 +252,20 @@ describe("a Library session start", () => {
     expect(sessionReplies()).toEqual([
       { sessionName: "rolls", result: "failed" },
     ]);
+    expect(await fs.readdir(folder)).toEqual([]);
+  });
+
+  it.each([
+    { action: "session", start: true, header: "a header" } as StartPayload,
+    { action: "session", start: true, name: "rolls" } as StartPayload,
+  ])("replies that it failed to a start without a field: %j", async (e) => {
+    await writer.restart(true, folder);
+    await server.emit("CLIENT->MAIN::write-data", e);
+
+    expect(sessionReplies()).toEqual([
+      { sessionName: e.name, result: "failed" },
+    ]);
+    expect(logger.history).toContain("Invalid session start event.");
     expect(await fs.readdir(folder)).toEqual([]);
   });
 });

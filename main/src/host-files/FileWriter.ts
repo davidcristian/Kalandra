@@ -101,7 +101,7 @@ export class FileWriter {
     e: IpcEventPayload<"CLIENT->MAIN::write-data">,
   ) {
     if (e.action === "session" && e.start) {
-      await this.startSession(e.name ?? "", e.header ?? "");
+      await this.startSession(e.name, e.header);
       return;
     }
     if (!this._enabled) return;
@@ -156,15 +156,16 @@ export class FileWriter {
       );
       return "failed";
     }
+    // The type requires both fields, but main does not check what a page sends
+    if (typeof name !== "string" || !header) {
+      this.logger.write("error [FileWriter] Invalid session start event.");
+      return "failed";
+    }
     if (!isValidFileName(name)) {
       this.logger.write(
         `error [FileWriter] Session name "${name}" is not a valid file name.`,
       );
       return "invalid-name";
-    }
-    if (!header) {
-      this.logger.write("error [FileWriter] Invalid session start event.");
-      return "failed";
     }
     try {
       if (!existsSync(this.uploadsPath)) {
