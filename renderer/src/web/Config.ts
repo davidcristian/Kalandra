@@ -216,7 +216,7 @@ export const defaultConfig = (): Config => ({
     (widgets, { widget }) => {
       const res: widget.Widget[] = [];
       if (widget.instances === "single") {
-        res.push(widget.initInstance!());
+        res.push(widget.initInstance());
       } else if (
         widget.instances === "multi" &&
         widget.defaultInstances != null

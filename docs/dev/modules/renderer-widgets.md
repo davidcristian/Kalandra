@@ -21,7 +21,8 @@ that a saved config survives every update covers it ([config.md](config.md),
   settings widget opens that widget's settings page.
 - `WidgetSpec` is the static `widget` option of a widget component: `type` (its `wmType`), `instances`
   (`single` or `multi`), `trNameKey` (the i18n key of its name in the menu's "add widget…" list), `initInstance()`
-  (the config of a single widget) and `defaultInstances()` (the instances of a multi widget in a new config).
+  (the config of a single widget, which a single widget must have) and `defaultInstances()` (the instances of a
+  multi widget in a new config, which a multi widget can leave out).
   [widget-component.ts](../../../renderer/src/web/overlay/widget-component.ts) adds `widget` to Vue's component
   options with this type, so the type check covers the option in every component.
 - `registry` ([widget-registry.ts](../../../renderer/src/web/overlay/widget-registry.ts)) holds the array

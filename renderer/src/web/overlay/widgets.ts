@@ -7,13 +7,21 @@ export interface Widget {
   wmFlags: Array<WellKnownFlag | string>;
 }
 
-export interface WidgetSpec {
+interface SingleWidgetSpec {
   type: string;
-  instances: "single" | "multi";
+  instances: "single";
   trNameKey?: string;
-  initInstance?: () => Widget;
+  initInstance: () => Widget;
+}
+
+interface MultiWidgetSpec {
+  type: string;
+  instances: "multi";
+  trNameKey?: string;
   defaultInstances?: () => Widget[];
 }
+
+export type WidgetSpec = SingleWidgetSpec | MultiWidgetSpec;
 
 export type WellKnownFlag =
   | "uninitialized"
