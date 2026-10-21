@@ -7,7 +7,8 @@ import { ClientLogInfoType, parseClientLogText } from "./client-log-parser";
 const LogRegex =
   /^(?<datetime>\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}) (?<millis>\d+) (?<source>[a-f0-9]+) \[\S+ \S+ \S+\] (?<text>.*)$/;
 
-export const useClientLog = createGlobalState(() => {
+/** Builds a client log state; the app shares one through `useClientLog()`. */
+export function createClientLog() {
   const areaLevel = shallowRef<number>(1);
   const zoneName = shallowRef<string>("G1_1"); // default to riverbank
   const playerLevel = shallowRef<number>(1);
@@ -92,10 +93,6 @@ export const useClientLog = createGlobalState(() => {
     playerLevel.value = level;
   }
 
-  function testOnlyResetGameMillis() {
-    gameStartMillis = 0;
-  }
-
   return {
     handleLine,
     handleLines,
@@ -103,6 +100,7 @@ export const useClientLog = createGlobalState(() => {
     areaLevel: readonly(areaLevel),
     zoneName: readonly(zoneName),
     setPlayerLevel,
-    testOnlyResetGameMillis,
   };
-});
+}
+
+export const useClientLog = createGlobalState(createClientLog);

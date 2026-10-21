@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
-import { useClientLog } from "@/web/client-log/client-log";
+import { createClientLog } from "@/web/client-log/client-log";
 import fs from "fs";
 import { Host } from "@/web/background/IPC";
 import {
@@ -753,14 +753,12 @@ describe("clientLog", () => {
     vi.clearAllMocks();
     setupTests();
     await init("en");
-    useClientLog().testOnlyResetGameMillis();
   });
 
   it("should parse first log", () => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log1.split("\n")) {
-      handleLine(line);
       expect(() => {
         handleLine(line);
       }).not.toThrow();
@@ -769,7 +767,7 @@ describe("clientLog", () => {
   });
 
   it("should parse second log", () => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of logStartThroughRedVale.split("\n")) {
       expect(() => {
@@ -780,7 +778,7 @@ describe("clientLog", () => {
   });
 
   it("Should parse full campaign client log", () => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     const filePath = path.join(__dirname, "FullCampaign.txt");
     const lines = fs.readFileSync(filePath, "utf-8").split("\n");
@@ -793,7 +791,7 @@ describe("clientLog", () => {
   });
 
   it("sends the time of each line read in the local time zone", () => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log1.split("\n")) {
       handleLine(line);
@@ -816,7 +814,7 @@ describe("clientLog", () => {
     [log1, 0],
     [logStartThroughRedVale, 2],
   ])("Should have expected game starts", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -837,7 +835,7 @@ describe("clientLog", () => {
     [log1, 2],
     [logStartThroughRedVale, 15],
   ])("Should have expected load zone events", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -858,7 +856,7 @@ describe("clientLog", () => {
     [log1, 2],
     [logStartThroughRedVale, 4],
   ])("Should have expected level up events", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -883,7 +881,7 @@ describe("clientLog", () => {
     [log1, 0],
     [logStartThroughRedVale, 2],
   ])("Should have game versions", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -908,7 +906,7 @@ describe("clientLog", () => {
     [log1, 0],
     [logStartThroughRedVale, 28],
   ])("Should have alt-tabs", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -947,7 +945,7 @@ describe("clientLog", () => {
       },
     ],
   ])("Should have npc dialog", (log, count, expectedCounts) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -974,7 +972,7 @@ describe("clientLog", () => {
     [log1, 1],
     [logStartThroughRedVale, 1],
   ])("Should have deaths", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -1001,7 +999,7 @@ describe("clientLog", () => {
   ])(
     "Should have passive tree add & removes",
     (log, count, { expectedAdd, expectedRemove }) => {
-      const { handleLine } = useClientLog();
+      const { handleLine } = createClientLog();
 
       for (const line of log.split("\n")) {
         handleLine(line);
@@ -1036,7 +1034,7 @@ describe("clientLog", () => {
     [log1, 0],
     [logStartThroughRedVale, 1],
   ])("Should have permanent bonuses", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -1062,7 +1060,7 @@ describe("clientLog", () => {
     [log1, 2],
     [logStartThroughRedVale, 0],
   ])("Should have skill points", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -1088,7 +1086,7 @@ describe("clientLog", () => {
     [log1, 4, 2, 0],
     [logStartThroughRedVale, 42, 19, 5],
   ])("Should have source sets", (log, count, nulls, unknowns) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -1122,7 +1120,7 @@ describe("clientLog", () => {
     [log1, 0],
     [logStartThroughRedVale, 2],
   ])("Should have afk", (log, count) => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
       handleLine(line);
@@ -1148,7 +1146,7 @@ describe("clientLog", () => {
   });
 
   it("sends the game version of a line without a patch number", () => {
-    const { handleLine } = useClientLog();
+    const { handleLine } = createClientLog();
 
     handleLine(
       "2026/10/20 09:00:00 1800000000 a1e2d252 [INFO Client 443804] [HTTP2] User agent: PoE poe2_production/tags/0.4 Windows x64",
@@ -1180,7 +1178,7 @@ describe("clientLog", () => {
       .mockImplementation((...args: unknown[]) => {
         logged.push(args);
       });
-    const { handleLines, playerLevel } = useClientLog();
+    const { handleLines, playerLevel } = createClientLog();
 
     try {
       handleLines([gameVersion, levelUp(30)]);
@@ -1194,8 +1192,47 @@ describe("clientLog", () => {
     expect(logged[0]).toContain(gameVersion);
   });
 
+  it.each([
+    [
+      "a line older than the line before it",
+      "2026/04/26 09:28:47 1785270812 a1e2d25d [INFO Client 443804] [HTTP2] Using backend: cURL",
+      "2026/04/26 09:28:46 1785270900 a1e2d25d [INFO Client 443804] [HTTP2] Using backend: cURL",
+      "time just went backwards",
+    ],
+    [
+      "milliseconds below those of the game start",
+      "2026/04/26 09:28:48 1785271828 bdfe0c38 [INFO Client 443804] [STARTUP] Game Start",
+      "2026/04/26 09:28:49 1785270000 a1e2d25d [INFO Client 443804] [HTTP2] Using backend: cURL",
+      "Millis rolled over",
+    ],
+  ])("warns about %s", (_case, first, second, warning) => {
+    const warned: unknown[][] = [];
+    const consoleWarn = vi
+      .spyOn(console, "warn")
+      .mockImplementation((...args: unknown[]) => {
+        warned.push(args);
+      });
+    const { handleLines } = createClientLog();
+
+    try {
+      handleLines([first, second]);
+    } finally {
+      consoleWarn.mockRestore();
+    }
+    expect(warned).toHaveLength(1);
+    expect(String(warned[0][0])).toContain(warning);
+  });
+
+  it("starts at level 1 in area level 1 on The Riverbank", () => {
+    const { playerLevel, areaLevel, zoneName } = createClientLog();
+
+    expect(playerLevel.value).toBe(1);
+    expect(areaLevel.value).toBe(1);
+    expect(zoneName.value).toBe("G1_1");
+  });
+
   it("sets the player level and ignores an empty value", () => {
-    const { setPlayerLevel, playerLevel } = useClientLog();
+    const { setPlayerLevel, playerLevel } = createClientLog();
 
     setPlayerLevel(42);
     expect(playerLevel.value).toBe(42);
