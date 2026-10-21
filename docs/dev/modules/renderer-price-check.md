@@ -37,11 +37,12 @@ that the route needs ([main.md](main.md)).
 ### Filters (`filters/`)
 
 - `createPresets(item, opts)` in `create-presets.ts` returns the presets and the active one. An unidentified or
-  normal item, a non-unique item that is not craftable, and the non-unique categories listed there get one exact
-  preset (`filters.preset_exact`). A unique in `PRESET_UNIQUES` gets `createUniquePresets`. Every other item gets
-  "Pseudo" (`filters.preset_pseudo`), plus "Base item" (`filters.preset_base_item`) when `hasCraftingValue` is
-  true and `likelyFinishedItem` is false. `hasCraftingValue` (`filters/common.ts`) skips the item level test for
-  a category whose `maxUsefulItemLevel` is 1: tablets, jewels and waystones.
+  normal item, a non-unique item that is not craftable, the non-unique categories listed there and a currency item
+  with a trial count (`item.trials.numberOfTrials`) get one exact preset (`filters.preset_exact`). A unique in
+  `PRESET_UNIQUES` gets `createUniquePresets`. Every other item gets "Pseudo" (`filters.preset_pseudo`), plus
+  "Base item" (`filters.preset_base_item`) when `hasCraftingValue` is true and `likelyFinishedItem` is false.
+  `hasCraftingValue` (`filters/common.ts`) skips the item level test for a category whose `maxUsefulItemLevel`
+  is 1: tablets, jewels and waystones.
 - `createFilters` (`create-item-filters.ts`) returns the `ItemFilters`: name, base type, rarity, sockets,
   quality, levels, the corrupted and other states, and the `trade` options (league, listing type, currency).
   A unique's base type comes from the item data through `uniqueBaseTradeName` in `filters/common.ts`, or is
@@ -58,10 +59,13 @@ that the route needs ([main.md](main.md)).
 - `text-keys.ts` builds the `app_i18n.json` key that names a modifier type (`item.mod_added_rune`) or a trade
   category (`item_category.weapon_bow`). `FilterModifier.vue` names a tag by `filters.tag_<tag>`, and a stat
   filter's tag can be any `ModifierType`.
-- `fill-augments.ts` and `item-editor/` apply the item editor's rune, soul core, catalyst and quality changes to
-  the item and its filters, through `recalculateItemProperties` from the parser. The editor's lists come from
-  `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
-  once per game data load, so they switch to the new language after a language change.
+- The item editor applies its changes in `item-editor/`: `useAugment` in `augment.ts` puts a rune or soul core in a
+  socket, and `applyCatalyst` in `item-editor.ts` applies a catalyst and its quality. Both change the item and
+  recompute its properties through `recalculateItemProperties` from the parser. The parser also calls `useAugment`
+  to fill an item's empty sockets with the saved augments. The editor's lists come from `categoryAugments` in
+  `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list once per game data
+  load, so they switch to the new language after a language change. Of `filters/fill-augments.ts`, only
+  `getAugmentNameByRef` has a caller, the price check settings, and its other exports have none.
 
 ### Trade queries (`trade/`)
 
