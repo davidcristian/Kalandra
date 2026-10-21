@@ -48,6 +48,30 @@ export interface CsvColumns {
   [key: string]: ColumnOpts;
 }
 
+type ColumnKey =
+  | "refName"
+  | "itemLevel"
+  | "rarity"
+  | "sockets"
+  | "mods"
+  | "addedMods"
+  | "removedMods";
+
+const COLUMNS: ReadonlyArray<{ key: ColumnKey; header: string }> = [
+  { key: "refName", header: "base" },
+  { key: "itemLevel", header: "ilvl" },
+  { key: "rarity", header: "rarity" },
+  { key: "sockets", header: "sockets" },
+  { key: "mods", header: "mods" },
+  { key: "addedMods", header: "addedMods" },
+  { key: "removedMods", header: "removedMods" },
+];
+
+/** Returns the columns a profile writes, in file order. */
+function profileColumns(columnOpts: ColumnOpts) {
+  return COLUMNS.filter((column) => columnOpts[column.key]);
+}
+
 function modFilter(mod: ParsedModifier, keep: ColumnOpts["keep"]) {
   if (
     keep.explicit &&
@@ -82,59 +106,40 @@ export function buildCsvString(
 ): Result<string, string> {
   const { columnOpts } = opts;
   if (sessionType === "chaos") {
-    const filteredMods = item.newMods.filter((mod) =>
-      modFilter(mod, columnOpts.keep),
+    const modsCell = (mods: ParsedModifier[]) =>
+      arrayToCsvString(
+        mods
+          .filter((mod) => modFilter(mod, columnOpts.keep))
+          .map((m) => modToShortMod(m, columnOpts)),
+      );
+    const cells: Record<ColumnKey, string | number | undefined> = {
+      refName: item.info.refName,
+      itemLevel: item.itemLevel,
+      rarity: item.rarity,
+      sockets: item.augmentSockets?.current ?? 0,
+      mods: modsCell(item.newMods),
+      addedMods: modsCell(addedMods),
+      removedMods: modsCell(removedMods),
+    };
+
+    return ok(
+      profileColumns(columnOpts)
+        .map((column) => cells[column.key])
+        .join(","),
     );
-    const out: Array<string | number | undefined> = [];
-    if (columnOpts.refName) {
-      out.push(item.info.refName);
-    }
-    if (columnOpts.itemLevel) {
-      out.push(item.itemLevel);
-    }
-    if (columnOpts.rarity) {
-      out.push(item.rarity);
-    }
-    if (columnOpts.sockets) {
-      out.push(item.augmentSockets?.current ?? 0);
-    }
-
-    if (columnOpts.mods) {
-      out.push(
-        arrayToCsvString(filteredMods.map((m) => modToShortMod(m, columnOpts))),
-      );
-    }
-
-    if (columnOpts.addedMods) {
-      out.push(
-        arrayToCsvString(
-          addedMods
-            .filter((mod) => modFilter(mod, columnOpts.keep))
-            .map((m) => modToShortMod(m, columnOpts)),
-        ),
-      );
-    }
-
-    if (columnOpts.removedMods) {
-      out.push(
-        arrayToCsvString(
-          removedMods
-            .filter((mod) => modFilter(mod, columnOpts.keep))
-            .map((m) => modToShortMod(m, columnOpts)),
-        ),
-      );
-    }
-
-    return ok(out.join(","));
   }
 
   return err("sessionType not supported");
 }
 
-export function getHeader(sessionType: string) {
+export function getHeader(sessionType: string, columnOpts: ColumnOpts) {
   switch (sessionType) {
     case "chaos":
-      return ok("base,ilvl,rarity,sockets,mods,addedMods,removedMods");
+      return ok(
+        profileColumns(columnOpts)
+          .map((column) => column.header)
+          .join(","),
+      );
 
     default:
       return err("sessionType not supported");

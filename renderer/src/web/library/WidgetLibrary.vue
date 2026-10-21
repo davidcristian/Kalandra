@@ -173,7 +173,7 @@ export default defineComponent({
     });
 
     function startSession() {
-      const header = getHeader(sessionType.value);
+      const header = getHeader(sessionType.value, currentOpts.value);
 
       if (header.isErr()) {
         errMessage.value = header.error;
