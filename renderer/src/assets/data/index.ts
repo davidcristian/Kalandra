@@ -492,7 +492,7 @@ async function loadTradeData() {
         const craftable = category
           ? { category }
           : forceCraftable
-            ? { category: name as ItemCategory }
+            ? { category: ItemCategory.Unknown }
             : undefined;
 
         base = {

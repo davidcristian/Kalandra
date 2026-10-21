@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/src/web/item-check/WidgetItemCheck.vue](../../../../renderer/src/web/item-check/WidgetItemCheck.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-21
 
 The parser sets an item's category from `craftable.category` of its entry in `items.ndjson`, or of
 its base item for a unique (`renderer/src/parser/Parser.ts`). The other assignments in `Parser.ts`
@@ -24,8 +24,10 @@ have `Relic`. Code still checks the four missing ones:
   `SanctumRelic` case of `trends/getDetailsId.ts`, and the `HeistBlueprint`, `HeistContract` and
   `SanctumRelic` entries of `CATEGORY_TO_TRADE_ID` do the same.
 
-`ItemCategory` in `renderer/src/parser/meta.ts` has more values that the data does not have, such
-as `HeistTool` and `Claw`. This task covers the four above.
+`ItemCategory` in `renderer/src/parser/meta.ts` has more values that the data does not have, and
+`renderer/specs/data/item-categories.test.ts` lists each with its reason. This task covers the four
+above, the other Path of Exile 1 categories of that list and `Waystone`, which code checks the same
+way: most have an entry in `CATEGORY_TO_TRADE_ID`, and `FiltersBlock.vue` tests `Waystone`.
 
 A count of categories in the file, run from the repo root, measures it again:
 `python -c "import json,collections;print(collections.Counter(json.loads(l).get('craftable',{}).get('category') for l in open('renderer/public/data/en/items.ndjson',encoding='utf-8') if l.strip()))"`.
@@ -40,3 +42,5 @@ checks the items in the game.
 - 2026-10-18: Found while docs/map-check.md was rewritten, by comparing the category checks with a
   count of the categories in `items.ndjson`. The same day the check found that relics already get
   the automatic search, so the question of adding `Relic` to the condition was removed.
+- 2026-10-21: Widened to the other Path of Exile 1 categories and `Waystone`, when a test started to
+  list the categories that the data does not have.

@@ -1,5 +1,5 @@
-import { init } from "@/assets/data";
-import { parseClipboard } from "@/parser";
+import { init, TRADE_ITEM_BY_REF } from "@/assets/data";
+import { ItemCategory, parseClipboard } from "@/parser";
 import { uniqueBaseTradeName } from "@/web/price-check/filters/common";
 import { createFilters } from "@/web/price-check/filters/create-item-filters";
 import { Host } from "@/web/background/IPC";
@@ -60,6 +60,22 @@ describe("unique items found only in the trade site's item list", () => {
       nameTrade: "Stormglass Reverie",
       baseTypeTrade: "Prism Focus",
     });
+  });
+});
+
+describe("TRADE_ITEM_BY_REF", () => {
+  it("returns an item of the trade site's list as craftable with an unknown category when asked to", async () => {
+    setupTests();
+    await init("en");
+
+    expect(TRADE_ITEM_BY_REF({ name: "Temple Maul" }, true)).toEqual([
+      expect.objectContaining({
+        craftable: { category: ItemCategory.Unknown },
+      }),
+    ]);
+    expect(TRADE_ITEM_BY_REF({ name: "Temple Maul" })?.[0].craftable).toBe(
+      undefined,
+    );
   });
 });
 
