@@ -55,15 +55,13 @@ export async function loadLang(lang: Config["language"]): Promise<void> {
 
 export function useI18nNs(name: string) {
   const { t } = useI18n();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  const _t = t as Function;
-  return {
-    t: ((path, ...args) => {
-      if (typeof path === "string" && path.startsWith(":")) {
-        return _t(path.replace(":", `${name}.`), ...args);
-      } else {
-        return _t(path, ...args);
-      }
-    }) as typeof t,
+  // The wrapper passes on every argument, so it serves each overload of t and takes its type
+  const tNs = (...[path, ...args]: Parameters<typeof t>) => {
+    if (typeof path === "string" && path.startsWith(":")) {
+      return t(path.replace(":", `${name}.`), ...args);
+    } else {
+      return t(path, ...args);
+    }
   };
+  return { t: tNs as typeof t };
 }

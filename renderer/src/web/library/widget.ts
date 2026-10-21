@@ -194,7 +194,7 @@ function arrayToCsvString(arr: ShortMod[]) {
   return `"${json.replaceAll("'", "\\'").replaceAll('"', "'")}"`;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   modFilter,
 };

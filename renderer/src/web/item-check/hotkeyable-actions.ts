@@ -192,8 +192,7 @@ function getPoe2dbPath(item: ParsedItem) {
   return path + "#ModifiersCalc";
 }
 
-// Disable since this is export for tests
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   encodePoe2dbUri,
   poe2dbUrl,

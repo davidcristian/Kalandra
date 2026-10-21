@@ -238,7 +238,7 @@ export const defaultConfig = (): Config => ({
 });
 
 function upgradeConfig(_config: Config): Config {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-explicit-any -- the old steps read fields that Config no longer has */
   const config = _config as Omit<Config, "widgets"> & {
     widgets: Array<Record<string, any>>;
   };
@@ -702,7 +702,7 @@ function upgradeConfig(_config: Config): Config {
   }
   /* eslint-enable */
 
-  return config as unknown as Config;
+  return config as Config;
 }
 
 function getConfigForHost(): HostConfig {

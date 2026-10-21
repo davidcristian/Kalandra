@@ -11,7 +11,7 @@ export function configProp<T = undefined>() {
     },
     configWidget: {
       type: Object as PropType<T>,
-      default: undefined as unknown as T,
+      default: undefined as T | undefined,
     },
   };
 }

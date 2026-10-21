@@ -1,6 +1,6 @@
 import { BaseType } from "@/assets/data";
 import type { ItemCategory } from "@/parser";
-import type { StatCalculated } from "@/parser/modifiers";
+import type { ModifierType, StatCalculated } from "@/parser/modifiers";
 
 export interface FilterPreset {
   id: string;
@@ -216,4 +216,24 @@ export enum FilterTag {
   Desecrated = "desecrated",
   Skill = "skill",
   Mutated = "mutated",
+  Necropolis = "necropolis",
+  Veiled = "veiled",
+  Sanctum = "sanctum",
 }
+
+export const FILTER_TAG_BY_MODIFIER_TYPE: Record<ModifierType, FilterTag> = {
+  "pseudo": FilterTag.Pseudo,
+  "explicit": FilterTag.Explicit,
+  "implicit": FilterTag.Implicit,
+  "crafted": FilterTag.Crafted,
+  "enchant": FilterTag.Enchant,
+  "scourge": FilterTag.Scourge,
+  "necropolis": FilterTag.Necropolis,
+  "veiled": FilterTag.Veiled,
+  "fractured": FilterTag.Fractured,
+  "rune": FilterTag.Augment,
+  "added-rune": FilterTag.AddedAugment,
+  "sanctum": FilterTag.Sanctum,
+  "desecrated": FilterTag.Desecrated,
+  "skill": FilterTag.Skill,
+};

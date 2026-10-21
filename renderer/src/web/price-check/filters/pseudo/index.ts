@@ -633,8 +633,7 @@ export function translatedEffectsPseudos(translated: string): boolean {
   return refEffectsPseudos(ref);
 }
 
-// Disable since this is export for tests
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   filterPseudoSources,
 };

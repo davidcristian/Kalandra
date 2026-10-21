@@ -59,11 +59,6 @@
       "count": 1
     }
   },
-  "src/web/Config.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "src/web/background/Prices.ts": {
     "@typescript-eslint/no-floating-promises": {
       "count": 3
@@ -104,11 +99,6 @@
       "count": 3
     }
   },
-  "src/web/price-check/filters/create-stat-filters.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "src/web/price-check/price-prediction/FeedbackOption.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 1
@@ -131,11 +121,6 @@
   },
   "src/web/settings/SettingsWindow.vue": {
     "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    }
-  },
-  "src/web/settings/utils.ts": {
-    "no-restricted-syntax": {
       "count": 1
     }
   }

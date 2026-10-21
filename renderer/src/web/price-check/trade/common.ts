@@ -178,7 +178,7 @@ function _adjustRateLimits(
   limitRule: ServerLimit[],
   removeOtherLimits: boolean,
 ): void {
-  /* eslint-disable @typescript-eslint/no-unused-expressions */
+  /* eslint-disable @typescript-eslint/no-unused-expressions -- each DEBUG && console call below logs only when DEBUG is true */
   const DEBUG = false;
 
   // destroy, unless a rule was skipped: its limiter cannot be told apart from the old ones
@@ -242,6 +242,7 @@ function _adjustRateLimits(
       }
     }
   }
+  /* eslint-enable @typescript-eslint/no-unused-expressions */
 }
 
 export function preventQueueCreation(

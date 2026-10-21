@@ -13,6 +13,7 @@ import {
 } from "@/parser/modifiers";
 import { percentRoll, percentRollDelta, roundRoll } from "./util";
 import {
+  FILTER_TAG_BY_MODIFIER_TYPE,
   FilterTag,
   ItemHasEmptyModifier,
   StatFilter,
@@ -393,7 +394,7 @@ export function calculatedStatToFilter(
       ],
     statRef: stat.ref,
     text: translation.string,
-    tag: type as unknown as FilterTag,
+    tag: FILTER_TAG_BY_MODIFIER_TYPE[type],
     oils: decodeOils(calc),
     sources,
     roll: undefined,
@@ -894,7 +895,7 @@ function enableAllFilters(filters: StatFilter[]) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- not called; kept as an alternative to enableAllFilters
 function enableGoodRolledFilters(filters: StatFilter[], abovePct: number) {
   for (const filter of filters) {
     if (filter.hidden) continue;
@@ -967,8 +968,7 @@ function itemMaxModifiersBySlot(
   return maxAmount;
 }
 
-// Disable since this is export for tests
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   itemMaxModifiersBySlot,
 };

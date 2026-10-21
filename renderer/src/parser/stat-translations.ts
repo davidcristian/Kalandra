@@ -368,7 +368,7 @@ function findAndResolveTranslation(
   return statMatchForLine(STAT_BY_MATCH_STR(matchStr), matchStr, modType);
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   tryParseTranslation,
 };

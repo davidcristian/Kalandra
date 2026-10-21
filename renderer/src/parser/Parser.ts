@@ -745,7 +745,7 @@ function parseTalismanTier(section: string[], item: ParsedItem) {
 
 // disabling cause of https://github.com/Kvan7/Exiled-Exchange-2/issues/954
 // will come back if vaal gems are added later, will need to be reworked completely
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- unused while vaal gems are out of the game
 function parseVaalGemName(section: string[], item: ParserState) {
   performance.mark("parseVaalGemName");
   if (item.category !== ItemCategory.Gem) return "PARSER_SKIPPED";
@@ -2212,8 +2212,7 @@ function isItemMissingItemClass(section: string[]): boolean {
   return section[0].startsWith(_$.RARITY) && section[1] !== undefined;
 }
 
-// Disable since this is export for tests
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   itemTextToSections,
   findInDatabase,
