@@ -138,3 +138,4 @@ layout and its reasons.
 - 074: [The parser reads modifier suffixes, separators and the socket letter with literals](tasks/074-parser-separators-and-suffixes.md)
 - 075: [Hybrid armour bases start with every defence filter enabled](tasks/075-hybrid-armour-defence-filters.md)
 - 076: [Two main test files wait for real timers](tasks/076-main-tests-wait-for-real-timers.md)
+- 077: [Item icons load from web.poecdn.com outside the proxy](tasks/077-item-icons-outside-proxy.md)

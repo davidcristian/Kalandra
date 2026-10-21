@@ -1,6 +1,6 @@
 # ADR-0005: Other hosts only through the proxy list, trade searches through the rate limiters
 
-**Status:** Accepted (2026-10-19)
+**Status:** Accepted (2026-10-22)
 
 ## Context
 
@@ -14,18 +14,19 @@ clients that exceed them.
 
 **1. The renderer reaches another host only through `/proxy`.** `Host.proxy` in
 `renderer/src/web/background/IPC.ts` requests `/proxy/<host>/<path>` from the main process, and `HttpProxy` in
-`main/src/proxy.ts` sends it on to `https://<host>/<path>`. Every request the renderer code sends to another host
+`main/src/proxy.ts` sends it on to `https://<host>/<path>`. Every `fetch` the renderer code sends to another host
 goes this way: the league list (`Leagues.ts`), the trade stat and item data (`TradeData.ts`), trade searches,
 exchanges and fetches (`pathofexile-trade.ts`, `pathofexile-bulk.ts`), price predictions (`poeprices.ts`,
-although `CheckedItem.vue` has the prediction component commented out) and the price file (`Prices.ts`). Reason:
-network access to other hosts belongs to the main process ([ADR-0004](ADR-0004-process-boundary.md)).
+although `CheckedItem.vue` has the prediction component commented out) and the price file (`Prices.ts`). The item
+icons are the exception, described under Consequences. Reason: network access to other hosts belongs to the main
+process ([ADR-0004](ADR-0004-process-boundary.md)).
 
 **2. `HttpProxy` forwards only to the hosts in `PROXY_HOSTS`.** A request for any other host is closed with no
 response. Before forwarding, it removes the `sec-*`, `host`, `origin`, `content-length` and `x-kalandra-proxy`
 request headers and sends Electron's `app.userAgentFallback` as the User-Agent. Each entry also marks whether the host is an official trade
 site. `HttpProxy` reads the list only to check that the host is in it. Reason: the list in one file is the full set
-of hosts the renderer can reach, so a new host appears in the diff. The auto updater is separate: `electron-updater`
-in `main` checks the GitHub releases itself.
+of hosts the renderer code sends requests to, apart from the item icons, so a new host appears in the diff. The auto
+updater is separate: `electron-updater` in `main` checks the GitHub releases itself.
 
 **3. Adding a host is a reviewed change to that list.** `poe.ninja` is not in it: the app reads prices from Kalandra's
 own price service instead ([ADR-0006](ADR-0006-own-price-service.md)). Reason: each host on the list receives
@@ -52,6 +53,9 @@ checks do not wait in a queue for the limiter.
   request each time the app loads them.
 - The built-in browser (a `<webview>`) and links the user opens in the system browser load pages directly. They do
   not go through `/proxy`.
+- The item icons load directly from `web.poecdn.com`, the game's image server, outside `/proxy` and `PROXY_HOSTS`. The
+  `icon` addresses in `items.ndjson` and in trade listings go into the `src` of `<img>` tags, such as the one in
+  `renderer/src/web/ui/UiItemImg.vue`, so every running copy of the app requests them from that host.
 - No test calls a live site. Tests use saved responses such as `renderer/specs/docs/fetchResponses.json`
   ([AGENTS.md](../../../AGENTS.md), What every change must pass).
 

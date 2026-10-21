@@ -50,13 +50,14 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 - **ipc** (`ipc/`) holds the types and key tables both processes import: `HostConfig`, `ShortcutAction`, the
   `IpcEvent` union and `ClientLogEvent` in `types.ts`, and the key name tables in `KeyToCode.ts`. See
   [modules/ipc.md](modules/ipc.md).
-- **The outside hosts** are reached only through main's proxy. The official trade sites serve searches, listings,
-  bulk exchange queries, the league list and the trade stat and item lists. `poeWebApi()` in `Config.ts` picks the
-  site from the language, realm and preferred trade site settings. `www.poeprices.info` is a price prediction
-  service for rare items, called from `price-check/price-prediction/poeprices.ts`. The price check settings have a
-  checkbox for it, but `CheckedItem.vue` does not render the `PricePrediction` component, so the app sends it no
-  request. `kalandra.ashoal.com` serves the price files. The app never calls poe.ninja's API and only links to its
-  pages ([ADR-0006](adr/ADR-0006-own-price-service.md)).
+- **The outside hosts** are reached through main's proxy, except the item icons, which the page loads from
+  `web.poecdn.com` ([ADR-0005](adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). The official trade sites serve
+  searches, listings, bulk exchange queries, the league list and the trade stat and item lists. `poeWebApi()` in
+  `Config.ts` picks the site from the language, realm and preferred trade site settings. `www.poeprices.info` is a
+  price prediction service for rare items, called from `price-check/price-prediction/poeprices.ts`. The price check
+  settings have a checkbox for it, but `CheckedItem.vue` does not render the `PricePrediction` component, so the app
+  sends it no request. `kalandra.ashoal.com` serves the price files. The app never calls poe.ninja's API and only
+  links to its pages ([ADR-0006](adr/ADR-0006-own-price-service.md)).
 - **priceService** (`priceService/`) is a Python service, standard library only, that runs on a server outside the
   app. Once an hour it builds one price file per league from poe.ninja's API and serves the files at
   `kalandra.ashoal.com/prices/`. See [modules/price-service.md](modules/price-service.md) and
