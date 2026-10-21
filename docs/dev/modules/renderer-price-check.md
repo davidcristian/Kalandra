@@ -194,8 +194,11 @@ the price file ([price-service.md](price-service.md)); `renderer/public/data/nam
 neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. `specs/web/price-check/filters/`
-covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
-`filters/util.ts`. `text-keys.test.ts` there checks that the English `app_i18n.json` names each modifier type,
+covers the unidentified filters of `createFilters`, the ascendancy points of trials, which items get the base item
+tab, the missing fractured rules, the pseudo stats and the rounding of rolls in `filters/util.ts`.
+`stat-filter-rolls.test.ts` there runs `createPresets` on real copied items and checks the search range of rare and
+unique rolls, the fixed stats of a unique, negated stats and the values that the trade search sends for them.
+`text-keys.test.ts` there checks that the English `app_i18n.json` names each modifier type,
 filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
