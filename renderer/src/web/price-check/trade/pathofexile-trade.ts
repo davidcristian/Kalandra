@@ -197,7 +197,7 @@ enum TradePropType {
   MapConversionChargedCompass,
   MapConversionMavenInvite,
   MapConversionMemoryLine,
-  ScarabUseLimit, // ScrabUseLimit?
+  ScarabUseLimit,
   MapMapDropBonus,
   MapScarabDropBonus,
   MapCurrencyDropBonus,
@@ -485,7 +485,6 @@ export interface FetchResultExtended {
   ev_aug?: boolean;
   es_aug?: boolean;
   ward_aug?: boolean;
-  // only has implicit?
   mods?: Record<string, TradeModMetadata[]>;
   hashes?: Record<string, TradeModHashes[]>;
 }
@@ -1065,7 +1064,6 @@ export function createTradeRequest(
         propSet(query.filters, "type_filters.filters.rarity.option", "magic");
         break;
 
-      // FIXME: should also 100% include *.max here
       case "item.map_revives":
         propSet(
           query.filters,
@@ -1175,7 +1173,7 @@ export function createTradeRequest(
     propSet(query.filters, "misc_filters.filters.veiled.option", "true");
     const veiledCount = filters.veiled.veiledCount;
 
-    // HACK: add pseudo stat for veiled count(dont want on my ui though)
+    // The veiled count goes into the query as a pseudo stat, without a filter in the UI
     qAnd.filters.push(
       tradeIdToQuery("pseudo.pseudo_number_of_unrevealed_mods", {
         tradeId: ["pseudo.pseudo_number_of_unrevealed_mods"],
@@ -1721,7 +1719,6 @@ function buildNameBlock(
 
       block.push({
         text: text ?? `${parseAffixStrings(name)} `,
-        // if we have a value, there should only be one probably...
         value: values.length ? values[0][0] : "",
         color: values.length ? values[0][1] : TradeNumberColors.White,
       });
@@ -1773,7 +1770,6 @@ function buildItemProps(
       );
     }
 
-    // do i actually care about this?
     block.push({
       // no colon for req
       text: `${parseAffixStrings(requirements[0].name)} `,
@@ -1968,7 +1964,6 @@ function buildMageBloodNotFilter(
       return countFilter;
     }
   }
-  // yuk, "hard cases", will be on edge of complexity possibly
   // KNOWN 1 DUP 1, KNOWN 2 DUP 1, KNOWN 1 DUP 2
 
   // add existing

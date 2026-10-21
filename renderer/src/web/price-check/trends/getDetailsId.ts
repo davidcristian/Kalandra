@@ -5,7 +5,7 @@ import { TRADE_TAG_TO_REF } from "@/assets/data";
 
 export function getCurrencyDetailsId(id: string) {
   if (!TRADE_TAG_TO_REF.has(id)) {
-    // setting to not a value to get correct type
+    // Names that no item has, so the price lookup finds nothing for an unknown currency
     return { ns: "nan ns", name: "nan item", variant: undefined };
   }
   const refName = TRADE_TAG_TO_REF.get(id)!;
