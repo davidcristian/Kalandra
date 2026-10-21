@@ -141,7 +141,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    the page shows the start error described below instead of starting ([modules/config.md](modules/config.md)
    says why).
 3. When the overlay mounts, `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with the `HostConfig` that
-   `getConfigForHost()` builds: every hotkey as a `ShortcutAction`, and the settings main reads. The handler in
+   `getConfigForHost()` builds: every hotkey as a `ShortcutAction` (`shortcutActions()` in
+   `renderer/src/web/shortcut-actions.ts`), and the settings main reads. The handler in
    `main/src/main.ts` passes them to the overlay window, the shortcuts, the clipboard, the log watcher, the game
    config reader, the tray and the file writer. The updater's first check does not wait for this: `AppUpdater`
    starts it when main creates it.

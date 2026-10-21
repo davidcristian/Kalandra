@@ -53,7 +53,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 
 | Field | Built from | Used by |
 | --- | --- | --- |
-| `shortcuts` | every hotkey in the config, as `ShortcutAction`s | `Shortcuts.updateActions()` |
+| `shortcuts` | every hotkey in the config, as the `ShortcutAction`s of `shortcutActions()` in `shortcut-actions.ts` | `Shortcuts.updateActions()` |
 | `restoreClipboard`, `stashScroll`, `logKeys` | the setting of the same name | `Shortcuts.updateActions()` |
 | `language` | `language` | `Shortcuts.updateActions()`, for the OCR language |
 | `initialDelay` | the price check widget's `initialDelay` | `Shortcuts.updateDelay()`, the first clipboard poll |

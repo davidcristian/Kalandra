@@ -59,8 +59,9 @@ old one and keep that file, so a saved config must survive every update: this is
   from the last one sent or received, and does nothing while an exclusive widget is shown. `opts.isTemporary` makes
   main write `config.json.tmp`.
 - `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with `getConfigForHost()`, which builds the
-  `HostConfig` main reads: every hotkey as a `ShortcutAction`, and the settings main uses. [ipc.md](ipc.md) lists
-  each field and each action with the setting it comes from.
+  `HostConfig` main reads: every hotkey as a `ShortcutAction`, and the settings main uses. `shortcutActions(config)`
+  in `shortcut-actions.ts` builds the hotkey list from any config, so the Settings window can check its edited copy.
+  [ipc.md](ipc.md) lists each field and each action with the setting it comes from.
 - `poeWebApi()` returns the trade site host: `www.pathofexile.com` when `preferredTradeSite` is `www`, and
   otherwise the site for `language`, with `pathofexile.tw` for `cmn-Hant` on the `pc-garena` realm.
 
@@ -119,7 +120,8 @@ the `Logger` from `main/src/RemoteLogger.ts`.
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it. No test runs
 `defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against
-the steps before it and against the type. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
+the steps before it and against the type. `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
+`shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, and a rename

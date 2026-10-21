@@ -20,7 +20,7 @@ that the route needs ([main.md](main.md)).
   and returns `item.unknown` for a heist contract or a sentinel that is not unique. When the item is valid, it
   calls `queuePricesFetch()`.
 - Its two hotkeys are in `initInstance`: `hotkeyHold` plus `hotkey`, `Ctrl` and `D` by default ("Auto-hide
-  Mode"), and `hotkeyLocked`, `Ctrl + Alt + D` by default ("Open without auto-hide"). `getConfigForHost()` sends
+  Mode"), and `hotkeyLocked`, `Ctrl + Alt + D` by default ("Open without auto-hide"). `shortcutActions()` sends
   both to main as `copy-item` actions with target `price-check`, the second with `focusOverlay: true`
   ([config.md](config.md)). After the auto-hide key the window sends `OVERLAY->MAIN::track-area` with its screen
   area, the hold key and a distance. Main then hides it with `MAIN->OVERLAY::hide-exclusive-widget` when the

@@ -88,7 +88,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
    the new upgrade step inserts `defaultConfig()`'s entry with a new `wmId`, as the `< 29` step does for
    `experience-tracker` and the `< 30` step for `library`; without it an existing config has no entry for the type.
    Add the widget to `defaultConfigMock` in `renderer/specs/vitest.setup.ts` only when a test reads its config.
-5. A hotkey goes into `getConfigForHost()` in `Config.ts` as a `ShortcutAction`, such as `trigger-event` with a
+5. A hotkey goes into `shortcutActions()` in `shortcut-actions.ts` as a `ShortcutAction`, such as `trigger-event` with a
    target, as the stopwatch and the Delve grid have. The component handles `MAIN->CLIENT::widget-action` with that
    target.
 6. A settings page is a component in the widget's folder, a name in `SettingsPage` and a `case "<type>"` in
@@ -104,7 +104,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 - **`wmType` is a storage key.** It is renamed or removed only by an upgrade step: the `< 7` step renames
   `map-check` to `item-check`, and the `< 26` step removes `filter-generator` entries.
 - **Every single widget has an entry in every config.** Code reads it as `AppConfig("<type>")!`, and
-  `getConfigForHost()` reads the `price-check`, `item-check`, `library` and `delve-grid` entries without a check.
+  `shortcutActions()` reads the `price-check`, `item-check`, `library` and `delve-grid` entries without a check.
 - **A widget changes its config in place**, through its `config` prop, which is the entry in `AppConfig()`.
   `saveConfig()` sends the whole config to main with `CLIENT->MAIN::save-config` when it differs from the last
   one saved, and does nothing while an `exclusive` widget is shown.
