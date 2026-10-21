@@ -21,6 +21,8 @@ class Rule(NamedTuple):
 RULES = (
     Rule(".github/workflows/", ALL),
     Rule("scripts/", ALL),
+    # test_bannedwords.py reads the banned words table in AGENTS.md.
+    Rule("AGENTS.md", frozenset({"scripts"})),
     Rule("ipc/", frozenset({"renderer", "main"})),
     Rule("renderer/public/data/namespaceMap.json", frozenset({"renderer", "price_service"})),
     Rule("priceService/tests/fixtures/", frozenset({"renderer", "price_service"})),

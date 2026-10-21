@@ -61,8 +61,9 @@ another copy of the repo.
 The Changed paths job of `.github/workflows/test.yml` passes the changed paths on stdin to
 `python3 scripts/ci_paths.py`, with both the old and the new path of a moved file. The script prints `renderer=`,
 `main=`, `price_service=`, `scripts=` and `docs=` with `true` or `false` for `GITHUB_OUTPUT`. `RULES` maps a file,
-or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies. A markdown file at the
-repo root affects no job, and any other path that no rule matches affects every job
+or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies. `AGENTS.md` affects the
+Scripts job, because `test_bannedwords.py` reads its banned words table. Any other markdown file at the repo root
+affects no job, and any other path that no rule matches affects every job
 ([ADR-0011](../adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)).
 
 ### commitlint.py

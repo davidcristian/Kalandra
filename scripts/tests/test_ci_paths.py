@@ -16,7 +16,8 @@ class ClassifyTest(unittest.TestCase):
             "priceService/price_service/ninja.py": {"price_service"},
             "docs/faq.md": {"docs"},
             "docs/dev/index.md": set(),
-            "AGENTS.md": set(),
+            "AGENTS.md": {"scripts"},
+            "DEVELOPING.md": set(),
             ".github/ISSUE_TEMPLATE/bug-report.yml": set(),
         }
         for path, jobs in cases.items():
