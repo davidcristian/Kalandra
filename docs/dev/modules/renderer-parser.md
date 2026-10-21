@@ -127,10 +127,11 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
   new entry in `dataParser/src/constants/client_string_data.py`, then a `dataParser` run that writes it into
   every language's `client_strings.js` ([dataparser.md](dataparser.md),
   [runbooks/game-data-update.md](../runbooks/game-data-update.md)). The literals that match item text directly
-  include the modifier suffix constants in `advanced-mod-desc.ts` and the `LANGUAGE_DETECTOR` table in
-  `Parser.ts`. That table lists each language's item class and rarity prefix. When the first line is not the
-  app language's item class line and the next line starts with a rarity prefix from the table, the parse returns
-  `item.wrong_language` with the display name of that prefix's language.
+  include the modifier suffix constants and separators in `advanced-mod-desc.ts`, the damage separator and the
+  socket letter in `Parser.ts` ([refinement 074](../refinements/tasks/074-parser-separators-and-suffixes.md)), and
+  the `LANGUAGE_DETECTOR` table in `Parser.ts`. That table lists each language's item class and rarity prefix.
+  When the first line is not the app language's item class line and the next line starts with a rarity prefix
+  from the table, the parse returns `item.wrong_language` with the display name of that prefix's language.
 - **The generated files are regenerated, never edited**: `client_strings.js`, `items.ndjson` and `stats.ndjson`
   come from `dataParser`, and the `*.index.bin` files from `npm run make-index-files`. Git ignores `*.bin`, so the
   index files must be written before the tests, `npm run dev` or a build, and again after any data change.
