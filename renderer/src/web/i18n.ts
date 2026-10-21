@@ -1,10 +1,25 @@
 import { createI18n, Composer as I18n, useI18n } from "vue-i18n";
 import { nextTick } from "vue";
+import { Settings } from "luxon";
 import { fetchData } from "@/assets/data/fetch-data";
+import type { Config } from "@/web/Config";
+
+// The game's Traditional Chinese client is the one for Taiwan, and its Portuguese is Brazilian
+const DATE_LOCALES: Record<Config["language"], string> = {
+  "en": "en",
+  "ru": "ru",
+  "cmn-Hant": "zh-TW",
+  "ko": "ko",
+  "ja": "ja",
+  "de": "de",
+  "es": "es",
+  "pt": "pt-BR",
+  "fr": "fr",
+};
 
 let _global: I18n;
 
-export async function init(lang: string) {
+export async function init(lang: Config["language"]) {
   const plugin = createI18n<false>({
     legacy: false,
     locale: "en",
@@ -21,11 +36,12 @@ export async function init(lang: string) {
   return plugin;
 }
 
-export async function loadLang(lang: string): Promise<void> {
+export async function loadLang(lang: Config["language"]): Promise<void> {
   if (lang !== "en") {
     const messages = await (await fetchData(`${lang}/app_i18n.json`)).json();
     _global.setLocaleMessage(lang, messages);
   }
+  Settings.defaultLocale = DATE_LOCALES[lang];
   const prevLang = _global.locale.value;
   _global.locale.value = lang;
   if (prevLang !== "en") {

@@ -68,6 +68,8 @@ A module exports the internal functions its tests call as `__testExports` (`Pars
 `renderer/public/data/` over HTTP from the page's own server and exposes them as module variables. It and
 `web/i18n.ts` fetch each file with `fetchData(file)` from `fetch-data.ts`, which throws a `DataLoadError` with the
 file and the status when the server does not return it, so a missing index file fails the load.
+`loadLang(lang)` in `web/i18n.ts` also sets luxon's `Settings.defaultLocale` to the BCP 47 tag of the language, so
+relative times such as the listing ages are written in it.
 
 - `init(lang)` runs once from `renderer/src/main.ts`. It loads `CLIENT_STRINGS_REF` (the English client strings),
   `item-drop.json` and `patrons.json`, then calls `loadForLang(lang)`. A change to the language setting calls
