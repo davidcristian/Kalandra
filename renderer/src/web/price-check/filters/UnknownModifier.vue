@@ -14,7 +14,9 @@
         </div>
       </div>
       <div class="ml-5 text-xs leading-none">
-        <span class="text-gray-600">{{ t(stat.type) }} &mdash; </span>
+        <span class="text-gray-600"
+          >{{ t(modTypeKey(stat.type)) }} &mdash;
+        </span>
         <span class="text-orange-400">{{ t("Not recognized modifier") }}</span>
       </div>
     </div>
@@ -30,6 +32,7 @@ import { ParsedItem } from "@/parser";
 import ItemModifierText from "../../ui/ItemModifierText.vue";
 import { defineComponent, PropType } from "vue";
 import ReloadTradeData from "../fallback/ReloadTradeData.vue";
+import { modTypeKey } from "./text-keys";
 
 export default defineComponent({
   components: { ItemModifierText, ReloadTradeData },
@@ -46,7 +49,7 @@ export default defineComponent({
   setup() {
     const { t } = useI18n();
 
-    return { t };
+    return { t, modTypeKey };
   },
 });
 </script>

@@ -29,6 +29,7 @@ import { useI18n } from "vue-i18n";
 import type { ParsedItem } from "@/parser";
 import type { ItemFilters } from "./interfaces";
 import { CATEGORY_TO_TRADE_ID } from "../trade/pathofexile-trade";
+import { tradeCategoryKey } from "./text-keys";
 
 export default defineComponent({
   name: "FilterName",
@@ -60,9 +61,7 @@ export default defineComponent({
       }
       if (activeSearch.category) {
         const tradeId = CATEGORY_TO_TRADE_ID.get(activeSearch.category)!;
-        return t("item_category.prop", [
-          t(`item_category.${tradeId.replace(".", "_")}`),
-        ]);
+        return t("item_category.prop", [t(tradeCategoryKey(tradeId))]);
       }
 
       return "??? Report if you see this text";

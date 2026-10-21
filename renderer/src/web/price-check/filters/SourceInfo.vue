@@ -22,6 +22,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { applyIncr } from "@/parser/advanced-mod-desc";
 import { roundRoll } from "./util";
+import { modTypeKey } from "./text-keys";
 import type { StatCalculated } from "@/parser/modifiers";
 import type { StatFilter } from "./interfaces";
 
@@ -37,7 +38,7 @@ const { t } = useI18n();
 const modText = computed(() => {
   const { info } = props.source.modifier;
 
-  let text = t(`item.mod_${info.type}`);
+  let text = t(modTypeKey(info.type));
   if (info.name) {
     text += ` "${info.name}"`;
   }

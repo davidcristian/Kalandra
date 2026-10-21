@@ -54,6 +54,9 @@ that the route needs ([main.md](main.md)).
   for the trade site's pseudo stats, each the sum of several item stats, such as total fire resistance
   (`filterPseudo` and its `PSEUDO_RULES`), and the item property filters (`filterItemProp`). The types are in
   `filters/interfaces.ts`.
+- `text-keys.ts` builds the `app_i18n.json` key that names a modifier type (`item.mod_added_rune`) or a trade
+  category (`item_category.weapon_bow`). `FilterModifier.vue` names a tag by `filters.tag_<tag>`, and a stat
+  filter's tag can be any `ModifierType`.
 - `fill-augments.ts` and `item-editor/` apply the item editor's rune, soul core, catalyst and quality changes to
   the item and its filters, through `recalculateItemProperties` from the parser. The editor's lists come from
   `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
@@ -188,7 +191,8 @@ neverthrow, `object-hash`, `luxon`, `@vueuse/core`.
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. `specs/web/price-check/filters/`
 covers item filters, stat filters, the missing fractured rules, the pseudo stats and the rounding of rolls in
-`filters/util.ts`.
+`filters/util.ts`. `text-keys.test.ts` there checks that the English `app_i18n.json` names each modifier type,
+filter tag and trade category.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
 file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
