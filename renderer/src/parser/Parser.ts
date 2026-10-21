@@ -1161,6 +1161,15 @@ function parseLogbookArea(section: string[], item: ParsedItem) {
   return "SECTION_PARSED";
 }
 
+function endingTagModType(line: string): ModifierType | undefined {
+  if (line.endsWith(ENCHANT_LINE)) return ModifierType.Enchant;
+  if (line.endsWith(SCOURGE_LINE)) return ModifierType.Scourge;
+  if (line.endsWith(ADDED_AUGMENT_LINE)) return ModifierType.AddedAugment;
+  if (line.endsWith(AUGMENT_LINE)) return ModifierType.Augment;
+  if (line.startsWith(_$.GRANTS_SKILL)) return ModifierType.Skill;
+  return undefined;
+}
+
 export function parseModifiersPoe2(section: string[], item: ParsedItem) {
   performance.mark("parseModifiersPoe2");
   if (
@@ -1171,40 +1180,19 @@ export function parseModifiersPoe2(section: string[], item: ParsedItem) {
   ) {
     return "PARSER_SKIPPED";
   }
+  if (section.length === 0) return "SECTION_SKIPPED";
 
-  let foundAnyMods = false;
+  const endingModType = section
+    .map(endingTagModType)
+    .find((modType) => modType !== undefined);
 
-  const hasEndingTag = section.find(
-    (line) =>
-      line.endsWith(ENCHANT_LINE) ||
-      line.endsWith(SCOURGE_LINE) ||
-      line.endsWith(AUGMENT_LINE) ||
-      line.endsWith(ADDED_AUGMENT_LINE) ||
-      line.startsWith(_$.GRANTS_SKILL),
-  );
-
-  if (hasEndingTag) {
+  if (endingModType !== undefined) {
     const { lines } = parseModType(section);
-    let modType;
-
-    if (hasEndingTag.endsWith(ENCHANT_LINE)) {
-      modType = ModifierType.Enchant;
-    } else if (hasEndingTag.endsWith(SCOURGE_LINE)) {
-      modType = ModifierType.Scourge;
-    } else if (hasEndingTag.endsWith(ADDED_AUGMENT_LINE)) {
-      modType = ModifierType.AddedAugment;
-    } else if (hasEndingTag.endsWith(AUGMENT_LINE)) {
-      modType = ModifierType.Augment;
-    } else if (hasEndingTag.startsWith(_$.GRANTS_SKILL)) {
-      modType = ModifierType.Skill;
-    } else {
-      throw new Error("Invalid ending tag");
-    }
     const modInfo: ModifierInfo = {
-      type: modType,
+      type: endingModType,
       tags: [],
     };
-    foundAnyMods = parseStatsFromMod(lines, item, { info: modInfo, stats: [] });
+    parseStatsFromMod(lines, item, { info: modInfo, stats: [] });
   } else {
     for (const statLines of section) {
       let { modType, lines } = parseModType([statLines]);
@@ -1215,11 +1203,10 @@ export function parseModifiersPoe2(section: string[], item: ParsedItem) {
         modType = ModifierType.Sanctum;
       }
       // const modInfo = parseModInfoLine(modLine, modType);
-      const found = parseStatsFromMod(lines, item, {
+      parseStatsFromMod(lines, item, {
         info: { type: modType, tags: [] },
         stats: [],
       });
-      foundAnyMods = found || foundAnyMods;
 
       if (modType === ModifierType.Veiled) {
         item.isVeiled = true;
@@ -1227,7 +1214,7 @@ export function parseModifiersPoe2(section: string[], item: ParsedItem) {
     }
   }
 
-  return foundAnyMods ? "SECTION_PARSED" : "SECTION_SKIPPED";
+  return "SECTION_PARSED";
 }
 
 function parseModifiers(section: string[], item: ParsedItem) {
@@ -1816,11 +1803,11 @@ export function parseStatsFromMod(
   item: ParsedItem,
   modifier: ParsedModifier,
   addedAugment?: BaseType,
-): boolean {
+): void {
   item.newMods.push(modifier);
 
   if (modifier.info.type === ModifierType.Veiled) {
-    return true;
+    return;
   }
 
   const statIterator = linesToStatStrings(lines);
@@ -1877,8 +1864,6 @@ export function parseStatsFromMod(
       type: modifier.info.type,
     })),
   );
-
-  return true;
 }
 
 /**
