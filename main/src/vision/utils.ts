@@ -1,4 +1,5 @@
 import { cv } from "./wasm-bindings";
+import type { Mat } from "./wasm-types";
 
 export interface ImageData {
   width: number;
@@ -14,7 +15,7 @@ export interface WeightedPoint {
 
 export type LinePoints = [WeightedPoint, WeightedPoint];
 
-export function findNonZeroWeights(matchResult: any): WeightedPoint[] {
+export function findNonZeroWeights(matchResult: Mat): WeightedPoint[] {
   const locations = new cv.Mat();
   cv.findNonZero(matchResult, locations);
   const weights = Array<WeightedPoint>(locations.rows);

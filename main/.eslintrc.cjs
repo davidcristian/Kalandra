@@ -14,10 +14,6 @@ const existingOffenders = {
     "src/main.ts",
     "src/server.ts",
   ],
-  "@typescript-eslint/no-explicit-any": [
-    "src/vision/utils.ts",
-    "src/vision/wasm-bindings.ts",
-  ],
   "no-empty": [
     "src/host-files/ConfigStore.ts",
     "src/host-files/utils.ts",

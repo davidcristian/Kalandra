@@ -12,11 +12,10 @@ cast through `unknown` and one for an empty `.catch()` handler. The code that br
 were turned on is exempt:
 
 - main, in `existingOffenders` and the `no-restricted-syntax` override of `main/.eslintrc.cjs`:
-  4 `any` in `vision/utils.ts` and `vision/wasm-bindings.ts`; 4 empty `catch` blocks in
-  `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)), `guessFileLocation()`
-  and `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty `.catch()` handlers of the
-  `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the second also in
-  [010](010-ocr-errors-dropped.md).
+  4 empty `catch` blocks in `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)),
+  `guessFileLocation()` and `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
+  `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
+  second also in [010](010-ocr-errors-dropped.md).
 - the renderer, in `renderer/eslint-suppressions.json`: 32 casts through `unknown` in 11 files
   under `specs/`.
 
@@ -37,3 +36,5 @@ in a comment on the line. Then its file leaves the main lists, and
   each `eslint-disable` comment in `main/src/` got its reason.
 - 2026-10-21: The 3 casts in `renderer/src/` were removed, and each `eslint-disable` comment there
   got its reason.
+- 2026-10-22: The 4 `any` in `vision/utils.ts` and `vision/wasm-bindings.ts` were replaced by
+  interfaces in `vision/wasm-types.ts` that list the OpenCV and Tesseract members the code calls.

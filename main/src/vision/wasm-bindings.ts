@@ -1,9 +1,16 @@
 import fs from "fs/promises";
 import type { ImageData } from "./utils";
+import type {
+  LoaderFile,
+  Mat,
+  OpenCv,
+  TessApi,
+  TessModule,
+} from "./wasm-types";
 
-let tessModule: any;
-export let tessApi: any;
-export let cv: any;
+let tessModule: TessModule;
+export let tessApi: TessApi;
+export let cv: OpenCv;
 
 const langMap = new Map([
   ["en", "eng"],
@@ -16,14 +23,16 @@ export async function init(binDir: string) {
     throw new Error("Unsupported platform");
   }
 
-  const tessInstantiate = (
-    await import("file://" + binDir + "/tesseract-core-simd.js")
-  ).default;
-  tessModule = await tessInstantiate();
+  const tessFile: LoaderFile<() => Promise<TessModule>> = await import(
+    "file://" + binDir + "/tesseract-core-simd.js"
+  );
+  tessModule = await tessFile.default();
   tessApi = new tessModule.TessBaseAPI();
 
-  const cvPromise = (await import("file://" + binDir + "/opencv.js")).default;
-  cv = await cvPromise;
+  const cvFile: LoaderFile<PromiseLike<OpenCv>> = await import(
+    "file://" + binDir + "/opencv.js"
+  );
+  cv = await cvFile.default;
 }
 
 export async function changeLanguage(lang: string, binDir: string) {
@@ -55,7 +64,7 @@ export function ocrSetImage(
   tessModule._free(imgPtr);
 }
 
-export function cvMatFromImage(img: ImageData) {
+export function cvMatFromImage(img: ImageData): Mat {
   const mat = new cv.Mat(img.height, img.width, cv.CV_8UC4);
   mat.data.set(img.data);
   return mat;

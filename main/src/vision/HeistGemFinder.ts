@@ -9,6 +9,7 @@ import {
   hsvToU8,
   ImageData,
 } from "./utils";
+import type { Mat } from "./wasm-types";
 
 const REFERENCE_HEIGHT = 600;
 const TEMPLATE_THRESHOLD = 0.75;
@@ -18,12 +19,6 @@ const TEXT_HSV_MAX = hsvToU8(180, 100, 100);
 
 interface OcrResult {
   recognized: Array<{ text: string; confidence: number }>;
-}
-
-// The fields of an OpenCV.js Mat that this class reads
-interface Mat {
-  rows: number;
-  cols: number;
 }
 
 export class HeistGemFinder {
