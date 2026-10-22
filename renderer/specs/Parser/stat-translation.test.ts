@@ -1,53 +1,61 @@
 import { ModifierType } from "@/parser/modifiers";
 import { __testExports } from "@/parser/stat-translations";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { StatBetter, type Stat, type StatMatch } from "@/assets/data";
 
-import * as data from "@/assets/data";
-
-vi.mock("@/assets/data", async (importOriginal) => {
-  const actual = (await importOriginal()) as object;
-  return {
-    ...actual,
-    init: vi.fn(),
-    CLIENT_STRINGS: {},
-    STAT_BY_MATCH_STR: vi.fn(),
-    TRADE_STAT_BY_MATCH_STR: vi.fn(),
-    StatBetter: { PositiveRoll: 1 },
-  };
+/** The stat table and the trade site's stat list, in memory, keyed by their text. */
+const lists = vi.hoisted(() => {
+  const stats: Stat[] = [];
+  return { stats, tradeIds: new Map<string, Record<string, string[]>>() };
 });
 
-const PHYS_DAMAGE_STAT = {
-  ref: "#% increased Physical Damage",
-  better: 1,
+vi.mock("@/assets/data", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  STAT_BY_MATCH_STR: (text: string): StatMatch[] =>
+    lists.stats.flatMap((stat) => {
+      const matcher = stat.matchers.find(
+        (m) => m.string === text || m.advanced === text,
+      );
+      return matcher ? [{ stat, matcher }] : [];
+    }),
+  TRADE_STAT_BY_MATCH_STR: (text: string) => lists.tradeIds.get(text),
+}));
+
+const PHYS_TEXT = "#% increased Physical Damage";
+const PHYS_LINE = "180(170-190)% increased Physical Damage";
+const PHYS_IDS = {
+  explicit: ["explicit.stat_1509134228"],
+  fractured: ["fractured.stat_1509134228"],
+  enchant: ["enchant.stat_1509134228"],
+  rune: ["rune.stat_1509134228"],
+  desecrated: ["desecrated.stat_1509134228"],
+};
+const PHYS_DAMAGE_STAT: Stat = {
+  ref: PHYS_TEXT,
+  better: StatBetter.PositiveRoll,
   matchers: [
-    { string: "#% increased Physical Damage" },
+    { string: PHYS_TEXT },
     { string: "#% reduced Physical Damage", negate: true },
     { string: "No Physical Damage", value: -100 },
   ],
-  trade: {
-    ids: {
-      explicit: ["explicit.stat_1509134228"],
-      fractured: ["fractured.stat_1509134228"],
-      enchant: ["enchant.stat_1509134228"],
-      rune: ["rune.stat_1509134228"],
-      desecrated: ["desecrated.stat_1509134228"],
-    },
-  },
-  id: "local_physical_damage_+%",
-} as data.Stat;
+  trade: { ids: PHYS_IDS },
+};
 
-const EXACT_MATCH_STAT = {
-  ref: "Players are Cursed with Enfeeble",
-  better: 1,
-  matchers: [{ string: "Players are Cursed with Enfeeble" }],
-  trade: { ids: { explicit: ["explicit.stat_4103440490"] } },
-  id: "map_player_has_level_X_enfeeble",
-} as data.Stat;
-const OPTION_STAT = {
+const ENFEEBLE_LINE = "Players are Cursed with Enfeeble";
+const ENFEEBLE_IDS = { explicit: ["explicit.stat_4103440490"] };
+const EXACT_MATCH_STAT: Stat = {
+  ref: ENFEEBLE_LINE,
+  better: StatBetter.PositiveRoll,
+  matchers: [{ string: ENFEEBLE_LINE }],
+  trade: { ids: ENFEEBLE_IDS },
+};
+
+const RADIUS_LINE = "Upgrades Radius to Large";
+const OPTION_STAT: Stat = {
   ref: "Upgrades Radius to #",
-  better: 1,
+  better: StatBetter.PositiveRoll,
   matchers: [
-    { string: "Upgrades Radius to Large", value: 2 },
+    { string: RADIUS_LINE, value: 2 },
     { string: "Upgrades Radius to Medium", value: 1 },
   ],
   trade: {
@@ -58,265 +66,144 @@ const OPTION_STAT = {
     },
     option: true,
   },
-  id: "local_jewel_display_radius_change",
-} as data.Stat;
+};
+
+function parse(string: string, type = ModifierType.Explicit) {
+  return __testExports.tryParseTranslation(
+    { string, unscalable: false },
+    type,
+    undefined,
+  );
+}
 
 describe("tryParseTranslation", () => {
-  beforeEach(async () => {
-    vi.clearAllMocks();
+  beforeEach(() => {
+    lists.stats.length = 0;
+    lists.tradeIds.clear();
   });
 
-  it("should return undefined if no translation is found", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(undefined);
+  it("returns undefined when neither list has the line", () => {
+    lists.stats.push(EXACT_MATCH_STAT);
+    lists.tradeIds.set(ENFEEBLE_LINE, ENFEEBLE_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "180% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
-
-    expect(result).toBeUndefined();
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalled();
+    expect(parse(PHYS_LINE)).toBeUndefined();
   });
 
-  it("should not call trade stats if stat found in normal stats", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([
-      {
-        stat: PHYS_DAMAGE_STAT,
-        matcher: PHYS_DAMAGE_STAT.matchers[0],
-      },
-    ]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(undefined);
+  it("parses the roll and its range from a stat table line", () => {
+    lists.stats.push(PHYS_DAMAGE_STAT);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "180(170-190)% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
-
-    expect(result).toBeDefined();
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).not.toHaveBeenCalled();
-  });
-
-  it("should give simple parsed stat if match string fails but trade stat works", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      PHYS_DAMAGE_STAT.trade.ids!,
-    );
-
-    const result = __testExports.tryParseTranslation(
-      { string: "180(170-190)% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
-
-    expect(result).toBeDefined();
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalled();
-  });
-
-  it("should parse roll from stat, when by match str", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockImplementation((name) => {
-      if (!name.startsWith("#")) return [];
-      return [
-        {
-          stat: PHYS_DAMAGE_STAT,
-          matcher: PHYS_DAMAGE_STAT.matchers[0],
-        },
-      ];
-    });
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(undefined);
-
-    const result = __testExports.tryParseTranslation(
-      { string: "180(170-190)% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
-
-    expect(result).toBeDefined();
+    const result = parse(PHYS_LINE);
 
     expect(result?.stat).toBe(PHYS_DAMAGE_STAT);
     expect(result?.translation).toBe(PHYS_DAMAGE_STAT.matchers[0]);
-    expect(result?.roll?.value).toBe(180);
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
+    expect(result?.roll).toEqual({
+      unscalable: false,
+      dp: false,
+      value: 180,
+      min: 170,
+      max: 190,
+    });
   });
 
-  it("should parse roll from stat, when by trade stat", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockImplementation((name) => {
-      if (!name.startsWith("#")) return;
-      return PHYS_DAMAGE_STAT.trade.ids!;
-    });
+  it("prefers the stat table to the trade stat list", () => {
+    lists.stats.push(PHYS_DAMAGE_STAT);
+    lists.tradeIds.set(PHYS_TEXT, PHYS_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "180(170-190)% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
-
-    expect(result).toBeDefined();
-
-    expect(result?.stat).not.toBe(PHYS_DAMAGE_STAT);
-    expect(result?.translation.string).toBe("#% increased Physical Damage");
-    expect(result?.roll?.value).toBe(180);
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalledTimes(2);
+    expect(parse(PHYS_LINE)?.stat).toBe(PHYS_DAMAGE_STAT);
   });
 
-  it("should handle legacy rolls", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockImplementation((name) => {
-      if (!name.startsWith("#")) return [];
-      return [
-        {
-          stat: PHYS_DAMAGE_STAT,
-          matcher: PHYS_DAMAGE_STAT.matchers[0],
-        },
-      ];
+  it("builds a stat from the trade ids when the stat table lacks the line", () => {
+    lists.tradeIds.set(PHYS_TEXT, PHYS_IDS);
+
+    const result = parse(PHYS_LINE);
+
+    expect(result?.stat).toEqual({
+      ref: PHYS_TEXT,
+      better: StatBetter.PositiveRoll,
+      matchers: [{ string: PHYS_TEXT }],
+      trade: { ids: PHYS_IDS },
     });
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(undefined);
+    expect(result?.translation).toEqual({ string: PHYS_TEXT });
+    expect(result?.roll).toMatchObject({ value: 180, min: 170, max: 190 });
+  });
 
-    const result = __testExports.tryParseTranslation(
-      { string: "220(170-190)% increased Physical Damage", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
+  it("marks a roll above its range as legacy and widens the range", () => {
+    lists.stats.push(PHYS_DAMAGE_STAT);
 
-    expect(result).toBeDefined();
+    const result = parse("220(170-190)% increased Physical Damage");
 
     expect(result?.stat).toBe(PHYS_DAMAGE_STAT);
-    expect(result?.translation).toBe(PHYS_DAMAGE_STAT.matchers[0]);
-    expect(result?.roll?.value).toBe(220);
-    expect(result?.roll?.legacy).toBeTruthy();
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
+    expect(result?.roll).toMatchObject({
+      value: 220,
+      min: 170,
+      max: 220,
+      legacy: true,
+    });
   });
 
-  it("should prefer match str on exact match", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([
-      {
-        stat: EXACT_MATCH_STAT,
-        matcher: EXACT_MATCH_STAT.matchers[0],
-      },
-    ]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids!,
-    );
+  it("returns the stat table's stat of a line without numbers and no roll", () => {
+    lists.stats.push(EXACT_MATCH_STAT);
+    lists.tradeIds.set(ENFEEBLE_LINE, ENFEEBLE_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "Players are Cursed with Enfeeble", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
+    const result = parse(ENFEEBLE_LINE);
 
-    expect(result).toBeDefined();
     expect(result?.stat).toBe(EXACT_MATCH_STAT);
     expect(result?.translation).toBe(EXACT_MATCH_STAT.matchers[0]);
     expect(result?.roll).toBeUndefined();
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).not.toHaveBeenCalled();
   });
 
-  it("should handle exact match with trade stat", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids!,
-    );
+  it("builds a stat without a roll from the trade ids of a line without numbers", () => {
+    lists.tradeIds.set(ENFEEBLE_LINE, ENFEEBLE_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "Players are Cursed with Enfeeble", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
+    const result = parse(ENFEEBLE_LINE);
 
-    expect(result).toBeDefined();
+    expect(result?.stat.ref).toBe(ENFEEBLE_LINE);
+    expect(result?.stat.trade.ids).toEqual(ENFEEBLE_IDS);
     expect(result?.roll).toBeUndefined();
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalled();
   });
 
-  it("should handle options in match str", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([
-      {
-        stat: OPTION_STAT,
-        matcher: OPTION_STAT.matchers[0],
-      },
-    ]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      OPTION_STAT.trade.ids!,
-    );
+  it("reads the option value of a stat table line as its roll", () => {
+    lists.stats.push(OPTION_STAT);
+    lists.tradeIds.set(RADIUS_LINE, { explicit: ["explicit.stat_3891355829"] });
 
-    const result = __testExports.tryParseTranslation(
-      { string: "Upgrades Radius to Large", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
+    const result = parse(RADIUS_LINE);
 
-    expect(result).toBeDefined();
     expect(result?.stat).toBe(OPTION_STAT);
     expect(result?.translation).toBe(OPTION_STAT.matchers[0]);
-    expect(result?.roll?.value).toBe(2);
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).not.toHaveBeenCalled();
+    expect(result?.roll).toMatchObject({
+      value: 2,
+      min: 2,
+      max: 2,
+      option: 2,
+    });
   });
 
-  it("should handle options in trade stat", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue({
-      explicit: ["explicit.stat_3891355829|2"],
-    });
+  it("keeps the option in the trade id of a trade stat line", () => {
+    const ids = { explicit: ["explicit.stat_3891355829|2"] };
+    lists.tradeIds.set(RADIUS_LINE, ids);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "Upgrades Radius to Large", unscalable: false },
-      ModifierType.Explicit,
-      undefined,
-    );
+    const result = parse(RADIUS_LINE);
 
-    expect(result).toBeDefined();
-    expect(result?.stat).not.toBe(OPTION_STAT);
-    expect(result?.stat.trade.ids).toHaveProperty("explicit");
-    expect(result?.stat.trade.ids?.explicit).toHaveLength(1);
-
-    expect(data.STAT_BY_MATCH_STR).toHaveBeenCalled();
-    expect(data.TRADE_STAT_BY_MATCH_STR).toHaveBeenCalledOnce();
+    expect(result?.stat.ref).toBe(RADIUS_LINE);
+    expect(result?.stat.trade.ids).toEqual(ids);
+    expect(result?.roll).toBeUndefined();
   });
 
   it("should not use a trade stat without a rune id for a rune line", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      EXACT_MATCH_STAT.trade.ids!,
-    );
+    lists.tradeIds.set(ENFEEBLE_LINE, ENFEEBLE_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "Players are Cursed with Enfeeble", unscalable: false },
-      ModifierType.Augment,
-      undefined,
-    );
-
-    expect(result).toBeUndefined();
+    expect(parse(ENFEEBLE_LINE, ModifierType.Augment)).toBeUndefined();
   });
 
   it("should use a trade stat with a rune id for an added rune line", () => {
-    vi.mocked(data.STAT_BY_MATCH_STR).mockReturnValue([]);
-    vi.mocked(data.TRADE_STAT_BY_MATCH_STR).mockReturnValue(
-      PHYS_DAMAGE_STAT.trade.ids!,
-    );
+    lists.tradeIds.set(PHYS_TEXT, PHYS_IDS);
 
-    const result = __testExports.tryParseTranslation(
-      { string: "36% increased Physical Damage", unscalable: false },
+    const result = parse(
+      "36% increased Physical Damage",
       ModifierType.AddedAugment,
-      undefined,
     );
 
-    expect(result?.stat.trade.ids?.rune).toEqual(
-      PHYS_DAMAGE_STAT.trade.ids!.rune,
-    );
+    expect(result?.stat.trade.ids?.rune).toEqual(PHYS_IDS.rune);
+    expect(result?.roll?.value).toBe(36);
   });
 });
