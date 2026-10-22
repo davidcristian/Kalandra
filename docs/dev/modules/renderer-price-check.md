@@ -211,7 +211,8 @@ catalyst quality, the catalyst price, the augment tabs and the lists after a lan
 into their titles, name blocks, tags and affix tiers, and gets a listing it cannot read from a fake trade site,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
 file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
-`specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by mocks, and
+`specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by a fake trade site that
+returns the saved listings, and checks the grouped rows and how many listings it reads.
 `specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` that answers when
 the test says.
 `specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
