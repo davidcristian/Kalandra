@@ -64,3 +64,5 @@ replaces it with `vi.mock("electron", ...)`.
 ## vision/
 
 - `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink, fails or exits.
+- `heist-points.test.ts` groups weighted points, pairs them into lines and converts colors to the 0 to 255 range with
+  the functions of `vision/utils.ts` that `HeistGemFinder` calls, none of which needs the OpenCV build.
