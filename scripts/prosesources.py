@@ -5,12 +5,14 @@ import io
 import re
 import tokenize
 import warnings
+from collections.abc import Callable
 from pathlib import PurePosixPath
 
 Line = tuple[int, str]
 
-SCRIPT_SUFFIXES = frozenset({".ts", ".tsx", ".js", ".mjs", ".cjs"})
-HASH_SUFFIXES = frozenset({".yml", ".yaml", ".toml", ".sh"})
+SCRIPT_SUFFIXES = frozenset({".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs", ".jsonc"})
+HASH_SUFFIXES = frozenset({".yml", ".yaml", ".toml", ".sh", ".txt", ".conf", ".dockerignore"})
+HASH_NAMES = frozenset({"Dockerfile"})
 LOG_METHODS = frozenset({"debug", "info", "warning", "error", "exception", "critical"})
 # A call whose name ends with one of these builds a message, such as Problem(path, "...") or ValueError("...")
 MESSAGE_CALLS = ("Problem", "Error", "Exception")
@@ -24,6 +26,7 @@ _SCRIPT_CALL = re.compile(
 )
 _VUE_BLOCK = re.compile(r"<(script|style)\b[^>]*>(.*?)</\1>", re.DOTALL)
 _HTML_COMMENT = re.compile(r"<!--(.*?)-->", re.DOTALL)
+_CSS_COMMENT = re.compile(r"/\*(.*?)\*/", re.DOTALL)
 
 
 class SourceError(Exception):
@@ -32,18 +35,16 @@ class SourceError(Exception):
 
 def prose_lines(name: str, text: str) -> list[Line]:
     """Returns the prose of a file as numbered lines, read according to its file type."""
-    suffix = PurePosixPath(name).suffix
-    if suffix == ".md":
-        return markdown_prose(text)
-    if suffix in SCRIPT_SUFFIXES:
-        return script_prose(text)
-    if suffix == ".vue":
-        return vue_prose(text)
-    if suffix == ".py":
-        return python_prose(text)
-    if suffix in HASH_SUFFIXES:
-        return [(n, line.strip()[1:]) for n, line in enumerate(text.splitlines(), 1) if line.lstrip().startswith("#")]
-    return []
+    path = PurePosixPath(name)
+    if path.name in HASH_NAMES or (path.name.startswith(".") and not path.suffix):
+        return hash_prose(text)
+    read = _READERS.get(path.suffix)
+    return read(text) if read else []
+
+
+def hash_prose(text: str) -> list[Line]:
+    """Returns the text after the `#` of each line that starts with one."""
+    return [(n, line.strip()[1:]) for n, line in enumerate(text.splitlines(), 1) if line.lstrip().startswith("#")]
 
 
 def markdown_prose(text: str) -> list[Line]:
@@ -142,14 +143,26 @@ def script_prose(text: str, first_line: int = 1) -> list[Line]:
     return found
 
 
+def _comments(pattern: re.Pattern[str], text: str) -> list[Line]:
+    """Returns the text of each match of ``pattern``'s first group, with its line numbers."""
+    found: list[Line] = []
+    for comment in pattern.finditer(text):
+        found.extend(_split(comment.group(1), text.count("\n", 0, comment.start(1)) + 1))
+    return found
+
+
+def css_prose(text: str) -> list[Line]:
+    """Returns the comments of a CSS file."""
+    return _comments(_CSS_COMMENT, text)
+
+
 def vue_prose(text: str) -> list[Line]:
-    """Returns the prose of the script and style blocks of a Vue file, and the HTML comments of its template."""
+    """Returns the prose of the script and style blocks of a Vue or HTML file, and the HTML comments outside them."""
     found: list[Line] = []
     for block in _VUE_BLOCK.finditer(text):
         found.extend(script_prose(block.group(2), text.count("\n", 0, block.start(2)) + 1))
     template = _VUE_BLOCK.sub(lambda block: "\n" * block.group().count("\n"), text)
-    for comment in _HTML_COMMENT.finditer(template):
-        found.extend(_split(comment.group(1), template.count("\n", 0, comment.start(1)) + 1))
+    found.extend(_comments(_HTML_COMMENT, template))
     return sorted(found)
 
 
@@ -215,3 +228,14 @@ def python_prose(text: str) -> list[Line]:
         for message in _message_nodes(node):
             found.extend(_texts(message))
     return sorted(set(found))
+
+
+_READERS: dict[str, Callable[[str], list[Line]]] = {
+    ".md": markdown_prose,
+    ".vue": vue_prose,
+    ".html": vue_prose,
+    ".css": css_prose,
+    ".py": python_prose,
+    **dict.fromkeys(SCRIPT_SUFFIXES, script_prose),
+    **dict.fromkeys(HASH_SUFFIXES, hash_prose),
+}

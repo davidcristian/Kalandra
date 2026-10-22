@@ -125,3 +125,18 @@ class OtherTest(unittest.TestCase):
     def test_reads_hash_comments_of_yaml_and_nothing_of_json(self) -> None:
         self.assertEqual(texts("a.yml", "# a comment\nkey: value # not read\n"), [(1, "a comment")])
         self.assertEqual(texts("a.json", '{"comment": "text"}'), [])
+
+    def test_reads_hash_comments_of_dockerfiles_dotfiles_and_text_files(self) -> None:
+        names = ["a/Dockerfile", ".gitignore", "a/.coveragerc", "list.txt", "nginx.conf", "Dockerfile.dockerignore"]
+        read = {name: texts(name, "# a comment\nnot read\n") for name in [*names, "LICENSE"]}
+        self.assertEqual(read, {name: [(1, "a comment")] for name in names} | {"LICENSE": []})
+
+    def test_reads_the_comments_of_css_html_jsonc_and_mts(self) -> None:
+        self.assertEqual(
+            texts("a.css", "/* one */\na { color: red; }\n/* two\n   lines */\n"),
+            [(1, "one"), (3, "two"), (4, "lines")],
+        )
+        html = "<!-- a page comment -->\n<p>not read</p>\n<script>\n// a script comment\n</script>\n"
+        self.assertEqual(texts("a.html", html), [(1, "a page comment"), (4, "a script comment")])
+        self.assertEqual(texts("a.jsonc", '// a comment\n{"url": "https://example.com"}\n'), [(1, "a comment")])
+        self.assertEqual(texts("a.mts", "// a comment\n"), [(1, "a comment")])

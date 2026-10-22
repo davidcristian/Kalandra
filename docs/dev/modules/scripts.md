@@ -48,8 +48,10 @@ the repo.
   covers no dash fails. A line that contains `dashcheck: allow` is skipped.
 - **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. The first spaced `--` of a comment that
   starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
-  `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, Vue,
-  YAML, TOML and shell files; the docstrings and comments of Python; and the strings passed to `console.*`,
+  `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, JSON
+  with comments (`.jsonc`), Vue, HTML and CSS files; the lines that start with `#` in YAML, TOML, shell, `.txt`,
+  `.conf`, `Dockerfile` and `.dockerignore` files and in dotfiles without a suffix, such as `.gitignore` and
+  `.coveragerc`; the docstrings and comments of Python; and the strings passed to `console.*`,
   `logger.write`, `new ...Error` and `throw new` calls. In Python they are the strings passed to `print`, a logging
   method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and `problems.append` or
   `problems.extend`, and those assigned to `msg` or given as `help`, `description` or `epilog`. Each string of a
@@ -131,7 +133,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 102 tests on 22 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 104 tests on 22 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
