@@ -16,7 +16,7 @@
       "@ipc/*": ["../ipc/*"],
       "@specs/*": ["./specs/*"]
     },
-    "types": ["vite/client", "vitest/importMeta", "node"],
+    "types": ["vite/client", "node"],
     "lib": ["esnext", "dom", "dom.iterable"]
   },
   "include": [

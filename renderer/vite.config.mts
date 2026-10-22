@@ -29,9 +29,6 @@ export default defineConfig({
     },
     extensions: [".ts", ".js", ".vue", ".json"],
   },
-  define: {
-    "import.meta.vitest": "undefined",
-  },
   server: {
     proxy: {
       "^/(config|uploads|proxy)": { target: "http://127.0.0.1:8584" },

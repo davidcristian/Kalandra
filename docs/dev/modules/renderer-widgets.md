@@ -125,7 +125,7 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 `web/background/` and `web/client-log/`.
 
 **Tests.** `npx vitest run` in `renderer/`. No test covers the registry, `OverlayWindow.vue` or `Widget.vue`, and
-`vitest.config.ts` lists `*.vue` under `coverage.exclude`. Widget logic outside components is tested in
+coverage counts only the `.ts` files of `src/` (`coverage.include` in `vitest.config.ts`). Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
 until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP tracker reads, with
