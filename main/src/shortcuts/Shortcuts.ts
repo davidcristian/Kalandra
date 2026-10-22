@@ -232,7 +232,6 @@ export class Shortcuts {
             if (process.platform !== "win32") return;
 
             const { action } = entry;
-            const pressTime = Date.now();
             const imageData = this.poeWindow.screenshot();
             this.ocrWorker
               .findHeistGems({
@@ -245,8 +244,6 @@ export class Shortcuts {
                   name: "MAIN->CLIENT::ocr-text",
                   payload: {
                     target: action.target,
-                    pressTime,
-                    ocrTime: result.elapsed,
                     paragraphs: result.recognized.map((p) => p.text),
                   },
                 });

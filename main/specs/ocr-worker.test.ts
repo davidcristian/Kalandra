@@ -15,7 +15,6 @@ vi.mock("electron", async () => {
 const never = async () => await new Promise<never>(() => {});
 
 const GEMS = {
-  elapsed: 12,
   recognized: [{ text: "Fireball", confidence: 90 }],
 };
 

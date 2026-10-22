@@ -109,7 +109,6 @@ type IpcFocusChange = Event<
   {
     game: boolean;
     overlay: boolean;
-    usingHotkey: boolean;
   }
 >;
 
@@ -195,8 +194,6 @@ type IpcOcrText = Event<
   "MAIN->CLIENT::ocr-text",
   {
     target: string;
-    pressTime: number;
-    ocrTime: number;
     paragraphs: string[];
   }
 >;
@@ -233,7 +230,6 @@ type IpcWriteToFile = Event<
   | {
       action: "client-log-event";
       data: ClientLogEvent;
-      close: boolean;
     }
 >;
 

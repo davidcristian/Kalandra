@@ -116,9 +116,6 @@ export class FileWriter {
       }
       this._currentDateTime = e.data.ts;
       await this.writeLine(JSON.stringify(e.data), FileChannel.ClientLog);
-      if (e.close) {
-        await this.closeChannel(FileChannel.ClientLog);
-      }
       return;
     }
 

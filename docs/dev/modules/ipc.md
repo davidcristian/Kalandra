@@ -28,9 +28,9 @@ type check covers the files it imports. The routes that move the messages are in
 | `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
-| `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` and `close` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
+| `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
-| `MAIN->CLIENT::ocr-text` | `target`, `pressTime`, `ocrTime`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
+| `MAIN->CLIENT::ocr-text` | `target`, `paragraphs` | `Shortcuts` (`ocr-text`), to the last active client | `WidgetItemSearch.vue` |
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
 | `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`, the last 1000 lines, cleared when the socket opens) |
@@ -38,7 +38,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
 | `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |
 | `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
-| `MAIN->OVERLAY::focus-change` | `game`, `overlay`, `usingHotkey` | `OverlayWindow` | `OverlayWindow.vue` |
+| `MAIN->OVERLAY::focus-change` | `game`, `overlay` | `OverlayWindow` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::visibility` | `isVisible` | `OverlayVisibility` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::hide-exclusive-widget` | none | `WidgetAreaTracker` | `PriceCheckWindow.vue` |
 | `OVERLAY->MAIN::focus-game` | none | `OverlayWindow.vue`, `PriceCheckWindow.vue` | `OverlayWindow.assertGameActive()` |

@@ -55,7 +55,6 @@ export function createClientLog() {
         payload: {
           action: "client-log-event",
           data,
-          close: false,
         },
       });
     }

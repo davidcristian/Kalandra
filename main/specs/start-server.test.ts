@@ -83,7 +83,6 @@ function clientLogEntry(ms: number): string {
     payload: {
       action: "client-log-event",
       data: { ts: 0, ms, type: "game-start" },
-      close: false,
     },
   };
   return JSON.stringify(event);

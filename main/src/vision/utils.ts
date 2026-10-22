@@ -73,9 +73,3 @@ export function hsvToU8(h: number, s: number, v: number) {
     Math.round((v * 255) / 100),
   ];
 }
-
-export function timeIt(syncFn: () => void): number {
-  const startTime = performance.now();
-  syncFn();
-  return performance.now() - startTime;
-}

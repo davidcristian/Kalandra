@@ -15,7 +15,6 @@ export class OverlayWindow {
   public wasUsedRecently = true;
   private window?: BrowserWindow;
   private overlayKey: string = "Shift + Space";
-  private isOverlayKeyUsed = false;
   private shouldShowOverlay = true;
   private hideOverlayOnBlur = false;
 
@@ -127,7 +126,6 @@ export class OverlayWindow {
   };
 
   toggleActiveState = () => {
-    this.isOverlayKeyUsed = true;
     if (this.isInteractable) {
       this.assertGameActive();
     } else {
@@ -189,10 +187,8 @@ export class OverlayWindow {
       payload: {
         game: isActive,
         overlay: this.isInteractable,
-        usingHotkey: this.isOverlayKeyUsed,
       },
     });
-    this.isOverlayKeyUsed = false;
     this.syncWindowVisibility();
   };
 

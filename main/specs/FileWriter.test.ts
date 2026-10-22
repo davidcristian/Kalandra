@@ -45,7 +45,6 @@ async function sendEntry(ts: number) {
   await server.emit("CLIENT->MAIN::write-data", {
     action: "client-log-event",
     data: { ts, ms: 0, type: "log" },
-    close: false,
   });
 }
 
