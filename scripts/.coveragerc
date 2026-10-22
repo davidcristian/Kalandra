@@ -6,4 +6,4 @@ omit = tests/*
 
 [report]
 precision = 1
-fail_under = 97.4
+fail_under = 97.5

@@ -52,9 +52,11 @@ the repo.
   YAML, TOML and shell files; the docstrings and comments of Python; and the strings passed to `console.*`,
   `logger.write`, `new ...Error` and `throw new` calls, or in Python to `print`, a logging method, a `raise`, or a
   variable named `msg`.
-  `bannedwords.py` reads the words from the table in AGENTS.md, skips code spans, link targets and URLs, finds a
-  phrase across one line break, and skips the `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's
-  capitals. The rows of the table itself are not checked.
+  `bannedwords.py` reads the words from the table in AGENTS.md and finds them alone or joined to other words by a
+  hyphen (`non-gated`), and a phrase whose words have hyphens or one line break between them. It skips code spans,
+  link targets, URLs, a word that starts with a hyphen as a command line option does (`--gate`), and the
+  `GAME_TERMS` (`Delve`, `Spell`, `Spells`) when they have the game's capitals. The rows of the table itself are not
+  checked.
 - **`linkcheck.py`** reads every markdown file outside `docs/`, and those in `docs/dev/`, since VitePress checks the
   user pages. Each relative link outside code (`markdownlinks.py`) must name a file or folder in the repo, and an
   `#anchor` in a markdown file must match one of its headings as GitHub makes them: lowercase, punctuation removed,
@@ -126,11 +128,11 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 99 tests on 21 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 100 tests on 22 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 97.4% of lines and branches on 21 Oct 2026.
+floor in `scripts/.coveragerc`, 97.5% of lines and branches on 22 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.

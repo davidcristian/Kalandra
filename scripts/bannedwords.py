@@ -80,9 +80,19 @@ def read_table(path: Path) -> Table:
 
 
 def compile_words(words: Iterable[str]) -> re.Pattern[str]:
-    """Returns one pattern for all ``words``, in any case; the words of a phrase may have a line break between them."""
-    phrases = sorted({r"\s+".join(map(re.escape, word.split())) for word in words}, key=lambda p: (-len(p), p))
-    return re.compile(rf"(?<![\w-])(?:{'|'.join(phrases)})(?![\w-])", re.IGNORECASE)
+    """Returns one pattern for all ``words``, in any case, also as part of a hyphenated word.
+
+    The words of a phrase may have a hyphen or a line break between them.
+    """
+    phrases = sorted({r"[\s-]+".join(map(re.escape, word.split())) for word in words}, key=lambda p: (-len(p), p))
+    return re.compile(rf"(?<!\w)(?:{'|'.join(phrases)})(?!\w)", re.IGNORECASE)
+
+
+def _is_flag(text: str, start: int) -> bool:
+    """Returns whether the hyphenated word around ``start`` starts with a hyphen, as a command line option does."""
+    while start > 0 and (text[start - 1].isalnum() or text[start - 1] in "_-"):
+        start -= 1
+    return text.startswith("-", start)
 
 
 def mask(text: str) -> str:
@@ -106,7 +116,7 @@ def runs(lines: Iterable[Line]) -> list[list[Line]]:
 
 
 def find_words(lines: Sequence[Line], pattern: re.Pattern[str]) -> list[Hit]:
-    """Returns every banned word in ``lines``, on the line where it starts; game terms are left out."""
+    """Returns every banned word in ``lines``, on the line where it starts; game terms and options are left out."""
     hits: list[Hit] = []
     for run in runs(lines):
         text = mask("\n".join(line for _, line in run))
@@ -114,7 +124,7 @@ def find_words(lines: Sequence[Line], pattern: re.Pattern[str]) -> list[Hit]:
         for _, line in run[:-1]:
             starts.append(starts[-1] + len(line) + 1)
         for found in pattern.finditer(text):
-            if found.group() in GAME_TERMS:
+            if found.group() in GAME_TERMS or _is_flag(text, found.start()):
                 continue
             index = max(i for i, start in enumerate(starts) if start <= found.start())
             hits.append(Hit(line=run[index][0], word=" ".join(found.group().split()).lower()))

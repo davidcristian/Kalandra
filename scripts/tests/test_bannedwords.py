@@ -37,9 +37,15 @@ class FindWordsTest(unittest.TestCase):
     def test_finds_a_phrase_across_a_line_break_on_its_first_line(self) -> None:
         self.assertEqual(self.find("what happens under", "the hood here"), [Hit(1, "under the hood")])
 
-    def test_skips_code_spans_link_targets_urls_and_other_words(self) -> None:
-        lines = ("`gate` and [the page](gate.md)", "https://example.com/gate", "a gateway, gate-keeper, isGated")
+    def test_skips_code_spans_link_targets_urls_options_and_other_words(self) -> None:
+        lines = ("`gate` and [the page](gate.md)", "https://example.com/gate", "a gateway, isGated, --gate, -x-spell")
         self.assertEqual(self.find(*lines), [])
+
+    def test_finds_a_word_or_phrase_joined_to_other_words_by_hyphens(self) -> None:
+        lines = ("a gate-keeper and non-gates", "the under-the-hood", "code, re-spell it")
+        self.assertEqual(
+            self.find(*lines), [Hit(1, "gate"), Hit(1, "gates"), Hit(2, "under-the-hood"), Hit(3, "spell")]
+        )
 
     def test_skips_game_terms_written_with_the_games_capitals(self) -> None:
         self.assertEqual(self.find("Spell Damage and the Delve grid", "spell it out"), [Hit(2, "spell")])
