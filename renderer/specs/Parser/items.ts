@@ -411,8 +411,8 @@ Right Click to engrave a Support Gem.
 UncutSupportGem.category = ItemCategory.Currency;
 UncutSupportGem.gemLevel = 5;
 UncutSupportGem.info = {
-  name: "Uncut Spirit Gem",
-  refName: "Uncut Spirit Gem",
+  name: "Uncut Support Gem",
+  refName: "Uncut Support Gem",
   namespace: "ITEM",
   icon: "test",
   tags: [],
@@ -672,7 +672,7 @@ Note: ~b/o 1 aug
 `);
 NormalShield.category = ItemCategory.Shield;
 NormalShield.rarity = ItemRarity.Normal;
-NormalShield.itemLevel = 82;
+NormalShield.itemLevel = 54;
 NormalShield.armourAR = 71;
 NormalShield.armourEV = 64;
 NormalShield.armourBLOCK = 25;
@@ -908,14 +908,14 @@ Fractured Item
 FracturedItem.category = ItemCategory.Bow;
 FracturedItem.rarity = ItemRarity.Rare;
 FracturedItem.quality = 25;
-FracturedItem.weaponPHYSICAL = 624;
+FracturedItem.weaponPHYSICAL = 543;
 FracturedItem.weaponAS = 1.15;
 FracturedItem.weaponCRIT = 9.4;
 FracturedItem.itemLevel = 81;
 FracturedItem.requires = {
   level: 78,
-  str: 163,
-  dex: 0,
+  str: 0,
+  dex: 163,
   int: 0,
 };
 
@@ -935,81 +935,6 @@ FracturedItem.augmentSockets = {
   ],
 };
 // #endregion FracturedItem
-
-// #region FracturedItemNoModMarked
-export const FracturedItemNoModMarked = new TestItem(`Item Class: Bows
-Rarity: Rare
-Miracle Siege
-Obliterator Bow
---------
-Quality: +25% (augmented)
-Physical Damage: 381-705 (augmented)
-Critical Hit Chance: 9.40% (augmented)
-Attacks per Second: 1.15
---------
-Requires: Level 78, 163 (unmet) Dex
---------
-Sockets: S S
---------
-Item Level: 81
---------
-36% increased Physical Damage (rune)
---------
-{ Implicit Modifier }
-50% reduced Projectile Range
---------
-{ Prefix Modifier "Flaring" (Tier: 1) — Damage, Physical, Attack }
-Adds 32(26-39) to 59(44-66) Physical Damage
-
-{ Prefix Modifier "Bloodthirsty" (Tier: 4) — Damage, Physical, Attack }
-134(110-134)% increased Physical Damage
-
-{ Prefix Modifier "Champion's" (Tier: 4) — Damage, Physical, Attack }
-54(45-54)% increased Physical Damage
-+113(98-123) to Accuracy Rating
-
-{ Suffix Modifier "of the Essence" — Speed }
-20(20-25)% chance to gain Onslaught on Killing Hits with this Weapon
-
-{ Suffix Modifier "of the Essence" — Attack }
-+3 to Level of all Attack Skills
-
-{ Suffix Modifier "of Ruin" (Tier: 2) — Attack, Critical }
-+4.4(3.81-4.4)% to Critical Hit Chance
-
---------
-Fractured Item
-`);
-FracturedItemNoModMarked.category = ItemCategory.Bow;
-FracturedItemNoModMarked.rarity = ItemRarity.Rare;
-FracturedItemNoModMarked.quality = 25;
-FracturedItemNoModMarked.weaponPHYSICAL = 543;
-FracturedItemNoModMarked.weaponAS = 1.15;
-FracturedItemNoModMarked.weaponCRIT = 9.4;
-FracturedItemNoModMarked.itemLevel = 81;
-FracturedItemNoModMarked.requires = {
-  level: 78,
-  str: 163,
-  dex: 0,
-  int: 0,
-};
-
-FracturedItemNoModMarked.info.refName = "Obliterator Bow";
-FracturedItemNoModMarked.isFractured = true;
-FracturedItemNoModMarked.prefixCount = 3;
-FracturedItemNoModMarked.suffixCount = 3;
-FracturedItemNoModMarked.implicitCount = 1;
-FracturedItemNoModMarked.sectionCount = 9;
-FracturedItemNoModMarked.augmentSockets = {
-  empty: 0,
-  current: 2,
-  normal: 2,
-  augments: [
-    createEditorItem("Greater Iron Rune", "18% increased Physical Damage", 18),
-    createEditorItem("Greater Iron Rune", "18% increased Physical Damage", 18),
-  ],
-};
-// #endregion FracturedItemNoModMarked
 
 // #region RequiresOneAttribute
 export const RequiresOneAttribute = new TestItem(`Item Class: Boots
@@ -1284,7 +1209,7 @@ UnidentifiedTier.category = ItemCategory.Ring;
 UnidentifiedTier.rarity = ItemRarity.Magic;
 UnidentifiedTier.itemLevel = 54;
 
-UnidentifiedTier.info.refName = "Volatile Wand";
+UnidentifiedTier.info.refName = "Sapphire Ring";
 UnidentifiedTier.sectionCount = 4;
 UnidentifiedTier.implicitCount = 1;
 UnidentifiedTier.isUnidentified = true;
@@ -1388,6 +1313,7 @@ BowThreeAugments.requires = {
 };
 
 BowThreeAugments.info.refName = "Obliterator Bow";
+BowThreeAugments.isCorrupted = true;
 BowThreeAugments.sectionCount = 9;
 BowThreeAugments.prefixCount = 3;
 BowThreeAugments.suffixCount = 3;
