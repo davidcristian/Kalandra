@@ -32,6 +32,8 @@ replaces it with `vi.mock("electron", ...)`.
   records the window each key press reaches.
 - `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
 - `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts`.
+- `key-names.test.ts` writes hotkeys with `hotkeyToString()`, `mergeTwoHotkeys()` and `shortcutToElectron()`, and
+  checks that `KeyToCode` gives each key a code of its own and that `KeyToElectron` has an accelerator for each key.
 
 ## windowing/
 

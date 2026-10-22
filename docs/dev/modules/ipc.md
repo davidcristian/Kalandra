@@ -138,7 +138,8 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 main imports them in `server.ts`, `AppUpdater.ts`, `Shortcuts.ts`, `GameConfig.ts` and `FileWriter.ts`; the
 renderer in `IPC.ts`, `Config.ts`, `client-log/`, `HotkeyInput.vue` and `library/session.ts`.
 
-**Tests.** `ipc/` has no tests of its own; `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent`
-values the parser makes. The type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`.
-The pre-commit type check hooks run only for a change under `main/` or `renderer/`, so a change to `ipc/` alone
-runs both by hand or `pre-commit run --all-files`; CI's Lint & Format job runs every hook over all files.
+**Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
+`renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes. The type checks are `npm
+run build` in `main/` and `npm run check-types` in `renderer/`. The pre-commit type check hooks run only for a change
+under `main/` or `renderer/`, so a change to `ipc/` alone runs both by hand or `pre-commit run --all-files`; CI's
+Lint & Format job runs every hook over all files.
