@@ -7,12 +7,6 @@ import { CATEGORY_TO_TRADE_ID } from "../trade/pathofexile-trade";
 import { ARMOUR, GEM, WEAPON } from "@/parser/meta";
 import { maxUsefulItemLevel, uniqueBaseTradeName } from "./common";
 
-export const SPECIAL_SUPPORT_GEM = [
-  "Empower Support",
-  "Enlighten Support",
-  "Enhance Support",
-];
-
 const CATEGORIES_WITH_USEFUL_QUALITY = new Set([
   ItemCategory.Flask,
   ItemCategory.Charm,
@@ -101,34 +95,12 @@ export function createFilters(
   }
   if (
     item.category === ItemCategory.DivinationCard ||
-    item.category === ItemCategory.Currency ||
-    item.info.refName === "Charged Compass"
+    item.category === ItemCategory.Currency
   ) {
     filters.searchExact = {
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info),
     };
-    if (item.info.refName === "Chronicle of Atzoatl") {
-      filters.areaLevel = {
-        value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80]),
-        disabled: false,
-      };
-    }
-    if (
-      item.info.refName === "Mirrored Tablet" ||
-      item.info.refName === "Forbidden Tome"
-    ) {
-      filters.areaLevel = {
-        value: item.areaLevel!,
-        disabled: false,
-      };
-    }
-    if (item.info.refName === "Filled Coffin") {
-      filters.itemLevel = {
-        value: item.itemLevel!,
-        disabled: false,
-      };
-    }
     return filters;
   }
 
@@ -362,41 +334,6 @@ export function createFilters(
         };
       }
     }
-
-    if (item.rarity === ItemRarity.Unique) {
-      if (item.isUnidentified && item.info.refName === "Watcher's Eye") {
-        filters.itemLevel = {
-          value: item.itemLevel,
-          disabled: false,
-        };
-      }
-
-      if (
-        item.itemLevel >= 75 &&
-        [
-          "Agnerod",
-          "Agnerod East",
-          "Agnerod North",
-          "Agnerod South",
-          "Agnerod West",
-        ].includes(item.info.refName)
-      ) {
-        // https://pathofexile.gamepedia.com/The_Vinktar_Square
-        const normalizedLvl =
-          item.itemLevel >= 82
-            ? 82
-            : item.itemLevel >= 80
-              ? 80
-              : item.itemLevel >= 78
-                ? 78
-                : 75;
-
-        filters.itemLevel = {
-          value: normalizedLvl,
-          disabled: false,
-        };
-      }
-    }
   }
 
   if (item.isUnidentified) {
@@ -469,22 +406,6 @@ function createGemFilters(
       filters.quality = {
         value: item.quality,
         disabled: item.quality < 20,
-      };
-    }
-
-    return filters;
-  }
-
-  if (SPECIAL_SUPPORT_GEM.includes(item.info.refName)) {
-    filters.gemLevel = {
-      value: item.gemLevel!,
-      disabled: item.gemLevel! < 3,
-    };
-
-    if (item.isCorrupted && item.quality) {
-      filters.quality = {
-        value: item.quality,
-        disabled: true,
       };
     }
 

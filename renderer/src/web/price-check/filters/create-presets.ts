@@ -3,13 +3,10 @@ import {
   createExactStatFilters,
   initUiModFilters,
 } from "./create-stat-filters";
-import { sumStatsByModType } from "@/parser/modifiers";
 import { ItemCategory, ItemRarity, ParsedItem } from "@/parser";
 import type { FilterPreset } from "./interfaces";
 import { hasCraftingValue, likelyFinishedItem } from "./common";
 import { createUniquePresets, PRESET_UNIQUES } from "./create-unique-filters";
-
-const ROMAN_NUMERALS = ["I", "II", "III", "IV", "V"];
 
 export function createPresets(
   item: ParsedItem,
@@ -30,18 +27,6 @@ export function createPresets(
     defaultAllSelected: boolean;
   },
 ): { presets: FilterPreset[]; active: string } {
-  // logbooks aren't real anymore
-  if (item.info.refName === "logbook here") {
-    return {
-      active: ROMAN_NUMERALS[0],
-      presets: item.logbookAreaMods!.map<FilterPreset>((area, idx) => ({
-        id: ROMAN_NUMERALS[idx],
-        filters: createFilters(item, { ...opts, exact: true }),
-        stats: createExactStatFilters(item, sumStatsByModType(area), opts),
-      })),
-    };
-  }
-
   if (
     item.isUnidentified ||
     item.rarity === ItemRarity.Normal ||

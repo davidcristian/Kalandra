@@ -20,10 +20,8 @@ import {
   StatFilterRoll,
 } from "./interfaces";
 import { filterPseudo } from "./pseudo";
-import { applyRules as applyAtzoatlRules } from "./pseudo/atzoatl-rules";
-import { applyRules as applyMirroredTabletRules } from "./pseudo/reflection-rules";
 import { applyRules as applyMissingFracturedRules } from "./pseudo/missing-fractured-rules";
-import { filterItemProp, filterBasePercentile } from "./pseudo/item-property";
+import { filterItemProp } from "./pseudo/item-property";
 import { decodeOils, applyAnointmentRules } from "./pseudo/anointments";
 import { StatBetter, CLIENT_STRINGS, CATALYST_TYPES } from "@/assets/data";
 import { explicitModifierCount, maxUsefulItemLevel } from "./common";
@@ -117,15 +115,6 @@ export function createExactStatFilters(
       calculatedStatToFilter(mod, ctx.searchInRange, item),
     ),
   );
-
-  if (item.info.refName === "Chronicle of Atzoatl") {
-    applyAtzoatlRules(ctx.filters);
-    return ctx.filters;
-  }
-  if (item.info.refName === "Mirrored Tablet") {
-    applyMirroredTabletRules(ctx.filters);
-    return ctx.filters;
-  }
 
   for (const filter of ctx.filters) {
     // show all mods for exact
@@ -252,9 +241,6 @@ export function initUiModFilters(
     if (item.rarity !== ItemRarity.Unique || !getMaxSockets(item)) {
       filterPseudo(ctx);
     }
-    if (item.info.refName === "Emperor's Vigilance") {
-      filterBasePercentile(ctx);
-    }
   }
 
   if (itemIsModifiable(item)) {
@@ -361,10 +347,7 @@ export function calculatedStatToFilter(
   ];
   let filter: StatFilter;
 
-  const roll = statSourcesTotal(
-    calc.sources,
-    item.info.refName === "Mirrored Tablet" ? "max" : "sum",
-  );
+  const roll = statSourcesTotal(calc.sources);
   const translation = translateStatWithRoll(calc, roll);
 
   if (stat.trade.option) {
@@ -451,19 +434,6 @@ export function calculatedStatToFilter(
   }
 
   if (roll && (!filter.option || roll.option !== roll.value)) {
-    // Determine goodness first
-    let goodness: number | undefined;
-    if (calc.stat.better !== StatBetter.NotComparable) {
-      if (roll.min === roll.max) {
-        goodness = 1;
-      } else {
-        goodness = (roll.value - roll.min) / (roll.max - roll.min);
-        if (calc.stat.better === StatBetter.NegativeRoll) {
-          goodness = 1 - goodness;
-        }
-      }
-    }
-
     if (
       (item.rarity === ItemRarity.Magic &&
         (item.isUnmodifiable || !itemIsModifiable(item))) ||
@@ -544,7 +514,6 @@ export function calculatedStatToFilter(
       dp,
       isNegated: false,
       tradeInvert: calc.stat.trade.inverted,
-      goodness,
     };
 
     let usedBetter = calc.stat.better;
@@ -804,11 +773,8 @@ function applyClusterJewelRules(filters: StatFilter[]) {
 }
 
 function applyFlaskRules(filters: StatFilter[]) {
-  const usedEnkindling = filters.find(
-    (filter) => filter.statRef === "Gains no Charges during Flask Effect",
-  );
   for (const filter of filters) {
-    if (filter.tag === FilterTag.Enchant && !usedEnkindling) {
+    if (filter.tag === FilterTag.Enchant) {
       filter.hidden = "hide_harvest_and_instilling";
       filter.disabled = true;
     }
@@ -885,21 +851,6 @@ function showHasEmptyModifier(ctx: FiltersCreationContext):
 function enableAllFilters(filters: StatFilter[]) {
   for (const filter of filters) {
     if (!filter.hidden) {
-      filter.disabled = false;
-    }
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- not called; kept as an alternative to enableAllFilters
-function enableGoodRolledFilters(filters: StatFilter[], abovePct: number) {
-  for (const filter of filters) {
-    if (filter.hidden) continue;
-    if (!filter.roll || filter.roll.goodness == null) {
-      filter.disabled = false;
-      continue;
-    }
-
-    if (filter.roll.goodness >= abovePct) {
       filter.disabled = false;
     }
   }

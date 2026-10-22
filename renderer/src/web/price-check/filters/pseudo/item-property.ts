@@ -34,23 +34,6 @@ export function filterItemProp(ctx: FiltersCreationContext) {
   }
 }
 
-export function filterBasePercentile(ctx: FiltersCreationContext) {
-  if (ctx.item.basePercentile != null) {
-    ctx.filters.push(
-      propToFilter(
-        {
-          ref: "Base Percentile: #%",
-          tradeId: "item.base_percentile",
-          roll: { min: 0, max: 100, value: ctx.item.basePercentile },
-          sources: [],
-          disabled: ctx.item.basePercentile < 50,
-        },
-        ctx,
-      ),
-    );
-  }
-}
-
 export const ARMOUR_STATS = new Set<string>([
   ...QUALITY_STATS.ARMOUR.flat,
   ...QUALITY_STATS.EVASION.flat,

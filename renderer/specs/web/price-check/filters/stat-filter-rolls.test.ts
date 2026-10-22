@@ -94,7 +94,6 @@ describe("the stat filters of a price check", () => {
         min: 70,
         default: { min: 70, max: 70 },
         bounds: { min: 50, max: 70 },
-        goodness: 1,
       },
     );
   });

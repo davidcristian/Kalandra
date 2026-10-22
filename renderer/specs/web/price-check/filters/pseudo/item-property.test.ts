@@ -46,7 +46,7 @@ describe("Reload Time filter", () => {
       "#% increased Attack Speed",
       "#% increased Reload Speed",
     ]);
-    expect(filter?.roll?.goodness).toBeCloseTo(0.863, 3);
+    expect(filter?.roll?.default).toEqual({ min: 0.52, max: 0.5 });
   });
 
   it("counts Attack Speed when the crossbow has no Reload Speed roll", () => {
@@ -56,7 +56,7 @@ describe("Reload Time filter", () => {
     expect(filter?.sources.map((s) => s.stat.stat.ref)).toEqual([
       "#% increased Attack Speed",
     ]);
-    expect(filter?.roll?.goodness).toBe(1);
+    expect(filter?.roll?.default).toEqual({ min: 0.6, max: 0.61 });
   });
 });
 

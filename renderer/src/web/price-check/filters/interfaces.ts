@@ -114,7 +114,6 @@ export interface StatFilterRoll {
   tradeInvert?: boolean;
   dp: boolean;
   isNegated: boolean;
-  goodness?: number;
 }
 
 export interface StatFilter {

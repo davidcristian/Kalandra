@@ -18,12 +18,12 @@
 422 renderer/src/web/overlay/Widget.vue
 361 renderer/src/web/price-check/CheckedItem.vue
 448 renderer/src/web/price-check/PriceCheckWindow.vue
-607 renderer/src/web/price-check/filters/FilterModifier.vue
+604 renderer/src/web/price-check/filters/FilterModifier.vue
 451 renderer/src/web/price-check/filters/FiltersBlock.vue
-656 renderer/src/web/price-check/filters/create-item-filters.ts
-969 renderer/src/web/price-check/filters/create-stat-filters.ts
+577 renderer/src/web/price-check/filters/create-item-filters.ts
+920 renderer/src/web/price-check/filters/create-stat-filters.ts
 460 renderer/src/web/price-check/filters/pseudo/index.ts
-707 renderer/src/web/price-check/filters/pseudo/item-property.ts
+690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 377 renderer/src/web/price-check/settings-price-check.vue
 402 renderer/src/web/price-check/trade/TooltipItem.vue
 352 renderer/src/web/price-check/trade/TradeListing.vue
