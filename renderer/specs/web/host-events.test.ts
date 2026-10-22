@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { IpcEvent } from "@ipc/types";
+import type { HostState, IpcEvent } from "@ipc/types";
 import type * as IPC from "@/web/background/IPC";
 
 const OVERLAY_USER_AGENT =
@@ -147,5 +147,91 @@ describe("Host.logs after a reconnect", () => {
     expect(Host.logs.value).toBe(
       "[12:00:00] info before\n[12:00:01] info while closed\n",
     );
+  });
+});
+
+// Each test after the reconnect test reads the socket that test opened
+const socket = () => FakeWebSocket.created.at(-1)!;
+
+describe("Host.onEvent", () => {
+  it("passes each message of main to the listeners of its name until their controller aborts", () => {
+    const targets: string[] = [];
+    const listener = Host.onEvent("MAIN->CLIENT::widget-action", (e) => {
+      targets.push(e.target);
+    });
+
+    socket().receive({
+      name: "MAIN->CLIENT::widget-action",
+      payload: { target: "price-check" },
+    });
+    socket().receive({
+      name: "MAIN->CLIENT::config-changed",
+      payload: { contents: "{}" },
+    });
+    listener.abort();
+    socket().receive({
+      name: "MAIN->CLIENT::widget-action",
+      payload: { target: "after the abort" },
+    });
+
+    expect(targets).toEqual(["price-check"]);
+  });
+});
+
+// Listens for an overlay event in a page with this User-Agent, and returns the payloads it received
+function overlayEventsIn(userAgent: string): boolean[] {
+  vi.stubGlobal("navigator", { userAgent });
+  const received: boolean[] = [];
+  const listener = Host.onEvent("MAIN->OVERLAY::visibility", (e) => {
+    received.push(e.isVisible);
+  });
+  socket().receive({
+    name: "MAIN->OVERLAY::visibility",
+    payload: { isVisible: false },
+  });
+  listener.abort();
+  return received;
+}
+
+describe("Host.onEvent for an overlay event", () => {
+  it("passes it in the overlay window", () => {
+    expect(overlayEventsIn(OVERLAY_USER_AGENT)).toEqual([false]);
+  });
+
+  it("passes nothing in a browser tab", () => {
+    expect(overlayEventsIn(BROWSER_USER_AGENT)).toEqual([]);
+  });
+});
+
+describe("Host.updateInfo", () => {
+  it("is the updater state that main sent last", () => {
+    socket().receive({
+      name: "MAIN->CLIENT::updater-state",
+      payload: { state: "update-downloaded", version: "1.2.4" },
+    });
+
+    expect(Host.updateInfo.value).toEqual({
+      state: "update-downloaded",
+      version: "1.2.4",
+    });
+  });
+});
+
+describe("Host.getConfig", () => {
+  it("returns the saved config and keeps main's version and updater state", async () => {
+    const state: HostState = {
+      version: "1.2.3",
+      updater: { state: "checking-for-update" },
+      contents: '{"configVersion":1}',
+    };
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL) =>
+      String(input) === "/config"
+        ? new Response(JSON.stringify(state))
+        : new Response(null, { status: 404 }),
+    );
+
+    expect(await Host.getConfig()).toBe('{"configVersion":1}');
+    expect(Host.version.value).toBe("1.2.3");
+    expect(Host.updateInfo.value).toEqual({ state: "checking-for-update" });
   });
 });
