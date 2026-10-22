@@ -94,23 +94,6 @@
 
       <!-- Extraction Value -->
       <extraction-value :item="item" :first-result="groupedResults.at(0)" />
-
-      <!-- ADDED AUGMENTS COST -->
-      <!-- <div
-        v-if="addedAugments && addedAugments.length"
-        class="p-2 border-2 border-gray-600 rounded mt-2 flex items-center"
-      >
-        <div class="w-fit">{{ t(":added_augments") }}</div>
-        <div class="flex px-2 items-center">
-          <item-sum-price
-            :items="
-              addedAugments.map((augment) =>
-                augment ? augment.baseItem : null,
-              )
-            "
-          />
-        </div>
-      </div> -->
     </div>
   </div>
   <ui-error-box v-else>
@@ -127,18 +110,8 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  watch,
-  PropType,
-  inject,
-  ref,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import { defineComponent, computed, watch, PropType, inject } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import UiPopover from "@/web/ui/Popover.vue";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 import { createTradeRequest } from "./pathofexile-trade";
 import { getTradeEndpoint } from "./common";
@@ -147,13 +120,11 @@ import { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { ItemFilters, StatFilter } from "../filters/interfaces";
 import { ItemCategory, ParsedItem } from "@/parser";
 import { artificialSlowdown } from "./artificial-slowdown";
-import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import OnlineFilter from "./OnlineFilter.vue";
 import TradeLinks from "./TradeLinks.vue";
 import TradeItem from "./TradeItem.vue";
 import { useTradeApi } from "./trade-api";
 import { GEM, GRANTS_REAL_SKILL } from "@/parser/meta";
-import ItemSumPrice from "@/web/ui/ItemSumPrice.vue";
 import ExtractionValue from "./ExtractionValue.vue";
 
 const slowdown = artificialSlowdown(900);
@@ -163,13 +134,10 @@ const SHOW_RESULTS = 20;
 export default defineComponent({
   components: {
     ExtractionValue,
-    ItemQuickPrice,
-    ItemSumPrice,
     OnlineFilter,
     TradeLinks,
     TradeItem,
     UiErrorBox,
-    UiPopover,
   },
   props: {
     filters: {
@@ -207,31 +175,6 @@ export default defineComponent({
         : `https://${getTradeEndpoint()}/trade2/search/poe2/${props.filters.trade.league}?q=${JSON.stringify(createTradeRequest(props.filters, props.stats, props.item))}`;
     }
 
-    // Shift Key Detection
-    const isShiftPressed = ref(false);
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        isShiftPressed.value = true;
-      }
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        isShiftPressed.value = false;
-      }
-    };
-
-    onMounted(() => {
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("keyup", handleKeyUp);
-    });
-
-    onUnmounted(() => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    });
-
     return {
       t,
       list: searchResult,
@@ -266,8 +209,6 @@ export default defineComponent({
       openTradeLink() {
         showBrowser(makeTradeLink());
       },
-      // Shift key state and methods
-      isShiftPressed,
       ItemCategory,
       isGem: computed(
         () => props.item.category && GEM.has(props.item.category),
@@ -296,11 +237,6 @@ export default defineComponent({
         }
 
         return false;
-      }),
-      addedAugments: computed(() => {
-        return props.item.augmentSockets?.augments.filter(
-          (i) => i && !i.existing,
-        );
       }),
     };
   },

@@ -34,7 +34,6 @@
 import { ParsedItem } from "@/parser";
 import { computed, defineComponent, PropType } from "vue";
 import { PricingResult } from "./pathofexile-trade";
-import { useI18nNs } from "@/web/i18n";
 import { CurrencyValue, usePoeninja } from "@/web/background/Prices";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 
@@ -100,9 +99,7 @@ export default defineComponent({
       };
     });
 
-    const { t } = useI18nNs("trade_result");
     return {
-      t,
       extractionOrb,
       augmentPrice,
       profitValue,

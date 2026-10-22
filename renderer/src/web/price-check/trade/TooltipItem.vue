@@ -149,7 +149,6 @@ export default defineComponent({
     });
 
     return {
-      t,
       lineText,
       item,
       sections,

@@ -119,13 +119,12 @@
 import { defineComponent, PropType } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import UiRadio from "@/web/ui/UiRadio.vue";
-import UiToggle from "@/web/ui/UiToggle.vue";
 import UiPopover from "@/web/ui/Popover.vue";
 import type { ItemFilters } from "../filters/interfaces";
 import { useLeagues } from "@/web/background/Leagues";
 
 export default defineComponent({
-  components: { UiRadio, UiToggle, UiPopover },
+  components: { UiRadio, UiPopover },
   props: {
     filters: {
       type: Object as PropType<ItemFilters>,
@@ -155,41 +154,7 @@ export default defineComponent({
             ["1day", "3days", "1week"].includes(props.filters.trade.listed)) ||
             props.filters.trade.currency,
         ),
-      onOfflineUpdate(offline: boolean) {
-        const { filters } = props;
-        filters.trade.offline = offline;
-        if (props.byTime) {
-          filters.trade.listed = offline ? "2months" : undefined;
-        }
-      },
-      inputFocus(e: FocusEvent) {
-        const target = e.target as HTMLInputElement;
-        target.select();
-      },
     };
   },
 });
 </script>
-
-<style lang="postcss" module>
-.input {
-  @apply text-center;
-  @apply bg-transparent;
-  @apply text-gray-300;
-  @apply select-all;
-
-  &:hover,
-  &:focus {
-    @apply bg-gray-700;
-    @apply -my-px border-t border-b border-gray-500;
-  }
-
-  &::placeholder {
-    @apply text-gray-400;
-  }
-
-  &:focus {
-    cursor: none;
-  }
-}
-</style>

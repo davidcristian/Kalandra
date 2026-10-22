@@ -145,7 +145,6 @@ export function createTradeRequest(
         filters.stackSize && !filters.stackSize.disabled
           ? filters.stackSize.value
           : undefined,
-      // fulfillable: null
     },
     sort: { have: "asc" },
   };

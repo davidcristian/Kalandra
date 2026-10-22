@@ -25,8 +25,7 @@
 460 renderer/src/web/price-check/filters/pseudo/index.ts
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 377 renderer/src/web/price-check/settings-price-check.vue
-401 renderer/src/web/price-check/trade/TooltipItem.vue
-351 renderer/src/web/price-check/trade/TradeListing.vue
-2008 renderer/src/web/price-check/trade/pathofexile-trade.ts
+400 renderer/src/web/price-check/trade/TooltipItem.vue
+1944 renderer/src/web/price-check/trade/pathofexile-trade.ts
 343 renderer/src/web/price-check/trends/getDetailsId.ts
 537 renderer/src/web/settings/SettingsWindow.vue

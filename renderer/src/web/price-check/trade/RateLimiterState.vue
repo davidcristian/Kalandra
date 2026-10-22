@@ -50,14 +50,6 @@ export default defineComponent({
           rules: RATE_LIMIT_RULES.EXCHANGE,
         },
         { policy: "trade-fetch-request-limit", rules: RATE_LIMIT_RULES.FETCH },
-        // {
-        //   policy: "trade-whisper-request-limit",
-        //   rules: RATE_LIMIT_RULES.WHISPER,
-        // },
-        // {
-        //   policy: "trade-history-request-limit",
-        //   rules: RATE_LIMIT_RULES.HISTORY,
-        // },
       ];
 
       return LIMITS.map((limit) => ({

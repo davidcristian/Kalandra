@@ -164,8 +164,6 @@ export default defineComponent({
     const { t } = useI18nNs("trade_result");
     let instance: Instance;
 
-    // Shift Key Detection
-    const isShiftPressed = ref(false);
     const isHovered = ref(false); // Track hover state
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -174,7 +172,6 @@ export default defineComponent({
         if (isHovered.value) {
           instance.show();
         }
-        isShiftPressed.value = true;
       }
     };
 
@@ -182,7 +179,6 @@ export default defineComponent({
       if (event.key === "Shift") {
         instance.hide();
         instance.disable();
-        isShiftPressed.value = false;
       }
     };
 
@@ -221,7 +217,6 @@ export default defineComponent({
       target,
       content,
       isHovered,
-      isShiftPressed,
       ItemCategory,
       markers: computed(() => listingMarkers(props.result, props.showSeller)),
       isGem: computed(

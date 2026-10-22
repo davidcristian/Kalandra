@@ -817,10 +817,6 @@ export function createTradeRequest(
     propSet(query.filters, "misc_filters.filters.sanctified.option", "false");
   }
 
-  // TRADE FILTERS
-
-  // BREAK ==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-
   // Meta internal stuff, crafting as empty and setting dps/pdps/edps
   for (const stat of stats) {
     if (stat.tradeId[0] === "item.has_empty_modifier") {
@@ -903,18 +899,6 @@ export function createTradeRequest(
 
     const input = stat.roll!;
     switch (stat.tradeId[0] as InternalTradeId) {
-      // case 'item.base_percentile':
-      //   propSet(
-      //     query.filters,
-      //     'equipment_filters.filters.base_defence_percentile.min',
-      //     typeof input.min === 'number' ? input.min : undefined
-      //   )
-      //   propSet(
-      //     query.filters,
-      //     'equipment_filters.filters.base_defence_percentile.max',
-      //     typeof input.max === 'number' ? input.max : undefined
-      //   )
-      //   break
       case "item.armour":
         propSet(
           query.filters,
@@ -1339,41 +1323,16 @@ function getMinMax(roll: StatFilter["roll"]) {
 }
 
 function tradeIdToQuery(id: string, stat: StatFilter) {
-  // NOTE: if there will be too many overrides in the future,
-  //       consider moving them to stats.ndjson
-
   const roll = stat.roll;
   let tradeId = id;
   if (stat.option != null) {
     tradeId += `|${stat.option.value}`;
   }
 
-  // NOTE: poe1 overrides, leaving until any for poe2 are added
-  // fixes Corrupted Implicit "Bleeding cannot be inflicted on you"
-  // if (id === "implicit.stat_1901158930") {
-  //   if (stat.roll?.value === 100) {
-  //     roll = undefined; // stat semantic type is flag
-  //   }
-  //   // fixes "Cannot be Poisoned" from Essence
-  // } else if (id === "explicit.stat_3835551335") {
-  //   if (stat.roll?.value === 100) {
-  //     roll = undefined; // stat semantic type is flag
-  //   }
-  //   // fixes "Instant Recovery" on Flasks
-  // } else if (id.endsWith("stat_1526933524")) {
-  //   if (stat.roll?.value === 100) {
-  //     roll = undefined; // stat semantic type is flag
-  //   }
-  //   // fixes Delve "Reservation Efficiency of Skills"
-  // } else if (id.endsWith("stat_1269219558")) {
-  //   roll = { ...roll!, tradeInvert: !roll!.tradeInvert };
-  // }
-
   return {
     id: tradeId,
     value: {
       ...getMinMax(roll),
-      // option: stat.option != null ? stat.option.value : undefined,
     },
     disabled: stat.disabled,
   };
@@ -1712,9 +1671,6 @@ function buildNameBlock(
         case TradePropType.MapGoldQuantityBonus:
           text = "item.map_gold";
           break;
-        case TradePropType.MapQuantityBonus:
-          // text = "item.map_item_quantity";
-          break;
       }
 
       block.push({
@@ -1870,25 +1826,6 @@ function buildMageBloodNotFilter(
     filters: [],
   };
 
-  // {
-  //   type: "not",
-  //   filters: [],
-  //   disabled: duplicateStat.disabled,
-  // };
-  // if (!legacyOfStats.length) {
-  //   return filter;
-  // }
-  // const someLegacy = legacyOfStats[0];
-  // const tradeId = someLegacy.tradeId[0].split("|")[0];
-  // const myLegacies = new Set(legacyOfStats.map((s) => s.text));
-
-  // filter.filters.push(
-  //   ...someLegacy.sources[0].stat.stat.matchers.map((m) => ({
-  //     id: `${tradeId}|${m.value}`,
-  //     disabled: myLegacies.has(m.string),
-  //   })),
-  // );
-
   const knownCount = legacyOfStats.filter((s) => !s.disabled).length;
   const dupCount =
     (duplicateStat.roll!.min as number) ?? duplicateStat.roll!.value;
@@ -1897,7 +1834,6 @@ function buildMageBloodNotFilter(
       "not valid Mageblood, reduce duplicates or unselect a Legacy",
     );
   }
-  // let useMax: number | undefined;
 
   if (duplicateStat.disabled) {
     // dont do anything and return after adding to main filters,
