@@ -41,8 +41,11 @@ import {
 } from "./advanced-mod-desc";
 import { calcPropPercentile, QUALITY_STATS } from "./calc-q20";
 import { AppConfig } from "@/web/Config";
-import { buildEditorItems, getSavedAugments } from "./augment-builder";
-import { useAugment } from "@/web/price-check/item-editor/augment";
+import {
+  buildEditorItems,
+  getSavedAugments,
+  useAugment,
+} from "./augment-builder";
 import { avg, combinations } from "./utils";
 import { parseJewelleryQuality } from "./jewellery-quality";
 

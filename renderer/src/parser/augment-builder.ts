@@ -1,7 +1,13 @@
 import { AugmentLineData, BaseType, ITEM_BY_REF } from "@/assets/data";
 import { ARMOUR, ItemCategory, MARTIAL_WEAPON } from "./meta";
-import { replaceHashWithValues } from "./Parser";
+import { parseStatsFromMod, replaceHashWithValues } from "./Parser";
 import { EditorItem, ParsedItem } from "./ParsedItem";
+import {
+  INTERNAL_AUGMENT_TYPES,
+  ModifierType,
+  sumStatsByModType,
+} from "./modifiers";
+import { recalculateItemProperties } from "./calc-base";
 import { PriceCheckWidget } from "@/web/overlay/widgets";
 import { AppConfig } from "@/web/Config";
 
@@ -117,4 +123,51 @@ export function getSavedAugments(item: ParsedItem): Array<BaseType | null> {
   });
 
   return bases;
+}
+
+export function useAugment(
+  item: ParsedItem,
+  augment: EditorItem,
+  index: number,
+) {
+  if (!item.augmentSockets || item.augmentSockets.augments.length < index) {
+    throw new Error("Augment index out of bounds");
+  }
+
+  // deep copy
+  const oldItem = JSON.parse(JSON.stringify(item)) as ParsedItem;
+
+  // remove old augment stats from item
+  item.newMods = item.newMods.filter(
+    (mod) => !INTERNAL_AUGMENT_TYPES.has(mod.info.type),
+  );
+  item.statsByType = item.statsByType.filter(
+    (stat) => !INTERNAL_AUGMENT_TYPES.has(stat.type),
+  );
+
+  // add augment
+  item.augmentSockets!.augments[index] = augment;
+  // add augment stat to item
+  for (const thisAugment of item.augmentSockets!.augments) {
+    if (!thisAugment) continue;
+    const modInfo = {
+      // need to keep pre-existing ones marked as non-added
+      type: thisAugment.existing
+        ? ModifierType.Augment
+        : ModifierType.AddedAugment,
+      tags: [],
+    };
+    parseStatsFromMod(
+      thisAugment.displayString.split("\n"),
+      item,
+      {
+        info: modInfo,
+        stats: [],
+      },
+      thisAugment.existing ? undefined : thisAugment.baseItem,
+    );
+  }
+  item.statsByType = sumStatsByModType(item.newMods);
+
+  recalculateItemProperties(item, oldItem);
 }

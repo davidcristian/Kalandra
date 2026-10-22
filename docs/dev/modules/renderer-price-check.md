@@ -59,13 +59,13 @@ that the route needs ([main.md](main.md)).
 - `text-keys.ts` builds the `app_i18n.json` key that names a modifier type (`item.mod_added_rune`) or a trade
   category (`item_category.weapon_bow`). `FilterModifier.vue` names a tag by `filters.tag_<tag>`, and a stat
   filter's tag can be any `ModifierType`.
-- The item editor applies its changes in `item-editor/`: `useAugment` in `augment.ts` puts a rune or soul core in a
-  socket, and `applyCatalyst` in `item-editor.ts` applies a catalyst and its quality. Both change the item and
-  recompute its properties through `recalculateItemProperties` from the parser. The parser also calls `useAugment`
-  to fill an item's empty sockets with the saved augments. The editor's lists come from `categoryAugments` in
-  `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list once per game data
-  load, so they switch to the new language after a language change. Of `filters/fill-augments.ts`, only
-  `getAugmentNameByRef` has a caller, the price check settings, and its other exports have none.
+- The item editor applies its changes in `item-editor/`: `useAugment` from the parser's `augment-builder.ts` puts a
+  rune or soul core in a socket, and `applyCatalyst` in `item-editor.ts` applies a catalyst and its quality. Both
+  change the item and recompute its properties through `recalculateItemProperties` from the parser. The parser also
+  calls `useAugment` to fill an item's empty sockets with the saved augments. The editor's lists come from
+  `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
+  once per game data load, so they switch to the new language after a language change. Of `filters/fill-augments.ts`,
+  only `getAugmentNameByRef` has a caller, the price check settings, and its other exports have none.
 
 ### Trade queries (`trade/`)
 

@@ -15,8 +15,7 @@ this doc describes.
 type, `ItemRarity`, `ItemInfluence`, `itemIsModifiable` and `ItemCategory`. Code outside the parser, mostly the
 price check, also imports `@/parser/<file>` directly for `ParsedItem`, `Parser`, `meta`, `modifiers`,
 `advanced-mod-desc`, `stat-translations`, `calc-base`, `calc-q20` and `augment-builder`. `Parser.ts` exports
-`parseModifiersPoe2`, `parseStatsFromMod`, `parseAffixStrings`, `getMaxSockets` and `replaceHashWithValues` for
-that use.
+`parseModifiersPoe2`, `parseAffixStrings`, `getMaxSockets` and `replaceHashWithValues` for that use.
 
 - `parseClipboard(clipboard)` returns a neverthrow `Result<ParsedItem, string>`. It splits the text into sections,
   checks that the first one starts with the item class line, reads rarity, name and base type from it
@@ -56,7 +55,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others. `ItemCategory` has a member for each `craftable.category` of the item data, and `specs/data/item-categories.test.ts` checks that, and that each other member is listed there with its reason |
 | `jewellery-quality.ts` | `parseJewelleryQuality` reads the quality line of a ring, amulet, belt or jewel, such as `Quality (Attribute Modifiers): +20% (augmented)`, into `quality`, and sets `qualityType` to the catalyst whose modifier tag in `CATALYST_TO_TAG` the line names. The item editor and the stat filters read `qualityType` |
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
-| `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category. Each effect line takes its numbers from its own `values` array, because the data scales a number, such as Life regeneration per minute to per second, only for the line that shows it; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting |
+| `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category. Each effect line takes its numbers from its own `values` array, because the data scales a number, such as Life regeneration per minute to per second, only for the line that shows it; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting; `useAugment` puts an entry in a socket and recomputes the item's stats and properties, for the item editor and for the saved augments |
 | `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
 
 A module exports the internal functions its tests call as `__testExports` (`Parser.ts`, `stat-translations.ts`,
@@ -150,9 +149,8 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
 [dataparser.md](dataparser.md). The parser also reads the config: `AppConfig().language` in `Parser.ts` and
-`magic-name.ts`, and the price check's `savedAugments` in `augment-builder.ts` ([config.md](config.md)). It
-imports `useAugment` from `web/price-check/item-editor/augment.ts`. The data loader reads the trade site lists
-through the proxy ([renderer-price-check.md](renderer-price-check.md)).
+`magic-name.ts`, and the price check's `savedAugments` in `augment-builder.ts` ([config.md](config.md)). The data
+loader reads the trade site lists through the proxy ([renderer-price-check.md](renderer-price-check.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
 the floor in `renderer/vitest.config.ts` (65.9% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
