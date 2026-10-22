@@ -253,7 +253,7 @@ type BaseLogEvent = {
 };
 
 export type GeneralLogEvent = BaseLogEvent & {
-  type: "log" | "game-start" | "login";
+  type: "log" | "game-start";
 };
 
 export type LoadZoneEvent = BaseLogEvent & {

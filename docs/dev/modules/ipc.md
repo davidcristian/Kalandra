@@ -82,7 +82,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - `HostState` is the body of `GET /config`: `contents` (the text of `config.json`, or `null`), `version` and
   `updater`.
 - `ClientLogEvent` is the union of the entries the renderer's client log parser (`renderer/src/web/client-log/`)
-  makes from `Client.txt` lines. Each has `ts`, `ms` and `type`: `GeneralLogEvent` (`log`, `game-start`, `login`),
+  makes from `Client.txt` lines. Each has `ts`, `ms` and `type`: `GeneralLogEvent` (`log`, `game-start`),
   `LoadZoneEvent`, `LevelUpEvent`, `GameVersionEvent`, `AltTabEvent`, `NpcEvent`, `PlayerDeathEvent`,
   `PassiveTreeEvent`, `PermanentBonusEvent`, `SkillPointEvent`, `MapNavEvent` and `AfkEvent`. Every entry but
   `log` goes to main in `write-data`. While `libraryAlpha` is on, `FileWriter` writes each one as a JSON line of

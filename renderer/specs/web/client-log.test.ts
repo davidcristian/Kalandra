@@ -764,28 +764,23 @@ describe("clientLog", () => {
   });
 
   it.each([
-    ["log1", log1, 17, 16, "g2_1"],
-    ["logStartThroughRedVale", logStartThroughRedVale, 5, 5, "g1_5"],
+    ["log1", log1, 17, 16],
+    ["logStartThroughRedVale", logStartThroughRedVale, 5, 5],
   ])(
-    "ends %s with its last player level, area level and zone",
-    (_name, log, level, area, zone) => {
-      const { handleLine, playerLevel, areaLevel, zoneName } =
-        createClientLog();
+    "ends %s with its last player level and area level",
+    (_name, log, level, area) => {
+      const { handleLine, playerLevel, areaLevel } = createClientLog();
 
       for (const line of log.split("\n")) {
         handleLine(line);
       }
 
-      expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
-        level,
-        area,
-        zone,
-      ]);
+      expect([playerLevel.value, areaLevel.value]).toEqual([level, area]);
     },
   );
 
   it("reads each event and the last level and area of the full campaign", () => {
-    const { handleLine, playerLevel, areaLevel, zoneName } = createClientLog();
+    const { handleLine, playerLevel, areaLevel } = createClientLog();
     const filePath = path.join(__dirname, "FullCampaign.txt");
 
     for (const line of fs.readFileSync(filePath, "utf-8").split("\n")) {
@@ -815,54 +810,38 @@ describe("clientLog", () => {
       "afk": 4,
       "skill-point": 25,
     });
-    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
-      61,
-      65,
-      "mapspiderwoods",
-    ]);
+    expect([playerLevel.value, areaLevel.value]).toEqual([61, 65]);
   });
 
-  it("sets the area level and zone of each new area and keeps the player level", () => {
-    const { handleLines, playerLevel, areaLevel, zoneName } = createClientLog();
+  it("sets the area level of each new area and keeps the player level", () => {
+    const { handleLines, playerLevel, areaLevel } = createClientLog();
 
     handleLines([levelUpLine("09:50:00", 3), zoneLine("09:50:55", 4, "G1_4")]);
-    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
-      3,
-      4,
-      "g1_4",
-    ]);
+    expect([playerLevel.value, areaLevel.value]).toEqual([3, 4]);
     handleLines([zoneLine("09:52:17", 6, "G1_6")]);
-    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
-      3,
-      6,
-      "g1_6",
-    ]);
+    expect([playerLevel.value, areaLevel.value]).toEqual([3, 6]);
   });
 
   it.each(["G1_town", "G_Endgame_Town", "HideoutSummit"])(
-    "keeps the area level and zone of the area before %s",
+    "keeps the area level of the area before %s",
     (area) => {
-      const { handleLines, areaLevel, zoneName } = createClientLog();
+      const { handleLines, areaLevel } = createClientLog();
 
       handleLines([
         zoneLine("09:50:55", 4, "G1_4"),
         zoneLine("09:51:13", 65, area),
       ]);
 
-      expect([areaLevel.value, zoneName.value]).toEqual([4, "g1_4"]);
+      expect(areaLevel.value).toBe(4);
     },
   );
 
   it("sets the player level to 1 on The Riverbank", () => {
-    const { handleLines, playerLevel, areaLevel, zoneName } = createClientLog();
+    const { handleLines, playerLevel, areaLevel } = createClientLog();
 
     handleLines([levelUpLine("09:51:58", 3), zoneLine("09:52:17", 1, "G1_1")]);
 
-    expect([playerLevel.value, areaLevel.value, zoneName.value]).toEqual([
-      1,
-      1,
-      "g1_1",
-    ]);
+    expect([playerLevel.value, areaLevel.value]).toEqual([1, 1]);
   });
 
   it("sends the time of each line read in the local time zone", () => {
@@ -1298,12 +1277,11 @@ describe("clientLog", () => {
     expect(String(warned[0][0])).toContain(warning);
   });
 
-  it("starts at level 1 in area level 1 on The Riverbank", () => {
-    const { playerLevel, areaLevel, zoneName } = createClientLog();
+  it("starts at player level 1 and area level 1", () => {
+    const { playerLevel, areaLevel } = createClientLog();
 
     expect(playerLevel.value).toBe(1);
     expect(areaLevel.value).toBe(1);
-    expect(zoneName.value).toBe("G1_1");
   });
 
   it("sets the player level and ignores an empty value", () => {

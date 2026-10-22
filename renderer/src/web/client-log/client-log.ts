@@ -10,9 +10,7 @@ const LogRegex =
 /** Builds a client log state; the app shares one through `useClientLog()`. */
 export function createClientLog() {
   const areaLevel = shallowRef<number>(1);
-  const zoneName = shallowRef<string>("G1_1"); // default to riverbank
   const playerLevel = shallowRef<number>(1);
-  const lastCharacter = shallowRef<string>("");
   let gameStartMillis = 0;
 
   let currentDateTime = 0;
@@ -72,11 +70,9 @@ export function createClientLog() {
         }
 
         areaLevel.value = data.areaLevel;
-        zoneName.value = data.zone;
       }
     } else if (data.type === ClientLogInfoType.LevelUp) {
       playerLevel.value = data.level;
-      lastCharacter.value = data.charName;
     }
 
     if (data.ms < gameStartMillis) {
@@ -96,7 +92,6 @@ export function createClientLog() {
     handleLines,
     playerLevel: readonly(playerLevel),
     areaLevel: readonly(areaLevel),
-    zoneName: readonly(zoneName),
     setPlayerLevel,
   };
 }

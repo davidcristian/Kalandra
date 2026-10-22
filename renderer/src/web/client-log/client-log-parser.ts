@@ -4,7 +4,6 @@ import { ClientLogEvent, SkillPointEvent } from "@ipc/types";
 export enum ClientLogInfoType {
   Log = "log",
   GameStart = "game-start",
-  Login = "login",
   LoadZone = "load-zone",
   LevelUp = "level-up",
   GameVersion = "game-version",
