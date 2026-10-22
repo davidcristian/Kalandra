@@ -42,7 +42,7 @@ export default defineConfigWithVueTs(
 
   {
     rules: {
-      "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+      "no-console": ["error", { allow: ["warn", "error"] }],
       "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
       "@stylistic/quote-props": ["error", "consistent-as-needed"],
       "no-labels": ["error", { allowLoop: true }],

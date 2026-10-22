@@ -113,6 +113,9 @@ part alone:
   `@ts-ignore` and an `@ts-expect-error` without a reason, `no-empty` for an empty `catch`, and
   `no-restricted-syntax` for a cast through `unknown` and an empty `.catch()` handler. No installed
   plugin checks the reason on an `eslint-disable` line, so reading the diff checks it.
+- `no-console` allows only `console.warn` and `console.error`, except in `main/build/script.mjs`.
+  main writes the rest of its messages with `Logger`, which the Debug settings page shows, and
+  uses the console only before `Logger` exists.
 - `check.py` leaves out the data tool, whose tests need files the repo does not have
   ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
 

@@ -49,7 +49,7 @@ module.exports = {
   ],
   extends: ["standard-with-typescript", "prettier"],
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-console": ["error", { allow: ["warn", "error"] }],
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "quote-props": ["error", "consistent-as-needed"],
     "no-labels": ["error", { allowLoop: true }],
@@ -91,6 +91,11 @@ module.exports = {
     {
       files: ["src/shortcuts/Shortcuts.ts"],
       rules: { "no-restricted-syntax": ["error", castThroughUnknown] },
+    },
+    // The build script prints its progress to the terminal
+    {
+      files: ["build/*.mjs"],
+      rules: { "no-console": "off" },
     },
   ],
 };
