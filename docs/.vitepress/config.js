@@ -20,7 +20,7 @@ export default defineConfig({
     }
   },
   themeConfig: {
-    appVersion: '0.16.3',
+    appVersion: '0.17.0',
     github: {
       releasesUrl: 'https://github.com/davidcristian/Kalandra/releases'
     },
