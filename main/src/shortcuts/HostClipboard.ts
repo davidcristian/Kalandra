@@ -16,10 +16,6 @@ export class HostClipboard {
 
   private isRestored = true;
 
-  get isPolling() {
-    return this.pollPromise != null;
-  }
-
   constructor(private logger: Logger) {}
 
   updateOptions(restoreClipboard: boolean) {
@@ -71,10 +67,7 @@ export class HostClipboard {
               clipboard.writeText(textBefore);
             }
             this.pollPromise = undefined;
-
-            if (!isPoeItem(textAfter)) {
-              this.logger.write("warn [ClipboardPoller] No item text found.");
-            }
+            this.logger.write("warn [ClipboardPoller] No item text found.");
             reject(new Error("Reading clipboard timed out"));
           }
         }

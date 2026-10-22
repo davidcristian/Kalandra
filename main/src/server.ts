@@ -85,7 +85,7 @@ export function onEventAnyClient<Name extends IpcEvent["name"]>(
 }
 
 export function sendEventTo(
-  target: "last-active" | "any" | "broadcast",
+  target: "last-active" | "broadcast",
   event: IpcEvent,
 ) {
   const msg = JSON.stringify(event);

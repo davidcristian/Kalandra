@@ -20,7 +20,7 @@ let logger: Logger;
 function createReader(possiblePaths?: string[]) {
   const server = new FakeServer();
   logger = new Logger(server);
-  return new GameConfig(server, logger, possiblePaths);
+  return new GameConfig(logger, possiblePaths);
 }
 
 function configPath(...folders: string[]) {

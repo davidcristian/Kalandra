@@ -28,7 +28,7 @@ The entry, the server and the app services, in `main/src/`:
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and returns
   403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every path the
   other routes do not, so no request is left without a response. The target `"broadcast"` sends to every client, and
-  `"last-active"` and `"any"` both send to the last active client. A new client receives the log history and the
+  `"last-active"` sends to the last active client. A new client receives the log history and the
   current updater state, which the first update check can change after the page reads `GET /config`. An
   `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its
   User-Agent, as the overlay window's does. A message that is not JSON, has no string `name` or names an event without

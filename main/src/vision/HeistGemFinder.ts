@@ -19,10 +19,6 @@ const TEXT_HSV_MAX = hsvToU8(180, 100, 100);
 
 interface OcrResult {
   elapsed: number;
-  matches: number;
-  clusters: number;
-  linesMin: number;
-  linesMax: number;
   recognized: Array<{ text: string; confidence: number }>;
 }
 
@@ -162,15 +158,6 @@ export class HeistGemFinder {
     }
     colorMat.delete();
 
-    const linesWeight = lines.flatMap(([p0, p1]) => [p0.weight, p1.weight]);
-    const results = {
-      elapsed,
-      matches: matches!.length,
-      clusters: clusteredMatches.length,
-      linesMin: Math.min(...linesWeight),
-      linesMax: Math.max(...linesWeight),
-      recognized: recognizedLines,
-    };
-    return results;
+    return { elapsed, recognized: recognizedLines };
   }
 }

@@ -5,7 +5,6 @@ import { app } from "electron";
 import { hotkeyToString, CodeToKey } from "../../../ipc/KeyToCode";
 import { guessFileLocation } from "./utils";
 import type { Logger } from "../RemoteLogger";
-import type { ServerEvents } from "../server";
 
 const POSSIBLE_PATH =
   process.platform === "win32"
@@ -38,21 +37,13 @@ const POSSIBLE_PATH =
 export class GameConfig {
   private _wantedPath: string | null = null;
   private _actualPath: string | null = null;
-  get actualPath() {
-    return this._actualPath;
-  }
-
   private _showModsKey: string | null = null;
-  get showModsKeyNullable() {
-    return this._showModsKey;
-  }
 
   get showModsKey() {
     return this._showModsKey ?? "Alt";
   }
 
   constructor(
-    private server: ServerEvents,
     private logger: Logger,
     private possiblePaths: readonly string[] = POSSIBLE_PATH,
   ) {}

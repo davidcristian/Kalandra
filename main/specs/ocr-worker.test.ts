@@ -16,10 +16,6 @@ const never = async () => await new Promise<never>(() => {});
 
 const GEMS = {
   elapsed: 12,
-  matches: 2,
-  clusters: 1,
-  linesMin: 1,
-  linesMax: 1,
   recognized: [{ text: "Fireball", confidence: 90 }],
 };
 

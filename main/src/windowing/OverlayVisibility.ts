@@ -1,6 +1,5 @@
 import { uIOhook, UiohookKey } from "uiohook-napi";
 import type { ServerEvents } from "../server";
-import type { GameConfig } from "../host-files/GameConfig";
 import type { OverlayWindow } from "./OverlayWindow";
 
 export class OverlayVisibility {
@@ -10,7 +9,6 @@ export class OverlayVisibility {
   constructor(
     private server: ServerEvents,
     private overlay: OverlayWindow,
-    private gameConfig: GameConfig,
   ) {
     uIOhook.on("keydown", (e) => {
       if (

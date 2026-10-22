@@ -81,6 +81,18 @@ describe("HostClipboard.readItemText", () => {
     },
   );
 
+  it("logs that it found no item text when the copy times out", async () => {
+    const logger = new Logger(new FakeServer());
+    const read = new HostClipboard(logger).readItemText();
+    const failed = expect(read).rejects.toThrow("Reading clipboard timed out");
+    await vi.advanceTimersByTimeAsync(1000);
+    await failed;
+
+    expect(logger.history).toContain(
+      "warn [ClipboardPoller] No item text found.",
+    );
+  });
+
   it("resolves with the item text that the game copies on Linux", async () => {
     onPlatform("linux");
     system.text = "copied text";

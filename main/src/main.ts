@@ -60,7 +60,7 @@ startWhenReady(
   async () => {
     tray = new AppTray(eventPipe);
     const logger = new Logger(eventPipe);
-    const gameConfig = new GameConfig(eventPipe, logger);
+    const gameConfig = new GameConfig(logger);
     const poeWindow = new GameWindow();
     const appUpdater = new AppUpdater(eventPipe, logger);
     // eslint-disable-next-line no-new -- the proxy adds its route to the emitter it receives
@@ -89,7 +89,7 @@ startWhenReady(
       async () => {
         const overlay = new OverlayWindow(eventPipe, logger, poeWindow);
         // eslint-disable-next-line no-new -- the instance listens to key events from its constructor
-        new OverlayVisibility(eventPipe, overlay, gameConfig);
+        new OverlayVisibility(eventPipe, overlay);
         const shortcuts = await Shortcuts.create(
           logger,
           overlay,

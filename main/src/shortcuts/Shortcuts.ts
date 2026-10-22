@@ -302,11 +302,7 @@ function pressKeysToCopyItemText(
 }
 
 function isStashArea(mouse: UiohookWheelEvent, poeWindow: GameWindow): boolean {
-  if (
-    !poeWindow.bounds ||
-    mouse.x > poeWindow.bounds.x + poeWindow.uiSidebarWidth
-  )
-    return false;
+  if (mouse.x > poeWindow.bounds.x + poeWindow.uiSidebarWidth) return false;
 
   return (
     mouse.y > poeWindow.bounds.y + (poeWindow.bounds.height * 154) / 1600 &&

@@ -6,7 +6,7 @@
 563 dataParser/src/services/nd_builder_service.py
 317 dataParser/src/stores/helpers/description.py
 344 ipc/types.ts
-315 main/src/shortcuts/Shortcuts.ts
+311 main/src/shortcuts/Shortcuts.ts
 506 renderer/src/assets/data/index.ts
 334 renderer/src/assets/data/interfaces.ts
 2101 renderer/src/parser/Parser.ts

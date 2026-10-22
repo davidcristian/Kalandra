@@ -45,7 +45,7 @@ beforeEach(async () => {
   process.argv.push("--no-overlay");
   const overlay = new OverlayWindow(server, logger, game);
   process.argv.pop();
-  const gameConfig = new GameConfig(server, logger);
+  const gameConfig = new GameConfig(logger);
   shortcuts = await Shortcuts.create(logger, overlay, game, gameConfig, server);
 });
 
