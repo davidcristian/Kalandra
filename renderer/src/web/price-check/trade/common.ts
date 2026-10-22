@@ -178,9 +178,6 @@ function _adjustRateLimits(
   limitRule: ServerLimit[],
   removeOtherLimits: boolean,
 ): void {
-  /* eslint-disable @typescript-eslint/no-unused-expressions -- each DEBUG && console call below logs only when DEBUG is true */
-  const DEBUG = false;
-
   // destroy, unless a rule was skipped: its limiter cannot be told apart from the old ones
   if (removeOtherLimits) {
     for (const limit of clientLimits) {
@@ -190,7 +187,6 @@ function _adjustRateLimits(
       if (!isActive) {
         clientLimits.delete(limit);
         limit.destroy();
-        DEBUG && console.log("Destroy", limit.toString());
       }
     }
   }
@@ -202,21 +198,7 @@ function _adjustRateLimits(
     );
     if (!serverLimit) continue;
     const delta = serverLimit.state - limit.stack.length;
-
-    if (delta === 0) {
-      DEBUG && console.log("Limits are in sync");
-    } else if (delta > 0) {
-      DEBUG &&
-        console.error(
-          `Rate limit state on Server is greater by ${Math.abs(delta)}. Bursting to prevent rate limiting.`,
-        );
-      limit.addHits(delta);
-    } else if (delta < 0) {
-      DEBUG &&
-        console.warn(
-          `Rate limit state on Client is greater by ${Math.abs(delta)}`,
-        );
-    }
+    if (delta > 0) limit.addHits(delta);
   }
 
   // add new
@@ -227,8 +209,6 @@ function _adjustRateLimits(
 
     const rl = new RateLimiter(serverLimit.max, serverLimit.window);
     clientLimits.add(rl);
-    DEBUG && console.log("Add", rl.toString());
-
     rl.addHits(serverLimit.state);
   }
 
@@ -242,7 +222,6 @@ function _adjustRateLimits(
       }
     }
   }
-  /* eslint-enable @typescript-eslint/no-unused-expressions */
 }
 
 export function preventQueueCreation(
