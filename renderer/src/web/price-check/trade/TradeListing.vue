@@ -255,7 +255,6 @@ export default defineComponent({
       },
       error,
       errorFix: computed(() => {
-        console.log(error.value);
         if (error.value?.startsWith("Query is too complex.")) {
           return t(":fix_complex_query");
         }

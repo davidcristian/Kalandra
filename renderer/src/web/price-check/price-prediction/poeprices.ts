@@ -113,16 +113,11 @@ export async function sendFeedback(
   body.append("max", String(prediction.max));
   body.append("currency", prediction.currency);
   body.append("league", useLeagues().selectedId.value!);
-  // body.append('debug', String(1))
 
-  const response = await Host.proxy("www.poeprices.info/send_feedback", {
+  await Host.proxy("www.poeprices.info/send_feedback", {
     method: "POST",
     body,
   });
-  console.log(response);
-
-  // const text = await response.text();
-  // console.assert(text === `"${feedback.option}"`)
 }
 
 function utf8ToBase64(value: string) {

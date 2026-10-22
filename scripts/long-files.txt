@@ -26,7 +26,7 @@
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 377 renderer/src/web/price-check/settings-price-check.vue
 402 renderer/src/web/price-check/trade/TooltipItem.vue
-352 renderer/src/web/price-check/trade/TradeListing.vue
+351 renderer/src/web/price-check/trade/TradeListing.vue
 2008 renderer/src/web/price-check/trade/pathofexile-trade.ts
-345 renderer/src/web/price-check/trends/getDetailsId.ts
+343 renderer/src/web/price-check/trends/getDetailsId.ts
 537 renderer/src/web/settings/SettingsWindow.vue

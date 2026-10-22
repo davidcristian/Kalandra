@@ -76,7 +76,6 @@ export default defineComponent({
     };
 
     const retryItem = () => {
-      console.log("retrying item");
       Host.selfDispatch({
         name: "MAIN->CLIENT::item-text",
         payload: {

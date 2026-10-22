@@ -66,7 +66,7 @@ export function getDetailsId(item: ParsedItem) {
   }
   if (item.info.refName === "Filled Coffin") {
     const stat = item.statsByType[0];
-    const t = {
+    return {
       ns: item.info.namespace,
       name: stat.stat.ref.replace(
         "#",
@@ -74,8 +74,6 @@ export function getDetailsId(item: ParsedItem) {
       ),
       variant: floorToBracket(item.itemLevel!, [1, 70, 80, 84]).toString(),
     };
-    console.log(t);
-    return t;
   }
   return {
     ns: item.info.namespace,
