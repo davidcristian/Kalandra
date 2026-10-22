@@ -1,8 +1,8 @@
-import { __testExports, ParserState } from "@/parser/Parser";
+import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
-import { createTestItem } from "@specs/helper";
+import { createTestItem, createTestParserState } from "@specs/helper";
 import { ParsedItem } from "@/parser";
 
 describe("Parse Unidentified Sections", () => {
@@ -12,7 +12,7 @@ describe("Parse Unidentified Sections", () => {
   });
 
   it("can parse normal Unidentified", () => {
-    const parsedItem = {} as unknown as ParserState;
+    const parsedItem = createTestParserState();
     const lines = ["Unidentified"];
 
     const res = __testExports.parseUnidentified(lines, parsedItem);
@@ -23,7 +23,7 @@ describe("Parse Unidentified Sections", () => {
   });
 
   it("can parse Unidentified with tier", () => {
-    const parsedItem = {} as unknown as ParserState;
+    const parsedItem = createTestParserState();
     const lines = ["Unidentified (Tier 4)"];
 
     const res = __testExports.parseUnidentified(lines, parsedItem);
@@ -43,7 +43,7 @@ describe("Parse Unidentified Sections", () => {
     ],
     [["Item Class: Rings", "Rarity: Magic", "Sapphire Ring"]],
   ])("%#. shouldn't be unidentified", (lines: string[]) => {
-    const parsedItem = {} as unknown as ParserState;
+    const parsedItem = createTestParserState();
 
     const res = __testExports.parseUnidentified(lines, parsedItem);
 

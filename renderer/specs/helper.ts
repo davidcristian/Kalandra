@@ -3,6 +3,7 @@ import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { createVirtualItem, ParsedItem } from "@/parser/ParsedItem";
+import type { ParserState } from "@/parser/Parser";
 import { ParsedStat } from "@/parser/stat-translations";
 import { FilterTag, StatFilter } from "@/web/price-check/filters/interfaces";
 
@@ -42,9 +43,7 @@ export function createTestCreateOptions(): {
 }
 
 export function createTestItem(): ParsedItem {
-  return {
-    ...createVirtualItem({} as unknown as ParsedItem),
-    isUnidentified: false,
+  return createVirtualItem({
     info: {
       refName: "test",
       namespace: "ITEM",
@@ -55,6 +54,18 @@ export function createTestItem(): ParsedItem {
       icon: "",
       tags: [],
     },
+  });
+}
+
+export function createTestParserState(
+  props: Partial<ParserState> = {},
+): ParserState {
+  return {
+    ...createTestItem(),
+    name: "",
+    baseType: undefined,
+    infoVariants: [],
+    ...props,
   };
 }
 

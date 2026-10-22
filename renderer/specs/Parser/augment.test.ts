@@ -1,8 +1,9 @@
-import { init } from "@/assets/data";
+import { init, Stat, StatBetter } from "@/assets/data";
 import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { __testExports } from "@/parser/Parser";
+import { ParsedStat } from "@/parser/stat-translations";
 import { AppConfig } from "@/web/Config";
 import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import { createTestItem, makeCalcStat } from "@specs/helper";
@@ -19,11 +20,7 @@ describe("determineAugments", () => {
     const expectedRef = ["Greater Iron Rune", "Greater Iron Rune"];
 
     const result = __testExports.determineAugments(
-      {
-        info: {
-          type: ModifierType.Augment,
-        },
-      } as unknown as ParsedModifier,
+      { info: { type: ModifierType.Augment, tags: [] }, stats: [] },
       [makeCalcStat("#% increased Physical Damage", 36, ModifierType.Augment)],
     );
 
@@ -34,11 +31,7 @@ describe("determineAugments", () => {
     const expectedRef = ["Lesser Storm Rune"];
 
     const result = __testExports.determineAugments(
-      {
-        info: {
-          type: ModifierType.Augment,
-        },
-      } as unknown as ParsedModifier,
+      { info: { type: ModifierType.Augment, tags: [] }, stats: [] },
       [makeCalcStat("#% to Lightning Resistance", 10, ModifierType.Augment)],
     );
 
@@ -46,144 +39,52 @@ describe("determineAugments", () => {
   });
 
   it("handles range mods correctly", () => {
-    const mod = {
-      info: {
-        type: "rune",
-        tags: [],
-      },
-      stats: [
+    const stat: Stat = {
+      ref: "Adds # to # Lightning Damage",
+      better: StatBetter.PositiveRoll,
+      matchers: [
         {
-          stat: {
-            ref: "Adds # to # Lightning Damage",
-            better: 1,
-            matchers: [
-              {
-                string: "Adds # to # Lightning Damage",
-              },
-            ],
-            trade: {
-              ids: {
-                explicit: ["explicit.stat_3336890334"],
-                fractured: ["fractured.stat_3336890334"],
-                enchant: ["enchant.stat_3336890334"],
-                rune: ["rune.stat_3336890334"],
-                desecrated: ["desecrated.stat_3336890334"],
-                crafted: ["crafted.stat_3336890334"],
-              },
-            },
-            id: "local_minimum_added_lightning_damage",
-          },
-          translation: {
-            string: "Adds # to # Lightning Damage",
-          },
-          roll: {
-            unscalable: false,
-            dp: false,
-            value: 15.5,
-            min: 15.5,
-            max: 15.5,
-          },
+          string: "Adds # to # Lightning Damage",
         },
       ],
-    } as unknown as ParsedModifier;
-
-    const statCalcs = [
-      {
-        stat: {
-          ref: "Adds # to # Lightning Damage",
-          better: 1,
-          matchers: [
-            {
-              string: "Adds # to # Lightning Damage",
-            },
-          ],
-          trade: {
-            ids: {
-              explicit: ["explicit.stat_3336890334"],
-              fractured: ["fractured.stat_3336890334"],
-              enchant: ["enchant.stat_3336890334"],
-              rune: ["rune.stat_3336890334"],
-              desecrated: ["desecrated.stat_3336890334"],
-              crafted: ["crafted.stat_3336890334"],
-            },
-          },
-          id: "local_minimum_added_lightning_damage",
+      trade: {
+        ids: {
+          explicit: ["explicit.stat_3336890334"],
+          fractured: ["fractured.stat_3336890334"],
+          enchant: ["enchant.stat_3336890334"],
+          rune: ["rune.stat_3336890334"],
+          desecrated: ["desecrated.stat_3336890334"],
+          crafted: ["crafted.stat_3336890334"],
         },
-        type: "rune",
+      },
+    };
+    const parsedStat: ParsedStat = {
+      stat,
+      translation: stat.matchers[0],
+      roll: {
+        unscalable: false,
+        dp: false,
+        value: 15.5,
+        min: 15.5,
+        max: 15.5,
+      },
+    };
+    const mod: ParsedModifier = {
+      info: {
+        type: ModifierType.Augment,
+        tags: [],
+      },
+      stats: [parsedStat],
+    };
+
+    const statCalcs: StatCalculated[] = [
+      {
+        stat,
+        type: ModifierType.Augment,
         sources: [
           {
-            modifier: {
-              info: {
-                type: "rune",
-                tags: [],
-              },
-              stats: [
-                {
-                  stat: {
-                    ref: "Adds # to # Lightning Damage",
-                    better: 1,
-                    matchers: [
-                      {
-                        string: "Adds # to # Lightning Damage",
-                      },
-                    ],
-                    trade: {
-                      ids: {
-                        explicit: ["explicit.stat_3336890334"],
-                        fractured: ["fractured.stat_3336890334"],
-                        enchant: ["enchant.stat_3336890334"],
-                        rune: ["rune.stat_3336890334"],
-                        desecrated: ["desecrated.stat_3336890334"],
-                        crafted: ["crafted.stat_3336890334"],
-                      },
-                    },
-                    id: "local_minimum_added_lightning_damage",
-                  },
-                  translation: {
-                    string: "Adds # to # Lightning Damage",
-                  },
-                  roll: {
-                    unscalable: false,
-                    dp: false,
-                    value: 15.5,
-                    min: 15.5,
-                    max: 15.5,
-                  },
-                },
-              ],
-            },
-            stat: {
-              stat: {
-                ref: "Adds # to # Lightning Damage",
-                better: 1,
-                matchers: [
-                  {
-                    string: "Adds # to # Lightning Damage",
-                  },
-                ],
-                trade: {
-                  ids: {
-                    explicit: ["explicit.stat_3336890334"],
-                    fractured: ["fractured.stat_3336890334"],
-                    enchant: ["enchant.stat_3336890334"],
-                    rune: ["rune.stat_3336890334"],
-                    desecrated: ["desecrated.stat_3336890334"],
-                    crafted: ["crafted.stat_3336890334"],
-                  },
-                },
-                id: "local_minimum_added_lightning_damage",
-              },
-              translation: {
-                string: "Adds # to # Lightning Damage",
-              },
-              roll: {
-                unscalable: false,
-                dp: false,
-                value: 15.5,
-                min: 15.5,
-                max: 15.5,
-              },
-            },
+            modifier: mod,
+            stat: parsedStat,
             contributes: {
               value: 15.5,
               min: 15.5,
@@ -192,7 +93,7 @@ describe("determineAugments", () => {
           },
         ],
       },
-    ] as unknown as StatCalculated[];
+    ];
     const result = __testExports.determineAugments(mod, statCalcs);
 
     expect(result).toHaveLength(1);
@@ -203,11 +104,7 @@ describe("determineAugments", () => {
     const expectedRef = ["Fox Idol"];
 
     const result = __testExports.determineAugments(
-      {
-        info: {
-          type: ModifierType.Augment,
-        },
-      } as unknown as ParsedModifier,
+      { info: { type: ModifierType.Augment, tags: [] }, stats: [] },
       [
         makeCalcStat(
           "Idols socketed in this item gain the benefits of their Bonded modifiers",

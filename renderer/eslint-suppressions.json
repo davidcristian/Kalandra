@@ -1,34 +1,4 @@
 {
-  "specs/Parser/augment.test.ts": {
-    "no-restricted-syntax": {
-      "count": 5
-    }
-  },
-  "specs/Parser/fractureParsers.test.ts": {
-    "no-restricted-syntax": {
-      "count": 2
-    }
-  },
-  "specs/Parser/items.ts": {
-    "no-restricted-syntax": {
-      "count": 2
-    }
-  },
-  "specs/Parser/modifiersParsers.test.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "specs/Parser/sectionUnit.test.ts": {
-    "no-restricted-syntax": {
-      "count": 3
-    }
-  },
-  "specs/helper.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "specs/web/client-log.test.ts": {
     "no-restricted-syntax": {
       "count": 11

@@ -50,7 +50,7 @@ describe("[e2e] parseModifiers", () => {
         unknownModifiers: [],
         influences: [],
         info: testItem.info,
-        rawText: undefined!,
+        rawText: testItem.rawText,
       };
 
       modifierSections.forEach((section) => {
@@ -143,7 +143,7 @@ describe("[e2e] parseModifiers", () => {
         unknownModifiers: [],
         influences: [],
         info: testItem.info,
-        rawText: undefined!,
+        rawText: testItem.rawText,
       };
 
       const res = __testExports.parseModifiers(sections[section], parsedItem);
@@ -155,7 +155,7 @@ describe("[e2e] parseModifiers", () => {
 });
 
 describe("[unit] parseModifiers", () => {
-  let parsedItem: ParsedItem = {} as unknown as ParsedItem;
+  let parsedItem: ParsedItem;
 
   beforeEach(async () => {
     setupTests();

@@ -1,8 +1,9 @@
-import { __testExports, ParserState } from "@/parser/Parser";
+import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
 import { ModifierType } from "@/parser/modifiers";
+import { createTestParserState } from "@specs/helper";
 
 describe("Parse Fractured Items", () => {
   beforeEach(async () => {
@@ -11,7 +12,7 @@ describe("Parse Fractured Items", () => {
   });
 
   it("adds fractured if some mod is fractured", () => {
-    const parsedItem = {
+    const parsedItem = createTestParserState({
       newMods: [
         {
           info: { type: ModifierType.Fractured, tags: [] },
@@ -26,13 +27,13 @@ describe("Parse Fractured Items", () => {
           stats: [],
         },
       ],
-    } as unknown as ParserState;
+    });
     __testExports.parseFractured(parsedItem);
     expect(parsedItem.isFractured).toBe(true);
   });
 
   it("does nothing if no mod is fractured", () => {
-    const parsedItem = {
+    const parsedItem = createTestParserState({
       newMods: [
         {
           info: { type: ModifierType.Implicit, tags: [] },
@@ -43,7 +44,7 @@ describe("Parse Fractured Items", () => {
           stats: [],
         },
       ],
-    } as unknown as ParserState;
+    });
     __testExports.parseFractured(parsedItem);
     expect(parsedItem.isFractured).toBeUndefined();
   });

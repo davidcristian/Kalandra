@@ -802,9 +802,7 @@ Can be used in a Map Device, allowing you to enter a Map. Waystones can only be 
 RareMap.category = ItemCategory.Map;
 RareMap.rarity = ItemRarity.Normal;
 RareMap.mapTier = 14;
-RareMap.info = {
-  map: { tier: RareMap.mapTier },
-} as unknown as ParsedItem["info"];
+RareMap.info.map = { tier: RareMap.mapTier };
 RareMap.mapRevives = 2;
 RareMap.mapPackSize = 34;
 RareMap.mapRareMonsters = 28;
@@ -851,9 +849,7 @@ Corrupted
 RareMapFakeAllProps.category = ItemCategory.Map;
 RareMapFakeAllProps.rarity = ItemRarity.Normal;
 RareMapFakeAllProps.mapTier = 16;
-RareMapFakeAllProps.info = {
-  map: { tier: RareMapFakeAllProps.mapTier },
-} as unknown as ParsedItem["info"];
+RareMapFakeAllProps.info.map = { tier: RareMapFakeAllProps.mapTier };
 RareMapFakeAllProps.mapRevives = 0;
 RareMapFakeAllProps.mapPackSize = 20;
 RareMapFakeAllProps.mapMagicMonsters = 30;
