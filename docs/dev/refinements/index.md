@@ -143,3 +143,4 @@ layout and its reasons.
 - 079: [The map property filters send only their minimum to the trade site](tasks/079-map-filters-send-only-minimum.md)
 - 080: [The data loader imports the trade list loader from the web code](tasks/080-data-loader-imports-trade-data.md)
 - 081: [The anointment filter decodes oil indexes with its own copy of a game table's order](tasks/081-oil-names-follow-game-table-order.md)
+- 082: [Code still checks item names and fields that the Path of Exile 2 data does not have](tasks/082-checks-for-item-names-the-data-lacks.md)
