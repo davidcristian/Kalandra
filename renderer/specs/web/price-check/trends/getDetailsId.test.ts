@@ -3,10 +3,11 @@ import path from "path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init, ITEM_BY_REF } from "@/assets/data";
-import { ItemRarity } from "@/parser";
+import { ItemRarity, parseClipboard } from "@/parser";
 import { createVirtualItem } from "@/parser/ParsedItem";
 import { __testExports, NinjaSchema } from "@/web/background/Prices";
 import { getDetailsId } from "@/web/price-check/trends/getDetailsId";
+import { MetaSkillGem, RareItem, RareMap } from "@specs/Parser/items";
 
 const RENDERER = path.resolve(__dirname, "../../../..");
 const readText = (file: string) => fs.readFileSync(file, "utf-8");
@@ -66,5 +67,33 @@ describe("getDetailsId", () => {
     });
 
     expect(findPrice(priceFile, "Olroth's Resolve")?.primaryValue).toBe(1.5);
+  });
+
+  it.each([
+    [
+      "a skill gem by its name",
+      MetaSkillGem,
+      "GEM",
+      "Mirage Archer",
+      undefined,
+    ],
+    [
+      "a rare weapon by its base type",
+      RareItem,
+      "ITEM",
+      "Rider Bow",
+      undefined,
+    ],
+    [
+      "a waystone by its tier",
+      RareMap,
+      "ITEM",
+      "Waystone (Tier 14)",
+      "T14, Gen-18",
+    ],
+  ])("looks up %s", (_, item, ns, name, variant) => {
+    const parsed = parseClipboard(item.rawText)._unsafeUnwrap();
+
+    expect(getDetailsId(parsed)).toEqual({ ns, name, variant });
   });
 });
