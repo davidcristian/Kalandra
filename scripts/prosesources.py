@@ -12,6 +12,9 @@ Line = tuple[int, str]
 SCRIPT_SUFFIXES = frozenset({".ts", ".tsx", ".js", ".mjs", ".cjs"})
 HASH_SUFFIXES = frozenset({".yml", ".yaml", ".toml", ".sh"})
 LOG_METHODS = frozenset({"debug", "info", "warning", "error", "exception", "critical"})
+# A call whose name ends with one of these builds a message, such as Problem(path, "...") or ValueError("...")
+MESSAGE_CALLS = ("Problem", "Error", "Exception")
+MESSAGE_KEYWORDS = frozenset({"help", "description", "epilog"})
 # A "/" after one of these starts a regular expression; after anything else it divides
 REGEX_AFTER = frozenset("(,=:[!&|?{};+-*%<>~^")
 
@@ -150,13 +153,37 @@ def vue_prose(text: str) -> list[Line]:
     return sorted(found)
 
 
+def _parts(node: ast.AST) -> list[ast.expr]:
+    """Returns the parts of a message: of an f-string, `+`, `%`, `x if c else y`, or a comprehension."""
+    if isinstance(node, ast.JoinedStr):
+        return list(node.values)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        return [node.left, node.right]
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):
+        return [node.left]
+    if isinstance(node, ast.IfExp):
+        return [node.body, node.orelse]
+    if isinstance(node, ast.GeneratorExp | ast.ListComp):
+        return [node.elt]
+    return []
+
+
 def _texts(node: ast.AST) -> list[Line]:
-    """Returns the text of a string node, or of the constant parts of an f-string, with its line numbers."""
+    """Returns the text of each string that makes up a message, with its line numbers."""
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return _split(node.value, node.lineno)
-    if isinstance(node, ast.JoinedStr):
-        return [line for part in node.values for line in _texts(part)]
-    return []
+    return [line for part in _parts(node) for line in _texts(part)]
+
+
+def _builds_message(func: ast.expr) -> bool:
+    """Returns whether a call to ``func`` prints, logs or builds a message, or adds one to a list named problems."""
+    if isinstance(func, ast.Name):
+        return func.id == "print" or func.id.endswith(MESSAGE_CALLS)
+    if not isinstance(func, ast.Attribute):
+        return False
+    if isinstance(func.value, ast.Name) and func.value.id == "problems" and func.attr in {"append", "extend"}:
+        return True
+    return func.attr in LOG_METHODS or func.attr.endswith(MESSAGE_CALLS)
 
 
 def _message_nodes(node: ast.AST) -> list[ast.AST]:
@@ -164,10 +191,8 @@ def _message_nodes(node: ast.AST) -> list[ast.AST]:
         first = node.body[0]
         return [first.value] if isinstance(first, ast.Expr) else []
     if isinstance(node, ast.Call):
-        name = node.func.id if isinstance(node.func, ast.Name) else ""
-        method = node.func.attr if isinstance(node.func, ast.Attribute) else ""
-        if name == "print" or method in LOG_METHODS:
-            return list(node.args)
+        found: list[ast.AST] = [keyword.value for keyword in node.keywords if keyword.arg in MESSAGE_KEYWORDS]
+        return found + list(node.args) if _builds_message(node.func) else found
     if isinstance(node, ast.Raise) and isinstance(node.exc, ast.Call):
         return list(node.exc.args)
     if isinstance(node, ast.Assign) and [getattr(target, "id", "") for target in node.targets] == ["msg"]:
@@ -176,7 +201,7 @@ def _message_nodes(node: ast.AST) -> list[ast.AST]:
 
 
 def python_prose(text: str) -> list[Line]:
-    """Returns the comments and docstrings of Python, and the strings it prints, logs, raises or assigns to msg."""
+    """Returns the comments and docstrings of Python, and the text of the messages it prints, logs or builds."""
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", SyntaxWarning)

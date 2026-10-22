@@ -50,8 +50,11 @@ the repo.
   starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
   `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, Vue,
   YAML, TOML and shell files; the docstrings and comments of Python; and the strings passed to `console.*`,
-  `logger.write`, `new ...Error` and `throw new` calls, or in Python to `print`, a logging method, a `raise`, or a
-  variable named `msg`.
+  `logger.write`, `new ...Error` and `throw new` calls. In Python they are the strings passed to `print`, a logging
+  method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and `problems.append` or
+  `problems.extend`, and those assigned to `msg` or given as `help`, `description` or `epilog`. Each string of a
+  message counts: the parts of an f-string, both sides of `+`, the left of `%`, both results of an `if`
+  expression and the item of a comprehension.
   `bannedwords.py` reads the words from the table in AGENTS.md and finds them alone or joined to other words by a
   hyphen (`non-gated`), and a phrase whose words have hyphens or one line break between them. It skips code spans,
   link targets, URLs, a word that starts with a hyphen as a command line option does (`--gate`), and the
@@ -128,7 +131,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 100 tests on 22 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 102 tests on 22 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

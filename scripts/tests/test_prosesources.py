@@ -91,6 +91,31 @@ class PythonTest(unittest.TestCase):
             ],
         )
 
+    def test_reads_the_messages_of_problems_errors_and_option_help(self) -> None:
+        lines = [
+            'problems.append(Problem("a.md", "problem text"))',
+            'error = errors.TableError("error text")',
+            'parser.add_argument("--root", help="help text")',
+            'others.append("not a message")',
+            'call("not a message", help_text="not read")',
+            'handlers[0]("not a message")',
+        ]
+        self.assertEqual(
+            texts("a.py", "\n".join(lines)), [(1, "a.md"), (1, "problem text"), (2, "error text"), (3, "help text")]
+        )
+
+    def test_reads_every_string_of_a_message_expression(self) -> None:
+        lines = [
+            'print("joined " + "text")',
+            'print("formatted %s" % name)',
+            'print("first" if name else "second")',
+            'problems.extend(f"built {n}" for n in names)',
+        ]
+        self.assertEqual(
+            texts("a.py", "\n".join(lines)),
+            [(1, "joined"), (1, "text"), (2, "formatted %s"), (3, "first"), (3, "second"), (4, "built")],
+        )
+
     def test_reports_a_file_it_cannot_parse(self) -> None:
         with self.assertRaises(SourceError):
             prose_lines("a.py", "def broken(:\n")
