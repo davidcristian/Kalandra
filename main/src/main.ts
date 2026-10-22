@@ -75,7 +75,6 @@ startWhenReady(
         logger.write("info Vue Devtools installed");
       } catch (error) {
         logger.write(`error installing Vue Devtools: ${error}`);
-        console.log(`error installing Vue Devtools: ${error}`);
       }
     }
     process.addListener("uncaughtException", (err) => {
@@ -120,7 +119,6 @@ startWhenReady(
           },
         );
         uIOhook.start();
-        console.log("uIOhook started");
         let port: number;
         try {
           port = await startServer(appUpdater, logger);

@@ -13,7 +13,6 @@ export async function startWhenReady(
       app.quit();
       return;
     }
-    console.log("Accessibility permission granted, starting app");
   }
   // Electron emits `ready` once, which can happen during the permission wait,
   // and only whenReady() also resolves after that.
