@@ -217,7 +217,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (63.2% of the lines of `src/` on 22 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (72.9% of the lines of `src/` on 22 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and
 the production bundle, and `npm run lint` runs ESLint on `src/`, `specs/` and `build/`; the Build workflow packages
 main on all three platforms. Hotkeys, overlay focus, clipboard capture and OCR need the game:
