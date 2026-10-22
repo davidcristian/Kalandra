@@ -40,7 +40,7 @@ beforeAll(async () => {
   onEventAnyClient("CLIENT->MAIN::user-action", () => {
     lastEventHandled();
   });
-  onEventAnyClient("CLIENT->MAIN::re-parse-log", () => {
+  onEventAnyClient("CLIENT->MAIN::save-config", () => {
     throw new Error("the handler failed");
   });
   onEventAnyClient("CLIENT->MAIN::write-data", (e) => {
@@ -172,11 +172,11 @@ describe("a message main cannot use", () => {
 
   it("is logged when its handler throws, and the next event is handled", async () => {
     const event: IpcEvent = {
-      name: "CLIENT->MAIN::re-parse-log",
-      payload: undefined,
+      name: "CLIENT->MAIN::save-config",
+      payload: { contents: "{}", isTemporary: false },
     };
     expect(await logLinesFor(JSON.stringify(event))).toContain(
-      "error [server] Handling CLIENT->MAIN::re-parse-log failed: the handler failed",
+      "error [server] Handling CLIENT->MAIN::save-config failed: the handler failed",
     );
   });
 });

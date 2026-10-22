@@ -2,7 +2,6 @@ import { promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { FileWriter } from "../src/host-files/FileWriter";
 import {
   GameLogWatcher,
   type FileWatch,
@@ -72,13 +71,7 @@ function createWatcher(possiblePaths?: string[]) {
   server = new FakeServer();
   logger = new Logger(server);
   files = new FakeFileWatch();
-  watcher = new GameLogWatcher(
-    server,
-    logger,
-    new FileWriter(server, logger),
-    possiblePaths,
-    files,
-  );
+  watcher = new GameLogWatcher(server, logger, possiblePaths, files);
 }
 
 /** Follows an empty log, then writes `content` to it and reads the change. */
@@ -186,16 +179,6 @@ describe("GameLogWatcher reads", () => {
     );
   });
 
-  it("drops the partial last line when the log is read again", async () => {
-    await fs.writeFile(file, "a whole line\nhalf a li");
-    await watcher.restart(file, true);
-    await server.emit("CLIENT->MAIN::re-parse-log", undefined);
-    expect(server.gameLogLines()).toEqual(["a whole line"]);
-
-    await server.emit("CLIENT->MAIN::re-parse-log", undefined);
-    expect(server.gameLogLines()).toEqual(["a whole line", "a whole line"]);
-  });
-
   it("starts at the end of the file it opens", async () => {
     await fs.writeFile(file, "an old line\n");
     await watcher.restart(file, true);
@@ -294,11 +277,7 @@ describe("GameLogWatcher after the log changes on disk", () => {
 
 describe("the default FileWatch", () => {
   it("polls the log every 450 ms with fs.watchFile until reading is turned off", async () => {
-    watcher = new GameLogWatcher(
-      server,
-      logger,
-      new FileWriter(server, logger),
-    );
+    watcher = new GameLogWatcher(server, logger);
     await fs.writeFile(file, "");
     await watcher.restart(file, true);
     expect(polls.get(file)?.interval).toBe(450);

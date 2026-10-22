@@ -78,15 +78,7 @@ export class FileWriter {
     });
   }
 
-  public async flushClientLogFile(): Promise<void> {
-    await this.inOrder(async () => {
-      if (this._state.clientLogFile) {
-        await this.closeChannel(FileChannel.ClientLog);
-      }
-    });
-  }
-
-  // Each event, restart and flush starts after the one before it ends. Otherwise an entry that
+  // Each event and restart starts after the one before it ends. Otherwise an entry that
   // comes while client-log.ndjson opens finds no file, and Node does not order parallel writes.
   private async inOrder(task: () => Promise<void>): Promise<void> {
     this.queue = this.queue.then(task).catch((err: unknown) => {

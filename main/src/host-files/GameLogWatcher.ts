@@ -4,7 +4,6 @@ import { app } from "electron";
 import { guessFileLocation } from "./utils";
 import { ServerEvents } from "../server";
 import { Logger } from "../RemoteLogger";
-import { FileWriter } from "./FileWriter";
 import { LineSplitter } from "./LineSplitter";
 
 const POSSIBLE_PATH =
@@ -80,26 +79,9 @@ export class GameLogWatcher {
   constructor(
     private server: ServerEvents,
     private logger: Logger,
-    private fileWriter: FileWriter,
     private possiblePaths: readonly string[] = POSSIBLE_PATH,
     private files: FileWatch = pollFile,
-  ) {
-    this.server.onEventAnyClient("CLIENT->MAIN::re-parse-log", async () => {
-      if (this._state) {
-        if (!this._state.isReading) {
-          this.fileWriter.flushClientLogFile();
-          this._state.offset = 0;
-          this._state.lines.reset();
-          this._state.isReading = true;
-          await this.readToEOF(this._state);
-        } else {
-          this.logger.write(
-            "warn [GameLogWatcher] Asked to re-parse log but currently reading, skipping",
-          );
-        }
-      }
-    });
-  }
+  ) {}
 
   async restart(logFile: string, readLog: boolean) {
     if (!readLog) {

@@ -95,8 +95,7 @@ export type IpcEvent =
   | IpcConfigChanged
   | IpcUserAction
   | IpcWriteToFile
-  | import("./library").IpcLibrarySession
-  | IpcReparseLog;
+  | import("./library").IpcLibrarySession;
 
 export type IpcEventPayload<
   Name extends IpcEvent["name"],
@@ -208,8 +207,6 @@ type IpcGameLog = Event<
     lines: string[];
   }
 >;
-
-type IpcReparseLog = Event<"CLIENT->MAIN::re-parse-log">;
 
 type IpcUpdaterState = Event<"MAIN->CLIENT::updater-state", UpdateInfo>;
 

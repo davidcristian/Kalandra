@@ -139,19 +139,6 @@ describe("FileWriter.restart", () => {
     );
   });
 
-  it("starts the client log file again at the first entry after a flush", async () => {
-    await writer.restart(true, folder);
-    const written = sendEntry(1);
-    const flushed = writer.flushClientLogFile();
-    await sendEntry(2);
-    await Promise.all([written, flushed]);
-
-    expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
-      entryLines(2),
-    );
-    expect(logger.history).toContain("Channel client-log closed.");
-  });
-
   it("closes the session and client log files when the feature is turned off", async () => {
     await writer.restart(true, folder);
     await sendSessionStart("session");

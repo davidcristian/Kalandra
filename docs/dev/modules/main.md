@@ -164,22 +164,21 @@ The entry, the server and the app services, in `main/src/`:
   64 KiB with a warning. Each time it reads, it first compares the open file with the path: when the file is shorter
   than the read position, or the path holds another file, it reads from the start. When the path holds no file, or
   its new file is deleted before it opens, it reads the open file. A restart with the same `logFile` keeps the open
-  file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again.
-  `CLIENT->MAIN::re-parse-log` reads the file again from the start. A restart that closes the file stops a read in
-  progress after its current chunk, and a failed read is logged. The re-parse handler settles when its read ends.
+  file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again. A restart
+  that closes the file stops a read in progress after its current chunk, and a failed read is logged.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection on,
   in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv` between a
   `session` start and stop. It answers each start with `MAIN->CLIENT::library-session`: `started` once the file is
   open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path separator, and
   `failed` while it is off or when the folder or file cannot be created, with the reason in the log. It writes
-  `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run and at the first
-  write after a log re-parse. The folder is the library output path, or `apt-data/csv-data` by default, and it creates
-  the folder before it opens either file. A restart that turns it off closes both files. One that changes the folder
-  closes `client-log.ndjson`, which the next entry opens in the new folder, and leaves a session file open in the
-  folder it started in until the session stops. Each event, `restart` and `flushClientLogFile` starts after the one
-  before it ends, so an entry that comes while its file opens is written once the file is open, and lines keep the
-  order of their events. A failed open or write is logged, and the next event still runs.
+  `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run. The folder is the
+  library output path, or `apt-data/csv-data` by default, and it creates the folder before it opens either file. A
+  restart that turns it off closes both files. One that changes the folder closes `client-log.ndjson`, which the next
+  entry opens in the new folder, and leaves a session file open in the folder it started in until the session stops.
+  Each event and `restart` starts after the one before it ends, so an entry that comes while its file opens is written
+  once the file is open, and lines keep the order of their events. A failed open or write is logged, and the next
+  event still runs.
 - `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
   or `undefined` when none is.
 

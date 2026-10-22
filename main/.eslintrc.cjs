@@ -4,7 +4,6 @@ const existingOffenders = {
     "src/AppTray.ts",
     "src/AppUpdater.ts",
     "src/host-files/ConfigStore.ts",
-    "src/host-files/GameLogWatcher.ts",
     "src/main.ts",
     "src/shortcuts/Shortcuts.ts",
     "src/windowing/OverlayWindow.ts",
@@ -12,7 +11,6 @@ const existingOffenders = {
   "@typescript-eslint/no-misused-promises": [
     "src/AppUpdater.ts",
     "src/host-files/FileWriter.ts",
-    "src/host-files/GameLogWatcher.ts",
     "src/main.ts",
     "src/server.ts",
   ],

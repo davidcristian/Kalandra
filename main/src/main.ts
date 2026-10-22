@@ -67,7 +67,7 @@ startWhenReady(
     new HttpProxy(httpRoutes, logger);
     addFileUploadRoutes(httpRoutes, logger);
     const fileWriter = new FileWriter(eventPipe, logger);
-    const gameLogWatcher = new GameLogWatcher(eventPipe, logger, fileWriter);
+    const gameLogWatcher = new GameLogWatcher(eventPipe, logger);
 
     if (process.env.VITE_DEV_SERVER_URL) {
       try {
