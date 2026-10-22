@@ -31,7 +31,9 @@ replaces it with `vi.mock("electron", ...)`.
 - `stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that
   records the window each key press reaches.
 - `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
-- `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts`.
+- `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts` while the game window is active and checks
+  the hotkeys `updateActions()` leaves out. It presses a hotkey and reads the keys it releases from `fake-hook.ts`,
+  which keeps each key main presses, and turns the mouse wheel with `Ctrl` at the edges of the stash area.
 - `key-names.test.ts` writes hotkeys with `hotkeyToString()`, `mergeTwoHotkeys()` and `shortcutToElectron()`, and
   checks that `KeyToCode` gives each key a code of its own and that `KeyToElectron` has an accelerator for each key.
 

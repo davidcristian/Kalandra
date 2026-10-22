@@ -24,7 +24,11 @@ vi.mock("electron-overlay-window", async () => {
   const { EventEmitter } = await import("node:events");
   return {
     OVERLAY_WINDOW_OPTS: {},
-    OverlayController: { events: new EventEmitter() },
+    OverlayController: {
+      events: new EventEmitter(),
+      // A game window 1600 px high, whose sidebar is 987 px wide and whose stash tabs fill y 154 to 1192 of it
+      targetBounds: { x: 100, y: 50, width: 2560, height: 1600 },
+    },
   };
 });
 
@@ -33,12 +37,13 @@ vi.mock("../src/vision/link-main", () => ({
   OcrWorker: { create: async () => ({ updateOptions: async () => {} }) },
 }));
 
+let server: FakeServer;
 let logger: Logger;
 let game: GameWindow;
 let shortcuts: Shortcuts;
 
 beforeEach(async () => {
-  const server = new FakeServer();
+  server = new FakeServer();
   logger = new Logger(server);
   game = new GameWindow();
   // The overlay window object then creates no BrowserWindow
@@ -51,7 +56,7 @@ beforeEach(async () => {
 
 afterEach(() => {
   game.removeAllListeners();
-  hook.removeAllListeners();
+  hook.reset();
   globalShortcut.unregisterAll();
 });
 
@@ -66,6 +71,14 @@ async function registerOnFocus(actions: ShortcutAction[]) {
   await new Promise((resolve) => setImmediate(resolve));
 }
 
+const registered = () => [...globalShortcut.registered.keys()];
+
+function pressHotkey(accelerator: string) {
+  const callback = globalShortcut.registered.get(accelerator);
+  if (!callback) throw new Error(`${accelerator} is not registered`);
+  callback();
+}
+
 describe("Shortcuts", () => {
   it("registers the hotkeys after one with an unknown key name, and logs that one", async () => {
     await registerOnFocus([
@@ -74,10 +87,7 @@ describe("Shortcuts", () => {
       trigger("Shift + Space"),
     ]);
 
-    expect([...globalShortcut.registered.keys()]).toEqual([
-      "F5",
-      "Shift+Space",
-    ]);
+    expect(registered()).toEqual(["F5", "Shift+Space"]);
     expect(logger.history).toContain(
       'error [Shortcuts] Hotkey "Ctrl + Foo" has an unknown key name and will not be registered.',
     );
@@ -88,7 +98,132 @@ describe("Shortcuts", () => {
     async (shortcut) => {
       await registerOnFocus([trigger(shortcut), trigger("F5")]);
 
-      expect([...globalShortcut.registered.keys()]).toEqual(["F5"]);
+      expect(registered()).toEqual(["F5"]);
     },
   );
+
+  it("registers no hotkey until the game window is active, and none after it loses the focus", async () => {
+    shortcuts.updateActions([trigger("F5")], false, false, false, "en");
+    expect(registered()).toEqual([]);
+
+    await registerOnFocus([trigger("F5")]);
+    game.isActive = false;
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(registered()).toEqual([]);
+  });
+});
+
+describe("updateActions", () => {
+  it("leaves out and logs each hotkey the game uses", async () => {
+    await registerOnFocus([
+      trigger("Ctrl + F"),
+      trigger("ArrowUp"),
+      trigger("F5"),
+    ]);
+
+    expect(registered()).toEqual(["F5"]);
+    for (const shortcut of ["Ctrl + F", "ArrowUp"]) {
+      expect(logger.history).toContain(
+        `error [Shortcuts] Hotkey "${shortcut}" reserved by the game will not be registered.`,
+      );
+    }
+  });
+
+  it("leaves out the copy keys, which add the game's show mods key, Alt by default", async () => {
+    await registerOnFocus([trigger("Ctrl + Alt + C"), trigger("Ctrl + C")]);
+
+    expect(registered()).toEqual([]);
+    expect(logger.history).toContain(
+      'error [Shortcuts] Hotkey "Ctrl + Alt + C" reserved by the game will not be registered.',
+    );
+  });
+
+  it("leaves out and logs a hotkey that two actions use", async () => {
+    await registerOnFocus([
+      trigger("F5"),
+      { shortcut: "F5", action: { type: "stash-search", text: "map" } },
+      trigger("Shift + F5"),
+    ]);
+
+    expect(registered()).toEqual(["Shift+F5"]);
+    expect(logger.history).toContain(
+      'error [Shortcuts] It is not possible to use the same hotkey "F5" for multiple actions.',
+    );
+  });
+
+  it("leaves out an overlay key the game uses", async () => {
+    await registerOnFocus([
+      { shortcut: "Ctrl + F", action: { type: "toggle-overlay" } },
+    ]);
+
+    expect(registered()).toEqual([]);
+  });
+
+  it("keeps the overlay key when another action uses it too", async () => {
+    await registerOnFocus([
+      trigger("Shift + Space"),
+      { shortcut: "Shift + Space", action: { type: "toggle-overlay" } },
+    ]);
+
+    expect(registered()).toEqual(["Shift+Space"]);
+  });
+});
+
+describe("a hotkey press", () => {
+  it("releases the hotkey's keys, the last first, and sends the widget action to every page", async () => {
+    await registerOnFocus([trigger("Ctrl + Shift + F5")]);
+    pressHotkey("Ctrl+Shift+F5");
+
+    expect(hook.pressed).toEqual(["F5 up", "Shift up", "Ctrl up"]);
+    expect(server.sent).toContainEqual({
+      name: "MAIN->CLIENT::widget-action",
+      payload: { target: "Ctrl + Shift + F5" },
+    });
+  });
+
+  it("releases only the key that is not a modifier when the action keeps the modifiers held", async () => {
+    await registerOnFocus([{ ...trigger("Ctrl + F5"), keepModKeys: true }]);
+    pressHotkey("Ctrl+F5");
+
+    expect(hook.pressed).toEqual(["F5 up"]);
+  });
+});
+
+describe("Ctrl and the mouse wheel with stash scrolling on", () => {
+  beforeEach(async () => {
+    shortcuts.updateActions([], true, false, false, "en");
+    game.isActive = true;
+    await new Promise((resolve) => setImmediate(resolve));
+  });
+
+  it.each([
+    ["inside the stash area at its right edge", 1087, 700, []],
+    ["right of the stash area", 1088, 700, ["ArrowRight tap"]],
+    ["above the stash tabs", 500, 204, ["ArrowRight tap"]],
+    ["at the top of the stash tabs", 500, 205, []],
+    ["at the bottom of the stash tabs", 500, 1241, []],
+    ["below the stash tabs", 500, 1242, ["ArrowRight tap"]],
+  ])("%s, at (%i, %i), taps %j", (_place, x, y, taps) => {
+    hook.wheel(x, y, 1, { ctrlKey: true });
+
+    expect(hook.pressed).toEqual(taps);
+  });
+
+  it("taps ArrowLeft when the wheel turns the other way", () => {
+    hook.wheel(1500, 700, -1, { ctrlKey: true });
+
+    expect(hook.pressed).toEqual(["ArrowLeft tap"]);
+  });
+
+  it("taps nothing without Ctrl, with stash scrolling off or while the game is not active", async () => {
+    hook.wheel(1500, 700, 1);
+    shortcuts.updateActions([], false, false, false, "en");
+    hook.wheel(1500, 700, 1, { ctrlKey: true });
+    shortcuts.updateActions([], true, false, false, "en");
+    game.isActive = false;
+    hook.wheel(1500, 700, 1, { ctrlKey: true });
+
+    expect(hook.pressed).toEqual([]);
+  });
 });
