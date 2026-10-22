@@ -82,21 +82,6 @@ export function createPresets(
     stats: initUiModFilters(item, opts),
   };
 
-  // Apply augments if we should
-  // if (
-  //   (item.rarity === ItemRarity.Magic || item.rarity === ItemRarity.Rare) &&
-  //   pseudoPreset.filters.itemEditorSelection &&
-  //   !pseudoPreset.filters.itemEditorSelection.disabled &&
-  //   opts.autoFillEmptyAugmentSockets
-  // ) {
-  //   handleApplyItemEdits(
-  //     pseudoPreset.stats,
-  //     item,
-  //     pseudoPreset.filters.tempAugmentStorage ?? [],
-  //     opts.autoFillEmptyAugmentSockets ?? "None",
-  //   );
-  // }
-
   if (likelyFinishedItem(item) || !hasCraftingValue(item)) {
     return { active: pseudoPreset.id, presets: [pseudoPreset] };
   }

@@ -2,7 +2,6 @@ import fnv1a from "@sindresorhus/fnv1a";
 import type {
   BaseType,
   DropEntry,
-  AugmentDataByAugment,
   AugmentDataByTradeId,
   Stat,
   TranslationDict,
@@ -26,7 +25,6 @@ export let ITEM_DROP: DropEntry[];
 export let CLIENT_STRINGS: TranslationDict;
 export let CLIENT_STRINGS_REF: TranslationDict;
 export let APP_PATRONS: Array<{ from: string; months: number; style: number }>;
-export let AUGMENT_DATA_BY_AUGMENT: AugmentDataByAugment;
 export let AUGMENT_DATA_BY_TRADE_ID: AugmentDataByTradeId;
 
 export const HIGH_VALUE_AUGMENTS_HARDCODED = new Set<string>([]);
@@ -250,8 +248,6 @@ export function loadUltraLateItems() {
     augment: r.augment!.filter((s) => s.tradeId),
   }));
 
-  AUGMENT_DATA_BY_AUGMENT = augmentsToLookup(augmentList);
-
   AUGMENT_DATA_BY_TRADE_ID = augmentsToLookupTradeId(augmentList);
 
   GROUPED_AUGMENTS = groupAugments(augmentList);
@@ -303,32 +299,6 @@ export function loadUltraLateItems() {
     [CLIENT_STRINGS.ATTRIBUTE_TAG]: "attribute_catalyst",
     [CLIENT_STRINGS.MINION_TAG]: "minion_catalyst",
   };
-}
-
-function augmentsToLookup(augmentList: BaseType[]): AugmentDataByAugment {
-  const augmentDataByAugment: AugmentDataByAugment = {};
-
-  for (const augment of augmentList) {
-    if (!augment.augment) continue;
-    for (const augmentStat of augment.augment) {
-      const { categories, string: text, values, tradeId } = augmentStat;
-      if (!tradeId) continue;
-      if (!augmentDataByAugment[augment.refName]) {
-        augmentDataByAugment[augment.refName] = [];
-      }
-      augmentDataByAugment[augment.refName]!.push({
-        augment: augment.name,
-        refName: augment.refName,
-        baseStat: text,
-        values,
-        id: tradeId[0],
-        categories,
-        icon: augment.icon,
-      });
-    }
-  }
-
-  return augmentDataByAugment;
 }
 
 function augmentsToLookupTradeId(
@@ -534,8 +504,3 @@ async function loadTradeData() {
     };
   };
 }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
-export const __testExports = {
-  augmentsToLookup,
-};

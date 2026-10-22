@@ -297,23 +297,6 @@ export interface AugmentSingleValue {
   };
 }
 
-export interface AugmentData {
-  augment: string;
-  refName: string;
-  baseStat: string;
-  values: number[];
-  id: string;
-  categories: ItemCategory[];
-  icon: string;
-}
-/**
- * Key for each augment, Iron, Lesser Rebirth, Soul core of xx
- *
- * Value is each option that the value could be for, ie stat for armour or weapon.
- */
-export interface AugmentDataByAugment {
-  [augment: string]: AugmentData[] | undefined;
-}
 export interface AugmentDataByTradeId {
   [tradeId: string]:
     | Array<{

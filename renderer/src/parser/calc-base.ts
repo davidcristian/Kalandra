@@ -170,59 +170,6 @@ function recalculateArmourProperties(newItem: ParsedItem, oldItem: ParsedItem) {
   }
 }
 
-export function applyEleAugment(
-  item: ParsedItem,
-  type: string,
-  values: number[],
-) {
-  const { category } = item;
-  const weaponOrArmour = isArmourOrWeaponOrCaster(category);
-  if (
-    weaponOrArmour === undefined ||
-    weaponOrArmour === "armour" ||
-    weaponOrArmour === "caster"
-  )
-    return;
-  if (values.length !== 2) return;
-  const adding = values.reduce((a, b) => a + b) / 2;
-  if (item.weaponELEMENTAL) {
-    item.weaponELEMENTAL += adding;
-  } else {
-    item.weaponELEMENTAL = adding;
-  }
-  switch (type) {
-    case "Glacial Rune":
-    case "Lesser Glacial Rune":
-    case "Greater Glacial Rune":
-      if (item.weaponCOLD) {
-        item.weaponCOLD += adding;
-      } else {
-        item.weaponCOLD = adding;
-      }
-      break;
-    case "Storm Rune":
-    case "Lesser Storm Rune":
-    case "Greater Storm Rune":
-      if (item.weaponLIGHTNING) {
-        item.weaponLIGHTNING += adding;
-      } else {
-        item.weaponLIGHTNING = adding;
-      }
-      break;
-    case "Desert Rune":
-    case "Lesser Desert Rune":
-    case "Greater Desert Rune":
-      if (item.weaponFIRE) {
-        item.weaponFIRE += adding;
-      } else {
-        item.weaponFIRE = adding;
-      }
-      break;
-    default:
-      break;
-  }
-}
-
 export function calcBase(
   item: ParsedItem,
   inStat: number | undefined,

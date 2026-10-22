@@ -10,7 +10,7 @@ of the nine languages has a key for any of them:
 
 | Literal | Code | What it reads |
 | --- | --- | --- |
-| `" (implicit)"`, `" (enchant)"`, `" (rune)"`, `" (added rune)"`, `" (scourge)"`, `" (desecrated)"`, `" (crafted)"`, `" (fractured)"` | the `*_LINE` constants in `advanced-mod-desc.ts`, read by `parseModType()`, `Parser.ts` and `filters/fill-augments.ts` | the suffix of a stat line that names its modifier type |
+| `" (implicit)"`, `" (enchant)"`, `" (rune)"`, `" (added rune)"`, `" (scourge)"`, `" (desecrated)"`, `" (crafted)"`, `" (fractured)"` | the `*_LINE` constants in `advanced-mod-desc.ts`, read by `parseModType()` and `Parser.ts` | the suffix of a stat line that names its modifier type |
 | `"\u2014"`, the em dash | `parseModInfoLine()` in `advanced-mod-desc.ts` | the parts of a `{ ... }` modifier line: its type, its tags and its roll increase |
 | `", "` | `parseModInfoLine()` | the tags of a modifier line |
 | `"{"` and `"}"` | `isModInfoLine()` in `advanced-mod-desc.ts` | a modifier line of the advanced item description |
@@ -40,3 +40,5 @@ through `CLIENT_STRINGS`.
 
 - 2026-10-21: Found by comparing the literals in `advanced-mod-desc.ts` and `Parser.ts` with the
   keys of every language's `client_strings.js`. This clone has no game export to add strings from.
+- 2026-10-22: `filters/fill-augments.ts`, which also read the suffixes, was removed with the augment
+  fill code that had no caller.

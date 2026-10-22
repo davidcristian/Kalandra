@@ -347,38 +347,6 @@ export default defineComponent({
 
       return getItemEditorType(props.item);
     });
-    // For handling filling augments
-    // watch(
-    //   () => props.filters.itemEditorSelection?.value,
-    //   (selected, prev) => {
-    //     const normalCase = selected !== prev && props.filters.tempAugmentStorage;
-    //     if (normalCase && selected !== undefined) {
-    //       // If last wasn't empty
-    //       if (
-    //         prev !== "None" &&
-    //         props.filters.tempAugmentStorage &&
-    //         props.filters.tempAugmentStorage.length > 0
-    //       ) {
-    //         // Remove current augment
-    //         handleRemoveItemEdits(
-    //           props.stats,
-    //           props.item,
-    //           props.filters.tempAugmentStorage!,
-    //         );
-    //       }
-    //       // If we didn't choose empty
-    //       if (selected !== "None") {
-    //         // add new augment
-    //         handleApplyItemEdits(
-    //           props.stats,
-    //           props.item,
-    //           props.filters.tempAugmentStorage!,
-    //           selected,
-    //         );
-    //       }
-    //     }
-    //   },
-    // );
 
     const { t } = useI18n();
 

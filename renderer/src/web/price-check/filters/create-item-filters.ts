@@ -433,17 +433,6 @@ export function createFilters(
     }
   }
 
-  if (
-    (item.rarity === ItemRarity.Normal ||
-      item.rarity === ItemRarity.Magic ||
-      item.rarity === ItemRarity.Rare ||
-      item.rarity === ItemRarity.Unique) &&
-    item.augmentSockets &&
-    item.augmentSockets.empty > 0
-  ) {
-    filters.tempAugmentStorage = [];
-  }
-
   return filters;
 }
 

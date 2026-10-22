@@ -15,7 +15,7 @@ this doc describes.
 type, `ItemRarity`, `ItemInfluence`, `itemIsModifiable` and `ItemCategory`. Code outside the parser, mostly the
 price check, also imports `@/parser/<file>` directly for `ParsedItem`, `Parser`, `meta`, `modifiers`,
 `advanced-mod-desc`, `stat-translations`, `calc-base`, `calc-q20` and `augment-builder`. `Parser.ts` exports
-`parseModifiersPoe2`, `parseAffixStrings`, `getMaxSockets` and `replaceHashWithValues` for that use.
+`parseAffixStrings`, `getMaxSockets` and `replaceHashWithValues` for that use.
 
 - `parseClipboard(clipboard)` returns a neverthrow `Result<ParsedItem, string>`. It splits the text into sections,
   checks that the first one starts with the item class line, reads rarity, name and base type from it
@@ -59,8 +59,8 @@ The other files, each called from `Parser.ts` or from the price check:
 | `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
 | `settings.ts` | `parserSettings` returns the user settings the parser reads, the language and the saved augments, from the object the app passes to `setParserSettings` |
 
-A module exports the internal functions its tests call as `__testExports` (`Parser.ts`, `stat-translations.ts`,
-`assets/data/index.ts`).
+A module exports the internal functions its tests call as `__testExports` (`Parser.ts` and
+`stat-translations.ts`).
 
 ## The game data
 

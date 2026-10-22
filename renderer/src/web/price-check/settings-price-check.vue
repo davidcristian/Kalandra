@@ -246,7 +246,6 @@ import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 import { configModelValue, configProp, findWidget } from "../settings/utils.js";
 import type { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { useLeagues } from "../background/Leagues";
-import { getAugmentNameByRef } from "./filters/fill-augments.js";
 import { usePoeninja } from "../background/Prices.js";
 import UiItemImg from "../ui/UiItemImg.vue";
 
@@ -372,7 +371,6 @@ export default defineComponent({
           configWidget.value.initialDelay = Math.min(Math.max(value, 5), 400);
         },
       }),
-      getAugmentNameByRef,
     };
   },
 });

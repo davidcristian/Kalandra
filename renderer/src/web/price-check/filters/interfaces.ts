@@ -85,7 +85,6 @@ export interface ItemFilters {
     league: string;
     collapseListings: "api" | "app";
   };
-  tempAugmentStorage?: StatFilter[];
   requires?: {
     level?: FilterNumeric;
     str?: FilterNumeric;

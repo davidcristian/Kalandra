@@ -31,13 +31,11 @@ import {
   ModifierInfo,
   ParsedModifier,
   ENCHANT_LINE,
-  SCOURGE_LINE,
   IMPLICIT_LINE,
   AUGMENT_LINE,
   isModInfoLine,
   groupLinesByMod,
   parseModInfoLine,
-  ADDED_AUGMENT_LINE,
 } from "./advanced-mod-desc";
 import { calcPropPercentile, QUALITY_STATS } from "./calc-q20";
 import { parserSettings } from "./settings";
@@ -1158,62 +1156,6 @@ function parseLogbookArea(section: string[], item: ParsedItem) {
       item.logbookAreaMods = [areaMods];
     } else {
       item.logbookAreaMods.push(areaMods);
-    }
-  }
-
-  return "SECTION_PARSED";
-}
-
-function endingTagModType(line: string): ModifierType | undefined {
-  if (line.endsWith(ENCHANT_LINE)) return ModifierType.Enchant;
-  if (line.endsWith(SCOURGE_LINE)) return ModifierType.Scourge;
-  if (line.endsWith(ADDED_AUGMENT_LINE)) return ModifierType.AddedAugment;
-  if (line.endsWith(AUGMENT_LINE)) return ModifierType.Augment;
-  if (line.startsWith(_$.GRANTS_SKILL)) return ModifierType.Skill;
-  return undefined;
-}
-
-export function parseModifiersPoe2(section: string[], item: ParsedItem) {
-  performance.mark("parseModifiersPoe2");
-  if (
-    item.rarity !== ItemRarity.Normal &&
-    item.rarity !== ItemRarity.Magic &&
-    item.rarity !== ItemRarity.Rare &&
-    item.rarity !== ItemRarity.Unique
-  ) {
-    return "PARSER_SKIPPED";
-  }
-  if (section.length === 0) return "SECTION_SKIPPED";
-
-  const endingModType = section
-    .map(endingTagModType)
-    .find((modType) => modType !== undefined);
-
-  if (endingModType !== undefined) {
-    const { lines } = parseModType(section);
-    const modInfo: ModifierInfo = {
-      type: endingModType,
-      tags: [],
-    };
-    parseStatsFromMod(lines, item, { info: modInfo, stats: [] });
-  } else {
-    for (const statLines of section) {
-      let { modType, lines } = parseModType([statLines]);
-      if (
-        modType === ModifierType.Explicit &&
-        item.category === ItemCategory.Relic
-      ) {
-        modType = ModifierType.Sanctum;
-      }
-      // const modInfo = parseModInfoLine(modLine, modType);
-      parseStatsFromMod(lines, item, {
-        info: { type: modType, tags: [] },
-        stats: [],
-      });
-
-      if (modType === ModifierType.Veiled) {
-        item.isVeiled = true;
-      }
     }
   }
 

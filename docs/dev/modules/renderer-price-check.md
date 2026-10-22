@@ -64,8 +64,7 @@ that the route needs ([main.md](main.md)).
   change the item and recompute its properties through `recalculateItemProperties` from the parser. The parser also
   calls `useAugment` to fill an item's empty sockets with the saved augments. The editor's lists come from
   `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
-  once per game data load, so they switch to the new language after a language change. Of `filters/fill-augments.ts`,
-  only `getAugmentNameByRef` has a caller, the price check settings, and its other exports have none.
+  once per game data load, so they switch to the new language after a language change.
 
 ### Trade queries (`trade/`)
 
