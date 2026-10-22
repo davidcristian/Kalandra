@@ -223,7 +223,7 @@ export async function init(lang: string) {
     }
   }
   if (missing.length) {
-    console.log(
+    console.warn(
       `Cannot find stat${missing.length > 1 ? "s" : ""}: ${missing.join("\n")}`,
     );
   }

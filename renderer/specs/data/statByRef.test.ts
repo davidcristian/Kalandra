@@ -71,9 +71,9 @@ describe("STAT_BY_REF", () => {
     expect(STAT_BY_REF(PARRY_DAMAGE)?.ref).toBe(PARRY_DAMAGE);
   });
 
-  it("logs a recorded ref whose hash only another stat's ref has as missing", async () => {
+  it("warns about a recorded ref whose hash only another stat's ref has", async () => {
     const logged: string[] = [];
-    vi.spyOn(console, "log").mockImplementation((text: string) => {
+    vi.spyOn(console, "warn").mockImplementation((text: string) => {
       logged.push(text);
     });
 
@@ -83,9 +83,9 @@ describe("STAT_BY_REF", () => {
     expect(logged.join(" ")).toContain(SAME_HASH_AS_PARRY_DAMAGE);
   });
 
-  it("logs the missing refs after a colon, one per line", async () => {
+  it("warns with the missing refs after a colon, one per line", async () => {
     const logged: string[] = [];
-    vi.spyOn(console, "log").mockImplementation((text: string) => {
+    vi.spyOn(console, "warn").mockImplementation((text: string) => {
       logged.push(text);
     });
 

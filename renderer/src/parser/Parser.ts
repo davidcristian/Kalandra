@@ -224,7 +224,7 @@ export function parseClipboard(clipboard: string): Result<ParsedItem, string> {
     performance.mark("parse-end");
     return Object.freeze(parsed);
   } catch (e) {
-    console.log(e);
+    console.error("Cannot parse the item text:", e);
     return err("item.parse_error");
   }
 }
@@ -362,7 +362,7 @@ function findInDatabase(item: ParserState) {
     } else if (item.info.unique) {
       const { base } = item.info.unique;
       const category = ITEM_BY_REF("ITEM", base)?.[0]?.craftable?.category;
-      if (!category) console.log("No category for the unique base type:", base);
+      if (!category) console.warn("Unique base type has no category:", base);
       item.category = category ?? ItemCategory.Unknown;
     }
   }
@@ -536,7 +536,6 @@ function parseNamePlate(section: string[]) {
       missingItemClass = true;
     } else {
       // figure out if this was an issue with wrong language, or a bug
-      console.log(section);
       const langFound = LANGUAGE_DETECTOR.find(({ rarityLine }) =>
         section[1].startsWith(rarityLine),
       );
@@ -546,6 +545,7 @@ function parseNamePlate(section: string[]) {
         );
       }
 
+      console.warn("Cannot find the item class line:", section);
       return err("item.parse_error");
     }
   }
@@ -720,7 +720,7 @@ function parseRequirements(section: string[], item: ParsedItem) {
 
   const match = section[0].match(_$.REQUIRES_LINE);
   if (!match) {
-    console.log("Cannot parse the requirements line:", section[0]);
+    console.warn("Cannot parse the requirements line:", section[0]);
     return "SECTION_PARSED";
   }
 

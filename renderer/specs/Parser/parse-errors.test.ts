@@ -16,19 +16,31 @@ function parseError(text: string) {
   return result._unsafeUnwrapErr();
 }
 
-describe("parseClipboard on text it cannot price check", () => {
-  let logged: unknown[];
+let warned: unknown[][] = [];
+let failed: unknown[][] = [];
 
-  beforeEach(async () => {
-    logged = [];
-    vi.spyOn(console, "log").mockImplementation((message: unknown) => {
-      logged.push(message);
-    });
-    await loadLanguage("en");
+beforeEach(() => {
+  vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+    warned.push(args);
   });
+  vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
+    failed.push(args);
+  });
+});
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+async function loadLanguageQuietly(language: Config["language"]) {
+  await loadLanguage(language);
+  warned = [];
+  failed = [];
+}
+
+describe("parseClipboard on text it cannot price check", () => {
+  beforeEach(async () => {
+    await loadLanguageQuietly("en");
   });
 
   it.each([
@@ -37,21 +49,25 @@ describe("parseClipboard on text it cannot price check", () => {
     ["one line of text", "Hello there"],
   ])("returns item.parse_error and logs the error for %s", (_, text) => {
     expect(parseError(text)).toBe("item.parse_error");
-    expect(logged.at(-1)).toBeInstanceOf(Error);
+    expect(failed.at(-1)?.[0]).toBe("Cannot parse the item text:");
+    expect(failed.at(-1)?.[1]).toBeInstanceOf(Error);
   });
 
-  it("returns item.parse_error for lines in no language's item format", () => {
+  it("returns item.parse_error and warns with the lines in no language's item format", () => {
     expect(parseError("Path of Exile 2\nPatch notes\n")).toBe(
       "item.parse_error",
     );
-    expect(logged).toEqual([["Path of Exile 2", "Patch notes"]]);
+    expect(warned).toEqual([
+      ["Cannot find the item class line:", ["Path of Exile 2", "Patch notes"]],
+    ]);
   });
 
   it("returns item.parse_error for an item without its name line", () => {
     const text = NormalItem.rawText.replace("Superior Divine Crown\n", "");
 
     expect(parseError(text)).toBe("item.parse_error");
-    expect(logged).toEqual([]);
+    expect(warned).toEqual([]);
+    expect(failed).toEqual([]);
   });
 
   it("returns item.unknown for a base that neither the game data nor the trade data has", () => {
@@ -65,24 +81,17 @@ describe("parseClipboard on text it cannot price check", () => {
 });
 
 describe("parseClipboard on an item copied in another language", () => {
-  beforeEach(() => {
-    vi.spyOn(console, "log").mockImplementation(() => undefined);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it.each([
     ["German", "en", DePlatedVestments.rawText, "Deutsch|English"],
     ["Japanese", "en", JaArrayedFocus.rawText, "日本語|English"],
     ["English", "de", NormalItem.rawText, "English|Deutsch"],
   ] as const)(
-    "names the %s of the item and the language of the app",
+    "names the %s of the item and the language of the app without a warning",
     async (_, language, text, languages) => {
-      await loadLanguage(language);
+      await loadLanguageQuietly(language);
 
       expect(parseError(text)).toBe(`item.wrong_language|${languages}`);
+      expect(warned).toEqual([]);
     },
   );
 });

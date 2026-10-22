@@ -89,8 +89,8 @@ relative times such as the listing ages are written in it.
   game data does not have yet. Both lists come from `www.pathofexile.com` in every app language, so their texts
   are English, and `TRADE_ITEM_BY_REF` and `TRADE_STAT_BY_MATCH_STR` find only the names and stats of an English
   item.
-- `stat(text)` records a stat ref that code depends on. After loading, `init` logs `Cannot find stats: ` and then
-  the recorded refs that `stats.ndjson` does not contain, one per line, to the DevTools console (`stat:` for one).
+- `stat(text)` records a stat ref that code depends on. After loading, `init` passes `Cannot find stats: ` and then
+  the recorded refs that `stats.ndjson` does not contain, one per line, to `console.warn` (`stat:` for one).
 
 The files, per language under `renderer/public/data/<lang>/`:
 
@@ -132,15 +132,16 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
   the `LANGUAGE_DETECTOR` table in `Parser.ts`. That table lists each language's item class and rarity prefix.
   When the first line is not the app language's item class line and the next line starts with a rarity prefix
   from the table, the parse returns `item.wrong_language` with the display name of that prefix's language.
+  Otherwise it passes the lines to `console.warn` and returns `item.parse_error`.
 - **The generated files are regenerated, never edited**: `client_strings.js`, `items.ndjson` and `stats.ndjson`
   come from `dataParser`, and the `*.index.bin` files from `npm run make-index-files`. Git ignores `*.bin`, so the
   index files must be written before the tests, `npm run dev` or a build, and again after any data change.
-- **Item text is untrusted.** `parseClipboard` runs inside a `try`, logs what it caught and returns
-  `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat goes to
-  `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is not
-  its own instead of throwing. A requirements line that `REQUIRES_LINE` does not match is logged and leaves
-  `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or `MODIFIER_INCREASED` does not match is logged, and the
-  modifier keeps its type and tags without the parts that did not match.
+- **Item text is untrusted.** `parseClipboard` runs inside a `try`, passes what it caught to `console.error` and
+  returns `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat
+  goes to `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is
+  not its own instead of throwing. A requirements line that `REQUIRES_LINE` does not match is logged with
+  `console.warn` and leaves `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or `MODIFIER_INCREASED` does not
+  match is logged the same way, and the modifier keeps its type and tags without the parts that did not match.
 - **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which

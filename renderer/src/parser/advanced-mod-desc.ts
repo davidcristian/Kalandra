@@ -68,7 +68,7 @@ export function parseModInfoLine(
         break;
     }
   } else if (!_$.MODIFIER_LINE.test(modText)) {
-    console.log("Cannot parse the modifier line:", line);
+    console.warn("Cannot parse the modifier line:", line);
   } else {
     const match = modText.match(_$.MODIFIER_LINE)!;
     if (match.groups!.type.startsWith(_$.FRACTURED_MODIFIER)) {
@@ -160,7 +160,7 @@ export function parseModInfoLine(
     tags = tagsText ? tagsText.split(", ") : [];
     const incrMatch = incrText ? _$.MODIFIER_INCREASED.exec(incrText) : null;
     if (incrText && !incrMatch) {
-      console.log("Cannot parse the modifier roll increase:", line);
+      console.warn("Cannot parse the modifier roll increase:", line);
     }
     rollIncr = incrMatch ? Number(incrMatch[1]) : undefined;
   }
