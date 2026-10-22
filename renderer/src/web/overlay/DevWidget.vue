@@ -172,7 +172,6 @@ export default defineComponent({
     watch(
       () => item,
       (item) => {
-        performance.mark("checked-item-item-changed");
         presets.value = createPresets(item.value, {
           league: "Standard",
           collapseListings: "app",
@@ -183,8 +182,6 @@ export default defineComponent({
           listingType: undefined,
           defaultAllSelected: false,
         });
-
-        performance.mark("checked-item-switch-item-end");
       },
       { immediate: true, deep: true },
     );

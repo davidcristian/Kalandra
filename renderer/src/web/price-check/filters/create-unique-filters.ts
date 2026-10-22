@@ -57,7 +57,6 @@ function createMagebloodFilters(
   statsByType: StatCalculated[],
   opts: { searchStatRange: number },
 ): StatFilter[] {
-  performance.mark("create-mageblood-filters-start");
   const searchInRange = Math.min(2, opts.searchStatRange);
   const ctx: FiltersCreationContext = {
     item,

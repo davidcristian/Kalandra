@@ -35,7 +35,6 @@ export function createFilters(
   item: ParsedItem,
   opts: CreateOptions,
 ): ItemFilters {
-  performance.mark("create-item-filters-start");
   const filters: ItemFilters = {
     searchExact: {},
     trade: {

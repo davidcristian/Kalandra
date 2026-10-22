@@ -152,7 +152,6 @@ export const useTradeData = createGlobalState(() => {
     let foundStats: number = 0;
 
     try {
-      performance.mark("trade-data-load-start");
       isLoading.value = true;
       error.value = null;
 
@@ -179,7 +178,6 @@ export const useTradeData = createGlobalState(() => {
     } finally {
       if (controller === downloadController) isLoading.value = false;
     }
-    performance.mark("trade-data-load-end");
 
     // give caller some data if they want it
     return {

@@ -148,7 +148,6 @@ export default defineComponent({
     watch(
       () => props.item,
       (item, prevItem) => {
-        performance.mark("checked-item-item-changed");
         const prevCurrency =
           presets.value != null ? itemFilters.value.trade.currency : undefined;
         const prevListingType =
@@ -204,7 +203,6 @@ export default defineComponent({
         if (tradeAPI.value === "bulk") {
           itemFilters.value.trade.listingType = "online";
         }
-        performance.mark("checked-item-switch-item-end");
       },
       { immediate: true, deep: true },
     );

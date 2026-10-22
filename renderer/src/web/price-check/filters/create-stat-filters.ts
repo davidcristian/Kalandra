@@ -39,7 +39,6 @@ export function createExactStatFilters(
   statsByType: StatCalculated[],
   opts: { searchStatRange: number; defaultAllSelected: boolean },
 ): StatFilter[] {
-  performance.mark("create-exact-filters-start");
   let searchInRange = Math.min(2, opts.searchStatRange);
   if (item.category === ItemCategory.Tablet) {
     searchInRange = 0;
@@ -215,7 +214,6 @@ export function initUiModFilters(
     defaultAllSelected: boolean;
   },
 ): StatFilter[] {
-  performance.mark("create-ui-filters-start");
   const ctx: FiltersCreationContext = {
     item,
     filters: [],

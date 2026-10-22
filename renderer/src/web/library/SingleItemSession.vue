@@ -112,7 +112,6 @@ export default defineComponent({
       if (!props.libEnabled) return;
       if (!props.inSession) return;
 
-      performance.mark("log-item-event");
       const res = parseClipboard(e.clipboard);
       if (res.isErr()) {
         errMessage.value = res.error;
@@ -120,7 +119,6 @@ export default defineComponent({
         return;
       }
       item.value = res.value;
-      performance.mark("log-item-parsed");
     });
 
     const { t } = useI18nNs("library");
