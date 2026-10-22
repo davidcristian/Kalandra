@@ -1,9 +1,4 @@
 {
-  "specs/web/client-log.test.ts": {
-    "no-restricted-syntax": {
-      "count": 11
-    }
-  },
   "src/main.ts": {
     "@typescript-eslint/no-floating-promises": {
       "count": 1

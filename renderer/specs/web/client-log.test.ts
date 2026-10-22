@@ -4,18 +4,7 @@ import { init } from "@/assets/data";
 import { createClientLog } from "@/web/client-log/client-log";
 import fs from "fs";
 import { Host } from "@/web/background/IPC";
-import {
-  AfkEvent,
-  AltTabEvent,
-  GameVersionEvent,
-  LevelUpEvent,
-  MapNavEvent,
-  NpcEvent,
-  PassiveTreeEvent,
-  PermanentBonusEvent,
-  PlayerDeathEvent,
-  SkillPointEvent,
-} from "@ipc/types";
+import type { ClientLogEvent } from "@ipc/types";
 import path from "path";
 
 const log1 = `
@@ -756,6 +745,25 @@ function levelUpLine(time: string, level: number) {
   return `2026/04/26 ${time} 1786661875 3ef232c2 [INFO Client 443804] : kvanClientLogTestOne (Mercenary) is now level ${level}`;
 }
 
+function isLogEventOfType<T extends ClientLogEvent["type"]>(
+  event: ClientLogEvent,
+  type: T,
+): event is Extract<ClientLogEvent, { type: T }> {
+  return event.type === type;
+}
+
+function sentLogEvents<T extends ClientLogEvent["type"]>(type: T) {
+  return vi
+    .mocked(Host.sendEvent)
+    .mock.calls.flatMap(([event]) =>
+      event.name === "CLIENT->MAIN::write-data" &&
+      event.payload.action === "client-log-event" &&
+      isLogEventOfType(event.payload.data, type)
+        ? [event.payload.data]
+        : [],
+    );
+}
+
 describe("clientLog", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -916,18 +924,10 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "level-up",
-      );
-    expect(calls.length).toBe(count);
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: LevelUpEvent };
-      expect(arg.data.charName.toLowerCase()).toContain("kvan");
+    const events = sentLogEvents("level-up");
+    expect(events.length).toBe(count);
+    events.forEach((event) => {
+      expect(event.charName.toLowerCase()).toContain("kvan");
     });
   });
 
@@ -941,18 +941,10 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "game-version",
-      );
-    expect(calls.length).toBe(count);
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: GameVersionEvent };
-      expect(arg.data.version.toLowerCase()).toBe("4.4.0j");
+    const events = sentLogEvents("game-version");
+    expect(events.length).toBe(count);
+    events.forEach((event) => {
+      expect(event.version.toLowerCase()).toBe("4.4.0j");
     });
   });
 
@@ -966,20 +958,12 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "alt-tab",
-      );
-    expect(calls.length).toBe(count);
+    const events = sentLogEvents("alt-tab");
+    expect(events.length).toBe(count);
     let lastWas = true;
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: AltTabEvent };
-      expect(arg.data.gameFocused).toBe(!lastWas);
-      lastWas = arg.data.gameFocused;
+    events.forEach((event) => {
+      expect(event.gameFocused).toBe(!lastWas);
+      lastWas = event.gameFocused;
     });
   });
 
@@ -1005,19 +989,11 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "npc",
-      );
-    expect(calls.length).toBe(count);
+    const events = sentLogEvents("npc");
+    expect(events.length).toBe(count);
     const npcCounts: Record<string, number> = {};
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: NpcEvent };
-      npcCounts[arg.data.npcName] = (npcCounts[arg.data.npcName] ?? 0) + 1;
+    events.forEach((event) => {
+      npcCounts[event.npcName] = (npcCounts[event.npcName] ?? 0) + 1;
     });
     expect(npcCounts).toEqual(expectedCounts);
   });
@@ -1032,18 +1008,10 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "player-death",
-      );
-    expect(calls.length).toBe(count);
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: PlayerDeathEvent };
-      expect(arg.data.charName.toLowerCase()).toContain("kvan");
+    const events = sentLogEvents("player-death");
+    expect(events.length).toBe(count);
+    events.forEach((event) => {
+      expect(event.charName.toLowerCase()).toContain("kvan");
     });
   });
 
@@ -1059,21 +1027,13 @@ describe("clientLog", () => {
         handleLine(line);
       }
 
-      const calls = vi
-        .mocked(Host.sendEvent)
-        .mock.calls.filter(
-          (c) =>
-            c[0].name === "CLIENT->MAIN::write-data" &&
-            c[0].payload.action === "client-log-event" &&
-            c[0].payload.data.type === "passive-tree",
-        );
-      expect(calls.length).toBe(count);
+      const events = sentLogEvents("passive-tree");
+      expect(events.length).toBe(count);
       let added = 0;
       let removed = 0;
-      calls.forEach((call) => {
-        const arg = call[0].payload as unknown as { data: PassiveTreeEvent };
-        expect(arg.data.nodeId.match(/\d/)).toBeTruthy();
-        if (arg.data.allocate) {
+      events.forEach((event) => {
+        expect(event.nodeId.match(/\d/)).toBeTruthy();
+        if (event.allocate) {
           added++;
         } else {
           removed++;
@@ -1094,19 +1054,11 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "permanent-bonus",
-      );
-    expect(calls.length).toBe(count);
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: PermanentBonusEvent };
-      expect(arg.data.charName.toLowerCase()).toContain("kvan");
-      expect(arg.data.permanentBonus.match(/\d/)).toBeTruthy();
+    const events = sentLogEvents("permanent-bonus");
+    expect(events.length).toBe(count);
+    events.forEach((event) => {
+      expect(event.charName.toLowerCase()).toContain("kvan");
+      expect(event.permanentBonus.match(/\d/)).toBeTruthy();
     });
   });
 
@@ -1120,19 +1072,11 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "skill-point",
-      );
-    expect(calls.length).toBe(count);
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: SkillPointEvent };
-      expect(arg.data.points).toBe(2);
-      expect(arg.data.pointType).toBeOneOf(["passive", "weapon-set"]);
+    const events = sentLogEvents("skill-point");
+    expect(events.length).toBe(count);
+    events.forEach((event) => {
+      expect(event.points).toBe(2);
+      expect(event.pointType).toBeOneOf(["passive", "weapon-set"]);
     });
   });
 
@@ -1146,20 +1090,12 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "map-nav",
-      );
-    expect(calls.length).toBe(count);
+    const events = sentLogEvents("map-nav");
+    expect(events.length).toBe(count);
     let nullCount = 0;
     let unknownCount = 0;
-    calls.forEach((call) => {
-      const arg = call[0].payload as unknown as { data: MapNavEvent };
-      const mapName = arg.data.mapName;
+    events.forEach((event) => {
+      const mapName = event.mapName;
       if (mapName === "(null)") {
         nullCount++;
       } else if (mapName === "(unknown)") {
@@ -1180,22 +1116,11 @@ describe("clientLog", () => {
       handleLine(line);
     }
 
-    const calls = vi
-      .mocked(Host.sendEvent)
-      .mock.calls.filter(
-        (c) =>
-          c[0].name === "CLIENT->MAIN::write-data" &&
-          c[0].payload.action === "client-log-event" &&
-          c[0].payload.data.type === "afk",
-      );
-    expect(calls.length).toBe(count);
+    const events = sentLogEvents("afk");
+    expect(events.length).toBe(count);
     if (count >= 2) {
-      expect(
-        (calls[0][0].payload as unknown as { data: AfkEvent }).data.isAfk,
-      ).toBe(true);
-      expect(
-        (calls[1][0].payload as unknown as { data: AfkEvent }).data.isAfk,
-      ).toBe(false);
+      expect(events[0].isAfk).toBe(true);
+      expect(events[1].isAfk).toBe(false);
     }
   });
 

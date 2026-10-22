@@ -1,4 +1,4 @@
-# Existing code breaks the any, cast and empty catch checks of rule 7
+# Existing code in main breaks the empty catch checks of rule 7
 
 **Status:** open
 **Area:** rules
@@ -16,15 +16,12 @@ were turned on is exempt:
   `guessFileLocation()` and `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
   `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
   second also in [010](010-ocr-errors-dropped.md).
-- the renderer, in `renderer/eslint-suppressions.json`: 11 casts through `unknown` in
-  `specs/web/client-log.test.ts`.
 
 No installed ESLint plugin checks the reason on an `eslint-disable` line, so that ban is checked
 only by reading the diff.
 
-Done looks like: each place uses a real type, handles or passes on the error, or gives its reason
-in a comment on the line. Then its file leaves the main lists, and
-`npm run lint -- --prune-suppressions` in `renderer/` removes its count.
+Done looks like: each place handles or passes on the error, or gives its reason in a comment on
+the line. Then its file leaves the main lists.
 
 ## History
 
@@ -40,3 +37,5 @@ in a comment on the line. Then its file leaves the main lists, and
   interfaces in `vision/wasm-types.ts` that list the OpenCV and Tesseract members the code calls.
 - 2026-10-22: The 14 casts through `unknown` in `specs/helper.ts` and `specs/Parser/` were
   replaced by typed test items, parser states and stat fixtures.
+- 2026-10-22: The 11 casts through `unknown` in `specs/web/client-log.test.ts` were replaced by a
+  helper that returns the sent client log events of one type, so the renderer exempts none.
