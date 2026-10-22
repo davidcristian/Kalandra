@@ -179,8 +179,6 @@ export const WEAPON_STATS = new Set<string>([
   ...QUALITY_STATS.PHYSICAL_DAMAGE.incr,
   stat("#% increased Attack Speed"),
   stat("#% to Critical Hit Chance"),
-
-  // stat('Adds # to # Chaos Damage'),
   stat("Adds # to # Lightning Damage"),
   stat("Adds # to # Cold Damage"),
   stat("Adds # to # Fire Damage"),

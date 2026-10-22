@@ -111,7 +111,6 @@ export function createExactStatFilters(
   if (item.category === ItemCategory.Tablet) {
     filterPseudo(ctx);
   }
-  // filterBasePercentile(ctx);
 
   ctx.filters.push(
     ...ctx.statsByType.map((mod) =>

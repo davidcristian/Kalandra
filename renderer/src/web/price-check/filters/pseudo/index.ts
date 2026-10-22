@@ -1,17 +1,10 @@
-import {
-  // populatePseudoRules,
-  // pseudoRules,
-  stat,
-  STAT_BY_REF,
-} from "@/assets/data";
+import { stat, STAT_BY_REF } from "@/assets/data";
 import { ModifierType, StatCalculated, StatSource } from "@/parser/modifiers";
 import {
   calculatedStatToFilter,
   FiltersCreationContext,
 } from "../create-stat-filters";
 import { type StatFilter } from "../interfaces";
-import { ARMOUR_STATS, WEAPON_STATS } from "./item-property";
-import { tryParseTranslation } from "@/parser/stat-translations";
 import { percentRoll, roundRoll } from "../util";
 
 const RESISTANCES_INFO: Array<{
@@ -186,10 +179,6 @@ const PSEUDO_RULES: PseudoRule[] = [
       ),
     ],
   },
-  // {
-  //   pseudo: stat("# total maximum Spirit"),
-  //   stats: [{ ref: stat("# to Spirit") }],
-  // },
   {
     pseudo: stat("#% total increased maximum Energy Shield"),
     stats: [{ ref: stat("#% increased maximum Energy Shield") }],
@@ -200,20 +189,6 @@ const PSEUDO_RULES: PseudoRule[] = [
       { ref: stat("# to maximum Energy Shield") }, // global
     ],
   },
-  // {
-  //   pseudo: stat("#% total Attack Speed"),
-  //   stats: [
-  //     { ref: stat("#% increased Attack Speed") }, // global
-  //     // { ref: stat('#% increased Attack and Cast Speed') }
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% total Cast Speed"),
-  //   stats: [
-  //     { ref: stat("#% increased Cast Speed") },
-  //     // { ref: stat('#% increased Attack and Cast Speed') }
-  //   ],
-  // },
   {
     pseudo: stat("#% increased Movement Speed"),
     stats: [{ ref: stat("#% increased Movement Speed") }],
@@ -227,129 +202,6 @@ const PSEUDO_RULES: PseudoRule[] = [
       }
     },
   },
-  // {
-  //   pseudo: stat("#% total increased Physical Damage"),
-  //   stats: [{ ref: stat("#% increased Global Physical Damage") }],
-  // },
-  // {
-  //   pseudo: stat("#% Global Critical Hit Chance"),
-  //   group: "global_crit_chance",
-  //   stats: [{ ref: stat("#% increased Global Critical Hit Chance") }],
-  // },
-  // {
-  //   pseudo: stat("#% total Critical Hit Chance for Spells"),
-  //   replaces: "global_crit_chance",
-  //   stats: [
-  //     {
-  //       ref: stat("#% increased Spell Critical Hit Chance"),
-  //       required: true,
-  //     },
-  //     { ref: stat("#% increased Global Critical Hit Chance") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% Global Critical Hit Multiplier"),
-  //   stats: [{ ref: stat("#% to Global Critical Hit Multiplier") }],
-  // },
-  // {
-  //   pseudo: stat("#% increased Elemental Damage"),
-  //   group: "incr_ele_dmg",
-  //   stats: [{ ref: stat("#% increased Elemental Damage") }],
-  // },
-  // {
-  //   pseudo: stat("#% increased Lightning Damage"),
-  //   replaces: "incr_ele_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Lightning Damage"), required: true },
-  //     { ref: stat("#% increased Elemental Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Cold Damage"),
-  //   replaces: "incr_ele_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Cold Damage"), required: true },
-  //     { ref: stat("#% increased Elemental Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Fire Damage"),
-  //   group: "incr_fire_dmg",
-  //   replaces: "incr_ele_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Fire Damage"), required: true },
-  //     { ref: stat("#% increased Elemental Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Spell Damage"),
-  //   group: "incr_spell_dmg",
-  //   stats: [{ ref: stat("#% increased Spell Damage") }],
-  // },
-  // {
-  //   pseudo: stat("#% increased Lightning Spell Damage"),
-  //   replaces: "incr_spell_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Lightning Spell Damage"), required: true },
-  //     { ref: stat("#% increased Spell Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Cold Spell Damage"),
-  //   replaces: "incr_spell_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Cold Spell Damage"), required: true },
-  //     { ref: stat("#% increased Spell Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Fire Spell Damage"),
-  //   replaces: "incr_spell_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Fire Spell Damage"), required: true },
-  //     { ref: stat("#% increased Spell Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Elemental Damage with Attack Skills"),
-  //   replaces: "incr_ele_dmg",
-  //   stats: [
-  //     {
-  //       ref: stat("#% increased Elemental Damage with Attack Skills"),
-  //       required: true,
-  //     },
-  //     { ref: stat("#% increased Elemental Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("#% increased Burning Damage"),
-  //   replaces: "incr_fire_dmg",
-  //   stats: [
-  //     { ref: stat("#% increased Burning Damage"), required: true },
-  //     { ref: stat("#% increased Fire Damage") },
-  //     { ref: stat("#% increased Elemental Damage") },
-  //   ],
-  // },
-  // {
-  //   pseudo: stat("# Life Regenerated per Second"),
-  //   stats: [{ ref: stat("Regenerate # Life per second") }],
-  // },
-  // {
-  //   pseudo: stat("#% of Life Regenerated per Second"),
-  //   stats: [{ ref: stat("Regenerate #% of Life per second") }],
-  // },
-  // {
-  //   pseudo: stat("#% of Physical Attack Damage Leeched as Life"),
-  //   stats: [{ ref: stat("#% of Physical Attack Damage Leeched as Life") }],
-  // },
-  // {
-  //   pseudo: stat("#% of Physical Attack Damage Leeched as Mana"),
-  //   stats: [{ ref: stat("#% of Physical Attack Damage Leeched as Mana") }],
-  // },
-  // {
-  //   pseudo: stat("#% increased Mana Regeneration Rate"),
-  //   stats: [{ ref: stat("#% increased Mana Regeneration Rate") }],
-  // },
   {
     pseudo: stat("# uses remaining"),
     disabled: false,
@@ -600,37 +452,6 @@ function filterPseudoSources(
     }
   }
   return out;
-}
-const PSEUDO_REF_SET = new Set([
-  ...PSEUDO_RULES.flatMap((rule) => rule.stats.map((stat) => stat.ref)),
-  ...PSEUDO_RULES.flatMap((rule) => rule.stats.map((stat) => stat.ref)).map(
-    (i) => i.replaceAll("+#", "#"),
-  ),
-  ...PSEUDO_RULES.flatMap((rule) => rule.stats.map((stat) => stat.ref)).map(
-    (i) => i.replaceAll("-#", "#"),
-  ),
-]);
-export function refEffectsPseudos(ref: string): boolean {
-  // If it is in these pseudos
-  return (
-    PSEUDO_REF_SET.has(ref) ||
-    ARMOUR_STATS.has(ref) ||
-    WEAPON_STATS.has(ref) ||
-    ref === "Adds # to # Chaos Damage"
-  );
-}
-
-export function translatedEffectsPseudos(translated: string): boolean {
-  // get the ref from the translated string
-  const stat = tryParseTranslation(
-    { string: translated, unscalable: false },
-    ModifierType.Augment,
-    undefined,
-  );
-  if (!stat) return false;
-  const ref = stat.stat.ref;
-  // If it is in these pseudos
-  return refEffectsPseudos(ref);
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests

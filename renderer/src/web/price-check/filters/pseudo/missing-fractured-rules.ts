@@ -1,4 +1,3 @@
-// import { stat } from "@/assets/data";
 import { FilterTag, type StatFilter } from "../interfaces";
 
 export function applyRules(filters: StatFilter[], explicitStats: StatFilter[]) {

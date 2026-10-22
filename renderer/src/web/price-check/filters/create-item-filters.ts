@@ -161,8 +161,6 @@ export function createFilters(
       baseTypeTrade: t(opts, item.info),
     };
     filters.areaLevel = {
-      // Seems like flooring area level doesn't quite matter for poe2
-      // value: floorToBracket(item.areaLevel!, [1, 68, 73, 79, 83]),
       value: item.areaLevel!,
       disabled: false,
     };
