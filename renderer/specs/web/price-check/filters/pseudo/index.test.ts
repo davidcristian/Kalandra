@@ -3,78 +3,74 @@ import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
 import { TempleTablet } from "@specs/Parser/items";
 import { init, Stat, StatBetter, STATS_ITERATOR } from "@/assets/data";
-import { ModifierType, StatCalculated } from "@/parser/modifiers";
+import { ModifierType, StatCalculated, StatSource } from "@/parser/modifiers";
 import { __testExports, filterPseudo } from "@/web/price-check/filters/pseudo";
 import { FiltersCreationContext } from "@/web/price-check/filters/create-stat-filters";
 import { createPresets } from "@/web/price-check/filters/create-presets";
 import { ItemCategory, ParsedItem, parseClipboard } from "@/parser";
 
+const keepSource = (_calc: StatCalculated, source: StatSource) => source;
+
+/** A stat with one source for each value, as when several modifiers add to it. */
+function statWithSources(
+  ref: string,
+  values: number[],
+  type: ModifierType = ModifierType.Explicit,
+): StatCalculated {
+  return {
+    ...createStatHelper(ref, 0, type),
+    sources: values.flatMap(
+      (value) => createStatHelper(ref, value, type).sources,
+    ),
+  };
+}
+
 describe("filterPseudoSources", () => {
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    setupTests();
-    await init("en");
-  });
-
   it("should do nothing if no stats", () => {
-    const stats: StatCalculated[] = [];
-    const mapFn = vi.fn();
-    mapFn.mockImplementation(() => true);
-    const result = __testExports.filterPseudoSources(stats, mapFn);
-
-    expect(result).toHaveLength(0);
+    expect(__testExports.filterPseudoSources([], keepSource)).toHaveLength(0);
   });
 
   it("should do nothing if no stats have any sources", () => {
-    const stats: StatCalculated[] = [
-      { sources: [] },
-      { sources: [] },
-      { sources: [], type: ModifierType.Explicit },
-    ] as unknown as StatCalculated[];
-    const mapFn = vi.fn();
-    mapFn.mockImplementation(() => true);
-    const result = __testExports.filterPseudoSources(stats, mapFn);
+    const stats = [
+      statWithSources(FireResRef, []),
+      statWithSources(ColdResRef, [], ModifierType.Enchant),
+    ];
 
-    expect(result).toHaveLength(0);
+    expect(__testExports.filterPseudoSources(stats, keepSource)).toHaveLength(
+      0,
+    );
   });
 
-  it("should add all, for each source if all return true", () => {
-    const stats: StatCalculated[] = [
-      { sources: [{}] },
-      { sources: [{}] },
-      { sources: [{}, {}] },
-    ] as unknown as StatCalculated[];
-    const mapFn = vi.fn();
-    mapFn.mockImplementation(() => true);
+  it("should add every source of every stat that mapFn keeps", () => {
+    const stats = [
+      statWithSources(FireResRef, [10]),
+      statWithSources(ColdResRef, [20]),
+      statWithSources(StrengthRef, [30, 40]),
+    ];
 
-    const result = __testExports.filterPseudoSources(stats, mapFn);
-    const expected = Array.from({ length: 4 }, () => true);
+    const result = __testExports.filterPseudoSources(stats, keepSource);
 
-    expect(result).toEqual(expected);
-    expect(mapFn).toHaveBeenCalledTimes(4);
+    expect(result).toEqual(stats.flatMap((calc) => calc.sources));
   });
 
-  it("should filter based on mapFn", () => {
-    const stats: StatCalculated[] = [
-      { sources: [{ valid: true }], type: ModifierType.Explicit },
-      { sources: [{ valid: false }], type: ModifierType.Explicit },
-      {
-        sources: [{ valid: false }, { valid: true }],
-        type: ModifierType.Enchant,
-      },
-    ] as unknown as StatCalculated[];
-    const mapFn = vi.fn();
-    mapFn.mockImplementation((calc, source) => {
-      if (source.valid) {
-        return calc.type;
-      }
+  it("should add what mapFn returns and drop the sources it rejects", () => {
+    const stats = [
+      statWithSources(FireResRef, [30]),
+      statWithSources(ColdResRef, [10]),
+      statWithSources(StrengthRef, [10, 40], ModifierType.Enchant),
+    ];
+
+    const result = __testExports.filterPseudoSources(stats, (calc, source) => {
+      const value = source.contributes!.value;
+      if (value < 25) return null;
+      const multi = calc.type === ModifierType.Enchant ? 2 : 1;
+      return {
+        ...source,
+        contributes: { ...source.contributes!, value: value * multi },
+      };
     });
 
-    const result = __testExports.filterPseudoSources(stats, mapFn);
-    const expected = [ModifierType.Explicit, ModifierType.Enchant];
-
-    expect(result).toEqual(expected);
-    expect(mapFn).toHaveBeenCalledTimes(4);
+    expect(result.map((source) => source.contributes?.value)).toEqual([30, 80]);
   });
 });
 

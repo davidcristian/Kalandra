@@ -28,7 +28,12 @@ describe("item mod count tests", () => {
       statRef: ref,
       roll: {
         value: roll,
-      } as unknown as StatFilterRoll,
+        min: roll,
+        max: roll,
+        default: { min: roll, max: roll },
+        dp: false,
+        isNegated: false,
+      },
     };
   }
 

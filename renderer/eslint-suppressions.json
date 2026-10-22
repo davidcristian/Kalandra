@@ -34,16 +34,6 @@
       "count": 11
     }
   },
-  "specs/web/price-check/filters/create-stat-filters.test.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "specs/web/price-check/filters/pseudo/index.test.ts": {
-    "no-restricted-syntax": {
-      "count": 3
-    }
-  },
   "specs/web/useTradeApi.test.ts": {
     "no-restricted-syntax": {
       "count": 1
