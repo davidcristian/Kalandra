@@ -63,8 +63,6 @@ export default defineComponent({
           code = code.slice("Key".length);
         } else if (code.startsWith("Digit")) {
           code = code.slice("Digit".length);
-        } else if (e.key === "Cancel" && code === "Pause") {
-          code = "Cancel";
         }
 
         if ((KeyToCode as Record<string, number>)[code]) {

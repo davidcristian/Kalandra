@@ -1,12 +1,10 @@
 export const KeyToCode = {
-  // Cancel: 3,
   Backspace: 8,
   Tab: 9,
   Enter: 13,
   Shift: 16,
   Ctrl: 17,
   Alt: 18,
-  // Pause: 19,
   CapsLock: 20,
   Escape: 27,
   Space: 32,
@@ -113,11 +111,9 @@ export const CodeToKey = Object.fromEntries(
 )
 
 export const KeyToElectron = {
-  // Cancel,
   Backspace: 'Backspace',
   Tab: 'Tab',
   Enter: 'Enter',
-  // Pause,
   CapsLock: 'CapsLock',
   Escape: 'Escape',
   Space: 'Space',
