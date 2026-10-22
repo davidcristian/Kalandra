@@ -57,7 +57,6 @@ import { computed, defineComponent, PropType } from "vue";
 import Widget from "../overlay/Widget.vue";
 import { WidgetSpec } from "../overlay/interfaces";
 import { XpWidget } from "./widget";
-import { useI18n } from "vue-i18n";
 import { useClientLog } from "../client-log/client-log";
 
 function calcBaseSafeZone(playerLevel: number): number {
@@ -126,10 +125,7 @@ export default defineComponent({
       },
     });
 
-    const { t } = useI18n();
-
     return {
-      t,
       characterLevel,
       areaLevel,
       expPenalty: computed(() => {
@@ -157,8 +153,6 @@ export default defineComponent({
     @apply text-gray-700;
     font-size: 0.8125rem;
   }
-
-  /* &:not(:placeholder-shown) { @apply border-gray-600; } */
 
   &:focus {
     @apply border-gray-500;

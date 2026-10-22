@@ -36,7 +36,6 @@ const LISTED_MISSING = [
   "Select",
   "Unable to determine fractured stat",
   "You",
-  "added mods column",
   "in demand",
   "keep augment mods",
   "keep enchant mods",
@@ -45,11 +44,6 @@ const LISTED_MISSING = [
   "max",
   "milliseconds",
   "min",
-  "removed mods column",
-  "show ref",
-  "show roll",
-  "show tier",
-  "show type",
 ];
 
 // Texts of task 019 that t() gets through an expression, which literalKeys() does not read

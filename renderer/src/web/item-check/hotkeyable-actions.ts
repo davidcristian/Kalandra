@@ -76,10 +76,6 @@ const POE2DB_CONVERSIONS = new Map([
   ["Ritual Precursor Tablet", "Ritual_Precursor_Tablet"],
   ["Precursor Tablet", "Precursor_Tablet"],
   ["Overseer Precursor Tablet", "Overseer_Precursor_Tablet"],
-  // Waystones
-  ["Waystones(Low)", "Waystones_low_tier"],
-  ["Waystones(Mid)", "Waystones_mid_tier"],
-  ["Waystones(Top)", "Waystones_top_tier"],
 ]);
 
 export function registerActions() {
@@ -135,7 +131,7 @@ export function findSimilarItems(item: ParsedItem) {
 
 export function findSamePricedItems(item: ParsedItem) {
   if (!item.note) return;
-  const note = item.note ? JSON.stringify(item.note) : "";
+  const note = JSON.stringify(item.note);
   const name = JSON.stringify(item.info.name);
   const useName =
     AppConfig<ItemCheckWidget>("item-check")!.samePricedType === "both";

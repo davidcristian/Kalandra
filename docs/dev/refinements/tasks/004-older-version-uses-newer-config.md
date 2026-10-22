@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** config
 **Origin:** [renderer/src/web/Config.ts](../../../../renderer/src/web/Config.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-22
 
 `upgradeConfig()` runs every step whose number is above the stored `configVersion`. A user can
 install an older version over a newer one that added upgrade steps. The stored `configVersion` is
@@ -11,10 +11,8 @@ then above `defaultConfig().configVersion` (35 on 2026-10-18), so no step runs a
 uses the config as it is, with fields and values it does not know. Nothing compares the two
 numbers.
 
-The commented-out `dialog.showErrorBox` titled `Kalandra: incompatible configuration` in
-`initConfig()` describes this case. It sits after a `return` in the `catch` block for a file that
-does not parse ([002](002-unparsable-config-stops-renderer.md)), and `dialog` is an Electron API
-that the renderer does not have.
+`initConfig()` shows no message for this case. `dialog.showErrorBox` is an Electron API that the
+renderer does not have, so a message comes from main or from the page.
 
 This is a decision for the maintainer, then code. The options:
 
@@ -30,3 +28,6 @@ Done looks like: the maintainer's choice is in the History and in
 ## History
 
 - 2026-10-18: Found while ADR-0003 was written, by reading `initConfig()` and `upgradeConfig()`.
+- 2026-10-22: Deleted the commented-out `dialog.showErrorBox` in `initConfig()`, titled
+  `Kalandra: incompatible configuration`, which described this case from the `catch` block for a
+  file that does not parse.

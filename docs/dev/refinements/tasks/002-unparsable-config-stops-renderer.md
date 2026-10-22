@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** config
 **Origin:** [renderer/src/web/Config.ts](../../../../renderer/src/web/Config.ts)
-**Verified:** 2026-10-20
+**Verified:** 2026-10-22
 
 When `JSON.parse` fails on the contents of `config.json`, the `catch` block in `initConfig()` applies
 `defaultConfig()` and calls `saveConfig({ isTemporary: true })`. That save is meant to make main
@@ -17,10 +17,6 @@ throws a `TypeError` and `initConfig()` rejects. The Vue app never mounts. A bro
 `Kalandra cannot start` with the `TypeError` (`startApp()` in `renderer/src/web/startup.ts`), and the
 overlay stays empty, because main attaches it to the game only after `CLIENT->MAIN::update-host-config`.
 
-The same `catch` block holds a commented-out `dialog.showErrorBox` titled
-`Kalandra: incompatible configuration`, after its `return`. That message belongs to the case in
-[004](004-older-version-uses-newer-config.md).
-
 Done looks like: the temporary save is sent after the socket opens, and a test that starts from
 contents that do not parse checks that the app mounts with the defaults and that one
 `CLIENT->MAIN::save-config` event with `isTemporary: true` is sent.
@@ -31,3 +27,5 @@ contents that do not parse checks that the app mounts with the defaults and that
   `renderer/src/main.ts` and `IPC.ts`. Not reproduced in a running app.
 - 2026-10-20: A failed start now shows its error in place of the app, so the text no longer says the
   page shows no message. The save still fails.
+- 2026-10-22: The commented-out `dialog.showErrorBox` after the `return` of the `catch` block was
+  deleted. Its message described the case in [004](004-older-version-uses-newer-config.md).

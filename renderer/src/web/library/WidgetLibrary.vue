@@ -57,14 +57,13 @@ import {
   defineComponent,
   onBeforeUnmount,
   PropType,
-  ref,
   shallowRef,
   watch,
 } from "vue";
 
 import Widget from "@/web/overlay/Widget.vue";
 import { WidgetSpec } from "@/web/overlay/interfaces";
-import { ColumnOpts, getHeader, LibraryWidget } from "./widget";
+import { getHeader, LibraryWidget } from "./widget";
 import { AppConfig } from "@/web/Config";
 import { useI18nNs } from "@/web/i18n";
 import SingleItemSession from "./SingleItemSession.vue";
@@ -136,8 +135,7 @@ export default defineComponent({
     const starting = computed(() => session.state.value === "starting");
 
     const sessionName = shallowRef<string>("mySession");
-    const sessionType = shallowRef<string>(props.config.selectedProfile);
-    const currentOpts = ref<ColumnOpts>(props.config.profiles.chaos);
+    const sessionType = props.config.selectedProfile;
     const errMessage = shallowRef<string | null>();
 
     watch(libEnabled, (curr) => {
@@ -160,19 +158,8 @@ export default defineComponent({
       }
     });
 
-    watch(
-      props.config.profiles,
-      () => {
-        currentOpts.value = props.config.profiles[sessionType.value];
-      },
-      { deep: true },
-    );
-    watch(sessionType, () => {
-      currentOpts.value = props.config.profiles[sessionType.value];
-    });
-
     function startSession() {
-      const header = getHeader(sessionType.value, currentOpts.value);
+      const header = getHeader(sessionType, props.config.profiles[sessionType]);
 
       if (header.isErr()) {
         errMessage.value = header.error;
@@ -201,8 +188,6 @@ export default defineComponent({
       libEnabled,
       inSession,
       sessionName,
-      sessionType,
-      currentOpts,
       errMessage,
     };
   },

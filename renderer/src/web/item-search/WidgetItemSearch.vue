@@ -17,7 +17,7 @@
       >
         <button
           v-for="item in starred"
-          :key="item.info.refName + item.discr"
+          :key="item.info.refName"
           :class="$style.starredItem"
           @click="starredItemClick($event, item)"
         >
@@ -32,9 +32,6 @@
           ></ItemQuickPrice>
           <div class="ml-1 truncate" style="max-width: 7rem">
             {{ item.info.name }}
-          </div>
-          <div v-if="item.discr" class="ml-1 truncate" style="max-width: 7rem">
-            {{ t(item.discr) }}
           </div>
         </button>
       </transition-group>
@@ -166,7 +163,6 @@ export default {
 
 interface SelectedItem {
   info: BaseType;
-  discr?: string;
   chaos?: number;
   price?: CurrencyValue;
 }
@@ -175,12 +171,7 @@ function useSelectedItems() {
   const items = ref<SelectedItem[]>([]);
 
   function addItem(newItem: SelectedItem) {
-    if (
-      items.value.some(
-        (item) =>
-          item.info.name === newItem.info.name && item.discr === newItem.discr,
-      )
-    )
+    if (items.value.some((item) => item.info.name === newItem.info.name))
       return false;
 
     if (items.value.length < 5) {

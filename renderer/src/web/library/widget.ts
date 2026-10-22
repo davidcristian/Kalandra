@@ -44,10 +44,6 @@ export interface ColumnOpts {
   };
 }
 
-export interface CsvColumns {
-  [key: string]: ColumnOpts;
-}
-
 type ColumnKey =
   | "refName"
   | "itemLevel"

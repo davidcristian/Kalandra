@@ -80,14 +80,6 @@ export async function initConfig() {
     updateConfig(defaultConfig());
     saveConfig({ isTemporary: true });
     return;
-
-    // TODO
-    // dialog.showErrorBox(
-    //   'Kalandra: incompatible configuration',
-    //   // ----------------------
-    //   'You are trying to use an older version of Kalandra with a newer incompatible configuration file.\n' +
-    //   'You need to install the latest version to continue using it.'
-    // )
   }
 
   updateConfig(upgradeConfig(config));
