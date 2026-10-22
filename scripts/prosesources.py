@@ -22,7 +22,8 @@ REGEX_AFTER = frozenset("(,=:[!&|?{};+-*%<>~^")
 
 _FENCE = re.compile(r"^\s*(```|~~~)")
 _SCRIPT_CALL = re.compile(
-    r"(?:\blogger\.write|\bconsole\.(?:log|info|warn|error|debug)|\bnew\s+\w*Error|\bthrow\s+new\s+\w+)\s*$"
+    r"(?:\blogger\.write|\bconsole\.(?:log|info|warn|error|debug)|\bdialog\.showErrorBox"
+    r"|\bnew\s+\w*Error|\bthrow\s+new\s+\w+)\s*$"
 )
 _VUE_BLOCK = re.compile(r"<(script|style)\b[^>]*>(.*?)</\1>", re.DOTALL)
 _HTML_COMMENT = re.compile(r"<!--(.*?)-->", re.DOTALL)

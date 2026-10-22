@@ -18,7 +18,7 @@
   Overlay detects a PoE window" in Settings, General is ticked, the default.
 - When the game runs as administrator and Kalandra does not, main logs
   `error [Overlay] PoE2 is running with administrator rights` and shows the dialog
-  `PoE2 window - No access` with `Path of Exile 2 is running with administrator rights.`
+  `PoE2 window: no access` with `Path of Exile 2 is running with administrator rights.`
   (`main/src/windowing/OverlayWindow.ts`).
 - On Windows the tray menu can open behind the game window. Opening another window first, such as
   File Explorer with Win + E, works around it.

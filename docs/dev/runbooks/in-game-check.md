@@ -56,7 +56,7 @@ Four lines from `main/src/shortcuts/` apply to every key below:
   Overlay detects a PoE window" in Settings, General is ticked, as it is by default.
 - **Logs:** when the game runs as administrator and Kalandra does not, main logs
   `error [Overlay] PoE2 is running with administrator rights` and shows a dialog titled
-  `PoE2 window - No access`. Main attaches to the window titled `Path of Exile 2` ("PoE window
+  `PoE2 window: no access`. Main attaches to the window titled `Path of Exile 2` ("PoE window
   title" in Settings, General). It reads the title once at start, so a change applies after a
   restart. Main writes no line while no such window exists.
 

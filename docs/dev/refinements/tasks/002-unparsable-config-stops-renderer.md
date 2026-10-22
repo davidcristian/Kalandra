@@ -18,7 +18,7 @@ throws a `TypeError` and `initConfig()` rejects. The Vue app never mounts. A bro
 overlay stays empty, because main attaches it to the game only after `CLIENT->MAIN::update-host-config`.
 
 The same `catch` block holds a commented-out `dialog.showErrorBox` titled
-`Kalandra - Incompatible configuration`, after its `return`. That message belongs to the case in
+`Kalandra: incompatible configuration`, after its `return`. That message belongs to the case in
 [004](004-older-version-uses-newer-config.md).
 
 Done looks like: the temporary save is sent after the socket opens, and a test that starts from

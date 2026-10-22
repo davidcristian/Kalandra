@@ -46,14 +46,16 @@ the repo.
   skips code spans and fenced code. `EXEMPTIONS` names the other files of game text (the spec files that hold copied
   item text and client log lines, and one comment that quotes item text), each with its reason. An exemption that
   covers no dash fails. A line that contains `dashcheck: allow` is skipped.
-- **`prosecheck.py`** reports a banned word, and a spaced `--`, in prose. The first spaced `--` of a comment that
-  starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
+- **`prosecheck.py`** reports a banned word, a spaced `--` and a spaced hyphen in prose. The first spaced `--` of a
+  comment that starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
+  A spaced hyphen is reported only between two words of two letters or more (`title - text`), so a list marker, a
+  table cell that holds `-`, `b - a` and `1 - 5` pass.
   `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, JSON
   with comments (`.jsonc`), Vue, HTML and CSS files; the lines that start with `#` in YAML, TOML, shell, `.txt`,
   `.conf`, `Dockerfile` and `.dockerignore` files and in dotfiles without a suffix, such as `.gitignore` and
-  `.coveragerc`; the docstrings and comments of Python; and the strings passed to `console.*`,
-  `logger.write`, `new ...Error` and `throw new` calls. In Python they are the strings passed to `print`, a logging
-  method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and `problems.append` or
+  `.coveragerc`; the docstrings and comments of Python; and the strings passed to `console.*`, `logger.write`,
+  `dialog.showErrorBox`, `new ...Error` and `throw new` calls. In Python they are the strings passed to `print`, a
+  logging method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and `problems.append` or
   `problems.extend`, and those assigned to `msg` or given as `help`, `description` or `epilog`. Each string of a
   message counts: the parts of an f-string, both sides of `+`, the left of `%`, both results of an `if`
   expression and the item of a comprehension.
@@ -133,7 +135,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 104 tests on 22 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 105 tests on 22 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and

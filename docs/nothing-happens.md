@@ -19,7 +19,7 @@ it never appears:
 - Check **PoE window title** on the **General** settings page. It must match the title of the game window, which is
   `Path of Exile 2` by default. A change takes effect after Kalandra restarts.
 - If the game runs with administrator rights, Kalandra cannot reach its window and shows a message titled
-  `PoE2 window - No access`. Quit Kalandra and start it as administrator.
+  `PoE2 window: no access`. Quit Kalandra and start it as administrator.
 - The notification itself is the setting **Show a notification when the Overlay detects a PoE window** in the
   **General** page. It is on by default.
 

@@ -39,7 +39,7 @@ export const useTradeData = createGlobalState(() => {
 
   const isLoading = shallowRef(false);
   const error = shallowRef<string | null>(null);
-  // ref data - nameplates are always REF
+  // English (ref) item names: loadItemData() reads the English trade site
   const itemData = shallowRef<Set<string>>(new Set([]));
   // English stat texts in every app language: only English item text matches
   const statDataSet = shallowRef<Set<string>>(new Set([]));

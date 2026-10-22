@@ -45,6 +45,20 @@ class ProseCheckTest(unittest.TestCase):
         dashes = [line for line in output.splitlines() if "a spaced `--` used as a dash" in line]
         self.assertEqual([line.split(":")[1] for line in dashes], ["3", "5", "6", "7"])
 
+    def test_reports_a_spaced_hyphen_only_between_two_words(self) -> None:
+        lines = [
+            "A title - with a dash.",
+            "Two  -  spaces.",
+            "- a list item",
+            "| a | - |",
+            "Code `title - text`, b - a, 1 - 5 and a well-known word.",
+        ]
+        with repo({"AGENTS.md": RULES_TABLE, "docs/page.md": "\n".join(lines) + "\n"}) as root:
+            code, output = run(prosecheck.main, root)
+        self.assertEqual(code, 1)
+        hyphens = [line for line in output.splitlines() if "a spaced hyphen used as a dash" in line]
+        self.assertEqual([line.split(":")[1] for line in hyphens], ["1", "2"])
+
     def test_reports_a_python_file_it_cannot_parse(self) -> None:
         with repo({"AGENTS.md": RULES_TABLE, "a.py": "def broken(:\n"}) as root:
             code, output = run(prosecheck.main, root)

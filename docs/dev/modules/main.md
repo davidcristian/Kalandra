@@ -122,7 +122,7 @@ The entry, the server and the app services, in `main/src/`:
   focus. `updateOpts()` attaches the window to the game window. The library hides the window while neither the game
   nor the overlay has the focus. With `hideOverlayOnBlur` main also hides it while the overlay is not active and
   either the game is not active or the page sent `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game
-  has administrator rights that Kalandra lacks, it shows the error `PoE2 window - No access`. `watchPage()` in
+  has administrator rights that Kalandra lacks, it shows the error `PoE2 window: no access`. `watchPage()` in
   `page-watch.ts` logs a failed page load, except `ERR_ABORTED`, which a reload causes, and an exit of its renderer
   process. After an exit other than `clean-exit` it reloads the page, at most `MAX_RELOADS` (3) times in a run.
 - `overlay-keys.ts`: `pressedHotkey(input)` names a key press in the overlay window with `hotkeyToString()` from

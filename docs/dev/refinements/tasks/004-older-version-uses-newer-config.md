@@ -11,7 +11,7 @@ then above `defaultConfig().configVersion` (35 on 2026-10-18), so no step runs a
 uses the config as it is, with fields and values it does not know. Nothing compares the two
 numbers.
 
-The commented-out `dialog.showErrorBox` titled `Kalandra - Incompatible configuration` in
+The commented-out `dialog.showErrorBox` titled `Kalandra: incompatible configuration` in
 `initConfig()` describes this case. It sits after a `return` in the `catch` block for a file that
 does not parse ([002](002-unparsable-config-stops-renderer.md)), and `dialog` is an Electron API
 that the renderer does not have.

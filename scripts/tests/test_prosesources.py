@@ -10,6 +10,7 @@ const pattern = /["'\\/]/g;
 console.log(`logged ${value} text`);
 throw new Error("thrown text");
 const ignored = "not a message";
+dialog.showErrorBox("box title", "box text");
 """
 
 VUE = """<template>
@@ -60,6 +61,8 @@ class ScriptTest(unittest.TestCase):
                 (4, "over two lines"),
                 (6, "logged  text"),
                 (7, "thrown text"),
+                (9, "box title"),
+                (9, "box text"),
             ],
         )
 

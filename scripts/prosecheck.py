@@ -1,4 +1,4 @@
-"""Fails when prose uses a banned word from the table in AGENTS.md, or a spaced `--` as a dash."""
+"""Fails when prose uses a banned word from the table in AGENTS.md, or a spaced `--` or hyphen as a dash."""
 
 import argparse
 import re
@@ -13,6 +13,8 @@ from repofiles import GAME_DATA, RepoError, read_text, repo_files, under
 
 RULES = "AGENTS.md"
 SPACED_DASH = re.compile(r"(?<=\S)\s--\s(?=\S)")
+# Only between two words of two letters or more, so a list marker, a "-" table cell, `b - a` and `1 - 5` pass
+SPACED_HYPHEN = re.compile(r"(?<=[^\W\d_]{2})\s+-\s+(?=[^\W\d_]{2})")
 _DIRECTIVE_REASON = re.compile(r"^(\s*eslint-(?:disable|enable)(?:-next-line|-line)?\b.*?\s)--(?=\s)")
 
 
@@ -43,11 +45,13 @@ def check_prose(path: str, lines: Sequence[Line], pattern: re.Pattern[str]) -> l
         Problem(path, hit.line, f'banned word "{hit.word}"; AGENTS.md gives a plain replacement')
         for hit in bannedwords.find_words(lines, pattern)
     ]
-    problems.extend(
-        Problem(path, number, "a spaced `--` used as a dash; restructure the sentence")
-        for number, text in lines
-        if SPACED_DASH.search(without_directive_separator(bannedwords.mask(text)))
-    )
+    for number, text in lines:
+        masked = without_directive_separator(bannedwords.mask(text))
+        problems.extend(
+            Problem(path, number, f"a spaced {mark} used as a dash; restructure the sentence")
+            for mark, dash in (("`--`", SPACED_DASH), ("hyphen", SPACED_HYPHEN))
+            if dash.search(masked)
+        )
     return sorted(problems)
 
 
