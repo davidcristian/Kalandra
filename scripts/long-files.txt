@@ -9,7 +9,7 @@
 315 main/src/shortcuts/Shortcuts.ts
 506 renderer/src/assets/data/index.ts
 334 renderer/src/assets/data/interfaces.ts
-2165 renderer/src/parser/Parser.ts
+2101 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
 729 renderer/src/web/Config.ts
 566 renderer/src/web/background/Prices.ts

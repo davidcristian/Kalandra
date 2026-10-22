@@ -145,7 +145,7 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
   parser reads which section, so the change comes with parser cases for the item kinds it affects.
-- **`Parser.ts` is 2223 lines** (2026-10-22, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+- **`Parser.ts` is 2101 lines** (2026-10-22, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
@@ -158,7 +158,7 @@ runtime. It reads the trade site lists through the proxy with `useTradeData()` f
 ([renderer-price-check.md](renderer-price-check.md), [080](../refinements/tasks/080-data-loader-imports-trade-data.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
-the floor in `renderer/vitest.config.ts` (67.0% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
+the floor in `renderer/vitest.config.ts` (68.8% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
 has the text and the expected fields) and `specs/Parser/mods.ts`; the suites in `specs/data/` cover the loader and its
 lookups, and `specs/data/fetchData.test.ts` a data file that the server does not return.

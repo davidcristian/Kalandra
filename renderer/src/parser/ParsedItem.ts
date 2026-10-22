@@ -19,15 +19,6 @@ export enum ItemInfluence {
   Warlord = "Warlord",
 }
 
-// export interface Augment {
-//   index: number;
-//   isEmpty: boolean;
-//   augment?: string;
-//   text?: string; // Text of modifier
-//   isFake?: boolean;
-//   modifier?: ParsedModifier; // @deprecated
-//   statCalculated?: StatCalculated; // @deprecated
-// }
 export interface EditorItem {
   existing?: true;
   socketBound?: boolean;

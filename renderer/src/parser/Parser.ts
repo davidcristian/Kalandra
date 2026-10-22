@@ -134,7 +134,6 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   parseUnidentified,
   { virtual: parseSuperior },
   { virtual: parseExceptional },
-  { virtual: parseRuneforged },
   parseSynthesised,
   parseCategoryByHelpText,
   { virtual: normalizeName },
@@ -740,37 +739,6 @@ function parseTalismanTier(section: string[], item: ParsedItem) {
   if (section[0].startsWith(_$.TALISMAN_TIER)) {
     item.talismanTier = Number(section[0].slice(_$.TALISMAN_TIER.length));
     return "SECTION_PARSED";
-  }
-  return "SECTION_SKIPPED";
-}
-
-// disabling cause of https://github.com/Kvan7/Exiled-Exchange-2/issues/954
-// will come back if vaal gems are added later, will need to be reworked completely
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- unused while vaal gems are out of the game
-function parseVaalGemName(section: string[], item: ParserState) {
-  performance.mark("parseVaalGemName");
-  if (item.category !== ItemCategory.Gem) return "PARSER_SKIPPED";
-
-  // TODO blocked by https://www.pathofexile.com/forum/view-thread/3231236
-  if (section.length === 1) {
-    let gemName: string | undefined;
-    if (ITEM_BY_REF("GEM", section[0])) {
-      gemName = section[0];
-    } else if (ITEM_BY_TRANSLATED("GEM", section[0])) {
-      gemName = section[0];
-    }
-    if (gemName) {
-      let gemItem = ITEM_BY_REF("GEM", gemName);
-      if (!gemItem || !gemItem.length) {
-        gemItem = ITEM_BY_TRANSLATED("GEM", gemName);
-      }
-      if (!gemItem || !gemItem.length) {
-        return "SECTION_SKIPPED";
-      }
-
-      item.name = gemItem![0].refName;
-      return "SECTION_PARSED";
-    }
   }
   return "SECTION_SKIPPED";
 }
@@ -1511,21 +1479,6 @@ function parseExceptional(item: ParserState) {
   }
 }
 
-function parseRuneforged(item: ParserState) {
-  performance.mark("parseRuneforged");
-  if (
-    item.rarity === ItemRarity.Normal ||
-    item.rarity === ItemRarity.Magic ||
-    item.rarity === ItemRarity.Rare ||
-    item.rarity === ItemRarity.Unique
-  ) {
-    // NOTE: don't actually use since they different basetype
-    // if (_$REF.ITEM_RUNEFORGED.test(item.name)) {
-    //   item.name = _$REF.ITEM_RUNEFORGED.exec(item.name)![1];
-    // }
-  }
-}
-
 function parseCategoryByHelpText(section: string[], item: ParsedItem) {
   performance.mark("parseCategoryByHelpText");
   if (section[0] === _$.BEAST_HELP) {
@@ -1778,18 +1731,6 @@ export function parseStatsFromMod(
       continue;
     }
 
-    // const validTradeIds = parsedStat?.stat.trade.ids[
-    //   modifier.info.type
-    // ]?.filter((id) =>
-    //   TRADE_STAT_BY_STAT_ID(
-    //     id +
-    //       (parsedStat.stat.trade.option
-    //         ? "|" + parsedStat.translation.value
-    //         : ""),
-    //   ),
-    // );
-
-    // if (parsedStat && validTradeIds && validTradeIds.length) {
     if (parsedStat) {
       // keep augment basetype on the stat
       if (modifier.info.type === ModifierType.AddedAugment) {
@@ -2057,9 +1998,6 @@ function determineAugments(
     .map((s) => s.sources[0].contributes?.value)
     .filter((v) => v !== undefined);
 
-  // const augmentTradeId = statCalcs[0].stat.trade.ids[ModifierType.Augment][0];
-  // const possibleAugments = AUGMENT_DATA_BY_TRADE_ID[augmentTradeId];
-
   const allTradeIds = statCalcs.flatMap(
     (c) => c.stat.trade.ids?.[ModifierType.Augment]?.[0] ?? [],
   );
@@ -2145,8 +2083,6 @@ function isItemMissingItemClass(section: string[]): boolean {
 // eslint-disable-next-line @typescript-eslint/naming-convention -- the name marks an object exported only for tests
 export const __testExports = {
   itemTextToSections,
-  findInDatabase,
-  parseNamePlate,
   isItemMissingItemClass,
   parseWeapon,
   parseArmour,

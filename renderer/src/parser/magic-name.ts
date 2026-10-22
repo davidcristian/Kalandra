@@ -23,7 +23,6 @@ export function magicBasetype(name: string) {
       // BUG[UPSTREAM]: https://www.pathofexile.com/forum/view-thread/3913283
       const result =
         ITEM_BY_REF("ITEM", name) ?? ITEM_BY_TRANSLATED("ITEM", name);
-      // TRADE_ITEM_BY_REF({ name }, true);
       if (result) {
         return { name, found: result && result[0].craftable, tradeItem: false };
       }
