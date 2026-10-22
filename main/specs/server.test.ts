@@ -147,4 +147,12 @@ describe("the /events WebSocket", () => {
     });
     expect(rebound).toBe(403);
   });
+
+  it("closes the connection of an upgrade to another path", async () => {
+    const pageOrigin = {
+      host: `localhost:${port}`,
+      origin: `http://localhost:${port}`,
+    };
+    expect(await openSocket(port, pageOrigin, "/other")).toBe(0);
+  });
 });

@@ -25,16 +25,18 @@ The entry, the server and the app services, in `main/src/`:
   `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
-  `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and returns
-  403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every path the
-  other routes do not, so no request is left without a response. The target `"broadcast"` sends to every client, and
-  `"last-active"` sends to the last active client. A new client receives the log history and the
-  current updater state, which the first update check can change after the page reads `GET /config`. An
-  `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its
-  User-Agent, as the overlay window's does. A message that is not JSON, has no string `name` or names an event without
-  a handler is ignored with a `warn [server]` line, and a handler that throws is logged. It passes on a
-  `client-log-event` only from the client `clientLogWriter()` returns, because every page parses the game log and
-  sends the same entries. The routes are in [architecture.md](../architecture.md#the-boundary-between-the-processes).
+  `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
+  returns 403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every
+  path the other routes do not, so no request is left without a response. The target `"broadcast"` sends to every
+  client, and `"last-active"` to the last active client: the one that connected or sent `CLIENT->MAIN::used-recently`
+  last, or the one client left after a close, for which main emits `used-recently` with `isOverlay` true. A new
+  client receives the log history and the current updater state, which the first update check can change after the
+  page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade
+  request has `Electron` in its User-Agent, as the overlay window's does. A message that is not JSON, has no string
+  `name` or names an event without a handler is ignored with a `warn [server]` line, and a handler that throws is
+  logged. It passes on a `client-log-event` only from the client `clientLogWriter()` returns, because every page
+  parses the game log and sends the same entries. The routes are in
+  [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `client-log-writer.ts`: `clientLogWriter(clients, isOverlay, lastActive)` returns the newest overlay window, or
   `lastActive` when no overlay window is connected.
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP

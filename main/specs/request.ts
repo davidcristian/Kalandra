@@ -1,5 +1,6 @@
 import * as http from "http";
 import WebSocket from "ws";
+import type { IpcEvent } from "../../ipc/types";
 
 export interface Reply {
   status: number;
@@ -63,13 +64,14 @@ async function send(
   });
 }
 
-// Resolves 101 when the upgrade succeeds, or the status code the server returned instead
+// Resolves 101 when the upgrade succeeds, the status code the server returned instead, or 0 when it closed the connection
 export async function openSocket(
   port: number,
   headers: { host?: string; origin?: string },
+  urlPath = "/events",
 ): Promise<number> {
   return await new Promise((resolve) => {
-    const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}${urlPath}`, {
       ...(headers.origin ? { origin: headers.origin } : {}),
       headers: headers.host ? { host: headers.host } : {},
     });
@@ -126,4 +128,49 @@ export async function firstMessages(
     });
     socket.on("error", reject);
   });
+}
+
+/** An /events client that keeps the events main sends it, in the order they came. */
+export class EventClient {
+  private readonly kept: IpcEvent[] = [];
+  private readonly waiting: Array<(event: IpcEvent) => void> = [];
+
+  private constructor(private readonly socket: WebSocket) {
+    socket.on("message", (data) => {
+      const event = JSON.parse(String(data)) as IpcEvent;
+      const resolve = this.waiting.shift();
+      if (resolve) resolve(event);
+      else this.kept.push(event);
+    });
+  }
+
+  // The message listener is added before the socket opens, so no event main sends on connect is missed
+  static async open(port: number): Promise<EventClient> {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
+      origin: `http://127.0.0.1:${port}`,
+    });
+    const client = new EventClient(socket);
+    await new Promise((resolve, reject) => {
+      socket.on("open", resolve);
+      socket.on("error", reject);
+    });
+    return client;
+  }
+
+  /** Resolves the oldest event not read yet, and waits for the next one when there is none. */
+  async next(): Promise<IpcEvent> {
+    const event = this.kept.shift();
+    if (event) return event;
+    return await new Promise((resolve) => {
+      this.waiting.push(resolve);
+    });
+  }
+
+  send(event: IpcEvent) {
+    this.socket.send(JSON.stringify(event));
+  }
+
+  close() {
+    this.socket.close();
+  }
 }

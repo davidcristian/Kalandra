@@ -14,9 +14,11 @@ replaces it with `vi.mock("electron", ...)`.
 - `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
   messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, sends
   messages main cannot use, and sends client log entries from the overlay window and a browser tab.
+- `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first, and
+  which client receives a `last-active` event after a connect, a `CLIENT->MAIN::used-recently` message and a close.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
 - `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes and to
-  `/events`, and paths and methods that no route serves.
+  `/events`, paths and methods that no route serves, and an upgrade request to another path.
 - `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake
   `net.request` that answers with the request it was given.
 - `RemoteLogger.test.ts` writes more entries than the history keeps.
