@@ -42,6 +42,11 @@ replaces it with `vi.mock("electron", ...)`.
 - `overlay-keys.test.ts` names a key press with each combination of modifiers and checks which presses move the
   focus.
 - `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process.
+- `widget-area.test.ts` sends `OVERLAY->MAIN::track-area` through the fake server and mouse events through the fake
+  global hook at the edges of the area and the close threshold, and on Windows and Linux through a fake `screen` at
+  150% scale.
+- `overlay-visibility.test.ts` holds `Alt` alone or with other keys and reads the `MAIN->OVERLAY::visibility` events,
+  with fake timers in place of the 85 ms and 275 ms delays.
 
 ## host-files/
 
