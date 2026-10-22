@@ -32,11 +32,6 @@
       src="/images/chaos.png"
       class="max-w-full max-h-full"
     />
-    <!-- <img
-        v-else-if="currency === 'annul'"
-        src="/images/annul.png"
-        class="max-w-full max-h-full"
-      /> -->
     <img v-else src="/images/exa.png" class="max-w-full max-h-full" />
   </div>
 </template>

@@ -4,7 +4,6 @@
       <ui-detailed-item-img
         :icon="result.displayItem.icon.url"
         :item-width="result.displayItem.icon.w"
-        :item-height="result.displayItem.icon.h"
         :sockets="result.displayItem.sockets"
       />
     </div>

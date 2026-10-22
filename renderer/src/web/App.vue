@@ -24,7 +24,6 @@ import OverlayWindow from "./overlay/OverlayWindow.vue";
   height: 100vh;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   overflow: hidden;
   justify-content: space-between;
 

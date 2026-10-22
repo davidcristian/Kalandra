@@ -65,14 +65,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import { configModelValue, configProp } from "./utils";
 import Tip from "../help/Tip.vue";
 import { TIP_COUNT } from "../help/tips";
 
 export default defineComponent({
   name: "settings.help",
-  components: { UiCheckbox, Tip },
+  components: { Tip },
   props: configProp(),
   setup(props) {
     const { t } = useI18nNs("settings");

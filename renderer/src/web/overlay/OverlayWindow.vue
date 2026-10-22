@@ -4,7 +4,6 @@
     class="overflow-hidden relative w-full h-full"
     :style="{ '--game-panel': poePanelWidth.toFixed(4) + 'px' }"
   >
-    <!-- <div style="border: 4px solid red; top: 0; left: 0; height: 100%; width: 100%; position: absolute;"></div> -->
     <div
       style="top: 0; left: 0; height: 100%; width: 100%; position: absolute"
       :style="{ background: overlayBackground }"
@@ -47,12 +46,6 @@
         <span class="bg-blue-800 rounded px-1">{{ overlayKey }}</span>
       </i18n-t>
     </div>
-    <!-- <template v-if="isDev">
-      <dev-widget text="DEV" />
-    </template> -->
-    <!-- <div v-show="!gameFocused && !active">
-      <div style="right: 24px; bottom: 24px; position: absolute;" class="bg-red-500 p-2 rounded">Game window is not active</div>
-    </div> -->
   </div>
 </template>
 
@@ -76,14 +69,12 @@ import LoadingAnimation from "./LoadingAnimation.vue";
 import { usePoeninja } from "@/web/background/Prices";
 import { useLeagues } from "@/web/background/Leagues";
 import { useClientLog } from "@/web/client-log/client-log";
-import DevWidget from "./DevWidget.vue";
 
 type WMID = Widget["wmId"];
 
 export default defineComponent({
   components: {
     LoadingAnimation,
-    DevWidget,
   },
   setup() {
     usePoeninja();
@@ -394,7 +385,6 @@ export default defineComponent({
         () => !active.value && showEditingNotification.value,
       ),
       registry,
-      isDev: import.meta.env.DEV,
     };
   },
 });

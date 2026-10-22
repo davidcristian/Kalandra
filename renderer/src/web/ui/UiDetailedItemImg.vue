@@ -44,10 +44,6 @@ export default defineComponent({
       type: Number,
       default: 1,
     },
-    itemHeight: {
-      type: Number,
-      default: 1,
-    },
     sockets: {
       type: Array as () => { type: string; item?: string }[] | undefined,
       default: undefined,
@@ -69,20 +65,6 @@ export default defineComponent({
 
 .icon-container {
   @apply inline-block relative bg-contain bg-no-repeat align-top;
-}
-
-.socket-w1 {
-  @apply w-12;
-}
-.socket-w2 {
-  @apply w-24;
-}
-.socket-w3 {
-  @apply w-36;
-}
-
-.socket-h1 {
-  @apply top-[7.5px];
 }
 
 .socket-grid {
