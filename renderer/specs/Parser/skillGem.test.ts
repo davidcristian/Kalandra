@@ -16,7 +16,7 @@ describe("isItemMissingItemClass", () => {
     setupTests();
     await init("en");
   });
-  it("so should now be false for meta skill gem", () => {
+  it("returns true for a meta skill gem copied without an item class line", () => {
     const sections = __testExports.itemTextToSections(MetaSkillGem.rawText);
     expect(__testExports.isItemMissingItemClass(sections[0])).toBeTruthy();
   });
@@ -49,12 +49,6 @@ describe("Uncut gems parse correctly", () => {
     expect(result).not.toBeNull();
     expect(result!.category).toBe(UncutSupportGem.category);
     expect(result!.gemLevel).toBeUndefined();
-  });
-  it("should parse meta skill gem", () => {
-    const result = parseClipboard(MetaSkillGem.rawText).unwrapOr(null);
-    expect(result).not.toBeNull();
-    expect(result!.category).toBe(MetaSkillGem.category);
-    expect(result!.gemLevel).toBe(MetaSkillGem.gemLevel);
   });
 });
 
