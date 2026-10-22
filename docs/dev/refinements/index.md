@@ -137,7 +137,7 @@ layout and its reasons.
 - 073: [The client log parser matches most chat lines with English text](tasks/073-client-log-chat-lines-in-english.md)
 - 074: [The parser reads modifier suffixes, separators and the socket letter with literals](tasks/074-parser-separators-and-suffixes.md)
 - 075: [Hybrid armour bases start with every defence filter enabled](tasks/075-hybrid-armour-defence-filters.md)
-- 076: [Two main test files wait for real timers](tasks/076-main-tests-wait-for-real-timers.md)
+- 076: [A ConfigStore test waits for real timers](tasks/076-main-tests-wait-for-real-timers.md)
 - 077: [Item icons load from web.poecdn.com outside the proxy](tasks/077-item-icons-outside-proxy.md)
 - 078: [Decide whether the app shows the Patreon links to Awakened PoE Trade's author](tasks/078-patreon-links-in-comments.md)
 - 079: [The map property filters send only their minimum to the trade site](tasks/079-map-filters-send-only-minimum.md)

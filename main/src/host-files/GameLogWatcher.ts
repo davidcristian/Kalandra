@@ -46,6 +46,23 @@ async function ifExists<T>(operation: Promise<T>): Promise<T | null> {
   }
 }
 
+/** Calls `onChange` when the file at a path changes on disk. */
+export interface FileWatch {
+  watch: (file: string, onChange: () => Promise<void>) => void;
+  unwatch: (file: string) => void;
+}
+
+const pollFile: FileWatch = {
+  watch: (file, onChange) => {
+    watchFile(file, { interval: 450 }, () => {
+      void onChange();
+    });
+  },
+  unwatch: (file) => {
+    unwatchFile(file);
+  },
+};
+
 interface WatchState {
   offset: number;
   path: string;
@@ -58,10 +75,6 @@ interface WatchState {
 export class GameLogWatcher {
   // The logFile whose file is open or opening; null makes the next restart open it again
   private _wantedPath: string | null = null;
-  get actualPath() {
-    return this._state?.path ?? null;
-  }
-
   private _state: WatchState | null = null;
 
   constructor(
@@ -69,6 +82,7 @@ export class GameLogWatcher {
     private logger: Logger,
     private fileWriter: FileWriter,
     private possiblePaths: readonly string[] = POSSIBLE_PATH,
+    private files: FileWatch = pollFile,
   ) {
     this.server.onEventAnyClient("CLIENT->MAIN::re-parse-log", async () => {
       if (this._state) {
@@ -125,7 +139,7 @@ export class GameLogWatcher {
     try {
       const file = await fs.open(logFile, "r");
       const stats = await file.stat();
-      watchFile(logFile, { interval: 450 }, this.handleFileChange.bind(this));
+      this.files.watch(logFile, this.handleFileChange.bind(this));
       this._state = {
         path: logFile,
         file,
@@ -147,7 +161,7 @@ export class GameLogWatcher {
     if (!state) return;
     // Cleared before the close so that a read still running stops after its current chunk
     this._state = null;
-    unwatchFile(state.path);
+    this.files.unwatch(state.path);
     await state.file.close();
   }
 
@@ -181,10 +195,10 @@ export class GameLogWatcher {
     state.lines.reset();
   }
 
-  private handleFileChange() {
+  private async handleFileChange() {
     if (this._state && !this._state.isReading) {
       this._state.isReading = true;
-      void this.readToEOF(this._state);
+      await this.readToEOF(this._state);
     }
   }
 

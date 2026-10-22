@@ -236,12 +236,12 @@ serves. `file-uploads.test.ts` posts images and other files to the `/uploads/` r
 the place of the uploads folder. `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy`
 header, through a fake `net.request` that answers with the request it was given. `ConfigStore.test.ts` saves configs
 in a temporary folder through fakes that write slowly, stop partway through a write or fail the rename as Windows does
-for a file another program has open. `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a
-temporary folder and send client events through the fake server in `fake-server.ts`, whose `emit` settles when the
-promises the handlers return settle. `FileWriter.test.ts` also delays the first file write to check that lines keep
-their order. `GameLogWatcher.test.ts` also deletes a new log as the watcher opens it, and on Windows fails that open
-with EPERM as Windows does during a delete. `GameConfig.test.ts` writes game config files in a temporary folder and
-passes its own default paths. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through
+for a file another program has open. `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and
+write real files in a temporary folder, and the first two pass their own default paths. `FileWriter.test.ts` sends
+client events through the fake server in `fake-server.ts`, whose `emit` settles when its handlers' promises settle,
+and delays the first write to check the line order. `GameLogWatcher.test.ts` calls the change listener of a fake
+`FileWatch` or `fs.watchFile`, deletes a new log as the watcher opens it, and on Windows fails that open with EPERM as
+Windows does during a delete. `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through
 Comlink, fails or exits. `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process. A
 test of a module that imports Electron replaces it with `vi.mock("electron", ...)`. `npm run build` in `main/` runs
 `tsc --noEmit` and the production bundle, and `npm run lint` runs ESLint on `src/`, `specs/` and `build/`; the Build
