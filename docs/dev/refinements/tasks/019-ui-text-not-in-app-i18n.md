@@ -51,3 +51,6 @@ the 37 keys and fails when one of them gets an English entry, so remove each one
   or one of these 43.
 - 2026-10-22: Removed the six `ProfileSettings.vue` keys that only commented-out checkboxes passed
   to `t()`, since the checkboxes were deleted. 37 keys remain.
+- 2026-10-22: `PLANNED` in `renderer/specs/web/i18n-keys.test.ts` keeps `item.open_on_craftofexile`
+  for the label in `settings-item-check.vue`. The test fails when code reads the key, so the commit
+  that adds it to the label removes it from that list.

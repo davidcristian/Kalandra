@@ -24,8 +24,7 @@
   height.
 - **Tier 1** and **Tier 2** labels show on modifier filters by default, and Always show tier shows
   every tier (`FilterModifierTiers.vue`). The code highlights tiers 1 and 2 as the best, which is
-  the Path of Exile 1 order. `app_i18n.json` also holds unused strings for a tier numbering setting
-  that call the Path of Exile 2 order "higher is better".
+  the Path of Exile 1 order.
 
 **Do.** [Section 4 of the runbook](../../runbooks/in-game-check.md#4-the-price-check-keys), with the
 cursor on items at the left and the right of the screen, at two resolutions. After Ctrl + D,

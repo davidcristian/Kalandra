@@ -15,25 +15,12 @@
     "version": "버전 {0}",
     "release_notes": "릴리즈 노트",
     "report_bug": "버그 발생 시 GitHub에 보고해주세요",
-    "quit": "종료",
-    "deprecated": "この機能は非推奨でありバージョン {0} のアップデートで削除されます"
+    "quit": "종료"
   },
   "map.mods.heist": "강탈",
   "map.mods.outdated": "사용X",
   "Support development on": "개발을 지원하세요",
-  "Blighted": "역병 걸린",
-  "Blight-ravaged": "역병에 유린당한",
   "Magic": "매직",
-  "Shaper": "쉐이퍼",
-  "Elder": "엘더",
-  "Crusader": "십자군",
-  "Hunter": "사냥꾼",
-  "Redeemer": "대속자",
-  "Warlord": "전쟁 군주",
-  "Superior": "상급",
-  "Anomalous": "기묘한",
-  "Divergent": "상이한",
-  "Phantasmal": "몽환적인",
   "item": {
     "prop_quality": "{0}% 퀄리티",
     "base_percentile": "기본 백분위수: {0}%",
@@ -58,9 +45,6 @@
     "stock": "홈: {0}",
     "map_tier": "지도 등급: {0}",
     "area_level": "지역 레벨: {0}",
-    "heist_wings_revealed": "드러낸 부속 건물: {0}",
-    "linked_sockets": "연결부: {0}",
-    "white_sockets": "흰 홈: {0}",
     "quality": "퀄리티: {0}",
     "gem_level": "젬 레벨: {0}",
     "find_in_stash": "보관함에서 찾기",
@@ -98,7 +82,6 @@
     "map_drop_chance": "경로석 출현 확률: +{0}%",
     "map_item_rarity": "아이템 희귀도: +{0}%",
     "map_gold": "골드 발견량: +{0}%",
-    "uses_remaining": "남은 사용: {0}",
     "victorious": "승리",
     "cowardly": "겁쟁이",
     "deadly": "치명적"
@@ -190,9 +173,7 @@
     "tag_rune": "증강물",
     "tag_added_rune": "증강물",
     "tag_sanctum": "성역",
-    "tag_desecrated": "훼손된",
-    "grade": "등급 {0}",
-    "hybrid_note": "ハイブリッドモッドであるためティアが誤っている可能性があります"
+    "tag_desecrated": "훼손된"
   },
   "online_filter": {
     "offline_toggle": "오프라인 & 온라인",
@@ -207,7 +188,6 @@
     "currency_any": "아무 화폐",
     "currency_only_chaos": "카오스 오브",
     "currency_only_div": "디바인 오브",
-    "currency_chaos_div": "카오스&디바인",
     "currency_exalted_div": "카오스&디바인",
     "currency_only_exalted": "엑잘티드 오브"
   },
@@ -274,7 +254,6 @@
   "trade_result": {
     "error": "거래소 응답 실패",
     "matched": "매치됨: {0}",
-    "trade": "거래소",
     "price": "가격",
     "bulk": "갯수",
     "stock": "재고",
@@ -282,7 +261,6 @@
     "listed": "등록 시간",
     "seller": "판매자",
     "item_level": "아이템 레벨",
-    "rank": "등급",
     "gem_level": "젬 레벨",
     "quality": "퀄리티",
     "base_item": "베이스 아이템",
@@ -333,22 +311,9 @@
     "use_tooltip_keybind": "SHIFT + 가격에 커서를 이동",
     "use_tooltip_always": "가격에 커서를 이동",
     "use_tooltip_off": "기능 끔",
-    "tier_numbering": "티어 넘버링 스타일",
-    "tier_numbering_poe1": "PoE1 (낮을수록 좋음)",
-    "tier_numbering_poe2": "PoE2 (높을수록 좋음)",
-    "tier_numbering_help": "혼란을 방지하기 위해서 POE 1의 아이템 티어는 \"티어\"가아닌\"등급\"으로 표시됩니다. ",
-    "always_show_tier": "常にティアを表示",
-    "remember_ratio": "通貨比率を記憶する"
+    "always_show_tier": "常にティアを表示"
   },
   "poe2_new": {
-    "beta_warning": "이 버전은 베타버전입니다. 예기치 못한 버그가 있을 수 있습니다.",
-    "beta_warning2": "문제가 생기면 바로 알려주세요.",
-    "pseudo_note": "해당 접사는 아직 거래소에서 검색이 불가능 합니다.",
-    "pseudo_note2": "아이템이 원래의 가격보다 더 비쌀 수도 있습니다.",
-    "parse_error": "예기치 못한 문제로 이 아이템은 검색할 수 없습니다.",
-    "parse_error2": "아마 특정 접사가 아직 검색이 불가능한 것으로 보입니다.",
-    "parse_error3": "(새로운 접사 혹은 POE 1과는 다른 이름일 수도 있습니다)",
-    "bulk_exchange": "아이템 대량교환 비율 표시는 아직 시행되지 않습니다."
   },
   "tips": {
     "tip_1": "세팅에서 Cheat Sheets 위젯에 원하는 이미지를 추가해 필요할때마다 보실 수 있습니다.",

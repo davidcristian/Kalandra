@@ -28,3 +28,6 @@ commit of their own.
 
 - 2026-10-18: Found while docs/price-check.md was rewritten, by comparing the save key in
   `AugmentEditor.vue` with the key `getSavedAugments()` reads.
+- 2026-10-22: `PLANNED` in `renderer/specs/web/i18n-keys.test.ts` keeps `item_editor.sceptre`. The
+  test fails when code reads the key or the English file drops it, so the commit that does either
+  removes it from that list.

@@ -49,6 +49,27 @@ const LISTED_MISSING = [
 // Texts of task 019 that t() gets through an expression, which literalKeys() does not read
 const COMPUTED_MISSING = ["Offline"];
 
+// Key prefixes that src/ completes at run time, as in t(`tips.tip_${n}`)
+const COMPUTED_PREFIXES = [
+  "filters.tag_",
+  "item.mod_",
+  "item_category.",
+  "tips.tip_",
+];
+
+// Keys that src/ builds whole: an Ultimatum hint in lower case, and a parse error name with _help
+const COMPUTED_KEYS = [
+  "item.victorious",
+  "item.cowardly",
+  "item.deadly",
+  "item.parse_error_help",
+  "item.unknown_help",
+  "item.wrong_language_help",
+];
+
+// Keys that no code reads yet, kept until tasks 019 and 016 put them to use or remove them
+const PLANNED = ["item.open_on_craftofexile", "item_editor.sceptre"];
+
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(dir, entry.name);
@@ -71,6 +92,22 @@ function literalKeys(): Map<string, string[]> {
     }
   }
   return keys;
+}
+
+/** Returns each quoted string in src/, and a string that starts with : as a key of its file's namespace. */
+function quotedStrings(): Set<string> {
+  const strings = new Set<string>();
+  for (const file of sourceFiles(SRC_DIR)) {
+    const source = fs.readFileSync(file, "utf8");
+    const namespace = source.match(/useI18nNs\(\s*"([^"]+)"/)?.[1];
+    for (const match of source.matchAll(/(["'`])([^"'`\n]*)\1/g)) {
+      strings.add(match[2]);
+      if (namespace && match[2].startsWith(":")) {
+        strings.add(match[2].replace(":", `${namespace}.`));
+      }
+    }
+  }
+  return strings;
 }
 
 describe("the literal keys passed to t()", () => {
@@ -111,4 +148,39 @@ describe("the keys of a translation", () => {
       expect(unknown).toEqual([]);
     },
   );
+});
+
+describe("the keys of the English file", () => {
+  const english = [...readMessages("en").keys()];
+  const quoted = quotedStrings();
+
+  it("are each a quoted string in the source, computed there or planned", () => {
+    const unread = english.filter(
+      (key) =>
+        !quoted.has(key) &&
+        !COMPUTED_KEYS.includes(key) &&
+        !PLANNED.includes(key) &&
+        !COMPUTED_PREFIXES.some((prefix) => key.startsWith(prefix)),
+    );
+    expect(unread).toEqual([]);
+  });
+});
+
+describe("the computed and planned key lists", () => {
+  const english = [...readMessages("en").keys()];
+  const quoted = quotedStrings();
+
+  it("name English keys, prefixes the source builds and planned keys it does not read", () => {
+    const source = sourceFiles(SRC_DIR)
+      .map((file) => fs.readFileSync(file, "utf8"))
+      .join("\n");
+    const outdated = [
+      ...[...COMPUTED_KEYS, ...PLANNED].filter((key) => !english.includes(key)),
+      ...COMPUTED_PREFIXES.filter(
+        (prefix) => !source.includes(`\`${prefix}\${`),
+      ),
+      ...PLANNED.filter((key) => quoted.has(key)),
+    ];
+    expect(outdated).toEqual([]);
+  });
 });
