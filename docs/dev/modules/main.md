@@ -215,7 +215,7 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 universal dmg on macOS, and publishes to GitHub releases.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (61.9% of the lines of `src/` on 20 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (63.2% of the lines of `src/` on 22 Oct 2026).
 `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
 host address no computer has, `served-file.test.ts` the path check, `request-origin.test.ts` the header check and
 `startup.test.ts` the startup order on each platform, with a fake `app` that emits `ready` once. `AppUpdater.test.ts`
