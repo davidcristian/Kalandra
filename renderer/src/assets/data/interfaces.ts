@@ -8,23 +8,6 @@ export interface StatMatcher {
   oils?: string; // Amulet anointment
 }
 
-export interface StatTier {
-  ilvl: number;
-  id: string;
-  name: string;
-  values: number[][];
-  items: string[];
-}
-
-export interface StatTierMod {
-  id: string;
-  generation?: string;
-  items: {
-    [type: string]: number;
-  };
-  mods: StatTier[];
-}
-
 export enum StatBetter {
   NegativeRoll = -1,
   PositiveRoll = 1,
@@ -247,7 +230,6 @@ export interface TranslationDict {
   WAYSTONE_RARITY: string;
   WAYSTONE_MONSTER_RARITY: string;
   WAYSTONE_EFFECTIVENESS: string;
-  // WAYSTONE_GOLD: string;
   TIMELESS_RADIUS: string;
   TIMELESS_SMALL_PASSIVES: string;
   TIMELESS_NOTABLE_PASSIVES: string;
@@ -269,32 +251,6 @@ export interface TranslationDict {
   ULTIMATUM_VICTORIOUS: string;
   ULTIMATUM_COWARDLY: string;
   ULTIMATUM_DEADLY: string;
-}
-
-export interface Filter {
-  id: string;
-  value: {
-    weight: number;
-  };
-  disabled: boolean;
-}
-
-export interface ItemCategoryToEmptyPrefix {
-  [id: string]: {
-    filters: Filter[];
-    type: "not";
-    disabled?: boolean;
-  };
-}
-
-export interface AugmentSingleValue {
-  [id: string]: {
-    augment: string;
-    baseStat: string;
-    values: number[];
-    id: string;
-    type: "armour" | "weapon";
-  };
 }
 
 export interface AugmentDataByTradeId {

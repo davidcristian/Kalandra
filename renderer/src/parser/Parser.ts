@@ -1856,43 +1856,6 @@ export function getMaxSockets(item: ParsedItem) {
   }
 }
 
-export function isArmourOrWeaponOrCaster(
-  category: ItemCategory | undefined,
-): "armour" | "weapon" | "caster" | undefined {
-  switch (category) {
-    case ItemCategory.BodyArmour:
-    case ItemCategory.Boots:
-    case ItemCategory.Gloves:
-    case ItemCategory.Helmet:
-    case ItemCategory.Shield:
-    case ItemCategory.Focus:
-    case ItemCategory.Buckler:
-      return "armour";
-    case ItemCategory.OneHandedAxe:
-    case ItemCategory.OneHandedMace:
-    case ItemCategory.OneHandedSword:
-    case ItemCategory.Quiver:
-    case ItemCategory.Claw:
-    case ItemCategory.Dagger:
-    case ItemCategory.Sceptre:
-    case ItemCategory.TwoHandedAxe:
-    case ItemCategory.TwoHandedMace:
-    case ItemCategory.TwoHandedSword:
-    case ItemCategory.Crossbow:
-    case ItemCategory.Bow:
-    case ItemCategory.Warstaff:
-    case ItemCategory.Spear:
-    case ItemCategory.Flail:
-    case ItemCategory.Talisman:
-      return "weapon";
-    case ItemCategory.Wand:
-    case ItemCategory.Staff:
-      return "caster";
-    default:
-      return undefined;
-  }
-}
-
 function modifiedBfs(
   remaining: number,
   combo: number[],

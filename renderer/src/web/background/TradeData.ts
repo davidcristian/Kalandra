@@ -8,12 +8,6 @@ const RETRY_INTERVAL_MS = 30 * 60 * 1000; // 30 min, try to get new stuff
 const UPDATE_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 hours, only allow every this period
 const INTEREST_SPAN_MS = 60 * 60 * 1000; // 20 min, refuse to get if haven't used for this period
 
-export interface ItemQuery {
-  group: string;
-  type: string;
-  name?: string;
-}
-
 interface TradeItem {
   type: string;
   text?: string;

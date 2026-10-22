@@ -27,7 +27,6 @@ export let CLIENT_STRINGS_REF: TranslationDict;
 export let APP_PATRONS: Array<{ from: string; months: number; style: number }>;
 export let AUGMENT_DATA_BY_TRADE_ID: AugmentDataByTradeId;
 
-export const HIGH_VALUE_AUGMENTS_HARDCODED = new Set<string>([]);
 export let GROUPED_AUGMENTS: AugmentGroup<BaseType> = {
   Rune: {
     Lesser: [],
@@ -50,7 +49,6 @@ export let CATALYST_TYPES: CatalystGroup<BaseType[]> = {
 };
 
 export let CATALYST_TO_TAG: Record<string, string[]> = {};
-export let TAG_TO_CATALYST: Record<string, string> = {};
 
 export let ITEM_BY_TRANSLATED: (
   ns: BaseType["namespace"],
@@ -281,23 +279,6 @@ export function loadUltraLateItems() {
     speed_catalyst: [CLIENT_STRINGS.SPEED_TAG],
     attribute_catalyst: [CLIENT_STRINGS.ATTRIBUTE_TAG],
     minion_catalyst: [CLIENT_STRINGS.MINION_TAG],
-  };
-  TAG_TO_CATALYST = {
-    [CLIENT_STRINGS.LIFE_TAG]: "life_catalyst",
-    [CLIENT_STRINGS.MANA_TAG]: "mana_catalyst",
-    [CLIENT_STRINGS.ARMOUR_TAG]: "defences_catalyst",
-    [CLIENT_STRINGS.EVASION_TAG]: "defences_catalyst",
-    [CLIENT_STRINGS.ENERGY_SHIELD_TAG]: "defences_catalyst",
-    [CLIENT_STRINGS.PHYSICAL_TAG]: "physical_catalyst",
-    [CLIENT_STRINGS.FIRE_TAG]: "fire_catalyst",
-    [CLIENT_STRINGS.COLD_TAG]: "cold_catalyst",
-    [CLIENT_STRINGS.LIGHTNING_TAG]: "lightning_catalyst",
-    [CLIENT_STRINGS.CHAOS_TAG]: "chaos_catalyst",
-    [CLIENT_STRINGS.ATTACK_TAG]: "attack_catalyst",
-    [CLIENT_STRINGS.CASTER_TAG]: "caster_catalyst",
-    [CLIENT_STRINGS.SPEED_TAG]: "speed_catalyst",
-    [CLIENT_STRINGS.ATTRIBUTE_TAG]: "attribute_catalyst",
-    [CLIENT_STRINGS.MINION_TAG]: "minion_catalyst",
   };
 }
 

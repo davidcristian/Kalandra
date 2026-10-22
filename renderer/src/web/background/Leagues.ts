@@ -4,10 +4,6 @@ import { AppConfig, poeWebApi } from "@/web/Config";
 import { Host } from "./IPC";
 import { readTradeData } from "@/web/price-check/trade/trade-response";
 
-// pc-ggg, pc-garena
-// const PERMANENT_SC = ['Standard', '標準模式']
-// const PERMANENT_HC = ["Hardcore", "專家模式"];
-
 interface TradeLeague {
   id: string;
   text: string;

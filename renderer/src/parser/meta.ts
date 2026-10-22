@@ -56,7 +56,6 @@ export enum ItemCategory {
   Focus = "Focus",
   Waystone = "Waystone",
   Relic = "Relic",
-  // Tablet = "Tablet",
   Tablet = "TowerAugment",
   Spear = "Spear",
   Flail = "Flail",
@@ -129,7 +128,6 @@ export const ACCESSORY = new Set([
   ItemCategory.Belt,
   ItemCategory.Ring,
   ItemCategory.Trinket,
-  // ItemCategory.Quiver
 ]);
 
 export const GRANTS_REAL_SKILL = new Set([
@@ -149,7 +147,6 @@ export const GEM = new Set([
   ItemCategory.Gem,
   ItemCategory.MetaGem,
   ItemCategory.SupportGem,
-  // ItemCategory.UncutGem,
 ]);
 
 export enum ItemEditorType {
