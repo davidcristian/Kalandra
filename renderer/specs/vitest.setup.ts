@@ -1,7 +1,6 @@
 import { vi } from "vitest";
 import fs from "fs";
 import path from "path";
-import { Headers } from "node-fetch";
 import { Config, TipsFrequency } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
 import { connectParserSettings } from "@/web/parser-settings";
@@ -41,7 +40,7 @@ export const setupClientStringLoaderMock = () => {
 };
 
 export const setupFetchMock = () => {
-  // @ts-expect-error: the fake returns part of a Response, with node-fetch's Headers in place of the DOM's
+  // @ts-expect-error: the fake returns part of a Response
   global.fetch = vi.fn(async (url) => {
     const basePath = path.resolve(__dirname, "../public/");
     const filePath = path.join(

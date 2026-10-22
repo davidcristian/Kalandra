@@ -23,9 +23,4 @@ export default defineConfig({
   define: {
     "import.meta.vitest": "undefined",
   },
-  resolve: {
-    alias: {
-      "@/assets/data/en": "./src/parser/en",
-    },
-  },
 });
