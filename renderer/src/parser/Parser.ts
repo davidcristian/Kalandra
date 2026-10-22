@@ -40,7 +40,7 @@ import {
   ADDED_AUGMENT_LINE,
 } from "./advanced-mod-desc";
 import { calcPropPercentile, QUALITY_STATS } from "./calc-q20";
-import { AppConfig } from "@/web/Config";
+import { parserSettings } from "./settings";
 import {
   buildEditorItems,
   getSavedAugments,
@@ -545,7 +545,7 @@ function parseNamePlate(section: string[]) {
       );
       if (langFound) {
         return err(
-          `item.wrong_language|${langFound.displayLang}|${LANGUAGE_DETECTOR.find(({ lang }) => lang === AppConfig().language)!.displayLang}`,
+          `item.wrong_language|${langFound.displayLang}|${LANGUAGE_DETECTOR.find(({ lang }) => lang === parserSettings().language)!.displayLang}`,
         );
       }
 

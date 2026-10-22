@@ -8,8 +8,7 @@ import {
   sumStatsByModType,
 } from "./modifiers";
 import { recalculateItemProperties } from "./calc-base";
-import { PriceCheckWidget } from "@/web/overlay/widgets";
-import { AppConfig } from "@/web/Config";
+import { parserSettings } from "./settings";
 
 export function selectAugmentEffectByItemCategory(
   category: ItemCategory,
@@ -90,7 +89,7 @@ function buildEditorItem(
 
 export function getSavedAugments(item: ParsedItem): Array<BaseType | null> {
   if (!item.augmentSockets) return [];
-  const lookup = AppConfig<PriceCheckWidget>("price-check")!.savedAugments;
+  const lookup = parserSettings().savedAugments;
 
   let refNames: Array<string | null> = [];
   if (item.category && lookup[item.category]?.length) {

@@ -3,6 +3,8 @@ import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { __testExports } from "@/parser/Parser";
+import { AppConfig } from "@/web/Config";
+import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import { createTestItem, makeCalcStat } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -552,5 +554,27 @@ describe("applyAugmentSockets", () => {
     expect(item.augmentSockets.augments).toHaveLength(2);
     expect(item.augmentSockets.augments[0]?.refName).toBe("Fox Idol");
     expect(item.augmentSockets.augments[1]).toBeNull();
+  });
+
+  it("fills empty sockets with the augments saved for the item's category", () => {
+    AppConfig<PriceCheckWidget>("price-check")!.savedAugments = {
+      [ItemCategory.Bow]: ["Greater Iron Rune", "Greater Iron Rune"],
+    };
+    const item = createTestItem();
+    item.category = ItemCategory.Bow;
+    item.augmentSockets = {
+      empty: 0,
+      current: 2,
+      normal: 2,
+      augments: [null, null],
+    };
+
+    __testExports.applyAugmentSockets(item);
+    expect(
+      item.augmentSockets.augments.map((augment) => augment?.refName),
+    ).toEqual(["Greater Iron Rune", "Greater Iron Rune"]);
+    expect(item.statsByType.map((calc) => calc.type)).toEqual([
+      ModifierType.AddedAugment,
+    ]);
   });
 });

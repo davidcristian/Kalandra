@@ -3,11 +3,11 @@ import {
   ITEM_BY_TRANSLATED,
   TRADE_ITEM_BY_REF,
 } from "@/assets/data";
-import { AppConfig } from "@/web/Config";
+import { parserSettings } from "./settings";
 
 export function magicBasetype(name: string) {
   let separator = " ";
-  if (AppConfig().language === "cmn-Hant") {
+  if (parserSettings().language === "cmn-Hant") {
     separator = /[\u4e00-\u9fa5]/.test(name) ? "" : " ";
   }
   const words = name.split(separator);

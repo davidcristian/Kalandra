@@ -3,6 +3,7 @@ import App from "./web/App.vue";
 import * as I18n from "./web/i18n";
 import * as Data from "./assets/data";
 import { initConfig, AppConfig } from "./web/Config";
+import { connectParserSettings } from "./web/parser-settings";
 import { Host } from "./web/background/IPC";
 import { startApp } from "./web/startup";
 import { convertTextMarks } from "./web/map-check/saved-marks";
@@ -18,6 +19,7 @@ function convertMapCheckMarks() {
 
 async function start() {
   await initConfig();
+  connectParserSettings();
   const i18nPlugin = await I18n.init(AppConfig().language);
   await Data.init(AppConfig().language);
   convertMapCheckMarks();

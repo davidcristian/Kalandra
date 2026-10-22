@@ -57,6 +57,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
 | `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category. Each effect line takes its numbers from its own `values` array, because the data scales a number, such as Life regeneration per minute to per second, only for the line that shows it; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting; `useAugment` puts an entry in a socket and recomputes the item's stats and properties, for the item editor and for the saved augments |
 | `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
+| `settings.ts` | `parserSettings` returns the user settings the parser reads, the language and the saved augments, from the object the app passes to `setParserSettings` |
 
 A module exports the internal functions its tests call as `__testExports` (`Parser.ts`, `stat-translations.ts`,
 `assets/data/index.ts`).
@@ -144,22 +145,26 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
   parser reads which section, so the change comes with parser cases for the item kinds it affects.
-- **`Parser.ts` is 2269 lines** (2026-10-18, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+- **`Parser.ts` is 2223 lines** (2026-10-22, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
-[dataparser.md](dataparser.md). The parser also reads the config: `AppConfig().language` in `Parser.ts` and
-`magic-name.ts`, and the price check's `savedAugments` in `augment-builder.ts` ([config.md](config.md)). The data
-loader reads the trade site lists through the proxy ([renderer-price-check.md](renderer-price-check.md)).
+[dataparser.md](dataparser.md). The parser imports no module under `src/web/`. It reads two settings of the config
+([config.md](config.md)) through `parserSettings()` in `settings.ts`: the language in `Parser.ts` and `magic-name.ts`,
+and the price check's `savedAugments` in `augment-builder.ts`. At start, `connectParserSettings()` in
+`web/parser-settings.ts` makes both read the current config at each use, and `parserSettings()` throws before that.
+The data loader imports from the parser only `meta.ts` and `ParsedItem.ts`, which import no other parser file at
+runtime. It reads the trade site lists through the proxy with `useTradeData()` from `web/background/TradeData.ts`
+([renderer-price-check.md](renderer-price-check.md), [080](../refinements/tasks/080-data-loader-imports-trade-data.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
-the floor in `renderer/vitest.config.ts` (65.9% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
+the floor in `renderer/vitest.config.ts` (67.0% of the lines of the `.ts` files in `src/` on 22 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
 has the text and the expected fields) and `specs/Parser/mods.ts`; the suites in `specs/data/` cover the loader and its
 lookups, and `specs/data/fetchData.test.ts` a data file that the server does not return.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces
-`@/web/Config` with a mock config, and replaces `Host` with a mock whose `proxy` returns the trade site's
-`data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no test
-reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
-and makes `fetch` read files from `renderer/public/`.
+`@/web/Config` with a mock config, connects the parser settings to it, and replaces `Host` with a mock whose
+`proxy` returns the trade site's `data/stats` and `data/items` responses from `specs/data/stats.json` and
+`specs/data/items.json`, so no test reaches the trade site. A suite calls its `setupTests()`, which fills the mock
+config from `defaultConfigMock` and makes `fetch` read files from `renderer/public/`.
 A parser fix adds the copied item text as a case (AGENTS.md, rule 5).

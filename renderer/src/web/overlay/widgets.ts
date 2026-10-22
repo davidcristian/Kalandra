@@ -1,3 +1,5 @@
+import type { SavedAugments } from "@/parser/settings";
+
 export interface Widget {
   wmId: number;
   wmType: string;
@@ -66,9 +68,7 @@ export interface PriceCheckWidget extends Widget {
   currencyVolume: "none" | "value" | "item" | "both";
   rememberListingType: boolean;
   initialDelay: number;
-  savedAugments: {
-    [key: string]: Array<string | null>;
-  };
+  savedAugments: SavedAugments;
 }
 
 export interface StopwatchWidget extends Widget {

@@ -4,6 +4,7 @@ import path from "path";
 import { Headers } from "node-fetch";
 import { Config, TipsFrequency } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
+import { connectParserSettings } from "@/web/parser-settings";
 
 vi.mock("@/web/Config", async () => {
   return {
@@ -21,6 +22,7 @@ vi.mock("@/web/Config", async () => {
   };
 });
 let mockConfig: Config;
+connectParserSettings();
 export const setupClientStringLoaderMock = () => {
   vi.mock("@/assets/client-string-loader", () => ({
     loadClientStrings: vi.fn(async (lang) => {

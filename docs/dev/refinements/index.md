@@ -141,3 +141,4 @@ layout and its reasons.
 - 077: [Item icons load from web.poecdn.com outside the proxy](tasks/077-item-icons-outside-proxy.md)
 - 078: [Decide whether the app shows the Patreon links to Awakened PoE Trade's author](tasks/078-patreon-links-in-comments.md)
 - 079: [The map property filters send only their minimum to the trade site](tasks/079-map-filters-send-only-minimum.md)
+- 080: [The data loader imports the trade list loader from the web code](tasks/080-data-loader-imports-trade-data.md)
