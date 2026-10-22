@@ -142,17 +142,10 @@
         </button>
 
         <button
-          v-if="saveButtonState === 'save'"
           @click="handleSave"
           class="btn hover:bg-green-800 active:bg-gray-900"
         >
           {{ t(":save") }}
-        </button>
-        <button
-          v-else-if="saveButtonState === 'confirm'"
-          class="btn bg-green-500 active:bg-green-900"
-        >
-          {{ t(":confirm") }}
         </button>
       </div>
     </div>
@@ -193,7 +186,6 @@ export default defineComponent({
     const soulCoreTab = shallowRef("Normal");
 
     const saveType = shallowRef<AugmentSaveType>(AugmentSaveType.Class);
-    const saveButtonState = shallowRef<"save" | "confirm">("save");
 
     const selectedAugment = shallowRef<EditorItem | undefined>();
     function resetSelectedAugment() {
@@ -252,7 +244,6 @@ export default defineComponent({
       selectedAugment,
       displayGroups,
       saveType,
-      saveButtonState,
       replaceAugment: (index: number) => {
         if (
           !props.item?.augmentSockets ||

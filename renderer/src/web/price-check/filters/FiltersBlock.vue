@@ -276,7 +276,6 @@ import {
   ItemCategory,
   itemIsModifiable,
 } from "@/parser";
-import FilterBtnDropdown from "./FilterBtnDropdown.vue";
 import { ModifierType } from "@/parser/modifiers";
 import Popover from "@/web/ui/Popover.vue";
 import { getItemEditorType } from "../item-editor/item-editor.js";
@@ -290,7 +289,6 @@ export default defineComponent({
     FilterModifier,
     FilterBtnNumeric,
     FilterBtnLogical,
-    FilterBtnDropdown,
     ItemEditorV2,
     UnknownModifier,
     Popover,

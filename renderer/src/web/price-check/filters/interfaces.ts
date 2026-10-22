@@ -16,13 +16,6 @@ interface SearchFilter {
   category?: ItemCategory;
 }
 
-export interface Suggestion {
-  type: "exalted";
-  text?: string;
-  text2?: string;
-  confidenceLevel?: "Low" | "Medium" | "High";
-}
-
 export interface ItemFilters {
   searchExact: SearchFilter;
   searchRelaxed?: SearchFilter & { disabled: boolean };
@@ -35,7 +28,6 @@ export interface ItemFilters {
   };
   socketNumber?: FilterNumeric;
   augmentSockets?: FilterNumeric;
-  itemEditorSelection?: { disabled: boolean; editing: boolean; value: string };
   corrupted?: {
     value: boolean;
     exact?: boolean;
@@ -97,12 +89,6 @@ export interface FilterNumeric {
   value: number;
   max?: number | undefined;
   disabled: boolean;
-}
-
-export interface FilterDropdown {
-  value: string;
-  disabled: boolean;
-  options: Array<{ label: string; value: string }>;
 }
 
 export interface StatFilterRoll {

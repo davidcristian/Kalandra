@@ -112,19 +112,6 @@ export default defineComponent({
             selectedAmount.value = 20;
             amountOptions.value = [0, 20, 30, 40, 50];
           }
-
-          // if (newItem.qualityType && newItem.quality) {
-          //   const catalysts =
-          //     newItem.category === ItemCategory.Jewel
-          //       ? CATALYST_TYPES.Refined
-          //       : CATALYST_TYPES.Normal;
-          //   selectedCatalyst.value = catalysts.find(
-          //     (c) => c.tags[1] === newItem.qualityType,
-          //   );
-          //   if (selectedCatalyst.value) {
-          //     selectedAmount.value = newItem.quality;
-          //   }
-          // }
         }
       },
       { immediate: true },

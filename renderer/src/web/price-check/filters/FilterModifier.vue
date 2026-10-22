@@ -423,8 +423,6 @@ export default defineComponent({
     font-size: 0.8125rem;
   }
 
-  /* &:not(:placeholder-shown) { @apply border-gray-600; } */
-
   &:focus {
     @apply border-gray-500;
     cursor: none;

@@ -213,14 +213,6 @@ export function createFilters(
       };
     }
   }
-  if (!filters.itemEditorSelection) {
-    filters.itemEditorSelection = {
-      disabled: true,
-      editing: false,
-      value: "None",
-    };
-  }
-
   if (item.requires && item.rarity === ItemRarity.Rare && !opts.exact) {
     if (
       item.requires.level &&

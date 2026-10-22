@@ -98,7 +98,6 @@ let _showTipCounter = 15;
 
 export default defineComponent({
   name: "CheckedItem",
-  emits: ["item-editor-selection"],
   components: {
     PricePrediction,
     TradeListing,
@@ -120,7 +119,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props, ctx) {
+  setup(props) {
     const widget = computed(() => AppConfig<PriceCheckWidget>("price-check")!);
     const leagues = useLeagues();
 
@@ -317,14 +316,6 @@ export default defineComponent({
           }
         }
       },
-    );
-
-    watch(
-      () => itemFilters.value.itemEditorSelection,
-      (val) => {
-        ctx.emit("item-editor-selection", val);
-      },
-      { deep: true },
     );
 
     const { t } = useI18n();

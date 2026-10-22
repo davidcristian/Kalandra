@@ -417,7 +417,6 @@ export function calculatedStatToFilter(
       )
     ) {
       // can't drop from ground, so don't show
-      // filter.tag = FilterTag.Unveiled
     } else if (
       sources.some((s) =>
         CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!),

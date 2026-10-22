@@ -10,9 +10,6 @@ interface Toggle {
   disabled: boolean;
 }
 
-// The item editor's state, which the filter buttons do not show
-const NOT_SHOWN = ["itemEditorSelection"];
-
 const ITEMS: Array<[string, Partial<ParsedItem>]> = [
   [
     "a sentinel with a charge",
@@ -64,14 +61,12 @@ function isToggle(value: unknown): value is Toggle {
 
 /** Returns each filter button that turns on and off, with the name of its filter. */
 function toggles(filters: ItemFilters): Array<[string, Toggle]> {
-  return Object.entries(filters)
-    .filter(([name]) => !NOT_SHOWN.includes(name))
-    .flatMap(([name, value]) => {
-      const list: unknown[] = Array.isArray(value) ? value : [value];
-      return list
-        .filter(isToggle)
-        .map((toggle): [string, Toggle] => [name, toggle]);
-    });
+  return Object.entries(filters).flatMap(([name, value]) => {
+    const list: unknown[] = Array.isArray(value) ? value : [value];
+    return list
+      .filter(isToggle)
+      .map((toggle): [string, Toggle] => [name, toggle]);
+  });
 }
 
 function search(filters: ItemFilters, parsed: ParsedItem) {

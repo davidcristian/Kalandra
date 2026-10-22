@@ -44,7 +44,6 @@ export function decodeOils(calc: StatCalculated): string[] | undefined {
   const decoded = encoded
     .split(",")
     .map(Number)
-    // .sort((a, b) => b - a) // [Golden Oil ... Clear Oil]
     .map((idx) => EMOTIONS[idx]);
 
   return decoded;

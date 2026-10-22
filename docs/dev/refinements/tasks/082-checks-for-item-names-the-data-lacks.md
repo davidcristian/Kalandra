@@ -15,9 +15,6 @@ that day. This code still checks them, or keeps a value that only the removed fi
   category.
 - `parseAreaLevel`, `parseAtzoatlRooms`, `parseMirroredTablet`, `parseFilledCoffin` and
   `parseItemLevel` in `Parser.ts` compare `item.info.refName` with these names.
-- `getDetailsId` in `renderer/src/web/price-check/trends/getDetailsId.ts` has a `Filled Coffin`
-  branch, and `forSkillGem` there keeps commented-out code that names `SPECIAL_SUPPORT_GEM`, a list
-  the filters no longer have.
 - `calcBasePercentile` in `Parser.ts` writes `basePercentile`. Nothing reads it since the filter for
   Emperor's Vigilance, a unique the data does not have, was removed.
 - `parseLogbookArea` in `Parser.ts` writes `logbookAreaMods`, and nothing reads it. It also takes
@@ -38,3 +35,5 @@ cluster jewel rules in `create-stat-filters.ts`.
 - 2026-10-22: Found while the filter branches for these names were removed. The parser and trends
   code was left for its own change, because removing `parseLogbookArea` changes how a real item is
   parsed.
+- 2026-10-22: The `Filled Coffin` branch of `getDetailsId` and the commented-out code of
+  `forSkillGem` were removed, so the list no longer names `getDetailsId.ts`.
