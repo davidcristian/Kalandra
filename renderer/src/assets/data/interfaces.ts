@@ -1,4 +1,4 @@
-import { ItemCategory } from "@/parser";
+import type { ItemCategory } from "@/parser/meta";
 
 export interface StatMatcher {
   string: string;
