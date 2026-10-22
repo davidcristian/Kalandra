@@ -205,6 +205,8 @@ unique rolls, the fixed stats of a unique, negated stats and the values that the
 filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
+`specs/web/price-check/item-editor/` checks which editor `getItemEditorType` opens for real copied items, the
+catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
 into their titles, name blocks, tags and affix tiers, and gets a listing it cannot read from a fake trade site,
 and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price

@@ -8,9 +8,6 @@
       v-else-if="actualItemType === ItemEditorType.Catalyst"
       :item="item"
     />
-    <div v-else-if="actualItemType === ItemEditorType.AugmentAndCatalyst">
-      AAAAA DO BOTH NEED TO ADD IT STILL
-    </div>
   </div>
 </template>
 

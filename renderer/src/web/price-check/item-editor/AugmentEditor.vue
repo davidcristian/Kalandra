@@ -157,9 +157,6 @@
       </div>
     </div>
   </div>
-  <div v-else class="bg-purple-700 text-green-600 border border-green-600">
-    no augments available for item
-  </div>
 </template>
 
 <script lang="ts">
