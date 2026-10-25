@@ -220,11 +220,11 @@ describe("OverlayWindow", () => {
     ]);
   });
 
-  it("loads the app page from the port, or from the dev server with the dev tools", () => {
+  it("loads the app page from localhost and the port, or from the dev server with the dev tools", () => {
     const { overlay, shown } = createOverlay();
-    overlay.loadAppPage(4321);
+    overlay.loadAppPage({ host: "0.0.0.0", port: 4321 });
     vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
-    overlay.loadAppPage(4321);
+    overlay.loadAppPage({ host: "0.0.0.0", port: 4321 });
 
     expect(shown.loaded).toEqual([
       "http://localhost:4321/index.html",
@@ -233,17 +233,17 @@ describe("OverlayWindow", () => {
     expect(shown.devTools).toEqual([{ mode: "detach", activate: false }]);
   });
 
-  it("opens the app page in the browser without the overlay window", () => {
+  it("opens the app page in the browser at the server's address without the overlay window", () => {
     process.argv.push("--no-overlay");
     try {
       const { overlay } = createOverlay();
-      overlay.loadAppPage(4321);
+      overlay.loadAppPage({ host: "192.168.1.20", port: 4321 });
     } finally {
       process.argv.pop();
     }
 
     expect(desktop.windows).toHaveLength(0);
-    expect(desktop.opened).toEqual(["http://localhost:4321/index.html"]);
+    expect(desktop.opened).toEqual(["http://192.168.1.20:4321/index.html"]);
   });
 
   it("opens a link of the page in the browser instead of a new window", () => {

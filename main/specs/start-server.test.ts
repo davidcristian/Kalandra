@@ -1,9 +1,11 @@
 import { app } from "electron";
 import * as fs from "fs";
+import type { AddressInfo } from "net";
 import * as path from "path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type WebSocket from "ws";
 import type { HostState, IpcEvent, UpdateInfo } from "../../ipc/types";
+import type { ListenAddress } from "../src/listen-option";
 import { Logger } from "../src/RemoteLogger";
 import { onEventAnyClient, server, startServer } from "../src/server";
 import { FakeServer } from "./fake-server";
@@ -28,10 +30,12 @@ const logger = new Logger(new FakeServer());
 const handled: Array<IpcEvent["name"]> = [];
 const clientLogEntries: number[] = [];
 let lastEventHandled = () => {};
+let listened: ListenAddress | undefined;
 let port = 0;
 
 beforeAll(async () => {
-  port = await startServer(updater, logger);
+  listened = await startServer(updater, logger);
+  port = listened.port;
   onEventAnyClient("OVERLAY->MAIN::focus-game", () => {
     handled.push("OVERLAY->MAIN::focus-game");
   });
@@ -113,6 +117,13 @@ async function logLinesFor(text: string): Promise<string> {
 }
 
 describe("startServer", () => {
+  it("resolves the default address it listens on", () => {
+    const { address, port: serverPort } = server.address() as AddressInfo;
+
+    expect(listened).toEqual({ host: "127.0.0.1", port: serverPort });
+    expect(address).toBe("127.0.0.1");
+  });
+
   it("returns the version and the updater state at GET /config", async () => {
     const reply = await get(port, "/config");
 

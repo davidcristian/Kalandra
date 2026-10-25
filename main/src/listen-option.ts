@@ -12,6 +12,9 @@ export interface ListenOption {
 
 const MAX_PORT = 65535;
 
+// A browser cannot open the address of every interface, and docs/cmd-flags.md gives the loopback page as localhost
+const LOCALHOST_ADDRESSES = new Set(["0.0.0.0", "::", "127.0.0.1"]);
+
 // --listen=[host][:port], with an IPv6 host in brackets: --listen=[::1]:9001
 export function readListenOption(
   argv: readonly string[],
@@ -43,13 +46,21 @@ export function readListenOption(
   return { address: { host: host || defaults.host, port } };
 }
 
-/** Listens on `address`, or on `fallback` after `address` fails, and resolves the port. */
+/** Returns the address a browser on this computer opens the page at, for the address the server listens on. */
+export function pageUrl(address: ListenAddress): string {
+  let host = address.host;
+  if (LOCALHOST_ADDRESSES.has(host)) host = "localhost";
+  else if (host.includes(":")) host = `[${host}]`;
+  return `http://${host}:${address.port}`;
+}
+
+/** Listens on `address`, or on `fallback` after `address` fails, and resolves the address it listens on. */
 export async function listenWithFallback(
   server: Server,
   address: ListenAddress,
   fallback: ListenAddress,
   onFallback: (error: Error) => void,
-): Promise<number> {
+): Promise<ListenAddress> {
   try {
     return await listen(server, address);
   } catch (error) {
@@ -62,14 +73,15 @@ export async function listenWithFallback(
 }
 
 async function listen(server: Server, address: ListenAddress) {
-  return await new Promise<number>((resolve, reject) => {
+  return await new Promise<ListenAddress>((resolve, reject) => {
     const onError = (error: Error) => {
       server.off("listening", onListening);
       reject(error);
     };
     const onListening = () => {
       server.off("error", onError);
-      resolve((server.address() as AddressInfo).port);
+      const info = server.address() as AddressInfo;
+      resolve({ host: info.address, port: info.port });
     };
     server.once("error", onError);
     server.once("listening", onListening);

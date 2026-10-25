@@ -132,15 +132,15 @@ describe("AppTray", () => {
     ]);
   });
 
-  it("opens the page on the port and names the overlay key set after the menu was built", () => {
+  it("opens the page main gives it and names the overlay key set after the menu was built", () => {
     const { tray, shown } = createTray();
-    tray.serverPort = 4321;
+    tray.pageUrl = "http://192.168.1.20:4321";
     tray.overlayKey = "Ctrl + Space";
 
     click(shown.menu, "Open in Browser");
     click(shown.menu, "Settings/League");
 
-    expect(desktop.opened).toEqual(["http://localhost:4321"]);
+    expect(desktop.opened).toEqual(["http://192.168.1.20:4321"]);
     expect(desktop.messages).toEqual([
       {
         title: "Settings",
@@ -148,6 +148,14 @@ describe("AppTray", () => {
           'Open Path of Exile 2 and press "Ctrl + Space". Click on the button with cog icon there.',
       },
     ]);
+  });
+
+  it("opens no page before the server listens", () => {
+    const { shown } = createTray();
+
+    click(shown.menu, "Open in Browser");
+
+    expect(desktop.opened).toEqual([]);
   });
 
   it("opens the folder of the saved config", () => {

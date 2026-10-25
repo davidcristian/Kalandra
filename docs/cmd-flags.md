@@ -46,9 +46,10 @@ A host other than the loopback address lets other devices on your network open K
 address and the port, such as `http://192.168.1.20:9001`. Kalandra rejects a request that names this computer by a
 host name, such as `computer.local`, because a web page can make a name like that point at this computer. The overlay
 always opens the page at `localhost`, so use `0.0.0.0`, which includes the loopback address. With a single network
-address as the host, the overlay cannot load its page. A page on another device takes the price check from the
-overlay when it connects or gets the focus, as [The price check opens in a browser
-page](/nothing-happens#the-price-check-opens-in-a-browser-page) explains.
+address as the host, the overlay cannot load its page, while **Open in Browser** in the tray menu and `--no-overlay`
+open the page at that address. A page on another device takes the price check from the overlay when it connects or
+gets the focus, as [The price check opens in a browser page](/nothing-happens#the-price-check-opens-in-a-browser-page)
+explains.
 
 **The server has no password.** When it listens on any address other than the loopback address, any device that
 reaches it can read and change your Kalandra settings. It can also send requests to the trade site with the sign-in of

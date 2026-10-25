@@ -4,6 +4,7 @@ import { app, dialog, systemPreferences } from "electron";
 import { uIOhook } from "uiohook-napi";
 import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
+import { type ListenAddress, pageUrl } from "./listen-option";
 import { Logger } from "./RemoteLogger";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
@@ -119,9 +120,9 @@ startWhenReady(
           },
         );
         uIOhook.start();
-        let port: number;
+        let address: ListenAddress;
         try {
-          port = await startServer(appUpdater, logger);
+          address = await startServer(appUpdater, logger);
         } catch (error) {
           dialog.showErrorBox(
             "Kalandra cannot start",
@@ -131,8 +132,8 @@ startWhenReady(
           return;
         }
         logger.write(`info ${os.type()} ${os.release} / v${app.getVersion()}`);
-        overlay.loadAppPage(port);
-        tray.serverPort = port;
+        overlay.loadAppPage(address);
+        tray.pageUrl = pageUrl(address);
       },
       // fixes(linux): window is black instead of transparent
       process.platform === "linux" ? 1000 : 0,

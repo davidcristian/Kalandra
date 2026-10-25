@@ -10,7 +10,11 @@ import * as path from "path";
 import { app } from "electron";
 import { IpcEvent, IpcEventPayload, HostState } from "../../ipc/types";
 import { ConfigStore } from "./host-files/ConfigStore";
-import { listenWithFallback, readListenOption } from "./listen-option";
+import {
+  type ListenAddress,
+  listenWithFallback,
+  readListenOption,
+} from "./listen-option";
 import { sendFile } from "./served-file";
 import { isAllowedRequest } from "./request-origin";
 import { clientLogWriter } from "./client-log-writer";
@@ -151,7 +155,7 @@ server.on("upgrade", (req, socket, head) => {
 export async function startServer(
   appUpdater: Pick<AppUpdater, "info">,
   logger: Logger,
-): Promise<number> {
+): Promise<ListenAddress> {
   const configStore = new ConfigStore(eventPipe, logger);
 
   websocketServer.on("connection", (socket, req: IncomingMessage) => {

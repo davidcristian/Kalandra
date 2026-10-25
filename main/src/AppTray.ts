@@ -5,7 +5,7 @@ import type { ServerEvents } from "./server";
 export class AppTray {
   public overlayKey = "Shift + Space";
   private tray: Tray;
-  serverPort = 0;
+  pageUrl?: string;
 
   constructor(server: ServerEvents) {
     let trayImage = nativeImage.createFromPath(
@@ -47,7 +47,7 @@ export class AppTray {
       {
         label: "Open in Browser",
         click: () => {
-          shell.openExternal(`http://localhost:${this.serverPort}`);
+          if (this.pageUrl) shell.openExternal(this.pageUrl);
         },
       },
       { type: "separator" },

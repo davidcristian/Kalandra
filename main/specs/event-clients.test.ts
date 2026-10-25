@@ -41,7 +41,7 @@ beforeAll(async () => {
   const updater: { info: UpdateInfo } = {
     info: { state: "update-not-available", checkedAt: 1 },
   };
-  port = await startServer(updater, logger);
+  ({ port } = await startServer(updater, logger));
   onEventAnyClient("CLIENT->MAIN::used-recently", (e) => {
     const matching = usedRecentlyWaiters.filter(
       (w) => w.isOverlay === e.isOverlay,

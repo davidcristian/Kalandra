@@ -6,17 +6,17 @@ replaces it with `vi.mock("electron", ...)`.
 
 ## The server and the app services
 
-- `listen-option.test.ts` covers the `--listen` parsing and the fallback with real servers on a port in use and on a
-  host address no computer has.
+- `listen-option.test.ts` covers the `--listen` parsing, the fallback with real servers on a port in use and on a
+  host address no computer has, and the `pageUrl()` of each kind of host.
 - `served-file.test.ts` covers the path check, and `request-origin.test.ts` the header check.
 - `startup.test.ts` covers the startup order on each platform, with a fake `app` that emits `ready` once.
-- `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry and sends
-  `CLIENT->MAIN::user-action` messages.
+- `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry, Open in Browser
+  also before the server listens, and sends `CLIENT->MAIN::user-action` messages.
 - `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails.
-- `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` before and after a
-  `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of the overlay
-  window, of a browser and with none, sends messages main cannot use, and sends client log entries from the overlay
-  window and a browser tab.
+- `start-server.test.ts` calls `startServer()` with a fake updater, checks the address it resolves, reads `GET /config`
+  before and after a `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of
+  the overlay window, of a browser and with none, sends messages main cannot use, and sends client log entries from the
+  overlay window and a browser tab.
 - `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first, and
   which client receives a `last-active` event after a connect, a `CLIENT->MAIN::used-recently` message and a close.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.

@@ -1,7 +1,11 @@
 import { createServer, type Server } from "http";
 import type { AddressInfo } from "net";
 import { afterEach, describe, expect, it } from "vitest";
-import { listenWithFallback, readListenOption } from "../src/listen-option";
+import {
+  listenWithFallback,
+  pageUrl,
+  readListenOption,
+} from "../src/listen-option";
 import { get } from "./request";
 
 const defaults = { host: "127.0.0.1", port: 0 };
@@ -57,6 +61,19 @@ describe("readListenOption", () => {
   });
 });
 
+describe("pageUrl", () => {
+  it.each([
+    ["127.0.0.1", "http://localhost:9001"],
+    ["0.0.0.0", "http://localhost:9001"],
+    ["::", "http://localhost:9001"],
+    ["192.168.1.20", "http://192.168.1.20:9001"],
+    ["::1", "http://[::1]:9001"],
+    ["2001:db8::20", "http://[2001:db8::20]:9001"],
+  ])("opens the page of a server on %s at %s", (host, url) => {
+    expect(pageUrl({ host, port: 9001 })).toBe(url);
+  });
+});
+
 describe("listenWithFallback", () => {
   const servers: Server[] = [];
   const fallbackErrors: Error[] = [];
@@ -83,16 +100,17 @@ describe("listenWithFallback", () => {
     fallbackErrors.splice(0);
   });
 
-  it("listens on a free address", async () => {
-    const port = await listenOn({ host: "127.0.0.1", port: 0 });
+  it("listens on a free address and resolves it", async () => {
+    const address = await listenOn({ host: "127.0.0.1", port: 0 });
 
-    expect(port).toBeGreaterThan(0);
+    expect(address.host).toBe("127.0.0.1");
+    expect(address.port).toBeGreaterThan(0);
     expect(fallbackErrors).toEqual([]);
   });
 
   it("listens on the fallback when the port is in use, and serves there", async () => {
     const taken = await takenPort();
-    const port = await listenOn({ host: "127.0.0.1", port: taken });
+    const { port } = await listenOn({ host: "127.0.0.1", port: taken });
 
     expect(port).not.toBe(taken);
     expect(fallbackErrors).toEqual([
@@ -103,9 +121,10 @@ describe("listenWithFallback", () => {
 
   it("listens on the fallback for a host this computer does not have", async () => {
     // 192.0.2.0/24 is reserved for documentation, so no computer has an address in it
-    const port = await listenOn({ host: "192.0.2.1", port: 0 });
+    const address = await listenOn({ host: "192.0.2.1", port: 0 });
 
-    expect(port).toBeGreaterThan(0);
+    expect(address.host).toBe("127.0.0.1");
+    expect(address.port).toBeGreaterThan(0);
     expect(fallbackErrors).toEqual([
       expect.objectContaining({ code: "EADDRNOTAVAIL" }),
     ]);

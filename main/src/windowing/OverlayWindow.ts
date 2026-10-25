@@ -4,6 +4,7 @@ import {
   OverlayController,
   OVERLAY_WINDOW_OPTS,
 } from "electron-overlay-window";
+import { type ListenAddress, pageUrl } from "../listen-option";
 import { isTradeSiteUrl } from "../proxy";
 import type { ServerEvents } from "../server";
 import type { Logger } from "../RemoteLogger";
@@ -86,14 +87,17 @@ export class OverlayWindow {
     });
   }
 
-  loadAppPage(port: number) {
-    const url =
-      process.env.VITE_DEV_SERVER_URL || `http://localhost:${port}/index.html`;
-
+  loadAppPage(address: ListenAddress) {
     if (!this.window) {
-      shell.openExternal(url);
+      shell.openExternal(
+        process.env.VITE_DEV_SERVER_URL || `${pageUrl(address)}/index.html`,
+      );
       return;
     }
+
+    const url =
+      process.env.VITE_DEV_SERVER_URL ||
+      `http://localhost:${address.port}/index.html`;
 
     if (process.env.VITE_DEV_SERVER_URL) {
       this.window.loadURL(url);

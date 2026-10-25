@@ -22,7 +22,7 @@ The entry, the server and the app services, in `main/src/`:
   it. It then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects, it shows the
   error box `Kalandra cannot start` and quits. In development it also installs Vue Devtools.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
-  `/config` route and the `/events` connection handler, listens and returns the port, and `eventPipe`, the
+  `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and
@@ -45,12 +45,13 @@ The entry, the server and the app services, in `main/src/`:
 - `served-file.ts`: `sendFile(res, folder, urlPath)` streams a file for the static route and `GET /uploads/`, and
   returns 404 for a missing file or a path outside the folder, such as one with `..` segments, which Node passes on
   in `req.url` as sent. `resolveInside()` checks the path with the platform's `path` module, or one a test passes.
-- `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in
-  brackets, and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the
-  defaults and an `error` text, which `startServer()` writes to the log. `listenWithFallback(server, address,
-  fallback, onFallback)` listens on `address`, and after an error such as `EADDRINUSE` or `EADDRNOTAVAIL` passes the
-  error to `onFallback` and listens on `fallback`; it rejects when `address` is `fallback`. `startServer()` passes the
-  defaults as `fallback` and logs the error.
+- `listen-option.ts`: `readListenOption(argv, defaults)` reads `--listen=[host][:port]`, with an IPv6 host in brackets,
+  and never throws. For `--listen` without `=`, an unreadable value or a port over 65535 it returns the defaults and an
+  `error` text, which `startServer()` writes to the log. `listenWithFallback(server, address, fallback, onFallback)`
+  listens on `address`, and after an error such as `EADDRINUSE` or `EADDRNOTAVAIL` passes the error to `onFallback` and
+  listens on `fallback`. It resolves the address it listens on, and rejects when `address` is `fallback`.
+  `startServer()` passes the defaults as `fallback` and logs the error. `pageUrl(address)` returns the page's address
+  for a browser: `localhost` for `127.0.0.1`, `0.0.0.0` and `::`, else the address, an IPv6 one in brackets.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade sites
   (`official: true`), `www.poeprices.info` and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an
   `https:` address on an official trade site. It returns 403 for a request without the `x-kalandra-proxy` header, which
@@ -72,8 +73,9 @@ The entry, the server and the app services, in `main/src/`:
   `--no-updates`. `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and
   `disabled-by-flag` for the flag. An `error` event logs `error [AppUpdater] Update failed:` and the first line of
   the error's message, because electron-updater writes the response headers, which can hold cookies, after it.
-- `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a
-  message box that says to press the overlay key; Open in Browser; Open config folder (`apt-data`); and Quit.
+- `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a message
+  box that says to press the overlay key; Open in Browser, which opens `pageUrl` once `main.ts` sets it after the server
+  listens; Open config folder (`apt-data`); and Quit.
 
 `shortcuts/`:
 
@@ -127,8 +129,8 @@ The entry, the server and the app services, in `main/src/`:
   is not checked. The window's menu has the edit roles, `toggleDevTools` (Ctrl + Shift + I on Windows), which the
   [in-game check](../runbooks/in-game-check.md#where-the-logs-are) uses in a packaged build, and `reload` only in a dev
   run, since a reload drops the overlay's state. `roundedCorners` is false on Linux, where Electron otherwise rounds a
-  frameless window. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
-  development, or with `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
+  frameless window. `loadAppPage(address)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
+  development, or with `--no-overlay` opens `pageUrl()` in the browser. `assertOverlayActive()`, `assertGameActive()`
   and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
   overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns whether the game window has the focus,
   and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.
