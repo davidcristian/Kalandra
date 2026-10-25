@@ -9,11 +9,14 @@ from typing import NamedTuple
 
 DATE = r"\d{4}-\d{2}-\d{2}"
 AREAS = re.compile("config|main|renderer|parser|trade|docs|data|dataparser|priceservice|ci|release|repo|rules")
+STATUSES_HEADING = "## Statuses"
 TASKS_HEADING = "## Tasks"
 HISTORY_HEADING = "## History"
 _ENTRY = re.compile(r"- (?P<number>\d{3}): \[(?P<title>.+)\]\(tasks/(?P<file>(?P<prefix>\d{3})-[a-z0-9-]+\.md)\)")
 _FILE = re.compile(r"\d{3}-[a-z0-9-]+\.md")
 _HISTORY_LINE = re.compile(rf"- {DATE}: \S")
+_STATUS = re.compile(r"- `(?P<status>[^`]+)`")
+_PLACEHOLDER = re.compile(r"<([^>]+)>")
 
 
 class Field(NamedTuple):
@@ -28,17 +31,11 @@ _ORIGIN = Field("Origin", re.compile(r"\[[^\]]+\]\([^)\s]+\)"), "a markdown link
 _VERIFIED = Field("Verified", re.compile(DATE), "a date")
 BACKLOGS = {
     "docs/dev/refinements": (
-        Field("Status", re.compile(rf"open|done {DATE}|declined {DATE}"), "a status the index lists"),
         Field("Area", AREAS, "an area the index's template lists"),
         _ORIGIN,
         _VERIFIED,
     ),
     "docs/dev/host": (
-        Field(
-            "Status",
-            re.compile(rf"never attempted|attempted {DATE}(?:, inconclusive: .+)?|done {DATE}"),
-            "a status the index lists",
-        ),
         Field(
             "Needs", re.compile(r"Path of Exile 2 on Windows.*"), "a line that starts with 'Path of Exile 2 on Windows'"
         ),
@@ -86,6 +83,31 @@ def read_entries(index: str, text: str) -> tuple[list[Entry], list[Problem]]:
     return entries, problems
 
 
+def status_pattern(status: str) -> str:
+    """Returns a regular expression for one status of an index: `<date>` is a date and any other `<...>` any text."""
+    parts = _PLACEHOLDER.split(status)
+    return "".join(
+        (DATE if part == "date" else ".+") if number % 2 else re.escape(part) for number, part in enumerate(parts)
+    )
+
+
+def read_statuses(index: str, text: str) -> tuple[Field | None, list[Problem]]:
+    """Returns the Status field that the list under the Statuses heading defines, or what is wrong with that list."""
+    lines = text.splitlines()
+    if STATUSES_HEADING not in lines:
+        return None, [Problem(index, f"has no {STATUSES_HEADING!r} heading")]
+    statuses: list[str] = []
+    for line in lines[lines.index(STATUSES_HEADING) + 1 :]:
+        if line.startswith("#"):
+            break
+        found = _STATUS.match(line)
+        if found is not None:
+            statuses.append(f"(?:{status_pattern(found.group('status'))})")
+    if not statuses:
+        return None, [Problem(index, f"has no '- `<status>`: <meaning>' line under {STATUSES_HEADING!r}")]
+    return Field("Status", re.compile("|".join(statuses)), "a status the index lists"), []
+
+
 def check_history(path: str, lines: Sequence[str]) -> list[Problem]:
     """Returns what is wrong with the History section: it is missing, repeated, empty or has an undated line."""
     if lines.count(HISTORY_HEADING) != 1:
@@ -125,7 +147,11 @@ def check_task(path: str, text: str, title: str, fields: Sequence[Field]) -> lis
 def check_backlog(root: Path, folder: str, fields: Sequence[Field]) -> list[Problem]:
     """Compares one index with the task files in its tasks folder."""
     index = f"{folder}/index.md"
-    entries, problems = read_entries(index, (root / index).read_text(encoding="utf-8"))
+    text = (root / index).read_text(encoding="utf-8")
+    entries, problems = read_entries(index, text)
+    status, status_problems = read_statuses(index, text)
+    problems.extend(status_problems)
+    checked = [*fields] if status is None else [status, *fields]
     files = sorted(path.name for path in (root / folder / "tasks").iterdir())
     problems.extend(
         Problem(f"{folder}/tasks/{name}", "is not a NNN-slug.md task file")
@@ -144,7 +170,7 @@ def check_backlog(root: Path, folder: str, fields: Sequence[Field]) -> list[Prob
         if entry.file not in files:
             problems.append(Problem(f"{index}:{entry.line}", f"lists {entry.file}, which is not in {folder}/tasks/"))
         else:
-            problems.extend(check_task(path, (root / path).read_text(encoding="utf-8"), entry.title, fields))
+            problems.extend(check_task(path, (root / path).read_text(encoding="utf-8"), entry.title, checked))
     return problems
 
 

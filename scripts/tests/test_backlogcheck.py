@@ -8,12 +8,28 @@ import backlogcheck
 
 INDEX = """# Refinements
 
+## Statuses
+
+- `open`: still to do.
+- `done <date>`: finished on that date.
+- `declined <date>`: decided against on that date.
+
 ## Tasks
 
 - 001: [The first task](tasks/001-first-task.md)
 - 002: [The second task](tasks/002-second-task.md)
 """
 HOST_INDEX = """# Host checks
+
+## Statuses
+
+A check has more outcomes than a refinement:
+
+- `never attempted`: nobody has run it.
+- `attempted <date>`: it ran and a claim failed.
+- `attempted <date>, inconclusive: <what happened>`: it ran and gave no answer,
+  for example because the game was down.
+- `done <date>`: every claim held.
 
 ## Tasks
 
@@ -58,7 +74,7 @@ class BacklogCheckTest(unittest.TestCase):
             code, output = run(backlogcheck.main, root)
         self.assertEqual(code, 1)
         self.assertIn("tasks/003-third-task.md: is not listed in docs/dev/refinements/index.md", output)
-        self.assertIn("index.md:7: lists 004-gone-task.md, which is not in docs/dev/refinements/tasks/", output)
+        self.assertIn("index.md:13: lists 004-gone-task.md, which is not in docs/dev/refinements/tasks/", output)
 
     def test_reports_a_title_that_differs_and_a_status_the_index_does_not_list(self) -> None:
         files = {**backlogs(), f"{TASKS}001-first-task.md": task("The renamed task", "closed")}
@@ -67,6 +83,44 @@ class BacklogCheckTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("its heading is '# The renamed task', and the index lists it as 'The first task'", output)
         self.assertIn("has the Status 'closed', which is not a status the index lists", output)
+
+    def test_reads_the_statuses_from_the_index(self) -> None:
+        statuses = "## Statuses\n\n- `waiting on <who>`: needs a decision.\n- `done <date>`: done.\n"
+        index = f"# Refinements\n\n{INDEX[INDEX.index('## Tasks') :]}\n{statuses}"
+        files = {
+            **backlogs(),
+            "docs/dev/refinements/index.md": index,
+            f"{TASKS}002-second-task.md": task("The second task", "waiting on the maintainer"),
+            f"{HOST_TASKS}001-a-check.md": task("A check in the game", "done soon", NEEDS),
+        }
+        with repo(files) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(),
+            [
+                f"{TASKS}001-first-task.md: has the Status 'open', which is not a status the index lists",
+                f"{HOST_TASKS}001-a-check.md: has the Status 'done soon', which is not a status the index lists",
+            ],
+        )
+
+    def test_reports_an_index_without_a_list_of_statuses(self) -> None:
+        host_index = HOST_INDEX.replace("\n- `", "\n  `")
+        files = {
+            **backlogs(),
+            "docs/dev/refinements/index.md": INDEX.replace("## Statuses", "## States"),
+            "docs/dev/host/index.md": host_index,
+        }
+        with repo(files) as root:
+            code, output = run(backlogcheck.main, root)
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            output.splitlines(),
+            [
+                "docs/dev/refinements/index.md: has no '## Statuses' heading",
+                "docs/dev/host/index.md: has no '- `<status>`: <meaning>' line under '## Statuses'",
+            ],
+        )
 
     def test_reports_entries_out_of_order_or_malformed(self) -> None:
         swapped = INDEX.replace("- 001: [The first task](tasks/001-first-task.md)\n", "") + (
@@ -100,7 +154,7 @@ class BacklogCheckTest(unittest.TestCase):
         self.assertEqual(
             output.splitlines(),
             [
-                "docs/dev/refinements/index.md:6: has a number that is not its file's number",
+                "docs/dev/refinements/index.md:12: has a number that is not its file's number",
                 f"{TASKS}002-second-task.md: is not listed in docs/dev/refinements/index.md",
             ],
         )
