@@ -22,65 +22,65 @@ export class HostClipboard {
     this.shouldRestore = restoreClipboard;
   }
 
-  async readItemText(): Promise<string> {
+  /** Clears item text from the clipboard, calls `pressCopyKeys` and resolves with the item text the game copies. */
+  async readItemText(pressCopyKeys: () => void): Promise<string> {
     this.elapsed = 0;
     if (this.pollPromise) {
+      pressCopyKeys();
       return await this.pollPromise;
     }
 
-    let textBefore = clipboard.readText();
+    this.pollPromise = this.pollItemText(pressCopyKeys).finally(() => {
+      this.pollPromise = undefined;
+    });
+    return await this.pollPromise;
+  }
+
+  private async pollItemText(pressCopyKeys: () => void): Promise<string> {
+    let textBefore = await clipboard.readText();
     let marker: string | null = null;
     if (isPoeItem(textBefore)) {
       textBefore = "";
       if (process.platform !== "linux") {
-        clipboard.writeText("");
+        await clipboard.writeText("");
       } else {
         // workaround KDE's "Prevent empty clipboard" feature
         // see https://github.com/SnosMe/awakened-poe-trade/issues/1790#issuecomment-4062830614 (please don't comment on, add issue in Kalandra if discussion is requested)
-        marker = writeMarker();
+        marker = await writeMarker();
       }
     } else if (process.platform === "linux") {
       // workaround bug in Proton 10+ https://github.com/SnosMe/awakened-poe-trade/issues/1846 (please don't comment on, add issue in Kalandra if discussion is requested)
-      marker = writeMarker();
+      marker = await writeMarker();
     }
 
-    this.pollPromise = new Promise((resolve, reject) => {
-      const poll = () => {
-        const textAfter = clipboard.readText();
+    // Only after the write above ends, since a write that ends after the game copies replaces the item text
+    pressCopyKeys();
 
-        if (isPoeItem(textAfter)) {
-          if (this.shouldRestore) {
-            clipboard.writeText(textBefore);
-          }
-          this.pollPromise = undefined;
-          resolve(textAfter);
-        } else {
-          this.elapsed += POLL_DELAY;
-          if (this.elapsed < POLL_LIMIT) {
-            setTimeout(poll, POLL_DELAY);
-          } else {
-            // On Linux the marker replaced the copied text, which goes back even with Restore clipboard off.
-            // No empty text is written back, since the KDE workaround above avoids an empty clipboard.
-            const markerReplacedText =
-              textAfter === marker && textBefore !== "";
-            if (this.shouldRestore || markerReplacedText) {
-              clipboard.writeText(textBefore);
-            }
-            this.pollPromise = undefined;
-            this.logger.write("warn [ClipboardPoller] No item text found.");
-            reject(new Error("Reading clipboard timed out"));
-          }
+    let textAfter = await readTextAfter(this.initialDelay);
+    while (!isPoeItem(textAfter)) {
+      this.elapsed += POLL_DELAY;
+      if (this.elapsed >= POLL_LIMIT) {
+        // On Linux the marker replaced the copied text, which goes back even with Restore clipboard off.
+        // No empty text is written back, since the KDE workaround above avoids an empty clipboard.
+        const markerReplacedText = textAfter === marker && textBefore !== "";
+        if (this.shouldRestore || markerReplacedText) {
+          await clipboard.writeText(textBefore);
         }
-      };
-      setTimeout(poll, this.initialDelay);
-    });
+        this.logger.write("warn [ClipboardPoller] No item text found.");
+        throw new Error("Reading clipboard timed out");
+      }
+      textAfter = await readTextAfter(POLL_DELAY);
+    }
 
-    return await this.pollPromise;
+    if (this.shouldRestore) {
+      await clipboard.writeText(textBefore);
+    }
+    return textAfter;
   }
 
   // when `shouldRestore` is false, this function continues
   // to work as a throttler for callback
-  restoreShortly(cb: (clipboard: Clipboard) => void) {
+  async restoreShortly(cb: (clipboard: Clipboard) => Promise<void>) {
     // Not only do we not overwrite the clipboard, but we don't exec callback.
     // This throttling helps against disconnects from "Too many actions".
     if (!this.isRestored) {
@@ -88,14 +88,19 @@ export class HostClipboard {
     }
 
     this.isRestored = false;
-    const saved = clipboard.readText();
-    cb(clipboard);
-    setTimeout(() => {
+    try {
+      const saved = await clipboard.readText();
+      await cb(clipboard);
+      await wait(RESTORE_AFTER);
       if (this.shouldRestore) {
-        clipboard.writeText(saved);
+        await clipboard.writeText(saved);
       }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.write(`error [Clipboard] ${message}`);
+    } finally {
       this.isRestored = true;
-    }, RESTORE_AFTER);
+    }
   }
 
   updateDelay(delay: number) {
@@ -103,9 +108,18 @@ export class HostClipboard {
   }
 }
 
-function writeMarker() {
+async function wait(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readTextAfter(ms: number) {
+  await wait(ms);
+  return await clipboard.readText();
+}
+
+async function writeMarker() {
   const marker = `__EE2_FORCE_EMPTY_${Date.now()}`;
-  clipboard.writeText(marker);
+  await clipboard.writeText(marker);
   return marker;
 }
 

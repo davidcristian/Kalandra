@@ -3,13 +3,15 @@ import { Logger } from "../src/RemoteLogger";
 import { HostClipboard } from "../src/shortcuts/HostClipboard";
 import { FakeServer } from "./fake-server";
 
-// Stands in for the system clipboard, which the game and the user write to
+// Stands in for the system clipboard, which the game and the user write to. A write ends on a later tick, as the
+// operating system's does.
 const system = vi.hoisted(() => ({ text: "" }));
 
 vi.mock("electron", () => ({
   clipboard: {
-    readText: () => system.text,
-    writeText: (text: string) => {
+    readText: async () => system.text,
+    writeText: async (text: string) => {
+      await Promise.resolve();
       system.text = text;
     },
   },
@@ -28,9 +30,12 @@ function createClipboard(restoreClipboard: boolean) {
   return clipboard;
 }
 
+// The game copies nothing when Kalandra presses the copy keys
+const gameCopiesNothing = () => {};
+
 /** Reads item text with Restore clipboard off and runs `during` 100 ms in, before the read gives up at 500 ms. */
 async function failedCopy(during = () => {}) {
-  const read = createClipboard(false).readItemText();
+  const read = createClipboard(false).readItemText(gameCopiesNothing);
   const failed = expect(read).rejects.toThrow("Reading clipboard timed out");
   await vi.advanceTimersByTimeAsync(100);
   during();
@@ -83,7 +88,7 @@ describe("HostClipboard.readItemText", () => {
 
   it("logs that it found no item text when the copy times out", async () => {
     const logger = new Logger(new FakeServer());
-    const read = new HostClipboard(logger).readItemText();
+    const read = new HostClipboard(logger).readItemText(gameCopiesNothing);
     const failed = expect(read).rejects.toThrow("Reading clipboard timed out");
     await vi.advanceTimersByTimeAsync(1000);
     await failed;
@@ -97,12 +102,25 @@ describe("HostClipboard.readItemText", () => {
     onPlatform("linux");
     system.text = "copied text";
 
-    const read = createClipboard(false).readItemText();
+    const read = createClipboard(false).readItemText(gameCopiesNothing);
     await vi.advanceTimersByTimeAsync(100);
     system.text = ITEM_TEXT;
     await vi.advanceTimersByTimeAsync(100);
 
     await expect(read).resolves.toBe(ITEM_TEXT);
     expect(system.text).toBe(ITEM_TEXT);
+  });
+
+  it("presses the copy keys after it clears the item text copied before", async () => {
+    onPlatform("win32");
+    system.text = "Item Class: Rings\nRarity: Magic\nIron Ring";
+
+    const read = createClipboard(false).readItemText(() => {
+      system.text = ITEM_TEXT;
+    });
+    const copied = expect(read).resolves.toBe(ITEM_TEXT);
+    await vi.advanceTimersByTimeAsync(1000);
+
+    await copied;
   });
 });

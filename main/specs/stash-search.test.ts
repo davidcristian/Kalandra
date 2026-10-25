@@ -6,17 +6,20 @@ import { GameWindow } from "../src/windowing/GameWindow";
 import { OverlayWindow } from "../src/windowing/OverlayWindow";
 import { FakeServer } from "./fake-server";
 
-// Stands in for the desktop: the window with the focus, the clipboard and each key press with the window it reached
+// Stands in for the desktop: the window with the focus, the clipboard, each key press with the window it reached
+// and the text each paste reached it with. A clipboard write ends on a later tick, as the operating system's does.
 const desktop = vi.hoisted(() => ({
   focused: "browser",
   clipboard: "",
   presses: [] as string[],
+  pasted: [] as string[],
 }));
 
 vi.mock("electron", () => ({
   clipboard: {
-    readText: () => desktop.clipboard,
-    writeText: (text: string) => {
+    readText: async () => desktop.clipboard,
+    writeText: async (text: string) => {
+      await Promise.resolve();
       desktop.clipboard = text;
     },
   },
@@ -29,6 +32,7 @@ vi.mock("uiohook-napi", () => ({
       desktop.presses.push(
         `${desktop.focused}: ${[...modifiers, key].join(" + ")}`,
       );
+      if (key === "V") desktop.pasted.push(desktop.clipboard);
     },
   },
 }));
@@ -60,6 +64,7 @@ beforeEach(() => {
   process.argv.pop();
   desktop.clipboard = "";
   desktop.presses = [];
+  desktop.pasted = [];
 });
 
 afterEach(() => {
@@ -67,30 +72,30 @@ afterEach(() => {
 });
 
 // A new clipboard for each search, because restoreShortly() skips a search within 120 ms of the last
-function search(text: string) {
-  stashSearch(text, new HostClipboard(logger), overlay);
+async function search(text: string) {
+  await stashSearch(text, new HostClipboard(logger), overlay);
 }
 
 describe("stashSearch", () => {
-  it("types the search into the game while the game has the focus", () => {
+  it("types the search into the game while the game has the focus", async () => {
     desktop.focused = "game";
     game.isActive = true;
 
-    search("Currency");
+    await search("Currency");
 
     expect(desktop.presses).toEqual([
       "game: Ctrl + F",
       `game: ${paste}`,
       "game: Enter",
     ]);
-    expect(desktop.clipboard).toBe("Currency");
+    expect(desktop.pasted).toEqual(["Currency"]);
   });
 
-  it("focuses the game first while the overlay has the focus", () => {
+  it("focuses the game first while the overlay has the focus", async () => {
     desktop.focused = "overlay";
     overlay.isInteractable = true;
 
-    search("Currency");
+    await search("Currency");
 
     expect(desktop.presses).toEqual([
       "game: Ctrl + F",
@@ -99,10 +104,10 @@ describe("stashSearch", () => {
     ]);
   });
 
-  it("presses no key and logs while a browser tab has the focus", () => {
+  it("presses no key and logs while a browser tab has the focus", async () => {
     desktop.focused = "browser";
 
-    search("Currency");
+    await search("Currency");
 
     expect(desktop.presses).toEqual([]);
     expect(desktop.clipboard).toBe("");

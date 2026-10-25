@@ -84,22 +84,27 @@ The entry, the server and the app services, in `main/src/`:
   `ArrowRight`, `ArrowLeft` and the copy keys) and a hotkey given to two actions, except that a `toggle-overlay`
   action keeps it. On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when
   `keepModKeys` is set) and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts
-  `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses the copy keys, sends `MAIN->CLIENT::item-text`
-  to the last active client and, with `focusOverlay`, makes the overlay active when the overlay was the last active
-  client) or `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game
-  window is active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or
-  `ArrowRight` for `Ctrl` and the mouse wheel while the game is active, except over the area `isStashArea()` computes.
-- `HostClipboard.ts`: `readItemText()` clears the clipboard when it holds item text, then polls every 48 ms
-  (`POLL_DELAY`) after the first delay, for at most 500 ms (`POLL_LIMIT`). It resolves with text that starts as
-  `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and rejects. On Linux it always
-  writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard" feature and a Proton 10 bug
-  (linked in the code). With Restore clipboard on it writes the previous text back, or empty text when that was item
-  text. On Linux it also writes that text back after a failed read that leaves the marker, unless it is empty.
-  `restoreShortly(cb)` runs `cb`, restores the clipboard after 120 ms (`RESTORE_AFTER`) with Restore clipboard on, and
-  drops a call within those 120 ms to avoid the game's "Too many actions" disconnects. `LANGUAGE_DETECTOR` holds the
-  first line of item text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
-- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. It presses `Enter`, then
-  `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
+  `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses the copy keys through `readItemText()`, sends
+  `MAIN->CLIENT::item-text` to the last active client and, with `focusOverlay`, makes the overlay active when the
+  overlay was the last active client) or `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it
+  logs each key while the game window is active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting)
+  it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active, except over the area
+  `isStashArea()` computes.
+- `HostClipboard.ts`: Electron's clipboard reads and writes return promises, and each one ends before main presses a
+  key. `readItemText(pressCopyKeys)` clears the clipboard when it holds item text and then calls `pressCopyKeys`, so a
+  write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for
+  at most 500 ms (`POLL_LIMIT`). A call during a read presses the keys again and returns the same result. It resolves
+  with text that starts as `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and
+  rejects. On Linux it always writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard"
+  feature and a Proton 10 bug (linked in the code). With Restore clipboard on it writes the previous text back, or
+  empty text when that was item text. On Linux it also writes that text back after a failed read that leaves the
+  marker, unless it is empty. `restoreShortly(cb)` awaits `cb`, restores the clipboard after 120 ms (`RESTORE_AFTER`)
+  with Restore clipboard on, and drops a call until then to avoid the game's "Too many actions" disconnects. A failed
+  clipboard read or write there logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item
+  text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
+- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. After its clipboard write ends,
+  it presses `Enter`, then `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`),
+  and pastes the text.
   When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
   `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text
   ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With
@@ -114,8 +119,9 @@ The entry, the server and the app services, in `main/src/`:
 
 - `OverlayWindow.ts`: `OverlayWindow` creates the overlay `BrowserWindow` with `OVERLAY_WINDOW_OPTS` from
   `electron-overlay-window` and the `webview` tag on, for the price check's built-in browser; links the page opens go
-  to the default browser. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
-  development, or with `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
+  to the default browser. `roundedCorners` is false on Linux, where Electron otherwise rounds a frameless window.
+  `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in development, or with
+  `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
   and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
   overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns whether the game window has the focus,
   and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.
@@ -208,23 +214,20 @@ with code <code>`, and rejects each call that waits for a reply or comes later, 
   `OcrWorker` and the `copy-item` and `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of
   [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on a new empty `catch` block or `.catch()` handler.
 
-**Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time `electron-overlay-window`
-4.0.2 and `uiohook-napi` 1.5.x, native modules the bundle leaves out with `electron`; bundled: `electron-updater`,
-`electron-devtools-installer`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `build/script.mjs` bundles `dist/main.js`
+**Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time Electron 44, and the native
+modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle leaves out with `electron`. Both
+modules load prebuilt Node-API binaries, which load in a new Electron version without a rebuild. The bundle includes
+`electron-updater`, `electron-devtools-installer`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `build/script.mjs` bundles `dist/main.js`
 and `dist/vision.js` with esbuild; in development it sets `VITE_DEV_SERVER_URL` to `http://localhost:5173` and
 restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main.js`, `dist/vision.js` and
 `../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned
 universal dmg on macOS, and publishes to GitHub releases.
 
-`overrides` in `package.json` sets `yauzl` to 3.x. Electron 40.10.2 unpacks its download with `extract-zip` 2.0.1,
-which depends on yauzl 2. On Node 24.16 and 24.17, and on Node 26.1 or newer, yauzl 2 stops partway through the
-archive, so Electron's install script exits without the binary
-([nodejs/node#63487](https://github.com/nodejs/node/issues/63487)). Electron 40.10.3 and newer unpack with
-`@electron-internal/extract-zip`, which uses no yauzl: remove the override with that update, once `npm ls yauzl`
-lists nothing without it.
+The `electron` package has no install script. `require("electron")` downloads the Electron binary the first time it
+runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (72.9% of the lines of `src/` on 22 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (73.2% of the lines of `src/` on 25 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and
 the production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
 `eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard

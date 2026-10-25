@@ -65,9 +65,9 @@ When Electron starts and quits at once, another copy of Kalandra is running: `ma
 calls `app.requestSingleInstanceLock()` and exits when another copy holds it. Quit the other copy
 from its tray icon.
 
-When `npm run dev` in `main/` fails with `Electron failed to install correctly`, the Electron
-binary is missing from `main/node_modules/electron`, because its install script did not run or
-did not finish. `node node_modules/electron/install.js` in `main/` downloads and extracts it.
+The first `npm run dev` in `main/` downloads the Electron binary into `main/node_modules/electron`,
+since the `electron` package has no install script. When the download fails, `npm run dev` stops
+with `Electron failed to install correctly`; `npx install-electron` in `main/` downloads it again.
 
 The command-line options the app reads (`--no-overlay`, `--listen` and `--no-updates`) are on the
 user page [docs/cmd-flags.md](docs/cmd-flags.md). `main/build/script.mjs` starts Electron without
@@ -158,13 +158,14 @@ npm 12 (Node 24.18.1 includes 12.1.0) runs a dependency's install script only wh
 the `package.json` of that folder has an entry for the package. It skips every other install script
 and lists the skipped ones at the end of the install; `npm install-scripts ls` lists them again.
 
-- Each entry here names an exact version, such as `electron@40.10.2`. An update that changes the
-  version of a package in `allowScripts` makes npm skip its script. Electron's script downloads the
-  Electron binary, so after an Electron update `npm run dev` in `main/` fails with
-  `Electron failed to install correctly`. Read the new version's install script, then run
-  `npm install-scripts approve <package>` in that folder, which writes the new version into the
-  entry, and `npm rebuild <package>`, which runs the script. Commit `package.json` with the lock
-  file.
+- Each entry here names an exact version, such as `uiohook-napi@1.5.4`. An update that changes the
+  version of a package in `allowScripts` makes npm skip its script. Read the new version's install
+  script, then run `npm install-scripts approve <package>` in that folder, which writes the new
+  version into the entry, and `npm rebuild <package>`, which runs the script. Commit `package.json`
+  with the lock file.
+- `electron` has no install script: `require("electron")` downloads the binary on its first run.
+  `electron-overlay-window` and `uiohook-napi` run `node-gyp-build`, which finds their prebuilt
+  Node-API binaries and compiles nothing.
 - `npm install-scripts prune` removes the entries whose package is gone or has no install script.
 - The `allowscripts` pre-commit hook fails when an entry names a package that the lock file has at
   another version or without an install script
@@ -172,8 +173,7 @@ and lists the skipped ones at the end of the install; `npm install-scripts ls` l
 - `renderer/` and `docs/` have no `allowScripts`: Vite 8 in `renderer/` builds with Rolldown and
   does not need esbuild. npm skips the scripts of `vue-demi`, `unrs-resolver` and the esbuild of
   `docs/`, and the tests and builds pass without them.
-- An `overrides` entry has its reason in the module doc of its folder, as `yauzl` has in
-  [main.md](docs/dev/modules/main.md).
+- An `overrides` entry has its reason in the module doc of its folder.
 - A Vue update in `renderer/` must keep the watchers of a component in the order they are
   defined, which `CheckedItem.vue` needs
   ([renderer-price-check.md](docs/dev/modules/renderer-price-check.md)).

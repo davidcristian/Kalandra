@@ -67,7 +67,7 @@ export class Shortcuts {
 
     this.server.onEventAnyClient("CLIENT->MAIN::user-action", (e) => {
       if (e.action === "stash-search") {
-        stashSearch(e.text, this.clipboard, this.overlay);
+        void stashSearch(e.text, this.clipboard, this.overlay);
       }
     });
 
@@ -187,21 +187,28 @@ export class Shortcuts {
             this.areaTracker.removeListeners();
             this.overlay.toggleActiveState();
           } else if (entry.action.type === "paste-in-chat") {
-            typeInChat(entry.action.text, entry.action.send, this.clipboard);
+            const { text, send } = entry.action;
+            void typeInChat(text, send, this.clipboard);
           } else if (entry.action.type === "trigger-event") {
             this.server.sendEventTo("broadcast", {
               name: "MAIN->CLIENT::widget-action",
               payload: { target: entry.action.target },
             });
           } else if (entry.action.type === "stash-search") {
-            stashSearch(entry.action.text, this.clipboard, this.overlay);
+            void stashSearch(entry.action.text, this.clipboard, this.overlay);
           } else if (entry.action.type === "copy-item") {
             const { action } = entry;
 
             const pressPosition = screen.getCursorScreenPoint();
+            const modKeys = entry.shortcut.split(" + ").filter(isModKey);
 
             this.clipboard
-              .readItemText()
+              .readItemText(() => {
+                pressKeysToCopyItemText(
+                  entry.keepModKeys ? modKeys : undefined,
+                  this.gameConfig.showModsKey,
+                );
+              })
               .then((clipboard) => {
                 this.areaTracker.removeListeners();
                 this.server.sendEventTo("last-active", {
@@ -218,13 +225,6 @@ export class Shortcuts {
                 }
               })
               .catch(() => {});
-
-            pressKeysToCopyItemText(
-              entry.keepModKeys
-                ? entry.shortcut.split(" + ").filter((key) => isModKey(key))
-                : undefined,
-              this.gameConfig.showModsKey,
-            );
           } else if (
             entry.action.type === "ocr-text" &&
             entry.action.target === "heist-gems"

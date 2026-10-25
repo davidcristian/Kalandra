@@ -15,6 +15,8 @@ type KeyName = (typeof Key)[keyof typeof Key];
 export class FakeChat {
   lastWhisperer = "UltraSkillPlayer";
   clipboardText = "";
+  // The error the next clipboard read fails with, or null for a read that works
+  clipboardError: Error | null = null;
   // The text left in the box when it closes, which the next Enter shows again
   draft = "";
   // The text in the open box, or null while the box is closed
@@ -23,15 +25,23 @@ export class FakeChat {
   private cursor = 0;
   private selected = false;
 
+  // A write ends on a later tick, as the operating system's does
   readonly clipboard = {
-    readText: () => this.clipboardText,
-    writeText: (text: string) => {
+    readText: async () => {
+      const error = this.clipboardError;
+      this.clipboardError = null;
+      if (error) throw error;
+      return this.clipboardText;
+    },
+    writeText: async (text: string) => {
+      await Promise.resolve();
       this.clipboardText = text;
     },
   };
 
   reset() {
     this.clipboardText = "";
+    this.clipboardError = null;
     this.draft = "";
     this.input = null;
     this.sent = [];

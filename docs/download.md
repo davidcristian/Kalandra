@@ -17,7 +17,7 @@ contain malware.
 | <a :href="`${theme.github.releasesUrl}/download/v${theme.appVersion}/Kalandra-Setup-${theme.appVersion}.exe`">Windows 10 or later (installer)</a> | Yes |
 | <a :href="`${theme.github.releasesUrl}/download/v${theme.appVersion}/Kalandra-${theme.appVersion}.exe`">Windows 10 or later (portable)</a> | No |
 | <a :href="`${theme.github.releasesUrl}/download/v${theme.appVersion}/Kalandra-${theme.appVersion}.AppImage`">Linux (AppImage)</a> | Yes |
-| <a :href="`${theme.github.releasesUrl}/download/v${theme.appVersion}/Kalandra-${theme.appVersion}-universal.dmg`">macOS (dmg)</a> | No |
+| <a :href="`${theme.github.releasesUrl}/download/v${theme.appVersion}/Kalandra-${theme.appVersion}-universal.dmg`">macOS 13 or later (dmg)</a> | No |
 
 These links download version {{ theme.appVersion }}. If a link returns an error, open the
 [releases page](https://github.com/davidcristian/Kalandra/releases), which lists every published version.

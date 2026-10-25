@@ -44,6 +44,9 @@ export class OverlayWindow {
     this.window = new BrowserWindow({
       icon: path.join(__dirname, process.env.STATIC!, "icon.png"),
       ...OVERLAY_WINDOW_OPTS,
+      // Electron rounds a frameless window's corners on Linux too, which would clip the overlay's corners there.
+      // macOS keeps the default, since false there makes the window not fullscreenable.
+      roundedCorners: process.platform !== "linux",
       width: 800,
       height: 600,
       webPreferences: {

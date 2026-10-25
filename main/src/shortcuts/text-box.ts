@@ -13,28 +13,28 @@ const AUTO_CLEAR = [
   "/", // Command
 ];
 
-export function typeInChat(
+export async function typeInChat(
   text: string,
   send: boolean,
   clipboard: HostClipboard,
 ) {
-  clipboard.restoreShortly((clipboard) => {
+  await clipboard.restoreShortly(async (clipboard) => {
     const modifiers = process.platform === "darwin" ? [Key.Meta] : [Key.Ctrl];
 
     if (text === PLACEHOLDER_LAST || text.startsWith(`${PLACEHOLDER_LAST} `)) {
       text = text.slice(`${PLACEHOLDER_LAST} `.length);
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
       uIOhook.keyTap(Key.Enter, modifiers);
     } else if (text.endsWith(PLACEHOLDER_LAST)) {
       text = text.slice(0, -PLACEHOLDER_LAST.length);
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
       uIOhook.keyTap(Key.Enter, modifiers);
       uIOhook.keyTap(Key.Home);
       // press twice to focus input when using controller
       uIOhook.keyTap(Key.Home);
       uIOhook.keyTap(Key.Delete);
     } else {
-      clipboard.writeText(text);
+      await clipboard.writeText(text);
       uIOhook.keyTap(Key.Enter);
       if (!AUTO_CLEAR.includes(text[0])) {
         uIOhook.keyTap(Key.A, modifiers);
@@ -54,14 +54,14 @@ export function typeInChat(
   });
 }
 
-export function stashSearch(
+export async function stashSearch(
   text: string,
   clipboard: HostClipboard,
   overlay: OverlayWindow,
 ) {
-  clipboard.restoreShortly((clipboard) => {
+  await clipboard.restoreShortly(async (clipboard) => {
     if (!overlay.focusGameFor("a stash search")) return;
-    clipboard.writeText(text);
+    await clipboard.writeText(text);
     uIOhook.keyTap(Key.F, [Key.Ctrl]);
 
     uIOhook.keyTap(Key.V, [

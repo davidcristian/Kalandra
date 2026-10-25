@@ -25,11 +25,14 @@ replaces it with `vi.mock("electron", ...)`.
 
 ## shortcuts/
 
-- `HostClipboard.test.ts` reads item text from a fake clipboard on each platform.
+- `HostClipboard.test.ts` reads item text on each platform from a fake clipboard, whose writes end a tick after the
+  call as the operating system's do, and checks that the copy keys are pressed after item text copied before is
+  cleared.
 - `text-box.test.ts` types chat commands into the fake clipboard and chat box of `fake-chat.ts`, which applies each
-  key press to the text in the box.
+  key press to the text in the box. Its clipboard writes end a tick late too, and a test can make a read fail. The
+  tests also check the restore with Restore clipboard on, and the log line and the next command after a failed read.
 - `stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that
-  records the window each key press reaches.
+  records the window each key press reaches and the text each paste reaches it with.
 - `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
 - `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts` while the game window is active and checks
   the hotkeys `updateActions()` leaves out. It presses a hotkey and reads the keys it releases from `fake-hook.ts`,
