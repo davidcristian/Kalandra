@@ -22,6 +22,15 @@ const PROXY_HOSTS = [
 // CORS preflight, which the Origin check rejects, and an image, a script or a link sends none
 const PROXY_HEADER = "x-kalandra-proxy";
 
+/** Returns whether `url` is an `https:` address on one of the official trade sites. */
+export function isTradeSiteUrl(url: string): boolean {
+  const parsed = URL.parse(url);
+  return (
+    parsed?.protocol === "https:" &&
+    PROXY_HOSTS.some((entry) => entry.official && entry.host === parsed.host)
+  );
+}
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class -- the class only adds the proxy route in its constructor
 export class HttpProxy {
   constructor(routes: HttpRoutes, logger: Logger) {

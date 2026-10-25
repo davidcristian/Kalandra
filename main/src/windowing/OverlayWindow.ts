@@ -4,6 +4,7 @@ import {
   OverlayController,
   OVERLAY_WINDOW_OPTS,
 } from "electron-overlay-window";
+import { isTradeSiteUrl } from "../proxy";
 import type { ServerEvents } from "../server";
 import type { Logger } from "../RemoteLogger";
 import type { GameWindow } from "./GameWindow";
@@ -66,6 +67,7 @@ export class OverlayWindow {
 
     watchPage(this.window.webContents, this.logger);
     this.window.webContents.on("before-input-event", this.handleExtraCommands);
+    this.window.webContents.on("will-attach-webview", this.checkWebview);
     this.window.webContents.on(
       "did-attach-webview",
       (_, webviewWebContents) => {
@@ -158,6 +160,24 @@ export class OverlayWindow {
       event.preventDefault();
       process.nextTick(this.toggleActiveState);
     }
+  };
+
+  // The page's <webview> attributes set the guest's preferences, so main resets those that give it more access
+  private checkWebview = (
+    event: Electron.Event,
+    webPreferences: Electron.WebPreferences,
+    params: Record<string, string>,
+  ) => {
+    delete webPreferences.preload;
+    webPreferences.nodeIntegration = false;
+    webPreferences.contextIsolation = true;
+    if (isTradeSiteUrl(params.src)) return;
+
+    event.preventDefault();
+    const blocked = URL.parse(params.src);
+    this.logger.write(
+      `warn [Overlay] Blocked a web view that opens ${blocked ? `${blocked.protocol}//${blocked.host}` : "an address that is not a URL"}`,
+    );
   };
 
   private handleOverlayAttached = (hasAccess?: boolean) => {

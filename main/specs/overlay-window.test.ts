@@ -148,6 +148,23 @@ function keyDown(code: string, modifiers: { shift?: boolean } = {}) {
   };
 }
 
+// Sends what Electron emits before a <webview> starts, with the preferences a page could ask for
+function attachWebview(window: (typeof desktop.windows)[number], src: string) {
+  let prevented = false;
+  const event = {
+    preventDefault: () => {
+      prevented = true;
+    },
+  };
+  const webPreferences = {
+    preload: "/page/preload.js",
+    nodeIntegration: true,
+    contextIsolation: false,
+  };
+  window.contents.emit("will-attach-webview", event, webPreferences, { src });
+  return { prevented, webPreferences };
+}
+
 beforeEach(() => {
   vi.stubEnv("STATIC", "icons");
   vi.stubEnv("VITE_DEV_SERVER_URL", "");
@@ -226,6 +243,50 @@ describe("OverlayWindow", () => {
     expect(result).toEqual({ action: "deny" });
     expect(desktop.opened).toEqual(["https://example.com/"]);
   });
+
+  it("lets a web view open the trade site, with no preload, no Node.js and an isolated context", () => {
+    const { shown } = createOverlay();
+
+    const attach = attachWebview(
+      shown,
+      "https://www.pathofexile.com/trade2/search/poe2/Standard/abc",
+    );
+
+    expect(attach).toEqual({
+      prevented: false,
+      webPreferences: { nodeIntegration: false, contextIsolation: true },
+    });
+    expect(server.logEntries()).toEqual([]);
+  });
+
+  it.each([
+    ["http://www.pathofexile.com/trade2", "http://www.pathofexile.com"],
+    ["https://www.poeprices.info/api", "https://www.poeprices.info"],
+    ["https://kalandra.ashoal.com/prices", "https://kalandra.ashoal.com"],
+    [
+      "https://www.pathofexile.com.evil.example/",
+      "https://www.pathofexile.com.evil.example",
+    ],
+    ["file:///C:/Windows/win.ini", "file://"],
+    ["not a url", "an address that is not a URL"],
+  ])(
+    "blocks and logs a web view that opens %s, with its preferences reset",
+    (src, logged) => {
+      const { shown } = createOverlay();
+
+      const attach = attachWebview(shown, src);
+
+      expect(attach).toEqual({
+        prevented: true,
+        webPreferences: { nodeIntegration: false, contextIsolation: true },
+      });
+      expect(server.logEntries()).toEqual([
+        expect.stringContaining(
+          `warn [Overlay] Blocked a web view that opens ${logged}\n`,
+        ),
+      ]);
+    },
+  );
 
   it("attaches to the game window once, by the title from the settings", () => {
     const { overlay } = createOverlay();

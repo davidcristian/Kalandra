@@ -52,7 +52,8 @@ The entry, the server and the app services, in `main/src/`:
   error to `onFallback` and listens on `fallback`; it rejects when `address` is `fallback`. `startServer()` passes the
   defaults as `fallback` and logs the error.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
-  sites (`official: true`, a flag that changes nothing in forwarding), `www.poeprices.info` and `kalandra.ashoal.com`.
+  sites (`official: true`), `www.poeprices.info` and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a
+  URL is an `https:` address on an official trade site.
   It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()` sends and a page on another
   site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`,
   `origin`, `content-length` and `x-kalandra-proxy` request headers, sends the request through `net.request` with the
@@ -119,7 +120,10 @@ The entry, the server and the app services, in `main/src/`:
 
 - `OverlayWindow.ts`: `OverlayWindow` creates the overlay `BrowserWindow` with `OVERLAY_WINDOW_OPTS` from
   `electron-overlay-window` and the `webview` tag on, for the price check's built-in browser; links the page opens go
-  to the default browser. `roundedCorners` is false on Linux, where Electron otherwise rounds a frameless window.
+  to the default browser. Before a web view starts, its `will-attach-webview` handler removes a `preload`, sets
+  `nodeIntegration` false and `contextIsolation` true, and blocks the web view with a `warn [Overlay]` line unless
+  `isTradeSiteUrl()` accepts its first address. Later navigation inside it, such as a sign-in through another site,
+  is not checked. `roundedCorners` is false on Linux, where Electron otherwise rounds a frameless window.
   `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in development, or with
   `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
   and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
