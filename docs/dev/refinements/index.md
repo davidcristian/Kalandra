@@ -148,3 +148,4 @@ layout and its reasons.
 - 084: [The German data searches each Time-Lost jewel conqueror one option too low](tasks/084-german-time-lost-jewel-ids.md)
 - 085: [Four committed client string regexes read game text characters as regex syntax](tasks/085-unescaped-client-string-regexes.md)
 - 086: [The committed data has five unique items without a name and 18 client strings nothing reads](tasks/086-unique-names-and-unread-client-strings.md)
+- 087: [The renderer build needs Vite's legacy CommonJS interop for vue3-apexcharts](tasks/087-legacy-commonjs-interop-for-apexcharts.md)

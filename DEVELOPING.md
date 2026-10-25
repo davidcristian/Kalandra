@@ -169,9 +169,9 @@ and lists the skipped ones at the end of the install; `npm install-scripts ls` l
 - The `allowscripts` pre-commit hook fails when an entry names a package that the lock file has at
   another version or without an install script
   ([scripts.md](docs/dev/modules/scripts.md#allowscriptspy)).
-- In `renderer/`, `allowScripts` approves only esbuild, and `docs/` has no `allowScripts`. npm skips
-  the scripts of `vue-demi`, `unrs-resolver` and the esbuild of `docs/`, and the tests and builds
-  pass without them.
+- `renderer/` and `docs/` have no `allowScripts`: Vite 8 in `renderer/` builds with Rolldown and
+  does not need esbuild. npm skips the scripts of `vue-demi`, `unrs-resolver` and the esbuild of
+  `docs/`, and the tests and builds pass without them.
 - An `overrides` entry has its reason in the module doc of its folder, as `yauzl` has in
   [main.md](docs/dev/modules/main.md).
 
