@@ -9,7 +9,7 @@ Python 3.12 or newer, standard library only.
 
 - What it writes, the file format, why its key order matters and how it treats poe.ninja:
   [docs/dev/modules/price-service.md](../docs/dev/modules/price-service.md).
-- Deploying it with Docker Compose, checking it and fixing a failed deploy:
+- Deploying it with Docker Compose, updating its images, checking it and fixing a failed deploy:
   [docs/dev/runbooks/price-service-deploy.md](../docs/dev/runbooks/price-service-deploy.md).
 
 ## Test

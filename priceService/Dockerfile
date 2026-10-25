@@ -1,6 +1,6 @@
 # Build from the repo root, since the image needs the app's namespaceMap.json:
 # docker build -f priceService/Dockerfile .
-FROM python:3.12-slim
+FROM python:3.12.15-slim-trixie
 
 RUN useradd --system --uid 10001 --no-create-home prices \
     && mkdir -p /srv/prices \

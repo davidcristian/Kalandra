@@ -180,7 +180,7 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Invariants
 
-- Standard library only, on Python 3.12 (the `python:3.12-slim` image and CI). Nothing is installed with pip.
+- Standard library only, on Python 3.12 (the image in `Dockerfile` and CI). Nothing is installed with pip.
 - Only this service calls poe.ninja's API, in the pattern above. No test, script or app code calls it.
 - The service and the app use the same file names, categories and format. `namespaceMap.json` is the one list of
   categories, and the tests of both read the two shared fixtures, `tests/fixtures/price_file.json` and

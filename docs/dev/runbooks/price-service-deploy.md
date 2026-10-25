@@ -17,9 +17,9 @@ service runs a cycle at once, which sends up to 277 requests to poe.ninja
 
 | Service | Image | Does |
 | --- | --- | --- |
-| `prices` | built from `priceService/Dockerfile`, with the repo root as the build context | runs `python -m price_service` as the user `prices` and writes to the `prices` volume at `/srv/prices`; restarts unless stopped |
-| `web` | `nginx:stable-alpine` | serves the volume read only under `/prices/` with `priceService/nginx.conf`, and publishes port 8080 on the host's loopback interface only |
-| `tunnel` (profile `tunnel`) | `cloudflare/cloudflared:latest` | connects out to Cloudflare Tunnel with `TUNNEL_TOKEN`, so the machine opens no port to the internet |
+| `prices` | built from `priceService/Dockerfile` on the `python` 3.12 slim image, with the repo root as the build context | runs `python -m price_service` as the user `prices` and writes to the `prices` volume at `/srv/prices`; restarts unless stopped |
+| `web` | `nginx`, the stable line on Alpine | serves the volume read only under `/prices/` with `priceService/nginx.conf`, and publishes port 8080 on the host's loopback interface only |
+| `tunnel` (profile `tunnel`) | `cloudflare/cloudflared` | connects out to Cloudflare Tunnel with `TUNNEL_TOKEN`, so the machine opens no port to the internet |
 
 `nginx.conf` sends every file as `application/json`, compresses files of 1024 bytes or more with gzip, adds
 `Cache-Control: public, max-age=300` and returns 404 for a name that starts with a dot and for any path outside
@@ -58,6 +58,22 @@ docker compose --profile tunnel up -d --build
 from the build context. So a change to either path reaches the service only through this command. The `prices`
 volume keeps the files across rebuilds, and `web` serves the last cycle's files while the new container runs its
 first cycle.
+
+### Update an image
+
+`compose.yaml` and `Dockerfile` name each image by an exact version, so a deploy on a new machine or after
+`docker compose pull` runs the same nginx, cloudflared and Python as the last one. The official nginx and Python
+images rebuild a version tag when their Alpine or Debian base gets a fix, so a pull can still bring a newer build of
+the same version. To move to a new version:
+
+1. Find the tag on Docker Hub. `https://hub.docker.com/v2/repositories/<owner>/<name>/tags?name=<prefix>` lists the
+   tags with their digests, with `library` as the owner of nginx and Python. Take the version tag that has the same
+   digest as `stable-alpine3.<n>` for nginx (such as `1.30.6-alpine3.24`) and as `latest` for cloudflared (such as
+   `2026.10.3`), and the newest `3.12.<patch>-slim-<debian release>` for Python. Python stays on 3.12, the version
+   CI tests, unless CI changes in the same commit.
+2. Change the tag in `compose.yaml` or `Dockerfile`, in a commit of its own.
+3. Deploy that commit with the command in [Deploy or update](#deploy-or-update), which pulls the new image, then
+   run [Check it](#check-it).
 
 ## Check it
 

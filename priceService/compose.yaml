@@ -16,7 +16,7 @@ services:
       start_period: 10m
 
   web:
-    image: nginx:stable-alpine
+    image: nginx:1.30.6-alpine3.24
     restart: unless-stopped
     depends_on: [prices]
     volumes:
@@ -26,7 +26,7 @@ services:
       - "127.0.0.1:8080:80"
 
   tunnel:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.10.3
     profiles: [tunnel]
     restart: unless-stopped
     depends_on: [web]
