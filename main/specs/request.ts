@@ -20,8 +20,15 @@ export async function post(
   port: number,
   urlPath: string,
   body: string,
+  headers: http.OutgoingHttpHeaders = {},
 ): Promise<Reply> {
-  const options = { host: "127.0.0.1", port, path: urlPath, method: "POST" };
+  const options = {
+    host: "127.0.0.1",
+    port,
+    path: urlPath,
+    method: "POST",
+    headers,
+  };
   return await send(options, body);
 }
 

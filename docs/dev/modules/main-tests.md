@@ -19,8 +19,10 @@ replaces it with `vi.mock("electron", ...)`.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
 - `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes and to
   `/events`, paths and methods that no route serves, and an upgrade request to another path.
-- `proxy.test.ts` sends `/proxy` requests with and without the `x-kalandra-proxy` header, through a fake
-  `net.request` that answers with the request it was given.
+- `proxy.test.ts` sends `/proxy` requests through the server's request check, with and without the
+  `x-kalandra-proxy` header, from another origin and for hosts that differ from the list in case, a port, user info
+  or a suffix. A fake `net.request` answers with the request and body it was given, or fails. The test also passes
+  `set-cookie` headers through the listener the proxy adds to the default session.
 - `RemoteLogger.test.ts` writes more entries than the history keeps.
 
 ## shortcuts/
