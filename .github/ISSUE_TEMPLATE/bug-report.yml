@@ -26,9 +26,9 @@ body:
     id: existing-issues
     attributes:
       label: Existing Issues
-      description: Please check the [pinned issues and existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue) before submitting an issue
+      description: Please check the [existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue), including those at the top of the list, before submitting an issue
       options:
-        - label: I have checked the [pinned issues and existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue) and my problem was not there
+        - label: I have checked the [existing issues](https://github.com/davidcristian/Kalandra/issues?q=is%3Aissue) and my problem was not there
           required: true
   - type: dropdown
     id: common-bug

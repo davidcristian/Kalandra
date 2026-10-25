@@ -56,12 +56,14 @@ the repo.
   `prosesources.py` finds the prose: markdown outside fenced code; the comments of TypeScript, JavaScript, JSON
   with comments (`.jsonc`), Vue, HTML and CSS files; the lines that start with `#` in YAML, TOML, shell, `.txt`,
   `.conf`, `Dockerfile` and `.dockerignore` files and in dotfiles without a suffix, such as `.gitignore` and
-  `.coveragerc`; the docstrings and comments of Python; and the strings passed to `console.*`, `logger.write`,
-  `dialog.showErrorBox`, `new ...Error` and `throw new` calls. In Python they are the strings passed to `print`, a
-  logging method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and `problems.append` or
-  `problems.extend`, and those assigned to `msg` or given as `help`, `description` or `epilog`. Each string of a
-  message counts: the parts of an f-string, both sides of `+`, the left of `%`, both results of an `if`
-  expression and the item of a comprehension.
+  `.coveragerc`; in the issue forms in `.github/ISSUE_TEMPLATE/`, also the value of each `name`, `title`,
+  `description`, `about`, `label`, `placeholder` and `value` key, with the lines that continue it, but not the
+  options of a dropdown; the docstrings and comments of Python; and the strings passed to `console.*`,
+  `logger.write`, `dialog.showErrorBox`, `new ...Error` and `throw new` calls. In Python they are the strings passed
+  to `print`, a logging method, a `raise`, a call whose name ends in `Problem`, `Error` or `Exception`, and
+  `problems.append` or `problems.extend`, and those assigned to `msg` or given as `help`, `description` or `epilog`.
+  Each string of a message counts: the parts of an f-string, both sides of `+`, the left of `%`, both results of an
+  `if` expression and the item of a comprehension.
   `bannedwords.py` reads the words from the table in AGENTS.md and finds them alone or joined to other words by a
   hyphen (`non-gated`), and a phrase whose words have hyphens or one line break between them. It skips code spans,
   link targets, URLs, a word that starts with a hyphen as a command line option does (`--gate`), and the
@@ -156,12 +158,12 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 120 tests on 26 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 124 tests on 26 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 97.7% of lines and branches on 26 Oct 2026.
+floor in `scripts/.coveragerc`, 97.8% of lines and branches on 26 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`, and its Python
 steps need coverage.py (`pip install coverage`).

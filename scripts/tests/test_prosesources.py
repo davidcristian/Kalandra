@@ -45,6 +45,34 @@ def run() -> None:
 ignored = "not a message"
 '''
 
+ISSUE_FORM = """# a comment
+name: Bug Report
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A block line
+
+        and another
+  - type: checkboxes
+    attributes:
+      label: FAQ
+      description: 'Check the FAQ'
+      options:
+        - label: I have checked
+          required: true
+  - type: dropdown
+    attributes:
+      description: A long
+        plain text
+      options:
+        - not read
+      placeholder: >-
+        folded text
+      render: shell
+"""
+
 
 def texts(name: str, text: str) -> list[tuple[int, str]]:
     return [(number, line.strip()) for number, line in prose_lines(name, text)]
@@ -122,6 +150,35 @@ class PythonTest(unittest.TestCase):
     def test_reports_a_file_it_cannot_parse(self) -> None:
         with self.assertRaises(SourceError):
             prose_lines("a.py", "def broken(:\n")
+
+
+class IssueFormTest(unittest.TestCase):
+    def test_reads_the_comments_and_the_text_an_issue_form_shows(self) -> None:
+        self.assertEqual(
+            texts(".github/ISSUE_TEMPLATE/bug.yml", ISSUE_FORM),
+            [
+                (1, "a comment"),
+                (2, "Bug Report"),
+                (3, "[Bug]:"),
+                (8, "A block line"),
+                (10, "and another"),
+                (13, "FAQ"),
+                (14, "Check the FAQ"),
+                (16, "I have checked"),
+                (20, "A long"),
+                (21, "plain text"),
+                (25, "folded text"),
+            ],
+        )
+
+    def test_reads_the_links_of_the_template_chooser(self) -> None:
+        chooser = "contact_links:\n  - name: Help\n    url: https://example.com\n    about: 'Ask here'\n"
+        self.assertEqual(texts(".github/ISSUE_TEMPLATE/config.yml", chooser), [(2, "Help"), (4, "Ask here")])
+
+    def test_reads_only_the_comments_of_other_yaml_files(self) -> None:
+        for name in (".github/workflows/bug.yml", "bug.yml", ".github/ISSUE_TEMPLATE/old/bug.yml"):
+            with self.subTest(name=name):
+                self.assertEqual(texts(name, ISSUE_FORM), [(1, "a comment")])
 
 
 class OtherTest(unittest.TestCase):

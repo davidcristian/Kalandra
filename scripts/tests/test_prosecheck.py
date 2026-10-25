@@ -59,6 +59,17 @@ class ProseCheckTest(unittest.TestCase):
         hyphens = [line for line in output.splitlines() if "a spaced hyphen used as a dash" in line]
         self.assertEqual([line.split(":")[1] for line in hyphens], ["1", "2"])
 
+    def test_reports_a_banned_word_in_the_text_of_an_issue_form(self) -> None:
+        form = "name: Bug\nbody:\n  - type: input\n    attributes:\n      label: The gates you passed\n"
+        files = {"AGENTS.md": RULES_TABLE, ".github/ISSUE_TEMPLATE/bug.yml": form, ".github/workflows/a.yml": form}
+        with repo(files) as root:
+            code, output = run(prosecheck.main, root)
+        self.assertEqual(code, 1)
+        problems = [line for line in output.splitlines() if line.startswith(".github/")]
+        self.assertEqual(
+            problems, ['.github/ISSUE_TEMPLATE/bug.yml:5: banned word "gates"; AGENTS.md gives a plain replacement']
+        )
+
     def test_reports_a_python_file_it_cannot_parse(self) -> None:
         with repo({"AGENTS.md": RULES_TABLE, "a.py": "def broken(:\n"}) as root:
             code, output = run(prosecheck.main, root)

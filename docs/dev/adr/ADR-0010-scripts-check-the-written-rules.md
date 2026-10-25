@@ -1,6 +1,6 @@
 # ADR-0010: Scripts check the written rules
 
-**Status:** Accepted (2026-10-22)
+**Status:** Accepted (2026-10-26)
 
 ## Context
 
@@ -35,11 +35,12 @@ text uses both dashes, and the parser matches that text exactly.
 
 **5. Prose has no banned word, no spaced `--` and no spaced hyphen between words.** `scripts/prosecheck.py` reads the
 banned words from the table in AGENTS.md, so the table is the only list. Prose is markdown outside code, the comments
-and docstrings of the code, and the strings that the code passes to a log or error call, builds into a reported
-problem or gives as the help of a command line option. `GAME_TERMS` in `scripts/bannedwords.py` names the game terms
-the check skips when they have the game's capitals, such as Spell and Delve. The `--` that starts the reason of an
-`eslint-disable` or `eslint-enable` comment is skipped too, since ESLint needs it there. Reason: one list means the
-rule and the check cannot disagree, and the capitals tell a game term from the same word used as a metaphor.
+and docstrings of the code, the strings that the code passes to a log or error call, builds into a reported problem
+or gives as the help of a command line option, and the text that GitHub's issue forms show a reporter. `GAME_TERMS`
+in `scripts/bannedwords.py` names the game terms the check skips when they have the game's capitals, such as Spell
+and Delve. The `--` that starts the reason of an `eslint-disable` or `eslint-enable` comment is skipped too, since
+ESLint needs it there. Reason: one list means the rule and the check cannot disagree, and the capitals tell a game
+term from the same word used as a metaphor.
 
 **6. Every script fails rather than passing on nothing.** A script that finds no file to read, or cannot read the
 table or the long-file list, exits with 2. Reason: a check that reads nothing cannot fail, which AGENTS.md calls a

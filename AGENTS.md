@@ -133,9 +133,9 @@ except the renderer and main builds, which run only on a push to `master`.
 
 ## Prose
 
-Write comments, docstrings, docs, commit messages and the text of log and error messages in plain English that a
-new reader understands on the first read. `scripts/prosecheck.py` and `scripts/dashcheck.py` check the dash and
-banned-word rules; read your own diff for the rest.
+Write comments, docstrings, docs, issue forms, commit messages and the text of log and error messages in plain
+English that a new reader understands on the first read. `scripts/prosecheck.py` and `scripts/dashcheck.py` check
+the dash and banned-word rules; read your own diff for the rest.
 
 - **Comments.** None unless strictly necessary: why a workaround exists, a constraint that is not visible (an
   ordering, a game or API quirk with its link, a measured number), or a directive a tool reads

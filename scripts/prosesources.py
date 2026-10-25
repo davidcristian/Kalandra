@@ -13,6 +13,9 @@ Line = tuple[int, str]
 SCRIPT_SUFFIXES = frozenset({".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs", ".jsonc"})
 HASH_SUFFIXES = frozenset({".yml", ".yaml", ".toml", ".sh", ".txt", ".conf", ".dockerignore"})
 HASH_NAMES = frozenset({"Dockerfile"})
+ISSUE_FORMS = ".github/ISSUE_TEMPLATE"
+# The keys of a GitHub issue form or template chooser whose values the reporter reads
+FORM_KEYS = ("name", "title", "description", "about", "label", "placeholder", "value")
 LOG_METHODS = frozenset({"debug", "info", "warning", "error", "exception", "critical"})
 # A call whose name ends with one of these builds a message, such as Problem(path, "...") or ValueError("...")
 MESSAGE_CALLS = ("Problem", "Error", "Exception")
@@ -28,6 +31,8 @@ _SCRIPT_CALL = re.compile(
 _VUE_BLOCK = re.compile(r"<(script|style)\b[^>]*>(.*?)</\1>", re.DOTALL)
 _HTML_COMMENT = re.compile(r"<!--(.*?)-->", re.DOTALL)
 _CSS_COMMENT = re.compile(r"/\*(.*?)\*/", re.DOTALL)
+_FORM_KEY = re.compile(rf"(\s*(?:-\s+)?)(?:{'|'.join(FORM_KEYS)}):(.*)")
+_BLOCK_START = re.compile(r"[|>][+-]?\d?")
 
 
 class SourceError(Exception):
@@ -37,6 +42,8 @@ class SourceError(Exception):
 def prose_lines(name: str, text: str) -> list[Line]:
     """Returns the prose of a file as numbered lines, read according to its file type."""
     path = PurePosixPath(name)
+    if path.parent.as_posix() == ISSUE_FORMS and path.suffix in {".yml", ".yaml"}:
+        return issue_form_prose(text)
     if path.name in HASH_NAMES or (path.name.startswith(".") and not path.suffix):
         return hash_prose(text)
     read = _READERS.get(path.suffix)
@@ -46,6 +53,31 @@ def prose_lines(name: str, text: str) -> list[Line]:
 def hash_prose(text: str) -> list[Line]:
     """Returns the text after the `#` of each line that starts with one."""
     return [(n, line.strip()[1:]) for n, line in enumerate(text.splitlines(), 1) if line.lstrip().startswith("#")]
+
+
+def _unquoted(value: str) -> str:
+    return value[1:-1] if len(value) > 1 and value[0] == value[-1] and value[0] in "'\"" else value
+
+
+def issue_form_prose(text: str) -> list[Line]:
+    """Returns the comments of an issue form and the text of each key in FORM_KEYS, with the lines that continue it."""
+    found: list[Line] = []
+    column: int | None = None
+    for number, line in enumerate(text.splitlines(), start=1):
+        if column is not None and (not line.strip() or len(line) - len(line.lstrip()) > column):
+            if line.strip():
+                found.append((number, line.strip()))
+            continue
+        column = None
+        key = _FORM_KEY.fullmatch(line)
+        if line.lstrip().startswith("#"):
+            found.append((number, line.strip()[1:]))
+        elif key is not None:
+            column = len(key.group(1))
+            value = key.group(2).strip()
+            if value and not _BLOCK_START.fullmatch(value):
+                found.append((number, _unquoted(value)))
+    return found
 
 
 def markdown_prose(text: str) -> list[Line]:
