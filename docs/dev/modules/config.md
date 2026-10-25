@@ -100,6 +100,10 @@ old one and keep that file, so a saved config must survive every update: this is
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
   on each stash search widget, and `logKeys`.
+- The `< 29` step sets `tipsFrequency` to Never on every config older than version 29, which Exiled Exchange 2
+  v0.12.x and earlier saved, while `defaultConfig()` gives Normal. Those users see no tips until they change the
+  setting under Help. Exiled Exchange 2 added that line in v0.13.0 with no recorded reason. No new step sets
+  Normal: a saved Never does not show whether the user chose it, and such a step would override the users who did.
 - Field names and `wmType` values are keys in saved files. Renaming one takes an upgrade step that moves the value,
   as the `< 7` step does when it turns the `map-check` widget into `item-check`.
 - A new widget type also takes an upgrade step that adds its default instance to saved configs, as the `< 29` and
