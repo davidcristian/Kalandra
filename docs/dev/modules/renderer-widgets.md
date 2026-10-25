@@ -131,15 +131,16 @@ loads every widget component and checks the registered types and the invariants 
 menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`: the poe2db page of each item kind, in English and
 Japanese, and the stash search for the same price note, which adds the name up to 50 characters),
-`specs/web/library/libraryChaos.test.ts`
-(`library/widget.ts`: the kept modifier kinds and the columns of a profile), `specs/web/library/itemDiff.test.ts`
-(`diffItem()`, the prefixes and suffixes a logged Waystone gained and lost, and the CSV row they make),
-`specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
-until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP tracker reads, with
-`FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
-German, before and after a conversion), `specs/web/map-check-decisions.test.ts` (the mark each click sets in one
-profile, and the marks that have a color), `specs/web/map-check-stats.test.ts` (the rows `prepareMapStats()` lists for
-a Waystone and a Tablet, with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which
+`specs/web/library/libraryChaos.test.ts` (`library/widget.ts`: the kept modifier kinds and the columns of a
+profile), `specs/web/library/itemDiff.test.ts` (`diffItem()`, the prefixes and suffixes a logged Waystone gained
+and lost, and the CSV row they make), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a
+session inactive until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP
+tracker reads, with `FullCampaign.txt`, and a line that fails), `specs/web/xp-formula.test.ts`
+(`leveling/xp-formula.ts`, the XP tracker's safe zone, multiplier, Over and star, with the examples of the user
+page), `specs/web/map-check-marks.test.ts` (the Map check marks in English and German, before and after a
+conversion), `specs/web/map-check-decisions.test.ts` (the mark each click sets in one profile, and the marks that
+have a color), `specs/web/map-check-stats.test.ts` (the rows `prepareMapStats()` lists for a Waystone and a Tablet,
+with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which
 the image strip uses to add an image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
