@@ -153,3 +153,4 @@ layout and its reasons.
 - 089: [The poedb button opens a flask's or a tablet's own page instead of its calculator](tasks/089-poe2db-flask-and-tablet-pages.md)
 - 090: [The XP tracker page describes Over in words that differ from its formula at a safe zone step](tasks/090-xp-tracker-over-wording.md)
 - 091: [Ten modules in main and the renderer have no spec that imports them](tasks/091-modules-without-a-spec.md)
+- 092: [The default macOS Client.txt path is the folder of the Path of Exile 1 Mac client](tasks/092-macos-client-log-path.md)

@@ -41,8 +41,8 @@ above level 1 cannot enter `G1_1`.
 
 **Record.** The game patch, and real lines if they differ from the test logs. A difference goes into
 docs/xp-tracker.md or a refinement, in the same commit as this file's History line. The macOS path
-in the page needs a Mac, which this list does not cover
-([refinement 009](../../refinements/tasks/009-macos-updater-auto-download.md)).
+in docs/settings.md needs a Mac, which this list does not cover
+([refinement 092](../../refinements/tasks/092-macos-client-log-path.md)).
 
 ## History
 
@@ -53,3 +53,5 @@ in the page needs a Mac, which this list does not cover
   position, which `initInstance()` in `WidgetXpTracker.vue` sets. Added the return to `G1_1`.
 - 2026-10-25: Added the Korean level up line, after the data stopped reading `(가)` as a regex group
   ([refinement 085](../../refinements/tasks/085-unescaped-client-string-regexes.md)).
+- 2026-10-25: The macOS path points to [refinement 092](../../refinements/tasks/092-macos-client-log-path.md),
+  which holds the Mac check of the default paths.

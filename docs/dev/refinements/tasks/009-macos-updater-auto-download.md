@@ -24,10 +24,12 @@ not run: it needs a Mac and a published release.
 Done looks like: `autoDownload` is `false` whenever `noAutoUpdatesReason` is set, checked on a Mac
 with a release. The same Mac run can check the macOS claims of
 [docs/download.md](../../../download.md), such as the Accessibility prompt at first start, and the
-macOS `Client.txt` path in [docs/xp-tracker.md](../../../xp-tracker.md). No host task covers macOS,
+macOS default paths of [092](092-macos-client-log-path.md). No host task covers macOS,
 because [host/](../../host/index.md) holds only checks on Windows.
 
 ## History
 
 - 2026-10-18: Found while docs/download.md was rewritten, by reading `AppUpdater` and
   `MacUpdater.js`.
+- 2026-10-25: The macOS `Client.txt` path moved to [092](092-macos-client-log-path.md), since
+  docs/xp-tracker.md no longer lists it.
