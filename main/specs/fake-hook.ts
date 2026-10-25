@@ -28,6 +28,9 @@ export class FakeHook extends EventEmitter {
   /** Each key main pressed through the hook, in order, such as `Ctrl up` or `ArrowLeft tap`. */
   readonly pressed: string[] = [];
 
+  /** Runs after each key main presses, as the game reacts to it. */
+  onPress: (pressed: string) => void = () => {};
+
   press(keycode: number, modifiers: Modifiers = {}) {
     this.emit("keydown", { ...keyEvent(keycode), ...modifiers });
   }
@@ -49,16 +52,22 @@ export class FakeHook extends EventEmitter {
   }
 
   keyToggle(keycode: number | undefined, direction: "down" | "up") {
-    this.pressed.push(`${keyName(keycode)} ${direction}`);
+    this.record(`${keyName(keycode)} ${direction}`);
   }
 
   keyTap(keycode: number | undefined) {
-    this.pressed.push(`${keyName(keycode)} tap`);
+    this.record(`${keyName(keycode)} tap`);
+  }
+
+  private record(pressed: string) {
+    this.pressed.push(pressed);
+    this.onPress(pressed);
   }
 
   reset() {
     this.removeAllListeners();
     this.pressed.length = 0;
+    this.onPress = () => {};
   }
 }
 
