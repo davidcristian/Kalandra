@@ -891,31 +891,24 @@ def test_value_trade_stats_df_extracts_values_and_hashes():
 
     result = service.value_trade_stats_df()
 
-    expected = pd.DataFrame(
-        [
-            {
-                "id": "explicit.stat_123456",
-                "text": "x",
-                "ref": "y",
-                "type": "explicit",
-                "value": "10",
-                "hash": 123456,
-            },
-            {
-                "id": "rune.stat_654321",
-                "text": "a",
-                "ref": "b",
-                "type": "rune",
-                "value": "99",
-                "hash": 654321,
-            },
-        ]
-    )
-
-    pd.testing.assert_frame_equal(
-        result.sort_values("id").reset_index(drop=True),
-        expected.sort_values("id").reset_index(drop=True),
-    )
+    assert result.sort_values("id").to_dict("records") == [
+        {
+            "id": "explicit.stat_123456",
+            "text": "x",
+            "ref": "y",
+            "type": "explicit",
+            "value": "10",
+            "hash": 123456,
+        },
+        {
+            "id": "rune.stat_654321",
+            "text": "a",
+            "ref": "b",
+            "type": "rune",
+            "value": "99",
+            "hash": 654321,
+        },
+    ]
 
 
 def test_valueless_trade_stats_df_filters_out_value_stats():
