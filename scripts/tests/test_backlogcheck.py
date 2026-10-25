@@ -190,6 +190,16 @@ class BacklogCheckTest(unittest.TestCase):
                 self.assertTrue(output.startswith("backlogcheck: "), output)
                 self.assertIn("docs", output)
 
+    def test_exits_2_when_a_backlog_has_no_task_file(self) -> None:
+        files = {name: text for name, text in backlogs().items() if not name.startswith(HOST_TASKS)}
+        files["docs/dev/host/index.md"] = HOST_INDEX[: HOST_INDEX.index("- 001")]
+        for others in ({}, {f"{HOST_TASKS}notes.txt": "A note.\n"}):
+            with self.subTest(others=sorted(others)), repo(files | others) as root:
+                (root / HOST_TASKS).mkdir(exist_ok=True)
+                code, output = run(backlogcheck.main, root)
+                self.assertEqual(code, 2)
+                self.assertEqual(output, f"backlogcheck: {HOST_TASKS} has no task file, so the check cannot fail\n")
+
     def test_reports_template_lines_that_are_missing_or_have_a_wrong_value(self) -> None:
         wrong = task("The first task", "open", "**Area:** kitchen\n").replace("2026-10-18\n", "soon\n", 1)
         files = {

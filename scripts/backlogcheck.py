@@ -45,6 +45,10 @@ BACKLOGS = {
 }
 
 
+class BacklogError(Exception):
+    """A backlog has no task file, so its check cannot fail."""
+
+
 class Problem(NamedTuple):
     """One disagreement between an index and its task files."""
 
@@ -153,6 +157,9 @@ def check_backlog(root: Path, folder: str, fields: Sequence[Field]) -> list[Prob
     problems.extend(status_problems)
     checked = [*fields] if status is None else [status, *fields]
     files = sorted(path.name for path in (root / folder / "tasks").iterdir())
+    if not any(_FILE.fullmatch(name) for name in files):
+        msg = f"{folder}/tasks/ has no task file, so the check cannot fail"
+        raise BacklogError(msg)
     problems.extend(
         Problem(f"{folder}/tasks/{name}", "is not a NNN-slug.md task file")
         for name in files
@@ -182,7 +189,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     root: Path = args.root
     try:
         problems = [problem for folder, fields in BACKLOGS.items() for problem in check_backlog(root, folder, fields)]
-    except OSError as error:
+    except (BacklogError, OSError) as error:
         print(f"backlogcheck: {error}", file=sys.stderr)
         return 2
     for problem in problems:

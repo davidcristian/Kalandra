@@ -76,7 +76,8 @@ the repo.
   `<...>` for any text. A task file also follows its index's template: exactly one `**Origin:**` line with a
   markdown link and one `**Verified:**` line with a date, one `**Area:**` line from `AREAS` in a refinement, which a
   test compares with the template's list, and one `**Needs:**` line that starts with `Path of Exile 2 on Windows` in
-  a host task. One `## History` heading follows, and each list line under it starts with `- <date>: `.
+  a host task. One `## History` heading follows, and each list line under it starts with `- <date>: `. A `tasks/`
+  folder that holds no task file exits with 2, as a missing one does.
 
 ### versioncheck.py
 
@@ -153,7 +154,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 116 tests on 26 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 117 tests on 26 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
