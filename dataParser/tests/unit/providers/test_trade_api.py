@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -85,6 +86,21 @@ def test_pull_keeps_the_old_file_after_a_status_other_than_200(
     assert (tmp_path / "items.json").read_text(encoding="utf-8") == "old items"
     assert f"Failed to fetch JSON from: {BASE_URL}/items, code: 404" in caplog.text
     assert read(tmp_path / "static.json") == {"result": []}
+
+
+def test_pull_logs_under_the_name_of_its_module(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.INFO, logger="providers.trade_api")
+
+    _ = pull(
+        tmp_path,
+        [ok(FILTERS), ok(STATS), FakeResponse(404, "Not Found"), ok({"result": []})],
+    )
+
+    lines = [record for record in caplog.records if "JSON" in record.getMessage()]
+    assert {record.name for record in lines} == {"providers.trade_api"}
+    assert {record.levelname for record in lines} == {"INFO", "ERROR"}
 
 
 @pytest.mark.parametrize(

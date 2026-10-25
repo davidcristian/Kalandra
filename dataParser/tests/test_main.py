@@ -1,4 +1,8 @@
 import json
+import logging
+import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -162,3 +166,19 @@ def test_write_text_logs_a_failed_write_and_raises_it_again(
     assert [record.levelname for record in caplog.records] == ["ERROR"]
     assert caplog.records[0].getMessage().startswith(f"Failed to write {path}: ")
     assert capsys.readouterr().out == ""
+
+
+def test_importing_main_adds_no_log_handler_and_keeps_the_default_level():
+    # A new interpreter, since this test run has already imported every module
+    script = "import logging, main; root = logging.getLogger(); print(len(root.handlers), root.level)"
+    src = Path(__file__).parent.parent / "src"
+    result = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=src,
+        env={**os.environ, "PYTHONPATH": str(src)},
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert result.stdout.splitlines()[-1].split() == ["0", str(logging.WARNING)]

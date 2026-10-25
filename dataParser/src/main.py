@@ -21,9 +21,6 @@ from services.image_provider import MODE, backup_cache
 from services.nd_builder_service import NdBuilderService
 from services.request_pacer import RequestPacer
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 
@@ -136,5 +133,9 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    logging.getLogger().setLevel(args.pop("log").upper())  # pyright:ignore [reportAny]
+    # Only here, so importing a module sets no handler and no level
+    logging.basicConfig(
+        level=args.pop("log").upper(),  # pyright:ignore [reportAny]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     main(**args)  # pyright:ignore [reportAny]

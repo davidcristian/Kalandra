@@ -64,6 +64,20 @@ def test_run_export_logs_a_command_that_fails(
     assert "Exported game data" not in caplog.text
 
 
+def test_run_export_logs_under_the_name_of_its_module(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.INFO, logger="providers.game_api")
+    vendor = tmp_path / "vendor"
+    vendor.mkdir()
+
+    run_export(tmp_path, monkeypatch, 0, vendor)
+
+    assert [(record.name, record.levelname) for record in caplog.records] == [
+        ("providers.game_api", "INFO")
+    ]
+
+
 def test_run_export_logs_a_command_missing_from_the_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:

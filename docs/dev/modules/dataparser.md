@@ -23,6 +23,9 @@ flags (`src/main.py`):
 | `--main-repo-path` | `..` | the repo root, which is the parent of `dataParser/` |
 | `--log` | `info` | the log level: `debug`, `info`, `warn` or `error` |
 
+Each module logs through `logging.getLogger(__name__)`, so each line names its module. Only the `__main__` block of a
+command sets the log level and format, so importing a module changes neither.
+
 Without `--pull`, it builds from the inputs already in `data/`. It builds English first, then the other eight
 languages in no fixed order, and each language overwrites `output/<lang>/stats.ndjson`, `items.ndjson` and
 `client_strings.js`. Each build logs `Building <lang>: <n>/9` between two lines of `=` signs.

@@ -14,6 +14,8 @@ from constants.lang import LANG
 from constants.urls import LANG_URLS, TRADE_QUERY_URLS
 from services.request_pacer import RequestPacer
 
+logger = logging.getLogger(__name__)
+
 USER_AGENT_PRODUCT = (
     "kalandra-dataparser/1 (+https://github.com/davidcristian/Kalandra/issues)"
 )
@@ -88,7 +90,7 @@ class TradeApiProvider:
         for relative_url in TRADE_QUERY_URLS:
             url = f"{base_url}{relative_url}"
             filename = os.path.basename(relative_url)
-            logging.info(f"Fetching JSON from: {url} for language: {self.lang}")
+            logger.info(f"Fetching JSON from: {url} for language: {self.lang}")
 
             data = self.fetch(url, filename)
             if data is None:
@@ -98,22 +100,22 @@ class TradeApiProvider:
                 data, ensure_ascii=False, indent=4, sort_keys=filename == "stats"
             )
             write_atomically(output_path, text)
-            logging.info(f"Saved JSON to: {output_path}")
+            logger.info(f"Saved JSON to: {output_path}")
 
     def fetch(self, url: str, filename: str) -> object | None:
         """Returns the response in the form it is saved, or None after logging why it is unusable."""
         try:
             response = self.pacer.get(url)
         except (RequestException, CloudflareException) as error:
-            logging.error(f"Failed to fetch JSON from: {url}, error: {error}")
+            logger.error(f"Failed to fetch JSON from: {url}, error: {error}")
             return None
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 f"Failed to fetch JSON from: {url}, code: {response.status_code}"
             )
             return None
         try:
             return saved_form(filename, response.json())
         except ValueError as error:
-            logging.error(f"Failed to read JSON from: {url}, error: {error}")
+            logger.error(f"Failed to read JSON from: {url}, error: {error}")
             return None

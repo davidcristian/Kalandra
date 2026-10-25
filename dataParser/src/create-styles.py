@@ -13,9 +13,6 @@ from models.user_style_model import UserStyleModel
 from services.tagged_stats import TaggedStats
 from services.userstyles_builder import UserStylesBuilder
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 CURRENT_VERSION = "1.0.12"
@@ -89,5 +86,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    logging.getLogger().setLevel(args.log.upper())  # pyright:ignore [reportAny]
+    logging.basicConfig(
+        level=args.log.upper(),  # pyright:ignore [reportAny]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     main(**vars(args))  # pyright:ignore [reportAny]
