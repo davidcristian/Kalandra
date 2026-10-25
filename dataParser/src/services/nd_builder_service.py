@@ -29,6 +29,7 @@ from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
 from services.image_provider import MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
 from services.specific_column_service import SpecificColumnService
+from services.static_items import add_static_data
 from services.value_converter_service import ValueConverterService
 from stores.game_store import GameStore
 from stores.trade_store import TradeStore
@@ -323,16 +324,8 @@ class NdBuilderService:
         )
 
         logger.info("adding static data")
-        static = self.ref_trade_store.static()
-        static["icon_s"] = static["image"].apply(lambda x: f"https://web.poecdn.com{x}")
-        static_items_added = images_added.merge(
-            static[["text", "icon_s", "tradeTag"]],
-            left_on="refName",
-            right_on="text",
-            how="left",
-        )
-        static_items_added.loc[static_items_added["icon_s"].notna(), "icon"] = (
-            static_items_added["icon_s"]
+        static_items_added = add_static_data(
+            images_added, self.ref_trade_store.static()
         )
 
         logger.info("Sorting and returning items")

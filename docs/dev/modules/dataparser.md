@@ -90,8 +90,9 @@ A lookup is a trade search and a fetch on `www.pathofexile.com`, in the league t
 tool's own `RateLimiter` (`src/services/rate_limiter.py`). Only the English build uses `--image-mode`. The other
 languages use `noLookup` and read the cache the English build saved. Each build first copies the cache to
 `src/services/itemImageCache.old.json`. Where the trade site's `static.json` has an image for an item, that image
-replaces the icon. The cache is not in this repo, so a `noLookup` run without it writes `%NOT_FOUND%` for every other
-icon.
+replaces the icon (`src/services/static_items.py`). An entry without an image, such as a list separator, leaves
+the item's icon unchanged. The cache is not in this repo, so a `noLookup` run without it writes `%NOT_FOUND%` for
+every other icon.
 
 ## Outputs
 
