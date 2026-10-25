@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/ini": "^4.1.0",
-    "@types/node": "22.x.x",
+    "@types/node": "24.x.x",
     "@types/ws": "^8.5.3",
     "@vitest/coverage-v8": "^4.1.12",
     "@wokwi/bmp-ts": "^3.0.0",

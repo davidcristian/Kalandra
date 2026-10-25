@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@types/luxon": "^3.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "24.x.x",
     "@types/object-hash": "^3.0.0",
     "@vitejs/plugin-vue": "^4.6.2",
     "@vitest/coverage-v8": "^4.0.18",
