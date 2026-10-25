@@ -75,18 +75,15 @@ export default {
   SENTINEL_CHARGE: 'Заряд: ',
   FOIL_UNIQUE: 'Особый уникальный предмет',
   UNMODIFIABLE: 'Неизменяемый',
-  REQUIREMENTS: 'Требования',
   CHARM_SLOTS: 'Ячейки оберегов: ',
   BASE_SPIRIT: 'Дух: ',
   PRICE_NOTE: 'Примечание: ',
-  WAYSTONE_TIER: 'Уровень путевого камня: ',
   TIMELESS_RADIUS: 'Радиус: ',
   REQUIRES: 'Требуется: ',
   TIMELESS_SMALL_PASSIVES: 'Малые пассивные умения в радиусе также дают: {0}',
   TIMELESS_NOTABLE_PASSIVES: 'Значимые пассивные умения в радиусе также дают: {0}',
   GRANTS_SKILL: 'Дарует умение: ',
   RELOAD_SPEED: 'Время перезарядки: ',
-  FRACTURED_ITEM: 'Расколотый предмет',
   SANCTIFIED: 'Освящено',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Доступно возрождений: ',
@@ -98,7 +95,6 @@ export default {
   WAYSTONE_MONSTER_RARITY: 'Редкость монстров: ',
   WAYSTONE_EFFECTIVENESS: 'Эффективность монстров: ',
   DOUBLE_CORRUPTED: 'Дважды осквернено',
-  UNIQUE_MODIFIER: 'Уникальное свойство',
   VAAL_UNIQUE_MODIFIER: 'Уникальное свойство ваал',
   TRIAL_COUNT: 'Число испытаний: ',
   ULTIMATUM_VICTORIOUS: 'Победный',
@@ -119,18 +115,6 @@ export default {
   SPEED_TAG: 'Скорость',
   ATTRIBUTE_TAG: 'Характеристика',
   MINION_TAG: 'Приспешник',
-  // [Array]
-  SHAPER_MODS: ['of Shaping', 'The Shaper\'s'],
-  // [Array]
-  ELDER_MODS: ['of the Elder', 'The Elder\'s'],
-  // [Array]
-  CRUSADER_MODS: ['Crusader\'s', 'of the Crusade'],
-  // [Array]
-  HUNTER_MODS: ['Hunter\'s', 'of the Hunt'],
-  // [Array]
-  REDEEMER_MODS: ['Redeemer\'s', 'of Redemption'],
-  // [Array]
-  WARLORD_MODS: ['Warlord\'s', 'of the Conquest'],
   // [Array]
   DELVE_MODS: ['Subterranean', 'of the Underground'],
   // [Array]
@@ -160,20 +144,6 @@ export default {
   MODIFIER_INCREASED: /^(.*)% увеличение$/,
   EATER_IMPLICIT: /^Собственное свойство Пожирателя миров \((?<rank>.+)\)$/,
   EXARCH_IMPLICIT: /^Собственное свойство Пламенного экзарха \((?<rank>.+)\)$/,
-  // [Manual]
-  CHAT_SYSTEM: /^: (?<body>.+)$/,
-  // [Manual]
-  CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GLOBAL: /^#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_PARTY: /^%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GUILD: /^&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_TO: /^@Кому (?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_FROM: /^@От кого (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_WEBTRADE_GEM: /^level (?<gem_lvl>\d+) (?<gem_qual>\d+)% (?<gem_name>.+)$/,
   // [Override]
   LOG_LEVEL_UP: /^(?<char_name>.*) \((?<char_class>.*)\) достигает (?<level>\d+) уровня$/,
   // [Manual]

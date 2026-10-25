@@ -75,18 +75,15 @@ export default {
   SENTINEL_CHARGE: 'チャージ: ',
   FOIL_UNIQUE: 'フォイルユニーク',
   UNMODIFIABLE: '変更不可',
-  REQUIREMENTS: '装備要求',
   CHARM_SLOTS: 'チャームスロット: ',
   BASE_SPIRIT: 'スピリット: ',
   PRICE_NOTE: 'メモ: ',
-  WAYSTONE_TIER: 'ウェイストーンティア: ',
   TIMELESS_RADIUS: '半径: ',
   REQUIRES: '装備条件：',
   TIMELESS_SMALL_PASSIVES: '範囲内のスモールパッシブスキルは{0}も付与する',
   TIMELESS_NOTABLE_PASSIVES: '範囲内のノータブルパッシブスキルは{0}も付与する',
   GRANTS_SKILL: 'スキルを付与: ',
   RELOAD_SPEED: '再装填時間: ',
-  FRACTURED_ITEM: 'フラクチャーアイテム',
   SANCTIFIED: '聖別化',
   HYPHEN: '-',
   WAYSTONE_REVIVES: '復活が利用可能: ',
@@ -98,7 +95,6 @@ export default {
   WAYSTONE_MONSTER_RARITY: 'モンスターレアリティ: ',
   WAYSTONE_EFFECTIVENESS: 'モンスターエフェクティブ: ',
   DOUBLE_CORRUPTED: 'ダブルコラプト状態',
-  UNIQUE_MODIFIER: 'ユニークモッド',
   VAAL_UNIQUE_MODIFIER: 'ヴァールユニークモッド',
   TRIAL_COUNT: '試練数: ',
   ULTIMATUM_VICTORIOUS: '勝利',
@@ -119,18 +115,6 @@ export default {
   SPEED_TAG: 'スピード',
   ATTRIBUTE_TAG: '能力値',
   MINION_TAG: 'ミニオン',
-  // [Array]
-  SHAPER_MODS: ['of Shaping', 'The Shaper\'s'],
-  // [Array]
-  ELDER_MODS: ['of the Elder', 'The Elder\'s'],
-  // [Array]
-  CRUSADER_MODS: ['Crusader\'s', 'of the Crusade'],
-  // [Array]
-  HUNTER_MODS: ['Hunter\'s', 'of the Hunt'],
-  // [Array]
-  REDEEMER_MODS: ['Redeemer\'s', 'of Redemption'],
-  // [Array]
-  WARLORD_MODS: ['Warlord\'s', 'of the Conquest'],
   // [Array]
   DELVE_MODS: ['Subterranean', 'of the Underground'],
   // [Array]
@@ -160,20 +144,6 @@ export default {
   MODIFIER_INCREASED: /^(.*)%増加$/,
   EATER_IMPLICIT: /^世界を喰らう者 暗黙モッド 「(?<rank>.+)」$/,
   EXARCH_IMPLICIT: /^灼熱の代行者 暗黙モッド 「(?<rank>.+)」$/,
-  // [Manual]
-  CHAT_SYSTEM: /^: (?<body>.+)$/,
-  // [Manual]
-  CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GLOBAL: /^#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_PARTY: /^%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GUILD: /^&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_TO: /^@宛先 (?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_FROM: /^@差出人 (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_WEBTRADE_GEM: /^level (?<gem_lvl>\d+) (?<gem_qual>\d+)% (?<gem_name>.+)$/,
   LOG_LEVEL_UP: /^(?<char_name>.*) \((?<char_class>.*)\)は現在レベル(?<level>\d+)です$/,
   // [Manual]
   LOG_ZONE_GEN: /^Generating level (?<area_level>\d+) area "(?<zone>.*)" with seed (?<seed>\d+)$/,

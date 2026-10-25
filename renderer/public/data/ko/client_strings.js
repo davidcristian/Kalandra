@@ -75,18 +75,15 @@ export default {
   SENTINEL_CHARGE: '충전: ',
   FOIL_UNIQUE: '반짝이 버전 고유 아이템',
   UNMODIFIABLE: '속성 부여 불가',
-  REQUIREMENTS: '요구사항',
   CHARM_SLOTS: '호신부 슬롯: ',
   BASE_SPIRIT: '정신력: ',
   PRICE_NOTE: '메모: ',
-  WAYSTONE_TIER: '경로석 등급: ',
   TIMELESS_RADIUS: '적용 반경: ',
   REQUIRES: '요구 사항: ',
   TIMELESS_SMALL_PASSIVES: '반경 내 소형 패시브 스킬이 {0}도 부여',
   TIMELESS_NOTABLE_PASSIVES: '반경 내 주요 패시브 스킬이 {0}도 부여',
   GRANTS_SKILL: '스킬 부여: ',
   RELOAD_SPEED: '재장전 시간: ',
-  FRACTURED_ITEM: '분열된 아이템',
   SANCTIFIED: '축성',
   HYPHEN: '-',
   WAYSTONE_REVIVES: '부활 횟수: ',
@@ -98,7 +95,6 @@ export default {
   WAYSTONE_MONSTER_RARITY: '몬스터 희귀도: ',
   WAYSTONE_EFFECTIVENESS: '몬스터 효율: ',
   DOUBLE_CORRUPTED: '두 번 타락',
-  UNIQUE_MODIFIER: '고유 속성 부여',
   VAAL_UNIQUE_MODIFIER: '바알 고유 속성',
   TRIAL_COUNT: '시련 수: ',
   ULTIMATUM_VICTORIOUS: '승리',
@@ -119,18 +115,6 @@ export default {
   SPEED_TAG: '속도',
   ATTRIBUTE_TAG: '능력치',
   MINION_TAG: '소환수',
-  // [Array]
-  SHAPER_MODS: ['of Shaping', 'The Shaper\'s'],
-  // [Array]
-  ELDER_MODS: ['of the Elder', 'The Elder\'s'],
-  // [Array]
-  CRUSADER_MODS: ['Crusader\'s', 'of the Crusade'],
-  // [Array]
-  HUNTER_MODS: ['Hunter\'s', 'of the Hunt'],
-  // [Array]
-  REDEEMER_MODS: ['Redeemer\'s', 'of Redemption'],
-  // [Array]
-  WARLORD_MODS: ['Warlord\'s', 'of the Conquest'],
   // [Array]
   DELVE_MODS: ['Subterranean', 'of the Underground'],
   // [Array]
@@ -160,20 +144,6 @@ export default {
   MODIFIER_INCREASED: /^(.*)% 증가$/,
   EATER_IMPLICIT: /^세계 포식자 고정 속성 \((?<rank>.+)\)$/,
   EXARCH_IMPLICIT: /^작열의 총주교 고정 속성 \((?<rank>.+)\)$/,
-  // [Manual]
-  CHAT_SYSTEM: /^: (?<body>.+)$/,
-  // [Manual]
-  CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GLOBAL: /^#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_PARTY: /^%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GUILD: /^&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_TO: /^@발신 (?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_FROM: /^@수신 (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_WEBTRADE_GEM: /^level (?<gem_lvl>\d+) (?<gem_qual>\d+)% (?<gem_name>.+)$/,
   LOG_LEVEL_UP: /^(?<char_name>.*) \((?<char_class>.*)\)의 레벨이 (?<level>\d+)이\(가\) 되었습니다$/,
   // [Manual]
   LOG_ZONE_GEN: /^Generating level (?<area_level>\d+) area "(?<zone>.*)" with seed (?<seed>\d+)$/,

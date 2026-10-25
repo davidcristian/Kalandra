@@ -75,18 +75,15 @@ export default {
   SENTINEL_CHARGE: '充能: ',
   FOIL_UNIQUE: '貼模傳奇',
   UNMODIFIABLE: '不可調整的',
-  REQUIREMENTS: '需求',
   CHARM_SLOTS: '護符欄位: ',
   BASE_SPIRIT: '精魂: ',
   PRICE_NOTE: '備註: ',
-  WAYSTONE_TIER: '換界石階級: ',
   TIMELESS_RADIUS: '範圍: ',
   REQUIRES: '需求: ',
   TIMELESS_SMALL_PASSIVES: '範圍內小型天賦也會賦予 {0}',
   TIMELESS_NOTABLE_PASSIVES: '範圍內核心天賦也會賦予 {0}',
   GRANTS_SKILL: '賦予技能: ',
   RELOAD_SPEED: '重新裝填時間: ',
-  FRACTURED_ITEM: '破裂之物',
   SANCTIFIED: '聖化的',
   HYPHEN: '到',
   WAYSTONE_REVIVES: '可用的復活數: ',
@@ -98,7 +95,6 @@ export default {
   WAYSTONE_MONSTER_RARITY: '怪物稀有度: ',
   WAYSTONE_EFFECTIVENESS: '怪物效能: ',
   DOUBLE_CORRUPTED: '雙重 Corrupted',
-  UNIQUE_MODIFIER: '傳奇詞綴',
   VAAL_UNIQUE_MODIFIER: '瓦爾傳奇終結特效',
   TRIAL_COUNT: '試煉數量: ',
   ULTIMATUM_VICTORIOUS: '勝利',
@@ -119,18 +115,6 @@ export default {
   SPEED_TAG: '速度',
   ATTRIBUTE_TAG: '能力',
   MINION_TAG: '召喚物',
-  // [Array]
-  SHAPER_MODS: ['of Shaping', 'The Shaper\'s'],
-  // [Array]
-  ELDER_MODS: ['of the Elder', 'The Elder\'s'],
-  // [Array]
-  CRUSADER_MODS: ['Crusader\'s', 'of the Crusade'],
-  // [Array]
-  HUNTER_MODS: ['Hunter\'s', 'of the Hunt'],
-  // [Array]
-  REDEEMER_MODS: ['Redeemer\'s', 'of Redemption'],
-  // [Array]
-  WARLORD_MODS: ['Warlord\'s', 'of the Conquest'],
   // [Array]
   DELVE_MODS: ['Subterranean', 'of the Underground'],
   // [Array]
@@ -160,20 +144,6 @@ export default {
   MODIFIER_INCREASED: /^增加 (.*)%$/,
   EATER_IMPLICIT: /^吞噬天地固定詞綴 \((?<rank>.+)\)$/,
   EXARCH_IMPLICIT: /^灼烙總督固定詞綴 \((?<rank>.+)\)$/,
-  // [Manual]
-  CHAT_SYSTEM: /^: (?<body>.+)$/,
-  // [Manual]
-  CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GLOBAL: /^#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_PARTY: /^%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GUILD: /^&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_TO: /^@向 (?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_FROM: /^@來自 (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_WEBTRADE_GEM: /^level (?<gem_lvl>\d+) (?<gem_qual>\d+)% (?<gem_name>.+)$/,
   LOG_LEVEL_UP: /^(?<char_name>.*) \((?<char_class>.*)\) 現在等級 (?<level>\d+)$/,
   // [Manual]
   LOG_ZONE_GEN: /^Generating level (?<area_level>\d+) area "(?<zone>.*)" with seed (?<seed>\d+)$/,

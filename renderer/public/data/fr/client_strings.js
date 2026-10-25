@@ -75,18 +75,15 @@ export default {
   SENTINEL_CHARGE: 'Charge : ',
   FOIL_UNIQUE: 'Unique en version surbrillante',
   UNMODIFIABLE: 'Non modifiable',
-  REQUIREMENTS: 'Prérequis:',
   CHARM_SLOTS: 'Emplacements de Charmes: ',
   BASE_SPIRIT: 'Esprit: ',
   PRICE_NOTE: 'Commentaire: ',
-  WAYSTONE_TIER: 'Palier de Pierre de téléportation: ',
   TIMELESS_RADIUS: 'Rayon: ',
   REQUIRES: 'Prérequis : ',
   TIMELESS_SMALL_PASSIVES: 'Les Talents Mineurs dans le Rayon octroient également {0}',
   TIMELESS_NOTABLE_PASSIVES: 'Les Talents éminents dans le Rayon octroient également {0}',
   GRANTS_SKILL: 'Octroie l\'Aptitude: ',
   RELOAD_SPEED: 'Temps de rechargement: ',
-  FRACTURED_ITEM: 'Objet fissuré',
   SANCTIFIED: 'Sanctifié',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Résurrections disponibles: ',
@@ -98,7 +95,6 @@ export default {
   WAYSTONE_MONSTER_RARITY: 'Rareté des Monstres: ',
   WAYSTONE_EFFECTIVENESS: 'Efficacité des Monstres: ',
   DOUBLE_CORRUPTED: 'Double Corruption',
-  UNIQUE_MODIFIER: 'Modificateur d\'Objet unique',
   VAAL_UNIQUE_MODIFIER: 'Modificateur vaal unique',
   TRIAL_COUNT: 'Nombre d\'Épreuves: ',
   ULTIMATUM_VICTORIOUS: 'Victorieux',
@@ -119,18 +115,6 @@ export default {
   SPEED_TAG: 'Vitesse',
   ATTRIBUTE_TAG: 'Attribut',
   MINION_TAG: 'Créature',
-  // [Array]
-  SHAPER_MODS: ['of Shaping', 'The Shaper\'s'],
-  // [Array]
-  ELDER_MODS: ['of the Elder', 'The Elder\'s'],
-  // [Array]
-  CRUSADER_MODS: ['Crusader\'s', 'of the Crusade'],
-  // [Array]
-  HUNTER_MODS: ['Hunter\'s', 'of the Hunt'],
-  // [Array]
-  REDEEMER_MODS: ['Redeemer\'s', 'of Redemption'],
-  // [Array]
-  WARLORD_MODS: ['Warlord\'s', 'of the Conquest'],
   // [Array]
   DELVE_MODS: ['Subterranean', 'of the Underground'],
   // [Array]
@@ -161,20 +145,6 @@ export default {
   MODIFIER_INCREASED: /^Augmentation : (.*)%$/,
   EATER_IMPLICIT: /^Implicite du Mangeur de mondes \((?<rank>.+)\)$/,
   EXARCH_IMPLICIT: /^Implicite de l'Exarque ardent \((?<rank>.+)\)$/,
-  // [Manual]
-  CHAT_SYSTEM: /^: (?<body>.+)$/,
-  // [Manual]
-  CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GLOBAL: /^#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_PARTY: /^%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_GUILD: /^&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_TO: /^@À (?<char_name>.+?): (?<body>.+)$/,
-  CHAT_WHISPER_FROM: /^@De (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
-  // [Manual]
-  CHAT_WEBTRADE_GEM: /^level (?<gem_lvl>\d+) (?<gem_qual>\d+)% (?<gem_name>.+)$/,
   LOG_LEVEL_UP: /^(?<char_name>.*) \((?<char_class>.*)\) vient de passer au niveau (?<level>\d+)\.$/,
   // [Manual]
   LOG_ZONE_GEN: /^Generating level (?<area_level>\d+) area "(?<zone>.*)" with seed (?<seed>\d+)$/,
