@@ -215,6 +215,8 @@ changes the body of `createTradeRequest`, so `createFilters` returns no filter t
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
 `mageblood.test.ts` there makes the Mageblood preset of `create-unique-filters.ts` for belts with one to four
 Legacy kinds, and checks the Duplicates filter and the count of Legacy rolls that `createTradeRequest` sends.
+`pseudo/anointments.test.ts` there names the emotions of a real anointed amulet and checks when its anointment
+filter is left out of the search.
 `specs/web/price-check/item-editor/` checks which editor `getItemEditorType` opens for real copied items, the
 catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
@@ -235,6 +237,7 @@ timers. `listing-markers.test.ts` there checks which column shows a listing's ma
 reads hand-written responses with `readTradeData` and answers each trade site request with a web page.
 `listing-properties.test.ts` there reads a listing's item level, quality and gem level by property type, and
 `prop-set.test.ts` checks the paths `propSet` accepts with `expectTypeOf`, which `tsc` checks.
+`artificial-slowdown.test.ts` there checks with fake timers when a result list stops waiting after a reset.
 `specs/web/watch-order.test.ts` mounts a component with a fake renderer and checks that Vue runs its watchers in
 the order they are defined. No test calls a live site.
 `Leagues.ts` and `poeprices.ts` have no test file of their own.
