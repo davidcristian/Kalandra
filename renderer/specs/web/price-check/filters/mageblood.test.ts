@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { reactive } from "vue";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
 import { UniqueItem } from "@specs/Parser/items";
@@ -111,6 +112,24 @@ describe("the price check of a Mageblood", () => {
     });
     expect(legacyFilter(stats, "Topaz").roll).toBeUndefined();
     expect(legacyFilter(stats, "Gold").roll).toBeUndefined();
+  });
+
+  it("makes the preset of a reactive item and leaves the item's stats unchanged", () => {
+    const item = reactive(
+      parseClipboard(
+        mageblood(["Topaz", "Gold", "Topaz", "Jade"]),
+      )._unsafeUnwrap(),
+    );
+    const before = JSON.stringify(item.statsByType);
+
+    const [preset] = createPresets(item, createTestCreateOptions()).presets;
+
+    expect(JSON.stringify(item.statsByType)).toBe(before);
+    expect(legacyFilter(preset.stats, "Topaz").sources).toEqual([
+      expect.objectContaining({
+        contributes: { value: 0, min: 0, max: 0, option: OPTION.Topaz },
+      }),
+    ]);
   });
 
   it("searches each kind and counts four rolls for two kinds with two duplicates", () => {

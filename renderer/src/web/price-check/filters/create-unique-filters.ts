@@ -111,10 +111,11 @@ function createMagebloodFilters(
       },
       sources: legacies.flatMap((s) => s.sources),
       disabled: false,
-      hidden: "dont_hide_me",
     },
     ctx,
   );
+  // calculatedStatToFilter hides a unique's fixed roll, and this roll gets a range of 0 to 3 below
+  dupFilter.hidden = undefined;
   dupFilter.roll!.bounds = {
     min: 0,
     max: 3,
@@ -124,18 +125,11 @@ function createMagebloodFilters(
 
   ctx.filters.push(
     ...legacies.map((mod) => {
-      // copy to not modify original, causing infinite refEffect loop
-      const copiedMod = JSON.parse(JSON.stringify(mod));
-      const source = copiedMod.sources[0];
-      source.contributes = {
-        value: 0,
-        min: 0,
-        max: 0,
-        option: source.contributes?.option,
-      };
-
-      copiedMod.sources = [source];
-      const f = calculatedStatToFilter(copiedMod, ctx.searchInRange, item);
+      const f = calculatedStatToFilter(
+        withoutRoll(mod),
+        ctx.searchInRange,
+        item,
+      );
       f.roll = undefined;
 
       return f;
@@ -146,10 +140,17 @@ function createMagebloodFilters(
     if (!filter.hidden) {
       filter.disabled = false;
     }
-    if (filter.hidden === "dont_hide_me") {
-      filter.hidden = undefined;
-    }
   }
 
   return ctx.filters;
+}
+
+/** Returns a copy of the stat with its first source at a roll of 0, and leaves the item's own stat unchanged. */
+function withoutRoll(mod: StatCalculated): StatCalculated {
+  const [source] = mod.sources;
+  const option = source.contributes?.option;
+  return {
+    ...mod,
+    sources: [{ ...source, contributes: { value: 0, min: 0, max: 0, option } }],
+  };
 }
