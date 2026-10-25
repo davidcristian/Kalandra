@@ -26,7 +26,7 @@
       />
       <div v-if="config.showExp">
         Exp
-        {{ areaLevel > 70 || characterLevel >= 95 ? "*" : "" }}:
+        {{ outsideTestData(characterLevel, areaLevel) ? "*" : "" }}:
         <span
           class="font-semibold"
           :class="{
@@ -58,32 +58,7 @@ import Widget from "../overlay/Widget.vue";
 import { WidgetSpec } from "../overlay/interfaces";
 import { XpWidget } from "./widget";
 import { useClientLog } from "../client-log/client-log";
-
-function calcBaseSafeZone(playerLevel: number): number {
-  return Math.floor(playerLevel / 16) + 3;
-}
-
-function getOverIdeal(playerLevel: number, monsterLevel: number): number {
-  const safeZone = calcBaseSafeZone(playerLevel);
-  return safeZone - (monsterLevel - playerLevel);
-}
-
-function getExpPenalty(playerLevel: number, monsterLevel: number): number {
-  const safeZone =
-    monsterLevel > playerLevel ? calcBaseSafeZone(playerLevel) : 0;
-
-  const effectiveDiff = Math.max(
-    Math.abs(monsterLevel - playerLevel) - safeZone,
-    0,
-  );
-
-  const expMulti = Math.max(
-    0.01,
-    ((playerLevel + 5) / (playerLevel + 5 + effectiveDiff ** 2.5)) ** 1.3,
-  );
-
-  return 100 * expMulti;
-}
+import { getExpPenalty, getOverIdeal, outsideTestData } from "./xp-formula";
 
 export default defineComponent({
   widget: {
@@ -128,6 +103,7 @@ export default defineComponent({
     return {
       characterLevel,
       areaLevel,
+      outsideTestData,
       expPenalty: computed(() => {
         return getExpPenalty(characterLevel.value, areaLevel.value).toFixed(1);
       }),
