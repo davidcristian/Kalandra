@@ -137,3 +137,57 @@ def test_get_stat_by_hash():
     ).set_index("_index", drop=True)
 
     pd.testing.assert_frame_equal(result, expected)
+
+
+class FakeGameStore:
+    """Returns a copy of the named table, as GameStore.get does."""
+
+    def __init__(self, tables: dict[str, pd.DataFrame]) -> None:
+        self.tables: dict[str, pd.DataFrame] = tables
+
+    def get(self, filename: str) -> pd.DataFrame:
+        return self.tables[filename].copy()
+
+
+def test_join_all_adds_a_tag_from_a_stat_id_only_to_that_stat():
+    ts = TaggedStats()
+    ts.game_store = FakeGameStore(
+        {
+            MODS: pd.DataFrame(
+                [
+                    {
+                        "_index": 0,
+                        "Id": "StrengthAndDexterity1",
+                        "ImplicitTags": [1],
+                        "Stat1": 1,
+                        "Stat2": 2,
+                        "Stat3": None,
+                        "Stat4": None,
+                        "Stat5": None,
+                        "Stat6": None,
+                    }
+                ]
+            ),
+            TAGS: pd.DataFrame(
+                [{"_index": 0, "Id": "Physical"}, {"_index": 1, "Id": "Attack"}]
+            ),
+        }
+    )
+    stats_tags = ts.get_stats_with_tags()
+    hash_by_stat = pd.DataFrame(
+        [
+            {"_index": 1, "id": "additional_strength", "hash": 11},
+            {"_index": 2, "id": "additional_dexterity", "hash": 22},
+        ]
+    ).set_index("_index", drop=True)
+    trade_stats = pd.DataFrame(
+        [{"ref": "# to Strength", "hash": 11}, {"ref": "# to Dexterity", "hash": 22}]
+    )
+
+    joined = ts.join_all(trade_stats, stats_tags, hash_by_stat)
+
+    assert dict(zip(joined["ref"], joined["Tags"])) == {
+        "# to Strength": ["Attack", "strength"],
+        "# to Dexterity": ["Attack", "dexterity"],
+    }
+    assert stats_tags["Tags"].tolist() == [["Attack"], ["Attack"]]

@@ -12,6 +12,32 @@ from stores.game_store import GameStore
 logger = logging.getLogger(__name__)
 
 
+def with_id_tags(stat_id: str, tags: list[str]) -> list[str]:
+    """Returns a new list with the tags and the tags that the stat id implies."""
+    added = list(tags)
+    if "strength" in stat_id:
+        added.append("strength")
+    if "dexterity" in stat_id:
+        added.append("dexterity")
+    if "intelligence" in stat_id:
+        added.append("intelligence")
+    if "attribute_requirements" in stat_id:
+        added.append("attribute")
+    if "gem_level" in stat_id and "gem" not in added:
+        added.append("gem")
+    if re.search(r"base_max.*res", stat_id):
+        added.append("maximum")
+    if "shock_chance_" in stat_id:
+        added.append("lightning")
+    if "ignite_chance_" in stat_id:
+        added.append("fire")
+    if "hit_damage_freeze_multiplier_" in stat_id:
+        added.append("cold")
+    if "poison_on_hit" in stat_id:
+        added.append("poison")
+    return added
+
+
 class TaggedStats:
     def __init__(self) -> None:
         self.nd: NdBuilderService = NdBuilderService(
@@ -87,28 +113,15 @@ class TaggedStats:
         hash_by_stat: DataFrame,
     ):
         tag_and_hash = stats_tags.join(hash_by_stat, how="inner")
-
-        for _, row in tag_and_hash.iterrows():
-            if "strength" in row["id"]:
-                row["Tags"].append("strength")
-            if "dexterity" in row["id"]:
-                row["Tags"].append("dexterity")
-            if "intelligence" in row["id"]:
-                row["Tags"].append("intelligence")
-            if "attribute_requirements" in row["id"]:
-                row["Tags"].append("attribute")
-            if "gem_level" in row["id"] and "gem" not in row["Tags"]:
-                row["Tags"].append("gem")
-            if re.search(r"base_max.*res", row["id"]):
-                row["Tags"].append("maximum")
-            if "shock_chance_" in row["id"]:
-                row["Tags"].append("lightning")
-            if "ignite_chance_" in row["id"]:
-                row["Tags"].append("fire")
-            if "hit_damage_freeze_multiplier_" in row["id"]:
-                row["Tags"].append("cold")
-            if "poison_on_hit" in row["id"]:
-                row["Tags"].append("poison")
+        # The stats of one mod share one Tags list, so each stat gets a new list
+        tag_and_hash["Tags"] = pd.Series(
+            [
+                with_id_tags(stat_id, tags)
+                for stat_id, tags in zip(tag_and_hash["id"], tag_and_hash["Tags"])
+            ],
+            index=tag_and_hash.index,
+            dtype=object,
+        )
 
         filtered = tag_and_hash.loc[tag_and_hash["Tags"].apply(lambda x: len(x) > 0)]  # pyright: ignore[reportUnknownMemberType, reportUnknownLambdaType, reportUnknownArgumentType]
 
