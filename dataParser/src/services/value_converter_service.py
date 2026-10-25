@@ -1,8 +1,8 @@
-# pyright: basic
 import re
 from collections import defaultdict
+from collections.abc import Iterable
 from pprint import pformat
-from typing import Any
+from typing import Protocol, SupportsInt, cast
 
 import pandas as pd
 
@@ -29,8 +29,34 @@ from stores.game_store import GameStore
 from stores.helpers.description import Description
 
 
+class ValueStatRow(Protocol):
+    """A row of the trade stats whose id ends in a value, as itertuples returns it."""
+
+    type: str
+    id: str
+    text: str
+    ref: str
+    value: str
+
+
+def value_stat_rows(in_df: pd.DataFrame) -> Iterable[ValueStatRow]:
+    """Returns the rows of a group of trade stats with a value."""
+    # itertuples types each field as any scalar, and these columns hold strings
+    return cast(Iterable[ValueStatRow], in_df.itertuples())
+
+
+def group_hash(in_df: pd.DataFrame) -> int:
+    """Returns the stat hash of a group of trade stats with a value."""
+    # pandas types a row's name as any Hashable; here it is the hash the rows are grouped by
+    return int(cast(SupportsInt, in_df.iloc[0].name))
+
+
+def hash_list(stat_hash: int) -> list[int]:
+    return [int(stat_hash)]
+
+
 class ValueConverterService:
-    def __init__(self, lang: LANG):
+    def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
         self.blight = self.get_blight()
 
@@ -66,12 +92,12 @@ class ValueConverterService:
         grouped = filtered_to_supported.set_index("hash").groupby(level="hash")
         converted = grouped.apply(self.agg_by_hash).reset_index(drop=True)
         converted["dp"] = None
-        converted["hash"] = converted["hash"].apply(lambda x: [int(x)])
+        converted["hash"] = converted["hash"].apply(hash_list)
 
         return converted[["ref", "dp", "better", "matchers", "trade", "id", "hash"]]
 
     def agg_by_hash(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        hash: int = int(in_df.iloc[0].name)  # pyright: ignore[reportArgumentType]
+        hash = group_hash(in_df)
         if hash == JEWEL_RADIUS_CHANGE:
             return self.simple_agg(in_df)
         elif hash == JEWEL_RING_RADIUS:
@@ -88,23 +114,26 @@ class ValueConverterService:
         return in_df
 
     def simple_agg(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        id = int(in_df.iloc[0].name)  # pyright: ignore[reportArgumentType]
-        out = {
+        id = group_hash(in_df)
+        out: dict[str, object] = {
             "ref": VALUE_TO_REF[id],
             "id": VALUE_TO_DESCRIPTION_ID[id],
             "hash": id,
             "better": 1 if id not in BETTER_LOOKUP else BETTER_LOOKUP[id],
         }
-        ids = defaultdict(set)
-        matchers: list[dict[str, str | int | bool | list[int]]] = []
-        seen = set()
-        for row in in_df.itertuples():
+        ids: defaultdict[str, set[str]] = defaultdict(set)
+        matchers: list[dict[str, str | int]] = []
+        seen: set[str] = set()
+        for row in value_stat_rows(in_df):
             ids[row.type].add(row.id)
-            matcher: dict[str, Any] = {"string": row.text, "value": int(row.value)}  # pyright: ignore[reportArgumentType]
-            if id == ALLOCATES_NOTABLE and int(row.value) in self.blight:  # pyright: ignore[reportArgumentType]
-                matcher["oils"] = self.blight[int(row.value)]  # pyright: ignore[reportArgumentType]
+            matcher: dict[str, str | int] = {
+                "string": row.text,
+                "value": int(row.value),
+            }
+            if id == ALLOCATES_NOTABLE and int(row.value) in self.blight:
+                matcher["oils"] = self.blight[int(row.value)]
             if id == UNIQUE_JEWEL_PLUS_LEVEL:
-                matcher["string"] = matcher["string"].replace("+", "")
+                matcher["string"] = row.text.replace("+", "")
             signature = pformat(matcher)
             if signature not in seen:
                 seen.add(signature)
@@ -118,8 +147,10 @@ class ValueConverterService:
     def historic_agg(self, in_df: pd.DataFrame) -> pd.DataFrame:
         advanced_desc = Description(self.lang, ADVANCED_MOD_STAT_DESCRIPTIONS)
         advanced_desc.load()
-        advanced_df: dict[str, list[dict[str, str]]] = (
-            advanced_desc.to_dataframe().set_index("id")["matchers"].to_dict()
+        # to_dict types the keys as Hashable; the index holds the stat ids
+        advanced_df = cast(
+            dict[str, list[dict[str, str]]],
+            advanced_desc.to_dataframe().set_index("id")["matchers"].to_dict(),
         )
         historic_matchers = advanced_df["local_unique_jewel_alternate_tree_version"]
         advanced_desc_array = [matcher["string"] for matcher in historic_matchers]
@@ -131,14 +162,14 @@ class ValueConverterService:
         if len(advanced_desc_array) != max_value:
             # error case, just return simple agg
             return self.simple_agg(in_df)
-        out = []
-        for row in in_df.itertuples():
-            value = int(row.value) - 1  # pyright: ignore[reportArgumentType]
+        out: list[dict[str, object]] = []
+        for row in value_stat_rows(in_df):
+            value = int(row.value) - 1
             if self.lang == GERMAN:
                 value -= 1
 
-            out_row = {
-                "ref": row.ref.split("\n")[0],  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+            out_row: dict[str, object] = {
+                "ref": row.ref.split("\n")[0],
                 "id": VALUE_TO_DESCRIPTION_ID[TIME_LOST_HISTORIC_JEWEL],
                 "hash": TIME_LOST_HISTORIC_JEWEL,
                 "better": BETTER_LOOKUP[TIME_LOST_HISTORIC_JEWEL],

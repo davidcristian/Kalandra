@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import shutil
-from typing import Literal
+from typing import Any, Literal
 
 import pandas as pd
 from tqdm import tqdm
@@ -51,7 +51,7 @@ def backup_cache(cache_dir: str | None = None) -> None:
 class ImageProvider:
     def __init__(
         self, mode: MODE, cache_dir: str | None = None, net: RateLimiter | None = None
-    ):
+    ) -> None:
         self.mode: MODE = mode
         self.cache_dir: str = cache_dir or get_script_dir()
         self.net: RateLimiter = net or RateLimiter(debug=False)
@@ -71,7 +71,9 @@ class ImageProvider:
         with open(cache_path, "r", encoding="utf-8") as f:
             return json.loads(f.read())
 
-    def save_cache(self, cache: dict[str, str], output_file: str = ITEM_IMAGE_CACHE):
+    def save_cache(
+        self, cache: dict[str, str], output_file: str = ITEM_IMAGE_CACHE
+    ) -> None:
         cache_path = os.path.join(self.cache_dir, output_file)
         logger.info(f"Saving cache to {cache_path}")
         with open(cache_path, "w", encoding="utf-8") as f:
@@ -80,7 +82,7 @@ class ImageProvider:
     def apply_images(self, items: pd.DataFrame) -> pd.DataFrame:
         item_images = items.copy()
         try:
-            item_images["icon"] = item_images.progress_apply(self.get_image, axis=1)  # pyright:ignore [reportUnknownMemberType, reportCallIssue]
+            item_images["icon"] = item_images.progress_apply(self.get_image, axis=1)  # pyright: ignore[reportCallIssue] tqdm.pandas() adds progress_apply at run time
         finally:
             self.save_cache(self.cache)
         return item_images
@@ -122,7 +124,7 @@ class ImageProvider:
     def get_fetch_id(self, item: ItemImage) -> str | None:
         payload = item.search_payload()
         for _ in range(3):
-            result = self.net.post(SEARCH_URL, payload=payload, headers=SEARCH_HEADERS)  # pyright:ignore [reportArgumentType]
+            result = self.net.post(SEARCH_URL, payload=payload, headers=SEARCH_HEADERS)
             if result.status_code == 200:
                 data = result.json()
                 if data.get("result") and len(data.get("result")) > 0:
@@ -135,7 +137,7 @@ class ImageProvider:
                 )
         raise RateLimitError(f"Rate limited 3 times, gave up on the search for {item}")
 
-    def fetch_listing(self, fetch_id: str):
+    def fetch_listing(self, fetch_id: str) -> dict[str, Any] | None:
         for _ in range(3):
             result = self.net.get(FETCH_URL + fetch_id)
             if result.status_code == 200:
@@ -152,7 +154,7 @@ class ImageProvider:
             f"Rate limited 3 times, gave up on the fetch of {fetch_id}"
         )
 
-    def parse_listing_for_url(self, listing) -> str | None:
+    def parse_listing_for_url(self, listing: dict[str, Any]) -> str | None:
         item = listing.get("item")
         if item is None:
             return None

@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import cast
 
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -58,26 +59,28 @@ class TaggedStats:
         logger.debug(typed)
         return typed
 
-    def get_stats_with_tags(self):
-        tags: dict[int, str] = self.game_store.get(TAGS)["Id"].to_dict()  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    def get_stats_with_tags(self) -> DataFrame:
+        # to_dict types the keys as Hashable; the index holds the tag row numbers
+        tags = cast(dict[int, str], self.game_store.get(TAGS)["Id"].to_dict())
+
+        def tag_names(tag_rows: list[int]) -> list[str]:
+            return [tags[i] for i in tag_rows]
 
         mods = self.game_store.get(MODS)
-        mods["Tags"] = mods["ImplicitTags"].apply(lambda x: [tags[i] for i in x])  # pyright: ignore[reportUnknownLambdaType, reportUnknownVariableType, reportUnknownMemberType]
+        mods["Tags"] = mods["ImplicitTags"].apply(tag_names)
 
         tag_by_stat = mods[["Stat1", "Tags"]].rename({"Stat1": "Stat"}, axis=1)
         for i in range(2, 7):
             stat_i = mods[[f"Stat{i}", "Tags"]].rename({f"Stat{i}": "Stat"}, axis=1)
             tag_by_stat = pd.concat([tag_by_stat, stat_i])
-        deduped = tag_by_stat.drop_duplicates("Stat").dropna().astype({"Stat": int})  # pyright: ignore[reportUnknownMemberType]
-        filtered = deduped.set_index(  # pyright: ignore[reportUnknownMemberType]
-            "Stat", drop=True
-        )
+        deduped = tag_by_stat.drop_duplicates("Stat").dropna().astype({"Stat": int})
+        filtered = deduped.set_index("Stat", drop=True)
         logger.info(f"Stats with tags with {filtered.shape[0]} rows")
         logger.debug("stats with tags")
         logger.debug(filtered)
         return filtered
 
-    def get_stat_by_hash(self):
+    def get_stat_by_hash(self) -> DataFrame:
         stats = self.game_store.get(STATS)
         descriptions = self.game_store.get_description(STAT_DESCRIPTIONS)
 
@@ -92,16 +95,18 @@ class TaggedStats:
         logger.debug(filtered)
         return filtered
 
-    def add_bonded(self, trade_joined: DataFrame, trade_stats: DataFrame):
+    def add_bonded(self, trade_joined: DataFrame, trade_stats: DataFrame) -> DataFrame:
+        def bonded_tags(_: pd.Series) -> list[str]:
+            return ["bonded"]
+
+        def bonded_id(stat_hash: int) -> str:
+            return f"bonded_{stat_hash}"
+
         bonded_trade_stats = trade_stats.copy().loc[
             trade_stats["ref"].str.startswith("Bonded: ")
         ]
-        bonded_trade_stats["Tags"] = bonded_trade_stats.apply(
-            lambda _: ["bonded"], axis=1
-        )
-        bonded_trade_stats["id"] = bonded_trade_stats["hash"].apply(
-            lambda x: f"bonded_{x}"
-        )
+        bonded_trade_stats["Tags"] = bonded_trade_stats.apply(bonded_tags, axis=1)
+        bonded_trade_stats["id"] = bonded_trade_stats["hash"].apply(bonded_id)
 
         trade_joined = pd.concat([trade_joined, bonded_trade_stats])
         return trade_joined
@@ -111,7 +116,7 @@ class TaggedStats:
         trade_stats: DataFrame,
         stats_tags: DataFrame,
         hash_by_stat: DataFrame,
-    ):
+    ) -> DataFrame:
         tag_and_hash = stats_tags.join(hash_by_stat, how="inner")
         # The stats of one mod share one Tags list, so each stat gets a new list
         tag_and_hash["Tags"] = pd.Series(
@@ -123,7 +128,10 @@ class TaggedStats:
             dtype=object,
         )
 
-        filtered = tag_and_hash.loc[tag_and_hash["Tags"].apply(lambda x: len(x) > 0)]  # pyright: ignore[reportUnknownMemberType, reportUnknownLambdaType, reportUnknownArgumentType]
+        def has_tags(tags: list[str]) -> bool:
+            return len(tags) > 0
+
+        filtered = tag_and_hash.loc[tag_and_hash["Tags"].apply(has_tags)]
 
         trade_joined = pd.merge(trade_stats, filtered, on="hash", how="inner")
 
@@ -131,7 +139,7 @@ class TaggedStats:
 
         return added_bonded
 
-    def run(self):
+    def run(self) -> DataFrame:
         trade_stats = self.get_trade_stats()
         stats_tags = self.get_stats_with_tags()
         hash_by_stat = self.get_stat_by_hash()

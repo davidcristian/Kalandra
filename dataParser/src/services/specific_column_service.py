@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 
 from constants.filenames import (
@@ -42,7 +44,7 @@ GENERAL_CLASS_TO_ITEM_CLASS = {
 
 
 class SpecificColumnService:
-    def __init__(self, lang: LANG):
+    def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
 
         # self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
@@ -61,7 +63,7 @@ class SpecificColumnService:
     def apply_armour_column(self, items: pd.DataFrame) -> pd.DataFrame:
         armour = self.ref_game_store.get(ARMOUR_TYPES)
 
-        def create_armour_dict(row: dict[str, int | str]) -> dict[str, list[int]]:
+        def create_armour_dict(row: pd.Series) -> dict[str, list[int]]:
             armour_dict: dict[str, list[int]] = {}
             if row["Armour"] != 0:
                 armour_dict["ar"] = [int(row["Armour"]), int(row["Armour"])]
@@ -88,17 +90,19 @@ class SpecificColumnService:
                 else None
             )
 
-        gem["gem"] = gem["namespace"].apply(create_gem_dict)  # pyright:ignore [reportUnknownMemberType]
+        gem["gem"] = gem["namespace"].apply(create_gem_dict)
         return gem
 
-    def apply_augment_column(self, items: pd.DataFrame, stats: pd.DataFrame):
+    def apply_augment_column(
+        self, items: pd.DataFrame, stats: pd.DataFrame
+    ) -> pd.DataFrame:
         augments = items.copy()
         augment_df = AugmentBuilder(stats).build()
 
         def create_augment_column(
-            row: dict[str, int | str],
+            row: pd.Series,
         ) -> dict[str, str | list[str] | list[int]]:
-            return {  # pyright: ignore[reportReturnType]
+            return {
                 "categories": row["categories"],
                 "string": row["string"],
                 "values": row["values"],
@@ -106,12 +110,14 @@ class SpecificColumnService:
             }
 
         augment_df["out"] = augment_df.apply(create_augment_column, axis=1)
-        augment_dict: dict[str, dict[str, str | list[str] | list[int]]] = (  # pyright: ignore[reportUnknownVariableType]
-            augment_df.groupby("refName")  # pyright: ignore[reportUnknownMemberType]
+        # to_dict types the keys as Hashable; the index holds the item names
+        augment_dict = cast(
+            dict[str, list[dict[str, str | list[str] | list[int]]]],
+            augment_df.groupby("refName")
             .agg(make_list_agg(columns_to_list=["out"]))["out"]
-            .to_dict()
+            .to_dict(),
         )
 
-        augments["augment"] = augments["refName"].apply(augment_dict.get)  # pyright: ignore[reportUnknownMemberType]
+        augments["augment"] = augments["refName"].apply(augment_dict.get)
 
         return augments

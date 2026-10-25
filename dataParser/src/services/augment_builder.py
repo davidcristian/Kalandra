@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -88,7 +89,7 @@ class AugmentBuilder:
             cores, left_on="SoulCore", right_index=True, validate="many_to_one"
         ).drop(columns=["SoulCore"])
         cores_with_stats["Classes"] = cores_with_stats["StatCategory"].apply(
-            lambda x: categories[x]
+            categories.__getitem__
         )
         renamed = cores_with_stats.rename(
             {
@@ -101,7 +102,7 @@ class AugmentBuilder:
 
     def get_soul_cores(
         self,
-    ):
+    ) -> pd.DataFrame:
         soul_cores = self.ref_game_store.get(SOUL_CORES).drop(columns=["_index"])
         base_items = self.ref_game_store.get(BASE_ITEM_TYPES).drop(columns=["_index"])
         soul_core_item = soul_cores.merge(
@@ -111,7 +112,7 @@ class AugmentBuilder:
         logger.debug(soul_core_item)
         return soul_core_item
 
-    def get_stats(self, nd_stats: pd.DataFrame):
+    def get_stats(self, nd_stats: pd.DataFrame) -> pd.DataFrame:
         soul_core_stats = self.ref_game_store.get(SOUL_CORE_STATS).drop(
             columns=["_index"]
         )
@@ -121,7 +122,7 @@ class AugmentBuilder:
             stats, how="inner", left_on="Stats", right_index=True
         )[["SoulCore", "StatCategory", "Id", "StatsValues"]]
         with_id = (
-            exploded_joined.loc[lambda df: ~df.index.duplicated()]
+            exploded_joined.loc[~exploded_joined.index.duplicated()]
             .dropna(subset=["Id"])
             .reset_index(drop=True)
         )
@@ -139,16 +140,21 @@ class AugmentBuilder:
         soul_core_categories = self.ref_game_store.get(SOUL_CORE_STAT_CATEGORIES).drop(
             columns=["_index"]
         )
-        soul_core_categories["Classes"] = soul_core_categories["Id"].apply(
-            lambda x: [x]
-            if x not in SOUL_CORE_CLASS_MAPPINGS
-            else SOUL_CORE_CLASS_MAPPINGS[x]
-        )
+
+        def classes(category: str) -> list[str]:
+            if category not in SOUL_CORE_CLASS_MAPPINGS:
+                return [category]
+            return SOUL_CORE_CLASS_MAPPINGS[category]
+
+        soul_core_categories["Classes"] = soul_core_categories["Id"].apply(classes)
         logger.debug(soul_core_categories["Classes"])
-        return soul_core_categories["Classes"].to_dict()
+        # to_dict types the keys as Hashable; the index holds the category ids
+        return cast(dict[str, list[str]], soul_core_categories["Classes"].to_dict())
 
     @staticmethod
-    def first_non_negated(matchers: list[dict[str, str | int | bool]]):
+    def first_non_negated(
+        matchers: list[dict[str, str | int | bool]],
+    ) -> str | int | bool:
         """Returns the shortest matcher text: first without a value or negation, then
         without a value, then any."""
 
@@ -168,5 +174,7 @@ class AugmentBuilder:
             return sorted_matchers[0]["string"]
         raise ValueError("Stat has no matchers")
 
-    def rune_stat_id(self, ids: dict[str, dict[str, list[str]]] | None):
+    def rune_stat_id(
+        self, ids: dict[str, dict[str, list[str]]] | None
+    ) -> list[str] | None:
         return (ids.get("ids") or {}).get("rune") if ids else None

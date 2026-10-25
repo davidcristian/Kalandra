@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from collections.abc import Callable
 
 import pandas as pd
 
@@ -7,7 +7,7 @@ def make_list_agg(
     columns_to_list: list[str] | None = None,
     columns_to_set: list[str] | None = None,
     columns_to_csv: list[str] | None = None,
-) -> Callable[..., list[Any] | Any]:  # pyright: ignore[reportExplicitAny]
+) -> Callable[[pd.Series], object]:
     """
     Creates a function for the purpose of passing to `df.agg` after grouping the dataframe with
     `df.groupby` which will automatically select aggregation functions for specific columns,
@@ -24,7 +24,7 @@ def make_list_agg(
 
     Returns
     -------
-    Callable[..., list[Any] | Any]
+    Callable[[pd.Series], object]
         Function to pass to df.agg
 
     Examples
@@ -48,7 +48,7 @@ def make_list_agg(
     2	5
     """
 
-    def custom_agg(col: pd.Series) -> list[Any] | Any:  # pyright: ignore[reportExplicitAny, reportMissingTypeArgument]
+    def custom_agg(col: pd.Series) -> object:
         col_name = col.name
         if columns_to_list is not None and col_name in columns_to_list:
             return list(col.dropna())
@@ -56,6 +56,6 @@ def make_list_agg(
             return set(col.dropna())
         if columns_to_csv is not None and col_name in columns_to_csv:
             return ",".join(col.dropna())
-        return col.iloc[0]  # pyright: ignore[reportAny]
+        return col.iloc[0]
 
     return custom_agg

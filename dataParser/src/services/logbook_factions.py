@@ -6,7 +6,7 @@ from stores.game_store import GameStore
 
 
 class LogbookFactions:
-    def __init__(self, lang: LANG):
+    def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
         self.game_store: GameStore = GameStore(lang)
         self.ref_game_store: GameStore = GameStore(ENGLISH)

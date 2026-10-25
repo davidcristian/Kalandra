@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Sequence
+from typing import cast
 
 from constants.client_string_data import (
     CLIENT_STRING_JS_FOOTER,
@@ -16,11 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 class ClientStringsBuilder:
-    def __init__(self, lang: LANG):
+    def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
         game_store = GameStore(lang)
-        client_strings_df = game_store.get(CLIENT_STRINGS).set_index("Id")  # pyright: ignore[reportUnknownMemberType]
-        self.client_strings_lookup: dict[str, str] = client_strings_df["Text"].to_dict()  # pyright: ignore[reportUnknownMemberType]
+        client_strings_df = game_store.get(CLIENT_STRINGS).set_index("Id")
+        # to_dict types the keys as Hashable; the index holds the client string ids
+        self.client_strings_lookup: dict[str, str] = cast(
+            dict[str, str], client_strings_df["Text"].to_dict()
+        )
 
     def use_game_store(self, poe_key: str) -> str:
         logger.debug(f"Using game store for {poe_key}")

@@ -3,9 +3,11 @@ import math
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-from typing import Any, Protocol
+from typing import Any, Protocol, TypedDict
 
 import cloudscraper
+
+from models.json_value import Json
 
 logger = logging.getLogger(__name__)
 
@@ -29,31 +31,31 @@ class Response(Protocol):
 
 class Session(Protocol):
     def get(
-        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+        self, url: str, *, json: Json = None, headers: Mapping[str, str] | None = None
     ) -> Response: ...
 
     def post(
-        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+        self, url: str, *, json: Json = None, headers: Mapping[str, str] | None = None
     ) -> Response: ...
 
 
 class RateLimit:
-    def __init__(self, limit: int, window: int, penalty: int):
+    def __init__(self, limit: int, window: int, penalty: int) -> None:
         self.max = limit
         self.window = window
         self.penalty = penalty
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"RateLimiter<max={self.max}:window={self.window}:penalty={self.penalty}>"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"RateLimiter<max={self.max}:window={self.window}:penalty={self.penalty}>"
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, RateLimit):
             return False
         return (
@@ -63,15 +65,28 @@ class RateLimit:
         )
 
 
+class PolicyState(TypedDict):
+    """The rate limit headers of the last response of one policy, and when it came."""
+
+    policy: str
+    rules: str
+    limit: str
+    state: str
+    rate_limits: list[tuple[RateLimit, RateLimit]]
+    last_update: float
+    prev_state: str | None
+    prev_rate_limits: list[tuple[RateLimit, RateLimit]] | None
+
+
 class RateLimiter:
     def __init__(
         self,
-        debug=False,
+        debug: bool = False,
         session: Session | None = None,
         sleep: Callable[[float], None] = time.sleep,
         clock: Callable[[], float] = time.monotonic,
-    ):
-        self.limits = defaultdict()
+    ) -> None:
+        self.limits: defaultdict[str, PolicyState] = defaultdict()
         self.session: Session = (
             session
             if session is not None
@@ -80,7 +95,7 @@ class RateLimiter:
         self.sleep: Callable[[float], None] = sleep
         self.clock: Callable[[], float] = clock
 
-    def wait(self, duration: int | float):
+    def wait(self, duration: int | float) -> None:
         """Wait for a specified duration.
 
         Parameters
@@ -128,7 +143,7 @@ class RateLimiter:
             The parsed list of RateLimit objects.
         """
         split_limit = limit.split(",")
-        windows = []
+        windows: list[RateLimit] = []
         for window in split_limit:
             windows.append(self.parse_window_limit(window))
         return windows
@@ -152,14 +167,14 @@ class RateLimiter:
         limits = self.parse_rate_limit(limit)
         states = self.parse_rate_limit(state)
 
-        limit_groups = []
+        limit_groups: list[tuple[RateLimit, RateLimit]] = []
         for limit_group, state_group in zip(limits, states):
             if limit_group.window != state_group.window:
                 raise ValueError(f"rate limit state {state!r} does not match {limit!r}")
             limit_groups.append((limit_group, state_group))
         return limit_groups
 
-    def wait_if_exceeded(self, limit: RateLimit, state: RateLimit):
+    def wait_if_exceeded(self, limit: RateLimit, state: RateLimit) -> None:
         """Waits using time.sleep if the server says we are on a penalty currently. Will wait for the FULL penalty, not just what the server says is remaining.
 
         Parameters
@@ -181,7 +196,7 @@ class RateLimiter:
 
     def wait_if_needed(
         self, limit: RateLimit, state: RateLimit, last_update: float | None
-    ):
+    ) -> None:
         # average_request_rate is twice the seconds per request that the limit allows. When the
         # previous response of the policy came at most 1.5 times it ago, wait 1.4 times it.
         average_request_rate = limit.window / limit.max * 2
@@ -205,11 +220,11 @@ class RateLimiter:
         rules: str | None,
         limit: str | None,
         state: str | None,
-    ):
+    ) -> None:
         if policy is None or rules is None or limit is None or state is None:
             raise ValueError("a rate limit header named in the response is missing")
         rate_limits = self.get_limits(limit, state)
-        previous = self.limits.get(policy, {})
+        previous = self.limits.get(policy)
         self.limits[policy] = {
             "policy": policy,
             "rules": rules,
@@ -217,16 +232,17 @@ class RateLimiter:
             "state": state,
             "rate_limits": rate_limits,
             "last_update": self.clock(),
-            "prev_state": previous.get("state"),
-            "prev_rate_limits": previous.get("rate_limits"),
+            "prev_state": previous["state"] if previous else None,
+            "prev_rate_limits": previous["rate_limits"] if previous else None,
         }
+        last_update = previous["last_update"] if previous else None
         rate_limits.reverse()
-        for limit, state in rate_limits:
-            self.wait_if_exceeded(limit, state)
-            self.wait_if_needed(limit, state, previous.get("last_update"))
+        for rule_limit, rule_state in rate_limits:
+            self.wait_if_exceeded(rule_limit, rule_state)
+            self.wait_if_needed(rule_limit, rule_state, last_update)
         logger.debug(f"Current rate limits: {self.limits}")
 
-    def handle_headers(self, headers: dict[str, str], status_code: int):
+    def handle_headers(self, headers: Mapping[str, str], status_code: int) -> None:
         """Handles the headers returned from the server."""
         if status_code == 429:
             logger.error("Rate limit exceeded.")
@@ -258,7 +274,7 @@ class RateLimiter:
     def get(
         self,
         url: str,
-        payload: dict[str, str] | None = None,
+        payload: Mapping[str, Json] | None = None,
         headers: dict[str, str] | None = None,
     ) -> Response:
         response = self.session.get(url, json=payload, headers=headers)
@@ -268,7 +284,7 @@ class RateLimiter:
     def post(
         self,
         url: str,
-        payload: dict[str, str] | None = None,
+        payload: Mapping[str, Json] | None = None,
         headers: dict[str, str] | None = None,
     ) -> Response:
         response = self.session.post(url, json=payload, headers=headers)

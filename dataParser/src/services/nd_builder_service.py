@@ -1,8 +1,5 @@
-# pyright: basic
-
 import logging
 from collections import defaultdict
-from typing import Any
 
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -26,6 +23,7 @@ from constants.known_stats import (
 )
 from constants.lang import ENGLISH, LANG
 from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
+from models.matcher import Matcher
 from services.image_provider import MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
 from services.specific_column_service import SpecificColumnService
@@ -44,7 +42,7 @@ class NdBuilderService:
 
     def __init__(
         self, lang: LANG, image_mode: MODE, image_cache_dir: str | None = None
-    ):
+    ) -> None:
         self.lang: LANG = lang
 
         self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
@@ -108,7 +106,7 @@ class NdBuilderService:
         ]
         ndjson["better"] = ndjson["better"].fillna(1).astype(int)
 
-        def custom_sort_key(matcher):
+        def custom_sort_key(matcher: Matcher) -> tuple[int, int]:
             # Determine the group number: 0 for no 'negated' and no 'value', 1 for 'negated', 2 for 'value'
             if "negate" not in matcher and "value" not in matcher:
                 group = 0
@@ -123,16 +121,17 @@ class NdBuilderService:
             # Return a tuple: group number and string length
             return (group, len(matcher["string"]))
 
-        ndjson["matchers"] = ndjson["matchers"].apply(
-            lambda x: sorted(x, key=custom_sort_key)
-        )
+        def sort_matchers(matchers: list[Matcher]) -> list[Matcher]:
+            return sorted(matchers, key=custom_sort_key)
+
+        ndjson["matchers"] = ndjson["matchers"].apply(sort_matchers)
         self.stats = ndjson.sort_values(by="ref").drop(columns=["hash"])
         return self.stats
 
     def join_trade_and_descriptions(
         self, trade_stats_df: pd.DataFrame, desc_df: pd.DataFrame
     ) -> pd.DataFrame:
-        def custom_agg(col: pd.Series):
+        def custom_agg(col: pd.Series) -> object:
             col_name = col.name
             if col_name == "hash":
                 return list(col.dropna())
@@ -157,7 +156,7 @@ class NdBuilderService:
         return merged_trade_stats_df_un_exploded
 
     def add_trade_inverted(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        def add_inverted(row):
+        def add_inverted(row: pd.Series) -> dict[str, object]:
             trade = row["trade"]
             if len(row["hash"]) > 0 and row["hash"][0] in TRADE_INVERTED:
                 trade["inverted"] = True
@@ -209,32 +208,39 @@ class NdBuilderService:
             value_trade_stats_df["id"].str.split("\\|").str[-1]
         )
         value_trade_stats_df["id"] = value_trade_stats_df["id"].str.split("\\|").str[0]
-        value_trade_stats_df["hash"] = value_trade_stats_df.apply(
-            lambda row: int(row["id"].split("_")[-1]), axis=1
-        )
+
+        def trade_hash(row: pd.Series) -> int:
+            return int(row["id"].split("_")[-1])
+
+        value_trade_stats_df["hash"] = value_trade_stats_df.apply(trade_hash, axis=1)
         return value_trade_stats_df
 
     def group_trade_stats(self, in_df: pd.DataFrame) -> pd.DataFrame:
         if set(in_df.columns) != {"id", "text", "ref", "type"}:
             raise ValueError(f"unexpected trade stat columns {sorted(in_df.columns)}")
+
+        def id_list(ids: pd.Series) -> list[str]:
+            return list(ids)
+
+        def ids_or_empty(ids: list[str] | str) -> list[str]:
+            return ids if isinstance(ids, list) else []
+
         grouped_trade_stats_df = in_df.pivot_table(
             index=["ref"],
             columns="type",
             values="id",
-            aggfunc=lambda ids: list(ids),
+            aggfunc=id_list,  # pyright: ignore[reportArgumentType] pandas also takes an aggfunc that returns a list
         ).reset_index()
         for col in MOD_TYPES:
             grouped_trade_stats_df[col] = (
-                grouped_trade_stats_df[col]
-                .fillna("")
-                .apply(lambda d: d if isinstance(d, list) else [])
+                grouped_trade_stats_df[col].fillna("").apply(ids_or_empty)
             )
         if set(grouped_trade_stats_df.columns) != {"ref"}.union(MOD_TYPES):
             raise ValueError("trade stats have a type that is not in MOD_TYPES")
         return grouped_trade_stats_df
 
     def add_hash_to_trade_stats(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        def get_hash(row) -> list[int]:
+        def get_hash(row: pd.Series) -> list[int]:
             hashes: set[int] = set()
             for t in MOD_TYPES:
                 for trade_id in row[t]:
@@ -244,13 +250,13 @@ class NdBuilderService:
             return sorted(hashes)
 
         out_df = in_df.copy()
-        out_df["hash"] = out_df.apply(lambda row: get_hash(row), axis=1)
+        out_df["hash"] = out_df.apply(get_hash, axis=1)
 
         return out_df
 
     def convert_to_trade_out(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        def make_trade(row):
-            ids = {}
+        def make_trade(row: pd.Series) -> dict[str, dict[str, list[str]]]:
+            ids: dict[str, list[str]] = {}
             for mod in MOD_TYPES:
                 if row[mod]:
                     lookup_mod = mod if mod != AUGMENT else RUNE
@@ -264,8 +270,7 @@ class NdBuilderService:
                         ].items():
                             if key in ids[mod]:
                                 ids[mod].extend(related_stats)
-            x: dict[str, dict[Any, Any] | bool] = {"ids": ids}
-            return x
+            return {"ids": ids}
 
         trade_stats_out_closer_df = in_df.copy().drop(columns=MOD_TYPES)
         trade_stats_out_closer_df["trade"] = in_df.apply(make_trade, axis=1)
@@ -283,17 +288,15 @@ class NdBuilderService:
         return self.vc.convert_value_stats_to_trade(value)
 
     def set_timeless_matchers(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        if self.local_lookup is None:
-            raise ValueError("Local lookup is not set")
-
         out_df = in_df.copy()
         is_timeless = out_df["ref"].str.startswith(("Small", "Notable"))
-        out_df["matchers"] = [
+        column = [
             [{"string": self.local_lookup[ref]}] if timeless else matchers
             for ref, matchers, timeless in zip(
                 out_df["ref"], out_df["matchers"], is_timeless
             )
         ]
+        out_df["matchers"] = pd.Series(column, index=out_df.index, dtype=object)
         return out_df
 
     def build_items_ndjson(self) -> pd.DataFrame:
@@ -317,9 +320,13 @@ class NdBuilderService:
 
         logger.info(f"Applying images at level {self.image_mode}")
         images_added = self.apply_images(cleaned_items)
+
+        def craftable(category: str) -> dict[str, str]:
+            return {"category": category}
+
         images_added.loc[images_added["namespace"] != "UNIQUE", "craftable"] = (
             images_added.loc[images_added["namespace"] != "UNIQUE", "category"].apply(
-                lambda x: {"category": x}
+                craftable
             )
         )
 
@@ -381,15 +388,15 @@ class NdBuilderService:
             {"Text2": "name", "Text": "refName"}, axis=1
         )
 
-        named_unique_items["unique"] = named_unique_items.apply(
-            lambda row: {"base": row["type"]}
-            if row["refName"] not in UNIQUE_ITEMS_FIXED_STATS
-            else {
+        def unique_field(row: pd.Series) -> dict[str, object]:
+            if row["refName"] not in UNIQUE_ITEMS_FIXED_STATS:
+                return {"base": row["type"]}
+            return {
                 "base": row["type"],
                 "fixedStats": UNIQUE_ITEMS_FIXED_STATS[row["refName"]],
-            },
-            axis=1,
-        )
+            }
+
+        named_unique_items["unique"] = named_unique_items.apply(unique_field, axis=1)
         combined_unique = joined_base.merge(
             named_unique_items, on="type", how="right"
         ).drop("Name", axis=1)
@@ -402,9 +409,10 @@ class NdBuilderService:
 
         non_unique_items = ts_items.loc[non_unique_mask].copy()
 
-        non_unique_items["namespace"] = non_unique_items["id"].apply(
-            lambda x: "GEM" if x == "gem" else "ITEM"
-        )
+        def namespace(trade_category: str) -> str:
+            return "GEM" if trade_category == "gem" else "ITEM"
+
+        non_unique_items["namespace"] = non_unique_items["id"].apply(namespace)
         non_unique_items.loc[
             non_unique_items["type"].str.startswith("Uncut"), "namespace"
         ] = "ITEM"
@@ -438,12 +446,12 @@ class NdBuilderService:
         inner = map_mods.merge(gold, left_on="_index", right_on="Mod", how="inner")
 
         stat_col = [f"Stat{i}" for i in range(1, 7)]
-        all_stats_l = []
+        all_stats_l: list[pd.Series] = []
         for col in stat_col:
             all_stats_l.append(inner[col].fillna(-1).astype(int))
 
         all_stats = pd.concat(all_stats_l)
-        return set(stats_lookup[x] for x in all_stats[all_stats != -1].dropna())  # pyright: ignore[reportReturnType]
+        return set(stats_lookup[x] for x in all_stats[all_stats != -1].dropna())
 
     def clean_up_items(self, items: pd.DataFrame) -> pd.DataFrame:
         tags = self.ref_game_store.get(TAGS)
@@ -451,7 +459,11 @@ class NdBuilderService:
         filtered = items.drop(["ItemClass", "type", "DropLevel"], axis=1).rename(
             {"Id": "category", "Width": "w", "Height": "h", "Tags": "tags"}, axis=1
         )
-        filtered["tags"] = filtered["tags"].apply(lambda x: [tags_lookup[t] for t in x])
+
+        def tag_names(tag_rows: list[int]) -> list[str]:
+            return [tags_lookup[t] for t in tag_rows]
+
+        filtered["tags"] = filtered["tags"].apply(tag_names)
         return filtered
 
     def apply_images(self, items: pd.DataFrame) -> pd.DataFrame:
@@ -460,7 +472,7 @@ class NdBuilderService:
     def fill_in_missing_matchers(self, joined_df_i: pd.DataFrame) -> pd.DataFrame:
         trade_stats_df = self.stats_combined_df()
 
-        def create_matchers(row):
+        def create_matchers(row: pd.Series) -> list[dict[str, str]]:
             text = row["text"]
             if row["type"] == "pseudo":
                 text += " "
@@ -469,7 +481,7 @@ class NdBuilderService:
         trade_stats_df["matchers"] = trade_stats_df.apply(create_matchers, axis=1)
         ref_matchers_dict = trade_stats_df.set_index("ref")["matchers"].to_dict()
 
-        def update_matchers(row):
+        def update_matchers(row: pd.Series) -> object:
             if isinstance(row["matchers"], list) and len(row["matchers"]) == 0:
                 # Check if ref is in the dictionary
                 if row["ref"] in ref_matchers_dict:
@@ -482,10 +494,14 @@ class NdBuilderService:
     def get_refs_to_merge(self, in_df: pd.DataFrame) -> pd.Series:
         """get groups of rows(refs) that have any same matchers"""
         matchers_exploded = in_df.explode("matchers")
+
         # make all matchers hashable, and where currently nan(pseudos) make empty frozenset
-        matchers_exploded["matchers"] = matchers_exploded["matchers"].apply(
-            lambda x: frozenset([]) if isinstance(x, float) else frozenset(x.items())
-        )
+        def matcher_key(matcher: Matcher | float) -> frozenset[tuple[str, object]]:
+            if isinstance(matcher, dict):
+                return frozenset(matcher.items())
+            return frozenset([])
+
+        matchers_exploded["matchers"] = matchers_exploded["matchers"].apply(matcher_key)
         # put similar matchers in the same group, all other columns into a list
         matchers_grouped = matchers_exploded.groupby("matchers").agg(list).reset_index()
 
@@ -508,10 +524,10 @@ class NdBuilderService:
         )
         data_without_saved_refs = in_df.loc[~in_df["ref"].isin(refs_set)].copy()
 
-        def custom_fn(df):
+        def custom_fn(df: pd.DataFrame) -> pd.Series:
             """Add a column for the custom groupings"""
 
-            def find_index(c):
+            def find_index(c: str) -> int:
                 for index, val in enumerate(refs_to_merge):
                     if c in val:
                         return index
@@ -524,7 +540,7 @@ class NdBuilderService:
 
         with_groups = data_with_saved_refs.assign(custom_groups=custom_fn)
 
-        def custom_agg_refs(col: pd.Series):  # pyright: ignore[reportMissingTypeArgument]
+        def custom_agg_refs(col: pd.Series) -> object:
             col_name = col.name
             if col_name == "hash":
                 return list({i for row in col.dropna() for i in row})
@@ -537,7 +553,7 @@ class NdBuilderService:
                 )
 
             if col_name == "trade":
-                new_trade = defaultdict(list)
+                new_trade: defaultdict[str, list[str]] = defaultdict(list)
                 for row in col:
                     t = row["ids"]
                     for k, v in t.items():

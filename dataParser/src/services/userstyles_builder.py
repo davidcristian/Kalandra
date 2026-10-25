@@ -21,7 +21,7 @@ class UserStylesBuilder:
         tagged_df: pd.DataFrame,
         css_rules: list[CssRule],
         user_style: UserStyleModel,
-    ):
+    ) -> None:
         self.df: pd.DataFrame = tagged_df
         self.css_rules: list[CssRule] = css_rules
         self.css_rules.reverse()
