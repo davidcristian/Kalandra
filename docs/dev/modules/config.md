@@ -104,6 +104,12 @@ old one and keep that file, so a saved config must survive every update: this is
   v0.12.x and earlier saved, while `defaultConfig()` gives Normal. Those users see no tips until they change the
   setting under Help. Exiled Exchange 2 added that line in v0.13.0 with no recorded reason. No new step sets
   Normal: a saved Never does not show whether the user chose it, and such a step would override the users who did.
+- A config from an older version keeps keys that no type or default has and no code outside `upgradeConfig()`
+  reads. On the price check widget, the `< 4` and `< 10` steps set `chaosPriceThreshold`, the `< 22` step
+  `autoFillEmptyRuneSockets` and the `< 25` step `openItemEditorAbove`. The top-level keys that the `< 10`, `< 14`
+  and `< 16` steps copy into widgets, such as `priceCheckKey` and `itemCheckKey`, also stay. These keys change
+  nothing, so no step deletes them: such a step would raise `configVersion` and rewrite every saved config with no
+  change in behavior.
 - Field names and `wmType` values are keys in saved files. Renaming one takes an upgrade step that moves the value,
   as the `< 7` step does when it turns the `map-check` widget into `item-check`.
 - A new widget type also takes an upgrade step that adds its default instance to saved configs, as the `< 29` and
