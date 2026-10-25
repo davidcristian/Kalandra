@@ -44,12 +44,12 @@ No `.gitignore` entry covers them either, so `git status` lists them after a run
 | `data/json/<lang>/{filters,stats,items,static}.json` | the trade site's `/api/trade2/data/` endpoints, one set per language | `--pull` |
 | `src/services/itemImageCache.json` | item icon URLs found by earlier image lookups | every build: `ImageProvider` creates it empty when it is missing and saves it after it sets the icons |
 
-**The game export.** `--pull` runs the command `pathofexile-dat` in `data/vendor/` (`GameDataProvider` in
-`src/providers/game_api.py`). The command reads `data/vendor/config.json`: `steam`, the Path of Exile 2 install
-folder it reads from, set to a Steam install on Windows; `files`, the stat description files to extract;
-`translations`, the languages; and `tables`, each table with the columns to keep. No file in this repo installs that
-command or names its version. A failed export is logged as `Game data export failed: <error>`, and the build
-continues with whatever `data/vendor/` already holds.
+**The game export.** `--pull` finds the command `pathofexile-dat` on the PATH and runs it in `data/vendor/` without a
+shell (`GameDataProvider` in `src/providers/game_api.py`). The command reads `data/vendor/config.json`: `steam`, the
+Path of Exile 2 install folder it reads from, set to a Steam install on Windows; `files`, the stat description files
+to extract; `translations`, the languages; and `tables`, each table with the columns to keep. No file in this repo
+installs that command or names its version. A command missing from the PATH or a failed export is logged as
+`Game data export failed: <error>`, and the build continues with whatever `data/vendor/` already holds.
 
 **The trade data.** `TradeApiProvider` (`src/providers/trade_api.py`) requests the four endpoints for each language
 from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests in a row with no pause. It uses `cloudscraper`,
