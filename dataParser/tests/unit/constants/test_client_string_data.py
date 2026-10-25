@@ -1,7 +1,15 @@
 import pytest
 
 from constants.client_string_data import CLIENT_STRING_KEY_VALUES, CLIENT_STRING_REGEX
-from constants.lang import ENGLISH, FRENCH, KOREAN, LANG, SPANISH
+from constants.lang import (
+    CHINESE,
+    ENGLISH,
+    FRENCH,
+    GERMAN,
+    KOREAN,
+    LANG,
+    SPANISH,
+)
 
 ENGLISH_WAYSTONE_CLIENT_STRINGS = {
     "ItemDisplayMapTier": "Waystone Tier",
@@ -31,6 +39,25 @@ def test_waystone_client_strings_read_the_ids_of_the_current_game():
         "WAYSTONE_DROP_CHANCE": "Waystone Drop Chance: ",
         "WAYSTONE_RARITY": "Item Rarity: ",
     }
+
+
+@pytest.mark.parametrize(
+    ("lang", "game_text", "expected"),
+    [
+        (ENGLISH, "[Ward|Runic Ward]", "Runic Ward: "),
+        (GERMAN, "[Ward|Runenschutz]", "Runenschutz: "),
+        (CHINESE, "保護", "保護: "),
+    ],
+)
+def test_runic_ward_reads_the_armour_label_of_each_language(
+    lang: LANG, game_text: str, expected: str
+):
+    (runic_ward,) = [s for s in CLIENT_STRING_KEY_VALUES if s.my_key == "RUNIC_WARD"]
+
+    assert (
+        runic_ward.value({"ItemDisplayArmourWard": game_text}.__getitem__, lang)
+        == expected
+    )
 
 
 @pytest.mark.parametrize(

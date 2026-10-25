@@ -92,7 +92,8 @@ On 18 Oct 2026 the last two print 445 and 16.
    - the `%NOT_FOUND%` count went up;
    - the `"map"` count fell, since this copy of the tool writes no `map` field
      ([dataparser.md](../modules/dataparser.md#outputs));
-   - `git diff renderer/public/data/en/client_strings.js` shows a removed key.
+   - `git diff renderer/public/data/*/client_strings.js` shows a removed key, or a value in another language that
+     is now English text.
 
    `git restore renderer/public/data dataParser/output` puts the committed data back. It also discards every other
    uncommitted change under those two folders, such as an edit to an `app_i18n.json`.

@@ -73,7 +73,7 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("ARMOUR", ["ItemDisplayArmourArmour"], "{0}: "),
     ClientString("EVASION", ["ItemDisplayArmourEvasionRating"], "{0}: "),
     ClientString("ENERGY_SHIELD", ["ItemDisplayArmourEnergyShield"], "{0}: "),
-    ConstClientString("RUNIC_WARD", "Runic Ward: "),
+    ClientString("RUNIC_WARD", ["ItemDisplayArmourWard"], "{0}: "),
     ClientString("BLOCK_CHANCE", ["ItemDisplayShieldBlockChance"], "{0}: "),
     ClientString("CORRUPTED", ["ItemPopupCorrupted"]),
     ClientString("INFLUENCE_SHAPER", ["ItemPopupShaperItem"]),
