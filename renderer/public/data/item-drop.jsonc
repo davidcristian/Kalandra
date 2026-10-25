@@ -617,7 +617,9 @@
       "UNIQUE::The Burden of Leadership // Tapestry Relic"
     ],
     "items": [
-      "UNIQUE::Sekhema's Resolve // Ring"
+      "UNIQUE::Safrin's Resolve // Ring",
+      "UNIQUE::Eshtera's Path // Ring",
+      "UNIQUE::Zaida's Longevity // Ring"
     ]
   },
   //#endregion Trials

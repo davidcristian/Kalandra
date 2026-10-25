@@ -7,9 +7,6 @@ import { splitQueryId } from "@/web/price-check/related-items/related-items";
 
 const DATA_DIR = path.resolve(__dirname, "../../public/data");
 
-// The trade site lists this unique, but its Ring records in items.ndjson have no name.
-const NOT_IN_ITEM_DATA = ["UNIQUE::Sekhema's Resolve // Ring"];
-
 function inItemData(ref: string) {
   const { ns, name, variant } = splitQueryId(ref);
   const found = ITEM_BY_REF(ns as BaseType["namespace"], name) ?? [];
@@ -37,7 +34,7 @@ describe("item-drop.json", () => {
   it("names only items, and uniques on base items, that the item data contains", () => {
     const refs = ITEM_DROP.flatMap((entry) => [...entry.query, ...entry.items]);
 
-    expect(refs.filter((ref) => !inItemData(ref))).toEqual(NOT_IN_ITEM_DATA);
+    expect(refs.filter((ref) => !inItemData(ref))).toEqual([]);
   });
 
   it("holds the groups of item-drop.jsonc in the same order", () => {
