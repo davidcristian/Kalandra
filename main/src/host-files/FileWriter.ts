@@ -157,6 +157,8 @@ export class FileWriter {
       return "invalid-name";
     }
     try {
+      // A page that reloads during a session starts the next one without a stop
+      if (this._state.itemFile) await this.closeChannel(FileChannel.Item);
       if (!existsSync(this.uploadsPath)) {
         await fs.mkdir(this.uploadsPath, { recursive: true });
       }

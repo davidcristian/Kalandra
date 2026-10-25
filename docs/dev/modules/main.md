@@ -180,7 +180,8 @@ The entry, the server and the app services, in `main/src/`:
   in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv` between a
   `session` start and stop. It answers each start with `MAIN->CLIENT::library-session`: `started` once the file is
   open, `invalid-name` for a name that Windows does not allow as a file name, which includes a path separator, and
-  `failed` while it is off or when the folder or file cannot be created, with the reason in the log. It writes
+  `failed` while it is off or when the folder or file cannot be created, with the reason in the log. A start with a
+  valid name closes the file of a session that did not stop, as after a page reload. It writes
   `client-log-event` lines to `client-log.ndjson`, which it overwrites at its first write in a run. The folder is the
   library output path, or `apt-data/csv-data` by default, and it creates the folder before it opens either file. A
   restart that turns it off closes both files. One that changes the folder closes `client-log.ndjson`, which the next

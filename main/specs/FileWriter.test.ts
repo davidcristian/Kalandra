@@ -89,6 +89,18 @@ async function delayFirstWrite() {
   });
 }
 
+/** Keeps each file FileWriter opens, so a test can check which ones it closed: a closed one has fd -1. */
+function recordOpenedFiles(): fs.FileHandle[] {
+  const opened: fs.FileHandle[] = [];
+  const open = fs.open;
+  vi.spyOn(fs, "open").mockImplementation(async (...args) => {
+    const file = await open(...args);
+    opened.push(file);
+    return file;
+  });
+  return opened;
+}
+
 describe("FileWriter.restart", () => {
   it("writes client log entries to the new folder after the folder changes", async () => {
     const first = path.join(folder, "first");
@@ -218,6 +230,16 @@ describe("a Library session start", () => {
       expect(await fs.readdir(folder)).toEqual([]);
     },
   );
+
+  it("closes the file of a session that did not stop when the next one starts", async () => {
+    await writer.restart(true, folder);
+    const opened = recordOpenedFiles();
+
+    await sendSessionStart("first");
+    await sendSessionStart("second");
+
+    expect(opened.map((file) => file.fd === -1)).toEqual([true, false]);
+  });
 
   it("replies that it failed when the output folder cannot be created", async () => {
     const blocker = path.join(folder, "a file");
