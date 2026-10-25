@@ -63,6 +63,8 @@ replaces it with `vi.mock("electron", ...)`.
   saves in development and reads a `config.json` that is a folder.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary
   folder, and the first two pass their own default paths.
+- `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key
+  codes it cannot read, and reads a file again only at a new path.
 - `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its
   handlers' promises settle, and delays the first write to check the line order.
 - `GameLogWatcher.test.ts` calls the change listener of a fake `FileWatch` or `fs.watchFile`, deletes a new log as

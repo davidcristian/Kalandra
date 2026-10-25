@@ -27,9 +27,22 @@ function configPath(...folders: string[]) {
   return path.join(folder, ...folders, "poe2_production_Config.ini");
 }
 
-async function writeConfig(file: string) {
+async function writeConfig(file: string, contents = BOUND_TO_Z) {
   await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, BOUND_TO_Z);
+  await fs.writeFile(file, contents);
+}
+
+function boundTo(value: string): string {
+  return `[ACTION_KEYS]\nshow_advanced_item_descriptions=${value}\n`;
+}
+
+/** Reads a config file with these contents, and returns the key it read. */
+async function readKey(contents: string): Promise<string> {
+  const file = configPath();
+  await writeConfig(file, contents);
+  const reader = createReader();
+  await reader.readConfig(file);
+  return reader.showModsKey;
 }
 
 beforeEach(async () => {
@@ -102,5 +115,67 @@ describe("GameConfig.readConfig", () => {
     await writeConfig(proton);
     await reader.readConfig("");
     expect(reader.showModsKey).toBe("Z");
+  });
+});
+
+describe("the advanced descriptions key in the game config", () => {
+  it.each([
+    ["90 1", "Shift + Z"],
+    ["90 2", "Ctrl + Z"],
+    ["90 3", "Alt + Z"],
+    ["18", "Alt"],
+  ])("reads %j as %s", async (value, key) => {
+    expect(await readKey(boundTo(value))).toBe(key);
+    expect(logger.history).toBe("");
+  });
+
+  it("reads a file that starts with a byte order mark", async () => {
+    expect(await readKey(String.fromCharCode(0xfeff) + BOUND_TO_Z)).toBe("Z");
+  });
+
+  it("uses Alt without an error when the file does not set the key", async () => {
+    expect(await readKey("[GENERAL]\nlanguage=en\n")).toBe("Alt");
+    expect(logger.history).toBe("");
+  });
+
+  it("uses Alt and logs a key code that names no key", async () => {
+    expect(await readKey(boundTo("9999"))).toBe("Alt");
+    expect(logger.history).toContain(
+      "error [GameConfig] Failed to read key: 9999.",
+    );
+  });
+
+  it("uses Alt and logs a modifier code other than 1, 2 and 3", async () => {
+    expect(await readKey(boundTo("90 4"))).toBe("Alt");
+    expect(logger.history).toContain(
+      "error [GameConfig] Failed to read modifier key: 90 4.",
+    );
+  });
+});
+
+describe("GameConfig.readConfig after a read succeeded", () => {
+  it("does not read the file at the same path again", async () => {
+    const file = configPath();
+    await writeConfig(file);
+    const reader = createReader();
+    await reader.readConfig(file);
+
+    await writeConfig(file, boundTo("88"));
+    await reader.readConfig(file);
+
+    expect(reader.showModsKey).toBe("Z");
+  });
+
+  it("reads the file at a new path", async () => {
+    const first = configPath("first");
+    const second = configPath("second");
+    await writeConfig(first);
+    await writeConfig(second, boundTo("88"));
+    const reader = createReader();
+    await reader.readConfig(first);
+
+    await reader.readConfig(second);
+
+    expect(reader.showModsKey).toBe("X");
   });
 });
