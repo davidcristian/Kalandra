@@ -20,8 +20,9 @@ folder.
 
 - It runs every step, even after one fails, then prints `check: <n> of <m> steps failed: <names>` and exits with 1,
   or prints `check: all <m> steps passed` and exits with 0.
-- A step whose tool is not on `PATH`, or an `npm` or `npx` step whose folder has no `node_modules`, fails without
-  running, and the line `check: <name> cannot start: <reason>` says why.
+- A step whose tool is not on `PATH`, an `npm` or `npx` step whose folder has no `node_modules`, or a
+  `python -m <module>` step whose module the Python that runs `check.py` cannot find, such as coverage.py, fails
+  without running, and the line `check: <name> cannot start: <reason>` says why.
 - `python scripts/check.py --list` prints each step's name, command and folder, and runs none.
 - On Windows, `shutil.which()` returns `npm.cmd` for `npm`, and `check.py` runs that path, since `subprocess` does
   not find a `.cmd` file from the bare name.
@@ -154,11 +155,12 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 117 tests on 26 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 119 tests on 26 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
 floor in `scripts/.coveragerc`, 97.7% of lines and branches on 26 Oct 2026.
 
-**Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.
+**Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`, and its Python
+steps need coverage.py (`pip install coverage`).

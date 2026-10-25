@@ -1,6 +1,7 @@
 """Runs every check in AGENTS.md that a machine can run, and names each one that failed."""
 
 import argparse
+import importlib.util
 import shutil
 import subprocess
 import sys
@@ -49,6 +50,9 @@ def missing(root: Path, step: Step) -> str | None:
         return f"{tool} is not on PATH"
     if tool in NODE_TOOLS and not (root / step.folder / "node_modules").is_dir():
         return f"{step.folder}/node_modules is missing, so run npm ci in {step.folder}/ first"
+    module = step.command[2] if step.command[1:2] == ("-m",) and step.command[2:] else None
+    if tool == PYTHON and module is not None and importlib.util.find_spec(module.partition(".")[0]) is None:
+        return f"{tool} has no module named {module}, so install it as DEVELOPING.md says"
     return None
 
 

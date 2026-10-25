@@ -14,6 +14,9 @@ FAILS = Step("fails", ".", (sys.executable, "-c", "raise SystemExit(3)"))
 NO_TOOL = Step("no tool", ".", ("kalandra-no-such-tool",))
 NODE_STEP = Step("node step", "renderer", (sys.executable, "-c", "pass"))
 NOT_A_NODE_TOOL = Step("not node", "renderer", ("git", "--version"))
+NO_MODULE = Step("no module", ".", (sys.executable, "-m", "kalandra_no_such_module", "run"))
+NO_PACKAGE = Step("no package", ".", (sys.executable, "-m", "kalandra_no_such_package.child"))
+HAS_MODULE = Step("has module", ".", (sys.executable, "-m", "unittest", "--help"))
 
 
 def python_as_the_node_tool() -> AbstractContextManager[frozenset[str]]:
@@ -65,6 +68,19 @@ class MissingTest(unittest.TestCase):
 
     def test_another_tool_needs_no_packages(self) -> None:
         self.assertIsNone(check.missing(self.root, NOT_A_NODE_TOOL))
+
+
+class PythonModuleTest(unittest.TestCase):
+    def test_a_python_step_without_its_module_does_not_start(self) -> None:
+        code, output = quietly([NO_MODULE, NO_PACKAGE])
+        self.assertEqual(code, 1)
+        for step in (NO_MODULE, NO_PACKAGE):
+            module = step.command[2]
+            reason = f"{sys.executable} has no module named {module}, so install it as DEVELOPING.md says"
+            self.assertIn(f"check: {step.name} cannot start: {reason}\n", output)
+
+    def test_a_python_step_with_its_module_can_start(self) -> None:
+        self.assertIsNone(check.missing(check.ROOT, HAS_MODULE))
 
 
 class MainTest(unittest.TestCase):
