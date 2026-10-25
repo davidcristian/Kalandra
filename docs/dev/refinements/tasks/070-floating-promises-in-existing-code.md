@@ -14,7 +14,7 @@ nothing, such as `setInterval(this.check)` in `AppUpdater.ts`. In the renderer,
 `renderer/eslint-suppressions.json` holds 22 floating promises in 14 files.
 
 A rejection of one of these promises is not handled where it starts. Main writes it to the log
-with the generic `error [unhandledRejection]` line from `main.ts`. The renderer writes it only to
+with the generic `error [unhandledRejection]` line of `uncaught-errors.ts`. The renderer writes it only to
 the browser console, which Settings, Debug does not show
 ([013](013-renderer-errors-not-in-debug.md)).
 

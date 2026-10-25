@@ -11,16 +11,16 @@ of the whole app is [architecture.md](../architecture.md), the messages main exc
 
 The entry, the server and the app services, in `main/src/`:
 
-- `main.ts`, bundled into `dist/main.js`, takes Electron's single instance lock, turns off hardware acceleration
-  except on macOS and turns on Electron's sandbox. It passes the startup to `startWhenReady()` in `startup.ts`,
-  which on macOS waits up to 15 seconds for the accessibility permission and quits without it. It then awaits
-  `app.whenReady()`, which also resolves when Electron emitted `ready` during that wait, and runs the start
-  function, which creates `AppTray`, `Logger`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter`
-  and `GameLogWatcher`, and adds the `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and
-  `Shortcuts` after a timer: 1 second on Linux, because the window is black instead of transparent otherwise, and 0
-  elsewhere. Its `CLIENT->MAIN::update-host-config` handler passes each `HostConfig` field to the object that uses
-  it. It then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects, it shows the
-  error box `Kalandra cannot start` and quits. In development it also installs Vue Devtools.
+- `main.ts`, bundled into `dist/main.js`, takes Electron's single instance lock, turns off hardware acceleration except
+  on macOS and turns on Electron's sandbox. It passes the startup to `startWhenReady()` in `startup.ts`, which on macOS
+  waits up to 15 seconds for the accessibility permission and quits without it. It then awaits `app.whenReady()`, which
+  also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `AppTray`,
+  `Logger`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
+  `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on Linux,
+  because the window is black instead of transparent otherwise, and 0 elsewhere. Its `CLIENT->MAIN::update-host-config`
+  handler passes each `HostConfig` field to the object that uses it. It then starts `uIOhook`, calls `startServer()` and
+  loads the page. When `startServer()` rejects, it shows the error box `Kalandra cannot start` and quits. In development
+  it also installs Vue Devtools. `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
   `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles

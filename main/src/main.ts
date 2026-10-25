@@ -18,6 +18,7 @@ import { HttpProxy } from "./proxy";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { FileWriter } from "./host-files/FileWriter";
 import { startWhenReady } from "./startup";
+import { logUncaughtErrors } from "./uncaught-errors";
 
 if (!app.requestSingleInstanceLock()) {
   app.exit();
@@ -81,12 +82,7 @@ startWhenReady(
         logger.write(`error installing Vue Devtools: ${error}`);
       }
     }
-    process.addListener("uncaughtException", (err) => {
-      logger.write(`error [uncaughtException] ${err.message}, ${err.stack}`);
-    });
-    process.addListener("unhandledRejection", (reason) => {
-      logger.write(`error [unhandledRejection] ${(reason as Error).stack}`);
-    });
+    logUncaughtErrors(process, logger);
 
     setTimeout(
       async () => {

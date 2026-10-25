@@ -30,6 +30,8 @@ replaces it with `vi.mock("electron", ...)`.
   site and to the other hosts, and reads the headers of a response that sets a cookie. The test also passes `set-cookie`
   headers through the listener the proxy adds to the default session.
 - `RemoteLogger.test.ts` writes more entries than the history keeps.
+- `uncaught-errors.test.ts` emits uncaught errors and unhandled rejections of each kind of value from an `EventEmitter`
+  in place of `process`.
 
 ## shortcuts/
 
