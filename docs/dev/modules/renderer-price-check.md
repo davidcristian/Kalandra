@@ -217,6 +217,7 @@ changes the body of `createTradeRequest`, so `createFilters` returns no filter t
 Legacy kinds, and checks the Duplicates filter and the count of Legacy rolls that `createTradeRequest` sends.
 `pseudo/anointments.test.ts` there names the emotions of a real anointed amulet and checks when its anointment
 filter is left out of the search.
+`gem-filters.test.ts` there makes the filters and the search of a real skill gem and of three uncut gems.
 `specs/web/price-check/item-editor/` checks which editor `getItemEditorType` opens for real copied items, the
 catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
