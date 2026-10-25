@@ -16,7 +16,6 @@ import { OverlayVisibility } from "./windowing/OverlayVisibility";
 import { GameLogWatcher } from "./host-files/GameLogWatcher";
 import { HttpProxy } from "./proxy";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
-import { installExtension, VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import { FileWriter } from "./host-files/FileWriter";
 import { startWhenReady } from "./startup";
 
@@ -72,6 +71,10 @@ startWhenReady(
 
     if (process.env.VITE_DEV_SERVER_URL) {
       try {
+        // The production build defines VITE_DEV_SERVER_URL as null, so esbuild leaves this import out of its bundle
+        const { installExtension, VUEJS_DEVTOOLS } = await import(
+          "electron-devtools-installer"
+        );
         await installExtension(VUEJS_DEVTOOLS);
         logger.write("info Vue Devtools installed");
       } catch (error) {

@@ -230,11 +230,12 @@ fails. A gem search waits for the last change and fails when that change failed.
 **Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time Electron 44, and the native
 modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle leaves out with `electron`. Both
 modules load prebuilt Node-API binaries, which load in a new Electron version without a rebuild. The bundle includes
-`electron-updater`, `electron-devtools-installer`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `build/script.mjs` bundles `dist/main.js`
-and `dist/vision.js` with esbuild; in development it sets `VITE_DEV_SERVER_URL` to `http://localhost:5173` and
-restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main.js`, `dist/vision.js` and
-`../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned
-universal dmg on macOS, and publishes to GitHub releases.
+`electron-updater`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `main.ts` imports `electron-devtools-installer` inside
+its `VITE_DEV_SERVER_URL` check, which the production build defines as `null`, so only a development bundle has it.
+`build/script.mjs` bundles `dist/main.js` and `dist/vision.js` with esbuild; in development it sets
+`VITE_DEV_SERVER_URL` to `http://localhost:5173` and restarts Electron after each rebuild. `electron-builder.yml`
+packages `dist/main.js`, `dist/vision.js` and `../renderer/dist` as an NSIS installer and a portable build on Windows,
+an AppImage on Linux and an unsigned universal dmg on macOS, and publishes to GitHub releases.
 
 The `electron` package has no install script. `require("electron")` downloads the Electron binary the first time it
 runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
