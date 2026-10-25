@@ -1,0 +1,12 @@
+[
+    {
+        "id": "bleed_on_hit_with_attacks_%",
+        "hash": 2055966527,
+        "better": 1,
+        "matchers": [
+            {"string": "Attacks cannot cause Bleeding", "value": 0},
+            {"string": "Attacks cause Bleeding", "value": 100},
+            {"string": "Attacks have #% chance to cause Bleeding"}
+        ]
+    }
+]

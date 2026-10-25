@@ -141,18 +141,22 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 `python -m pytest` in `dataParser/`, where `pyproject.toml` adds `.` and `src` to the import path. `tests/unit/`
 tests the constants, models, providers, services and stores one module at a time. Its provider tests run a fake
 export command, the trade site tests use the fake session and clock in `tests/fake_http.py`, and its description
-tests read the sample files in `tests/data/cases/`.
-`tests/integration/` reads real files. `test_game_store_i.py` fails when parsed game text keeps markup such as `[`
-or `|` for an id outside `BROKEN_GAME_TEXT`, the ids whose game text is broken, or when one of those ids is fixed,
-so a game patch that changes either updates that set. `tests/test_main.py` runs `main()` end to end with `push`,
-checks the files it writes and copies, and tests the `--pull` step with a fake export and the fake session. Every
-test writes to a temporary folder: `main()` takes the output folder and `ImageProvider` the cache folder, and
-`NdBuilderService` opens the image cache only when it applies the icons. The hooks in
-`dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`, and the
-pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions and no
-`log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root.
-pre-commit runs every hook from the repo root, so the config's top-level `files: ^dataParser/` keeps them to this
-folder. CI runs neither: `.github/workflows/test.yml` has no job for `dataParser/`, and the root
+tests compare the blocks they load from the sample files in `tests/data/cases/` with `tests/data/expected/`.
+`tests/integration/` reads real files. Its description tests compare the frame parsed from a sample file with
+`tests/data/expected/<name>_integration.json` and skip a sample without one. Only the bleeding sample has one, since
+a description's hash can be checked by hand only against a trade site stat id. `test_game_store_i.py` fails when
+parsed game text keeps markup such as `[` or `|` for an id outside `BROKEN_GAME_TEXT`, the ids whose game text is
+broken, or when one of those ids is fixed, so a game patch that changes either updates that set.
+`tests/test_main.py` runs `main()` end to end with `push`, checks the files it writes and copies, and tests the
+`--pull` step with a fake export and the fake session. Every test writes to a temporary folder: `main()` takes the
+output folder and `ImageProvider` the cache folder, and `NdBuilderService` opens the image cache only when it
+applies the icons.
+
+The hooks in `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`,
+and the pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock
+assertions and no `log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in
+the repo root. pre-commit runs every hook from the repo root, so the config's top-level `files: ^dataParser/` keeps
+them to this folder. CI runs neither: `.github/workflows/test.yml` has no job for `dataParser/`, and the root
 `.pre-commit-config.yaml` does not include these hooks.
 
 A fresh clone cannot pass the tests as of 18 Oct 2026:
@@ -162,8 +166,6 @@ A fresh clone cannot pass the tests as of 18 Oct 2026:
 - `tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
   needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
   since it reads game tables when it is built.
-- The description tests in `tests/integration/stores/helpers/` read expected frames from `tests/data/expected/`,
-  which has only the expected blocks for the unit tests in `tests/unit/stores/helpers/test_description.py`.
 
 **Dependencies.** Python, the packages above, Node.js for `cloudscraper`, the `pathofexile-dat` command, a local
 Path of Exile 2 install, and the official trade sites.

@@ -1,7 +1,34 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
+from constants.lang import ENGLISH, KOREAN, LANG
 from stores.helpers.description import Description
+
+CASES = Path("tests/data/cases")
+EXPECTED = Path("tests/data/expected")
+
+
+def load_case(tmp_path: Path, file_name: str, lang: LANG) -> Description:
+    """Returns a description of a case file, copied to tmp_path as UTF-16 like the game's files."""
+    _ = (tmp_path / file_name).write_text(
+        (CASES / file_name).read_text(encoding="utf-8"), encoding="utf-16"
+    )
+    desc = Description(lang, file_name)
+    desc.data_dir = str(tmp_path)
+    return desc
+
+
+def read_expected(file_name: str) -> pd.DataFrame:
+    """Returns the expected frame, or skips a case whose expected frame is not in the repo."""
+    path = EXPECTED / file_name
+    if not path.is_file():
+        pytest.skip(
+            f"{path} is missing: the hash of a stat the trade site does not list "
+            "comes only from the code under test"
+        )
+    return pd.read_json(path)
 
 
 @pytest.mark.parametrize(
@@ -45,115 +72,40 @@ from stores.helpers.description import Description
     ],
 )
 def test_description_integration_test(tmp_path, file_name, expected):
-    from pathlib import Path
-
-    src = Path("tests/data/cases") / file_name
-    dst = tmp_path / file_name
-    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-16")
-
-    desc = Description("en", dst.name)
-    desc.data_dir = tmp_path
+    desc = load_case(tmp_path, file_name, ENGLISH)
 
     if isinstance(expected, str):
+        expected_df = read_expected(expected)
         desc.load()
-        df = desc.to_dataframe()
-        print("ACTUAL:")
-        print(df.head())
-        with open(Path("tests/data/expected") / expected, "r", encoding="utf-8") as f:
-            expected_df = pd.read_json(f)
-            print("EXPECTED:")
-            print(expected_df.head())
-            pd.testing.assert_frame_equal(
-                df.reset_index(drop=True), expected_df.reset_index(drop=True)
-            )
+        pd.testing.assert_frame_equal(
+            desc.to_dataframe().reset_index(drop=True), expected_df
+        )
     else:
         with expected:
             desc.load()
 
 
-def test_description_integration_test_hard(tmp_path):
-    from pathlib import Path
-
-    filename = "case_very_hard_encompassing_test.csd"
-    src = Path("tests/data/cases") / filename
-    dst = tmp_path / filename
-    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-16")
-
-    desc = Description("ko", dst.name)
-    desc.data_dir = tmp_path
-
-    desc.load()
-    df = desc.to_dataframe()
-    print("ACTUAL:")
-    print(df.head())
-    with open(
-        Path("tests/data/expected")
-        / "case_very_hard_encompassing_test_integration.json",
-        "r",
-        encoding="utf-8",
-    ) as f:
-        expected_df = pd.read_json(f)
-        print("EXPECTED:")
-        print(expected_df.head())
-        pd.testing.assert_frame_equal(
-            df.reset_index(drop=True), expected_df.reset_index(drop=True)
-        )
-
-
-def test_description_integration_missing_matchers_edge_case(tmp_path):
-    from pathlib import Path
-
-    filename = "case_uneven_lines_per_lang.csd"
-    src = Path("tests/data/cases") / filename
-    dst = tmp_path / filename
-    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-16")
-
-    desc = Description("ko", dst.name)
-    desc.data_dir = tmp_path
-
-    desc.load()
-    df = desc.to_dataframe()
-    print("ACTUAL:")
-    print(df.head())
-    with open(
-        Path("tests/data/expected")
-        / "case_uneven_lines_per_lang_test_integration.json",
-        "r",
-        encoding="utf-8",
-    ) as f:
-        expected_df = pd.read_json(f)
-        print("EXPECTED:")
-        print(expected_df.head())
-        pd.testing.assert_frame_equal(
-            df.reset_index(drop=True), expected_df.reset_index(drop=True)
-        )
-
-
-def test_description_integration_missing_lang(tmp_path):
-    from pathlib import Path
-
-    filename = "case_missing_lang.csd"
-    src = Path("tests/data/cases") / filename
-    dst = tmp_path / filename
-    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-16")
-
-    desc = Description("ko", dst.name)
-    desc.data_dir = tmp_path
+@pytest.mark.parametrize(
+    "file_name,expected",
+    [
+        (
+            "case_very_hard_encompassing_test.csd",
+            "case_very_hard_encompassing_test_integration.json",
+        ),
+        (
+            "case_uneven_lines_per_lang.csd",
+            "case_uneven_lines_per_lang_test_integration.json",
+        ),
+        ("case_missing_lang.csd", "case_missing_lang_test_integration.json"),
+    ],
+    ids=["Hard", "Uneven Lines per Language", "Missing Language"],
+)
+def test_description_integration_test_korean(tmp_path, file_name, expected):
+    desc = load_case(tmp_path, file_name, KOREAN)
+    expected_df = read_expected(expected)
 
     desc.load()
 
-    df = desc.to_dataframe()
-
-    print("ACTUAL:")
-    print(df.head())
-    with open(
-        Path("tests/data/expected") / "case_missing_lang_test_integration.json",
-        "r",
-        encoding="utf-8",
-    ) as f:
-        expected_df = pd.read_json(f)
-        print("EXPECTED:")
-        print(expected_df.head())
-        pd.testing.assert_frame_equal(
-            df.reset_index(drop=True), expected_df.reset_index(drop=True)
-        )
+    pd.testing.assert_frame_equal(
+        desc.to_dataframe().reset_index(drop=True), expected_df
+    )
