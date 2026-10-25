@@ -65,6 +65,13 @@ function legacyIds(kinds: Kind[]) {
   return kinds.map((kind) => `${LEGACY}|${OPTION[kind]}`);
 }
 
+/** The id and value of each Legacy filter in the "and" group of a search. */
+function andLegacies(stats: ReturnType<typeof search>) {
+  return stats[0].filters
+    .filter((filter) => filter.id.startsWith(LEGACY))
+    .map((filter) => [filter.id, filter.value]);
+}
+
 describe("the price check of a Mageblood", () => {
   beforeEach(async () => {
     setupTests();
@@ -161,6 +168,38 @@ describe("the price check of a Mageblood", () => {
     expect(legacies.every((filter) => !filter.value?.min)).toBe(true);
   });
 
+  it.each<[Kind[], Array<[Kind, object]>]>([
+    [
+      ["Topaz", "Topaz", "Gold", "Topaz"],
+      [
+        ["Topaz", {}],
+        ["Gold", {}],
+      ],
+    ],
+    [
+      ["Topaz", "Gold", "Topaz", "Jade"],
+      [
+        ["Topaz", {}],
+        ["Gold", {}],
+        ["Jade", {}],
+      ],
+    ],
+    [
+      ["Topaz", "Gold", "Jade", "Ruby"],
+      [
+        ["Topaz", {}],
+        ["Gold", {}],
+        ["Jade", {}],
+        ["Ruby", {}],
+      ],
+    ],
+    [["Topaz", "Topaz", "Topaz", "Topaz"], [["Topaz", { min: 4 }]]],
+  ])("sends each Legacy kind of %j once in the and group", (belt, sent) => {
+    expect(andLegacies(search(belt))).toEqual(
+      sent.map(([kind, value]) => [legacyIds([kind])[0], value]),
+    );
+  });
+
   it("leaves out the duplicates when the Duplicates filter is off", () => {
     const stats = search(["Topaz", "Topaz", "Gold", "Topaz"], (filters) => {
       const duplicates = duplicatesFilter(filters);
@@ -172,6 +211,10 @@ describe("the price check of a Mageblood", () => {
     expect(stats[0].filters.map((filter) => filter.id)).not.toContain(
       "item.duplicates",
     );
+    expect(andLegacies(stats)).toEqual([
+      [`${LEGACY}|14`, {}],
+      [`${LEGACY}|5`, {}],
+    ]);
   });
 
   it("searches any kind twice for one checked kind and one duplicate", () => {

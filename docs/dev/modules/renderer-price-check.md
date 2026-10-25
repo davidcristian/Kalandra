@@ -194,7 +194,7 @@ load is logged with `console.warn` and its message kept in `error`.
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 2079 lines** (2026-10-20,
+- **`pathofexile-trade.ts` is 1948 lines** (2026-10-26,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 
@@ -214,7 +214,8 @@ filter tag and trade category. `shown-filters.test.ts` there checks that turning
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
 `mageblood.test.ts` there makes the Mageblood preset of `create-unique-filters.ts` for belts with one to four
-Legacy kinds, and checks the Duplicates filter and the count of Legacy rolls that `createTradeRequest` sends.
+Legacy kinds, and checks the Duplicates filter, the count of Legacy rolls that `createTradeRequest` sends, and
+that its "and" group has each Legacy kind once.
 `pseudo/anointments.test.ts` there names the emotions of a real anointed amulet and checks when its anointment
 filter is left out of the search.
 `gem-filters.test.ts` there makes the filters and the search of a real skill gem and of three uncut gems.

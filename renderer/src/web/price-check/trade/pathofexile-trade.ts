@@ -817,6 +817,7 @@ export function createTradeRequest(
     propSet(query.filters, "misc_filters.filters.sanctified.option", "false");
   }
 
+  const addedStats = new Set<StatFilter>();
   // Meta internal stuff, crafting as empty and setting dps/pdps/edps
   for (const stat of stats) {
     if (stat.tradeId[0] === "item.has_empty_modifier") {
@@ -1102,22 +1103,25 @@ export function createTradeRequest(
           if (item.info.refName !== "Mageblood") {
             throw new Error("Duplicates filter applied to non-mageblood");
           }
-          // make a NOT and put all legacies in there
-          // then disable ones found on this item
+          const legacies = stats.filter((s) => s.statRef === "Legacy of #");
           const bmFilter = buildMageBloodNotFilter(
             stat,
-            stats.filter((s) => s.statRef.startsWith("Legacy of")),
+            legacies,
             query.stats[0],
           );
           if (bmFilter) {
             query.stats.push(bmFilter);
           }
+          legacies.forEach((legacy) => addedStats.add(legacy));
         }
         break;
     }
   }
 
-  stats = stats.filter((stat) => !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]));
+  stats = stats.filter(
+    (stat) =>
+      !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]) && !addedStats.has(stat),
+  );
 
   const qAnd = query.stats[0];
   for (const stat of stats) {

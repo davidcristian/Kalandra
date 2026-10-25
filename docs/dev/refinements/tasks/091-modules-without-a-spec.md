@@ -22,18 +22,16 @@ No file in `main/specs/` or `renderer/specs/` imports these `.ts` files of `main
 | `renderer/src/web/item-search/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 | `renderer/src/web/leveling/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 
-Two things the new specs showed, not yet checked against the trade site:
+One thing the new specs showed, not yet checked against the trade site:
 
-- `createTradeRequest` in `pathofexile-trade.ts` adds each Legacy filter of a Mageblood to the `and`
-  group twice: `buildMageBloodNotFilter()` adds it, and the loop over the stat filters adds it again.
 - `createUncutGemFilters()` in `create-item-filters.ts` never runs. The parser gives a copied uncut
   gem the Currency category and no `gemLevel`, although the `UncutSkillGem` case in
   `renderer/specs/Parser/items.ts` expects level 19, and the price check searches it in the exchange
   by its trade tag, which names the level.
 
 Done looks like: a spec for `main.ts` once its settings pass through a function, the maintainer's
-decision on the Heist gem OCR, and a result for each of the two points above: a `fix` commit with a
-test, or a History line that says why the code stays.
+decision on the Heist gem OCR, and a result for the point above: a `fix` commit with a test, or a
+History line that says why the code stays.
 
 ## History
 
@@ -41,3 +39,5 @@ test, or a History line that says why the code stays.
   the hotkey actions, the Mageblood preset, anointments, the result list wait, exchange searches,
   property filters, gems and the item check hotkeys. Before them, 8 main and 7 renderer web modules
   had no importing spec.
+- 2026-10-26: `createTradeRequest` sends each Legacy filter of a Mageblood once in the `and` group,
+  and `mageblood.test.ts` checks it.
