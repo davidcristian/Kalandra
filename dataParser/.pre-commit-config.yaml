@@ -36,3 +36,11 @@ repos:
       # Run the formatter.
       - id: ruff-format
         types_or: [ python, pyi ]
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.414
+    hooks:
+      # Strict mode on src/, set in pyproject.toml, with the packages in .venv
+      - id: pyright
+        args: [ "-p", "dataParser" ]
+        files: ^dataParser/(src/|stubs/|pyproject\.toml$)
+        pass_filenames: false

@@ -1,0 +1,9 @@
+# cloudscraper ships no type information, so this declares the part the data tool calls
+from requests import Session
+
+class CloudScraper(Session):
+    def __init__(self, *, interpreter: str = ..., debug: bool = ...) -> None: ...
+
+def create_scraper(
+    sess: Session | None = None, *, interpreter: str = ..., debug: bool = ...
+) -> CloudScraper: ...

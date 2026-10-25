@@ -1,2 +1,12 @@
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
+
+[tool.pyright]
+# pandas-stubs in .venv gives pandas its types, and stubs/ declares the cloudscraper calls
+include = ["src"]
+extraPaths = ["src"]
+stubPath = "stubs"
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"

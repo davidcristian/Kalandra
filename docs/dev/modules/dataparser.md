@@ -150,7 +150,8 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 - `--push` replaces the app's data with this copy's output, which can drop lines and fields the committed data has.
   Read the diff before committing ([game-data-update.md](../runbooks/game-data-update.md)).
 - Python code has type annotations, no `eval` and no blanket `noqa` ([AGENTS.md](../../../AGENTS.md)). The hooks
-  below check the last two.
+  below check the last two, and Pyright fails on a parameter without an annotation or a value of unknown type. It
+  passes a missing return annotation whose type it infers.
 
 ## Tests
 
@@ -169,16 +170,19 @@ copies, and tests the `--pull` step with a fake export and the fake session. Eve
 only when it applies the icons.
 
 The hooks in `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`,
-and the pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock
-assertions and no `log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in
-the repo root. pre-commit runs every hook from the repo root, so the config's top-level `files: ^dataParser/` keeps
-them to this folder. CI runs neither: `.github/workflows/test.yml` has no job for `dataParser/`, and the root
-`.pre-commit-config.yaml` does not include these hooks.
+the pygrep checks (annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions
+and no `log.warn`) and Pyright in strict mode on `src/`. Pyright reads its settings from `pyproject.toml` and the
+packages from `dataParser/.venv`, which needs `pandas-stubs` for the pandas types. `stubs/cloudscraper/` declares the
+calls the tool makes to `cloudscraper`, which has no types. Run the hooks with
+`pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root. pre-commit runs every hook from
+the repo root, so the config's top-level `files: ^dataParser/` keeps them to this folder. CI runs neither:
+`.github/workflows/test.yml` has no job for `dataParser/`, and the root `.pre-commit-config.yaml` does not include
+these hooks.
 
 A fresh clone cannot pass the tests as of 18 Oct 2026:
 
 - No file lists the packages `src/` and `tests/` import: `pandas`, `numpy` 2 or newer (for `numpy.strings`), `tqdm`,
-  `cloudscraper`, `requests`, `murmurhash2` and `pytest`.
+  `cloudscraper`, `requests`, `murmurhash2` and `pytest`, nor `pandas-stubs`, which the Pyright hook needs.
 - `tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
   needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
   since it reads game tables when it is built.
