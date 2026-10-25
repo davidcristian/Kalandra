@@ -54,8 +54,7 @@ STYLES_TO_BUILD = [
 ]
 
 
-def main(**kwargs: dict[str, bool | str]):
-    _ = kwargs
+def main() -> None:
     logger.info(f"Current version: {CURRENT_VERSION}")
 
     tagged_stats = TaggedStats()
@@ -87,7 +86,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logging.basicConfig(
-        level=args.log.upper(),  # pyright:ignore [reportAny]
+        level=args.log.upper(),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    main(**vars(args))  # pyright:ignore [reportAny]
+    main()

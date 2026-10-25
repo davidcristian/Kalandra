@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
     # Only here, so importing a module sets no handler and no level
     logging.basicConfig(
-        level=args.pop("log").upper(),  # pyright:ignore [reportAny]
+        level=args.pop("log").upper(),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    main(**args)  # pyright:ignore [reportAny]
+    main(**args)
