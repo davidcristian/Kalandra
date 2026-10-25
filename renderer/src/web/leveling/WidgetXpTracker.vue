@@ -25,7 +25,7 @@
         @mousewheel.stop
       />
       <div v-if="config.showExp">
-        Exp
+        {{ t(":exp") }}
         {{ outsideTestData(characterLevel, areaLevel) ? "*" : "" }}:
         <span
           class="font-semibold"
@@ -37,7 +37,7 @@
         >
       </div>
       <div>
-        Over:
+        {{ t(":over") }}
         <span
           class="font-semibold"
           :class="{
@@ -59,6 +59,7 @@ import { WidgetSpec } from "../overlay/interfaces";
 import { XpWidget } from "./widget";
 import { useClientLog } from "../client-log/client-log";
 import { getExpPenalty, getOverIdeal, outsideTestData } from "./xp-formula";
+import { useI18nNs } from "@/web/i18n";
 
 export default defineComponent({
   widget: {
@@ -89,6 +90,7 @@ export default defineComponent({
     },
   },
   setup() {
+    const { t } = useI18nNs("leveling");
     const { playerLevel, setPlayerLevel, areaLevel } = useClientLog();
 
     const characterLevel = computed({
@@ -101,6 +103,7 @@ export default defineComponent({
     });
 
     return {
+      t,
       characterLevel,
       areaLevel,
       outsideTestData,

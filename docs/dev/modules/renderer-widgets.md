@@ -98,7 +98,9 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
    `menuPages()` in `settings/menu.ts`, and an entry in `PAGES` in `settings/SettingsWindow.vue`. Its frame sets
    `inline-edit` to `false`, so "edit" opens that page.
 7. Put its UI text in `renderer/public/data/en/app_i18n.json` under the widget's key. A multi widget names its
-   menu entry with `trNameKey`.
+   menu entry with `trNameKey`. `specs/web/template-text.test.ts` fails on a template text node, or a static
+   `title`, `placeholder`, `label`, `alt` or `aria-label`, that has a letter and is not in `ALLOWED`, its list of
+   names, paths and symbols that are the same in every language.
 8. Describe it on a user page in `docs/`, add the page to the sidebar in `docs/.vitepress/config.js`, and add a row
    to the table above.
 

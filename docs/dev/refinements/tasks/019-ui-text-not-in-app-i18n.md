@@ -11,9 +11,17 @@
 realm option, which shows only when the language is `cmn-Hant`, and no language file defines it.
 `renderer/src/web/i18n.ts` sets `fallbackFormat: true`, so vue-i18n shows the key itself.
 
+The default widget titles that `defaultConfig()` saves are English literals, and the widget menu
+shows them: `XP` in `leveling/WidgetXpTracker.vue`, `Cheat sheets` in `overlay/WidgetImageStrip.vue`,
+and `Map rolling` and `Dump sorting` in `stash-search/WidgetStashSearch.vue`. `defaultConfig()` runs
+at the first start with `language: "en"`, before a language is loaded, so a title in the user's
+language needs the step that [task 072](072-stash-search-presets-in-english.md) describes for the
+presets.
+
 Done looks like: the maintainer gives the realm's name in English and in `cmn-Hant`, both files
 define it, and `Hotcool` leaves `LISTED_MISSING` in `renderer/specs/web/i18n-keys.test.ts`, which
-fails when the English file defines a key that the list still names.
+fails when the English file defines a key that the list still names. The default titles follow the
+language, or the maintainer decides to keep them in English.
 
 ## History
 
@@ -34,3 +42,7 @@ fails when the English file defines a key that the list still names.
   themselves, which keeps the Russian entries working. The Craft of Exile label reads
   `item.open_on_craftofexile`, and `None added` reads `library.none_added`. Only `Hotcool` remains,
   since it needs the realm's name from the maintainer.
+- 2026-10-25: The templates had more English literals: the XP tracker labels, the rate limit
+  state, the trade error prefix, the volume unit and others. They now read keys, and
+  `renderer/specs/web/template-text.test.ts` fails on a template text with a letter outside `t()`.
+  The default widget titles were added above.

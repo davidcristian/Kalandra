@@ -222,7 +222,7 @@
                 target="_blank"
                 href="https://www.pathofexile.com/forum/view-thread/3891367"
                 class="text-orange-400 underline hidden"
-                >Bug Report</a
+                >{{ t("filters.bug_report") }}</a
               >
             </div>
           </div>

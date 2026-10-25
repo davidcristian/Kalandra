@@ -81,6 +81,7 @@ export default defineComponent({
   },
   setup(props) {
     const wm = inject<WidgetManager>("wm")!;
+    const { t } = useI18nNs("notepad");
 
     if (props.config.wmFlags[0] === "uninitialized") {
       const config = props.config;
@@ -89,14 +90,13 @@ export default defineComponent({
         x: Math.random() * (5 - 1) + 1,
         y: Math.random() * (12 - 8) + 16,
       };
-      config.wmTitle = "Notepad";
+      config.wmTitle = t(":name");
       config.notepadBody = "";
       config.wmFlags = ["invisible-on-blur"];
       config.notepadSize = WidgetWidth.Medium;
       wm.show(config.wmId);
     }
 
-    const { t } = useI18nNs("notepad");
     return {
       t,
       WidgetWidth,

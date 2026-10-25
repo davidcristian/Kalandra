@@ -17,7 +17,9 @@ This is a decision for the maintainer, with two outcomes:
 
 - Restore the component, after checking that poeprices returns prices for Path of Exile 2 items. The
   request goes to a live site, so it needs the maintainer's go-ahead
-  ([AGENTS.md](../../../../AGENTS.md#safety)), and the user page then documents the setting.
+  ([AGENTS.md](../../../../AGENTS.md#safety)), and the user page then documents the setting. Its
+  English text moves into `app_i18n.json`, and `price-prediction/` leaves `SKIPPED_DIRS` in
+  `renderer/specs/web/template-text.test.ts`.
 - Remove the checkbox, the `price-prediction/` folder, the import in `CheckedItem.vue` and the
   proxy host. Removing `requestPricePrediction` from the widget config type follows the hard rule
   in [AGENTS.md](../../../../AGENTS.md#the-one-hard-rule), and

@@ -24,7 +24,7 @@
           <div class="w-6 h-6 flex items-center justify-center shrink-0">
             <core-currency-img :currency="priceData.volume.currency" />
           </div>
-          <div class="text-xs text-gray-500">/hr</div>
+          <div class="text-xs text-gray-500">{{ t(":per_hour") }}</div>
         </div>
         <!-- Items per hour -->
         <div
@@ -38,7 +38,7 @@
           <div class="w-6 h-6 flex items-center justify-center shrink-0">
             <ui-item-img :icon="item.info.icon" overflow-hidden />
           </div>
-          <div class="text-xs text-gray-500">/hr</div>
+          <div class="text-xs text-gray-500">{{ t(":per_hour") }}</div>
         </div>
       </div>
       <item-quick-price

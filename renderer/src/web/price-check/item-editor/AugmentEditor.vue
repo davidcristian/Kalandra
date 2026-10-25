@@ -118,7 +118,7 @@
         <div>{{ t(":save_type") }}</div>
         <select v-model="saveType" class="p-1 rounded bg-gray-700 w-28">
           <option value="class">
-            {{ item.category ?? "Unknown" }}
+            {{ item.category ?? t(":unknown_category") }}
           </option>
           <option
             v-if="item.category === 'Wand' || item.category === 'Staff'"

@@ -98,7 +98,7 @@
   </div>
   <ui-error-box v-else>
     <template #name>{{ t(":error") }}</template>
-    <p>Error: {{ error }}</p>
+    <p>{{ t(":error_detail", [error]) }}</p>
     <div v-if="error && errorFix" class="border p-1 rounded">
       {{ errorFix }}
     </div>
