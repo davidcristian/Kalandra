@@ -11,7 +11,7 @@ import {
 import { HttpProxy } from "../src/proxy";
 import { Logger } from "../src/RemoteLogger";
 import { httpRoutes, server } from "../src/server";
-import { get, post } from "./request";
+import { get, getHeaders, post } from "./request";
 
 type ResponseHeaders = Record<string, string[]> | undefined;
 type HeadersReceived = (
@@ -26,7 +26,8 @@ const electron = vi.hoisted(() => ({
 
 // net.request answers every request with the options it was given and the body it received, in place
 // of the remote host. A path that ends in /plain-request or /plain-response gets an object that is
-// not a stream, and one that ends in /fails gets the error Electron emits when the connection fails.
+// not a stream, one that ends in /fails gets the error Electron emits when the connection fails, and
+// one that ends in /sets-cookie gets a response that sets a cookie.
 vi.mock("electron", async () => {
   const { EventEmitter } = await import("node:events");
   const { Readable, Writable } = await import("node:stream");
@@ -57,7 +58,13 @@ vi.mock("electron", async () => {
             request.emit("error", new Error("net::ERR_CONNECTION_RESET"));
             return;
           }
-          const head = { statusCode: 200, statusMessage: "OK", headers: {} };
+          const headers = options.url.endsWith("/sets-cookie")
+            ? {
+                "set-cookie": ["POESESSID=from-site; Path=/; Secure; HttpOnly"],
+                "x-rate-limit-rules": "Ip",
+              }
+            : {};
+          const head = { statusCode: 200, statusMessage: "OK", headers };
           const response = options.url.endsWith("/plain-response")
             ? Object.assign(new EventEmitter(), head)
             : Object.assign(
@@ -142,6 +149,44 @@ describe("the /proxy route", () => {
     expect(Object.keys(forwarded.headers)).not.toContain(PROXY_HEADER);
     expect(Object.keys(forwarded.headers)).not.toContain("sec-fetch-site");
     expect(Object.keys(forwarded.headers)).not.toContain("host");
+  });
+
+  it("sends the session's cookies to the trade site and never the page's own cookies", async () => {
+    const reply = await get(port, fetchPath, {
+      [PROXY_HEADER]: "1",
+      cookie: "POESESSID=page-copy",
+    });
+
+    const forwarded = JSON.parse(reply.body) as ForwardedRequest;
+    expect(forwarded.useSessionCookies).toBe(true);
+    expect(Object.keys(forwarded.headers)).not.toContain("cookie");
+  });
+
+  it.each(["www.poeprices.info", "kalandra.ashoal.com"])(
+    "sends no cookies to %s, which is not a trade site",
+    async (host) => {
+      const reply = await get(port, `/proxy/${host}/api`, {
+        [PROXY_HEADER]: "1",
+        cookie: "POESESSID=page-copy",
+      });
+
+      const forwarded = JSON.parse(reply.body) as ForwardedRequest;
+      expect(forwarded.url).toBe(`https://${host}/api`);
+      expect(forwarded.useSessionCookies).toBe(false);
+      expect(Object.keys(forwarded.headers)).not.toContain("cookie");
+    },
+  );
+
+  it("returns the response headers of the host without its Set-Cookie", async () => {
+    const reply = await getHeaders(
+      port,
+      "/proxy/www.pathofexile.com/sets-cookie",
+      { [PROXY_HEADER]: "1" },
+    );
+
+    expect(reply.status).toBe(200);
+    expect(reply.headers["x-rate-limit-rules"]).toBe("Ip");
+    expect(Object.keys(reply.headers)).not.toContain("set-cookie");
   });
 
   it("forwards the body of a POST without its content-length and origin", async () => {

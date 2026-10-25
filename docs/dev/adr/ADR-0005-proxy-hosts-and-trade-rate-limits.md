@@ -21,12 +21,13 @@ although `CheckedItem.vue` has the prediction component commented out) and the p
 icons are the exception, described under Consequences. Reason: network access to other hosts belongs to the main
 process ([ADR-0004](ADR-0004-process-boundary.md)).
 
-**2. `HttpProxy` forwards only to the hosts in `PROXY_HOSTS`.** A request for any other host is closed with no
-response. Before forwarding, it removes the `sec-*`, `host`, `origin`, `content-length` and `x-kalandra-proxy`
-request headers and sends Electron's `app.userAgentFallback` as the User-Agent. Each entry also marks whether the host is an official trade
-site. `HttpProxy` reads the list only to check that the host is in it. Reason: the list in one file is the full set
-of hosts the renderer code sends requests to, apart from the item icons, so a new host appears in the diff. The auto
-updater is separate: `electron-updater` in `main` checks the GitHub releases itself.
+**2. `HttpProxy` forwards only to the hosts in `PROXY_HOSTS`.** A request for any other host is closed with no response.
+Before forwarding, it removes the `sec-*`, `host`, `origin`, `content-length`, `cookie` and `x-kalandra-proxy` request
+headers and sends Electron's `app.userAgentFallback` as the User-Agent. Each entry also marks whether the host is an
+official trade site: only those get the default session's cookies, which hold the sign-in of the built-in browser, and
+no `set-cookie` of any host reaches the page. Reason: the list in one file is the full set of hosts the renderer code
+sends requests to, apart from the item icons, so a new host appears in the diff. The auto updater is separate:
+`electron-updater` in `main` checks the GitHub releases itself.
 
 **3. Adding a host is a reviewed change to that list.** `poe.ninja` is not in it: the app reads prices from Kalandra's
 own price service instead ([ADR-0006](ADR-0006-own-price-service.md)). Reason: each host on the list receives

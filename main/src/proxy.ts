@@ -3,6 +3,8 @@ import { app, net, session } from "electron";
 import { Readable, Writable } from "stream";
 import type { Logger } from "./RemoteLogger";
 
+// An official trade site gets the session's cookies, which hold the sign-in and the bot check passed in the
+// built-in browser; no other host needs them
 const PROXY_HOSTS = [
   { host: "www.pathofexile.com", official: true },
   { host: "ru.pathofexile.com", official: true },
@@ -54,6 +56,8 @@ export class HttpProxy {
           key === "host" ||
           key === "origin" ||
           key === "content-length" ||
+          // The page's cookies are those of Kalandra's server, which no remote host needs
+          key === "cookie" ||
           key === PROXY_HEADER
         ) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- the loop removes the headers the remote host must not receive
@@ -68,7 +72,7 @@ export class HttpProxy {
           ...req.headers,
           "user-agent": app.userAgentFallback,
         },
-        useSessionCookies: true,
+        useSessionCookies: official,
         referrerPolicy: "no-referrer-when-downgrade",
       });
       // Electron's request and response extend Node's streams, which its types do not declare
@@ -86,6 +90,8 @@ export class HttpProxy {
           }
           const resHeaders = { ...proxyRes.headers };
           delete resHeaders["content-encoding"];
+          // The page would store a remote host's cookie as one of Kalandra's server and send it to every host
+          delete resHeaders["set-cookie"];
           res.writeHead(
             proxyRes.statusCode,
             proxyRes.statusMessage,

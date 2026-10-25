@@ -51,15 +51,16 @@ The entry, the server and the app services, in `main/src/`:
   fallback, onFallback)` listens on `address`, and after an error such as `EADDRINUSE` or `EADDRNOTAVAIL` passes the
   error to `onFallback` and listens on `fallback`; it rejects when `address` is `fallback`. `startServer()` passes the
   defaults as `fallback` and logs the error.
-- `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade
-  sites (`official: true`), `www.poeprices.info` and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a
-  URL is an `https:` address on an official trade site.
-  It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()` sends and a page on another
-  site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`,
-  `origin`, `content-length` and `x-kalandra-proxy` request headers, sends the request through `net.request` with the
-  session's cookies and `app.userAgentFallback` as the User-Agent, and drops `content-encoding` from the response. It
-  removes the `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and
-  `net.request` cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
+- `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade sites
+  (`official: true`), `www.poeprices.info` and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an
+  `https:` address on an official trade site. It returns 403 for a request without the `x-kalandra-proxy` header, which
+  `Host.proxy()` sends and a page on another site cannot
+  ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`, `origin`,
+  `content-length`, `cookie` and `x-kalandra-proxy` request headers, sends the request through `net.request` with
+  `app.userAgentFallback` as the User-Agent and, only to an official trade site, the session's cookies, which hold the
+  sign-in of the built-in browser. It drops `content-encoding` and `set-cookie` from the response. It removes the
+  `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and `net.request`
+  cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
 - `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the last
   1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start a message with its level
   (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that

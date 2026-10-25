@@ -130,8 +130,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    `renderer/src/web/price-check/trade/common.ts`, and `adjustRateLimits()` reads the site's `x-rate-limit-*`
    headers back into the sets ([ADR-0005](adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
 8. `HttpProxy` in `main/src/proxy.ts` sends each request with Electron's `net.request`, with the session's cookies
-   and `app.userAgentFallback` as the User-Agent, and returns the response with its `content-encoding` header
-   removed.
+   for a trade site and `app.userAgentFallback` as the User-Agent, and returns the response with its
+   `content-encoding` and `set-cookie` headers removed.
 
 ## The config, from file to settings
 

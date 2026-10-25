@@ -191,9 +191,9 @@ arrow button next to it opens your default browser. With it off, **Trade** opens
 overlay key to switch between the built-in browser and the game.
 
 Requests that Kalandra sends to the trade site use the sign-in of the built-in browser, which is how a
-[private league](/private-leagues) search works. When you turn the setting on, a warning about POESESSID appears.
-POESESSID is the cookie that keeps you signed in to pathofexile.com, and the built-in browser stores it where
-Kalandra's code can read it.
+[private league](/private-leagues) search works. Its requests to other sites, such as its price service, send no
+cookies. When you turn the setting on, a warning about POESESSID appears. POESESSID is the cookie that keeps you
+signed in to pathofexile.com, and the built-in browser stores it where Kalandra's code can read it.
 
 ## Rate limits
 

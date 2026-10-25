@@ -32,6 +32,25 @@ export async function post(
   return await send(options, body);
 }
 
+// Resolves the status and the response headers of a GET, which a test reads in place of the body
+export async function getHeaders(
+  port: number,
+  urlPath: string,
+  headers: http.OutgoingHttpHeaders = {},
+): Promise<{ status: number; headers: http.IncomingHttpHeaders }> {
+  return await new Promise((resolve, reject) => {
+    const options = { host: "127.0.0.1", port, path: urlPath, headers };
+    const req = http.request(options, (res) => {
+      res.resume();
+      res.on("end", () => {
+        resolve({ status: res.statusCode ?? 0, headers: res.headers });
+      });
+    });
+    req.on("error", reject);
+    req.end();
+  });
+}
+
 // Resolves the status and the Allow header of a request with this method and no body
 export async function sendMethod(
   port: number,
