@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from constants.filenames import ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE
 from models.item_image import ItemImage
-from services.rate_limiter import RateLimiter
+from services.rate_limiter import RateLimiter, RateLimitError
 
 tqdm.pandas()
 
@@ -20,6 +20,13 @@ SEARCH_URL = "https://www.pathofexile.com/api/trade2/search/Fate%20of%20the%20Va
 SEARCH_HEADERS = {"content-type": "application/json"}
 FETCH_URL = "https://www.pathofexile.com/api/trade2/fetch/"
 NOT_FOUND = "%NOT_FOUND%"
+# Lookups that fail in a row usually share a cause outside the items, such as a league the trade site
+# no longer lists, so the run stops instead of sending a failing search for every item.
+MAX_FAILED_IN_A_ROW = 5
+
+
+class ImageLookupError(Exception):
+    """The trade site sent a status or an icon URL that the lookup of one item cannot use."""
 
 
 def get_script_dir() -> str:
@@ -28,10 +35,13 @@ def get_script_dir() -> str:
 
 
 class ImageProvider:
-    def __init__(self, mode: MODE, cache_dir: str | None = None):
+    def __init__(
+        self, mode: MODE, cache_dir: str | None = None, net: RateLimiter | None = None
+    ):
         self.mode: MODE = mode
         self.cache_dir: str = cache_dir or get_script_dir()
-        self.net: RateLimiter = RateLimiter(debug=False)
+        self.net: RateLimiter = net or RateLimiter(debug=False)
+        self.failed_in_a_row: int = 0
 
         self.cache: dict[str, str] = self.get_cache()
 
@@ -58,8 +68,10 @@ class ImageProvider:
 
     def apply_images(self, items: pd.DataFrame) -> pd.DataFrame:
         item_images = items.copy()
-        item_images["icon"] = item_images.progress_apply(self.get_image, axis=1)  # pyright:ignore [reportUnknownMemberType, reportCallIssue]
-        self.save_cache(self.cache)
+        try:
+            item_images["icon"] = item_images.progress_apply(self.get_image, axis=1)  # pyright:ignore [reportUnknownMemberType, reportCallIssue]
+        finally:
+            self.save_cache(self.cache)
         return item_images
 
     def get_image(self, row: pd.Series) -> str:
@@ -75,10 +87,25 @@ class ImageProvider:
             not in self.cache  # mode = new (or missing and it isn't in cache)
             or (self.mode == "missing" and self.cache[save_name] == NOT_FOUND)
         ):
-            image_url = self.get_image_url(item)
-            self.cache[save_name] = image_url if image_url is not None else NOT_FOUND
+            image_url = self.look_up(item)
+            self.cache[save_name] = image_url
         elif save_name in self.cache:
             image_url = self.cache[save_name]
+        return image_url
+
+    def look_up(self, item: ItemImage) -> str:
+        """Returns the item's icon URL, or NOT_FOUND when the trade site has none or the lookup fails."""
+        try:
+            image_url = self.get_image_url(item)
+        except ImageLookupError as error:
+            self.failed_in_a_row += 1
+            if self.failed_in_a_row >= MAX_FAILED_IN_A_ROW:
+                raise ImageLookupError(
+                    f"{self.failed_in_a_row} image lookups in a row failed, the last for {item}: {error}"
+                ) from error
+            logger.warning(f"Image lookup failed for {item}: {error}")
+            return NOT_FOUND
+        self.failed_in_a_row = 0
         return image_url if image_url is not None else NOT_FOUND
 
     def get_fetch_id(self, item: ItemImage) -> str | None:
@@ -92,10 +119,10 @@ class ImageProvider:
                 else:
                     return None
             elif result.status_code != 429:
-                raise Exception(
-                    f"Unexpected status code: {result.status_code}\n {result.text}"
+                raise ImageLookupError(
+                    f"search got status {result.status_code}: {result.text}"
                 )
-        raise Exception(f"Retry limit exceeded for {item.name}")
+        raise RateLimitError(f"Rate limited 3 times, gave up on the search for {item}")
 
     def fetch_listing(self, fetch_id: str):
         for _ in range(3):
@@ -107,10 +134,12 @@ class ImageProvider:
                 else:
                     return None
             elif result.status_code != 429:
-                raise Exception(
-                    f"Unexpected status code: {result.status_code}\n {result.text}"
+                raise ImageLookupError(
+                    f"fetch got status {result.status_code}: {result.text}"
                 )
-        raise Exception(f"Retry limit exceeded for {fetch_id}")
+        raise RateLimitError(
+            f"Rate limited 3 times, gave up on the fetch of {fetch_id}"
+        )
 
     def parse_listing_for_url(self, listing) -> str | None:
         item = listing.get("item")
@@ -122,7 +151,7 @@ class ImageProvider:
         if not icon_url.startswith(
             "https://web.poecdn.com/gen/image"
         ) or not icon_url.endswith(".png"):
-            raise Exception(f"Unexpected icon url: {icon_url}")
+            raise ImageLookupError(f"unexpected icon url: {icon_url}")
         return icon_url
 
     def get_image_url(self, item: ItemImage) -> str | None:

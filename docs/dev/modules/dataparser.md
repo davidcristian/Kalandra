@@ -87,12 +87,17 @@ copy, and its error ends the pull. The folder `data/json/fr/` is not in the repo
 - `all` looks up every item.
 
 A lookup is a trade search and a fetch on `www.pathofexile.com`, in the league that `SEARCH_URL` names, through the
-tool's own `RateLimiter` (`src/services/rate_limiter.py`). Only the English build uses `--image-mode`. The other
-languages use `noLookup` and read the cache the English build saved. Each build first copies the cache to
-`src/services/itemImageCache.old.json`. Where the trade site's `static.json` has an image for an item, that image
-replaces the icon (`src/services/static_items.py`). An entry without an image, such as a list separator, leaves
-the item's icon unchanged. The cache is not in this repo, so a `noLookup` run without it writes `%NOT_FOUND%` for
-every other icon.
+tool's own `RateLimiter` (`src/services/rate_limiter.py`). A lookup that gets a status other than 200 or 429, or an
+icon URL outside `https://web.poecdn.com/gen/image`, logs `Image lookup failed for <item>: <reason>` and caches
+`%NOT_FOUND%` for the item, so `missing` looks it up again. Five such failures in a row, three 429 responses to one
+request, or a request that raises end the build. The cache is saved in every case, with the icons found before the
+failure.
+
+Only the English build uses `--image-mode`. The other languages use `noLookup` and read the cache the English build
+saved. Each build first copies the cache to `src/services/itemImageCache.old.json`. Where the trade site's
+`static.json` has an image for an item, that image replaces the icon (`src/services/static_items.py`). An entry
+without an image, such as a list separator, leaves the item's icon unchanged. The cache is not in this repo, so a
+`noLookup` run without it writes `%NOT_FOUND%` for every other icon.
 
 ## Outputs
 
@@ -142,17 +147,17 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 
 `python -m pytest` in `dataParser/`, where `pyproject.toml` adds `.` and `src` to the import path. `tests/unit/`
 tests the constants, models, providers, services and stores one module at a time. Its provider tests run a fake
-export command, the trade site tests use the fake session and clock in `tests/fake_http.py`, and its description
-tests compare the blocks they load from the sample files in `tests/data/cases/` with `tests/data/expected/`.
-`tests/integration/` reads real files. Its description tests compare the frame parsed from a sample file with
-`tests/data/expected/<name>_integration.json` and skip a sample without one. Only the bleeding sample has one, since
-a description's hash can be checked by hand only against a trade site stat id. `test_game_store_i.py` fails when
-parsed game text keeps markup such as `[` or `|` for an id outside `BROKEN_GAME_TEXT`, the ids whose game text is
-broken, or when one of those ids is fixed, so a game patch that changes either updates that set.
-`tests/test_main.py` runs `main()` end to end with `push`, checks the files it writes and copies, and tests the
-`--pull` step with a fake export and the fake session. Every test writes to a temporary folder: `main()` takes the
-output folder and `ImageProvider` the cache folder, and `NdBuilderService` opens the image cache only when it
-applies the icons.
+export command, the trade site and image lookup tests use the fake session and clock in `tests/fake_http.py`, and its
+description tests compare the blocks they load from the sample files in `tests/data/cases/` with
+`tests/data/expected/`. `tests/integration/` reads real files. Its description tests compare the frame parsed from a
+sample file with `tests/data/expected/<name>_integration.json` and skip a sample without one. Only the bleeding
+sample has one, since a description's hash can be checked by hand only against a trade site stat id.
+`test_game_store_i.py` fails when parsed game text keeps markup such as `[` or `|` for an id outside
+`BROKEN_GAME_TEXT`, the ids whose game text is broken, or when one of those ids is fixed, so a game patch that changes
+either updates that set. `tests/test_main.py` runs `main()` end to end with `push`, checks the files it writes and
+copies, and tests the `--pull` step with a fake export and the fake session. Every test writes to a temporary folder:
+`main()` takes the output folder and `ImageProvider` the cache folder, and `NdBuilderService` opens the image cache
+only when it applies the icons.
 
 The hooks in `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`,
 and the pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock

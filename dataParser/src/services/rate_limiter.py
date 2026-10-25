@@ -1,11 +1,12 @@
 import logging
 import math
 from collections import defaultdict
+from collections.abc import Mapping
 from datetime import datetime
 from time import sleep
+from typing import Any, Protocol
 
 import cloudscraper
-from requests.models import Response
 
 # Initial logging configuration
 logging.basicConfig(
@@ -23,7 +24,30 @@ def set_log_level(level):
 
 
 class RateLimitError(Exception):
-    pass
+    """Every try of a request got a 429 from the trade site."""
+
+
+class Response(Protocol):
+    @property
+    def status_code(self) -> int: ...
+
+    @property
+    def headers(self) -> Mapping[str, str]: ...
+
+    @property
+    def text(self) -> str: ...
+
+    def json(self) -> Any: ...
+
+
+class Session(Protocol):
+    def get(
+        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+    ) -> Response: ...
+
+    def post(
+        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+    ) -> Response: ...
 
 
 class RateLimit:
@@ -53,9 +77,13 @@ class RateLimit:
 
 
 class RateLimiter:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, session: Session | None = None):
         self.limits = defaultdict()
-        self.session = cloudscraper.create_scraper(interpreter="nodejs", debug=debug)
+        self.session: Session = (
+            session
+            if session is not None
+            else cloudscraper.create_scraper(interpreter="nodejs", debug=debug)
+        )
 
     def wait(self, duration: int | float):
         """Wait for a specified duration.

@@ -44,7 +44,17 @@ class FakeSession:
         self.latency: float = latency
         self.sent: list[tuple[str, float]] = []
 
-    def get(self, url: str) -> FakeResponse:
+    def get(
+        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+    ) -> FakeResponse:
+        return self.send(url)
+
+    def post(
+        self, url: str, json: object = None, headers: Mapping[str, str] | None = None
+    ) -> FakeResponse:
+        return self.send(url)
+
+    def send(self, url: str) -> FakeResponse:
         self.sent.append((url, self.clock.now))
         self.clock.now += self.latency
         result = self.results.pop(0)

@@ -71,7 +71,8 @@ On 18 Oct 2026 the last two print 445 and 16.
    ```
 
    The modes are listed in [dataparser.md](../modules/dataparser.md#image-modes). Without a cache file, `missing` and
-   `new` both look up every item. The run saves the cache, and the next run reads it.
+   `new` both look up every item. The run saves the cache, also when a failed lookup ends it, and the next run reads
+   it.
 
 4. **Build and copy into the app.** From `dataParser/`:
 
