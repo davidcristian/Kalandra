@@ -135,6 +135,36 @@ describe("GameLogWatcher.restart", () => {
     expect(files.watched).toEqual([steam]);
   });
 
+  it("keeps the open file and its read position on a restart with the same path", async () => {
+    await fs.writeFile(file, "an old line\n");
+    await watcher.restart(file, true);
+    await fs.appendFile(file, "a new line\n");
+
+    await watcher.restart(file, true);
+    await files.change(file);
+
+    expect(server.gameLogLines()).toEqual(["a new line"]);
+  });
+
+  it("names both default log files and follows neither when both exist", async () => {
+    const standalone = path.join(folder, "standalone", "Client.txt");
+    const steam = path.join(folder, "steam", "Client.txt");
+    for (const log of [standalone, steam]) {
+      await fs.mkdir(path.dirname(log));
+      await fs.writeFile(log, "");
+    }
+    createWatcher([standalone, steam]);
+
+    await watcher.restart("", true);
+
+    expect(files.watched).toEqual([]);
+    expect(logger.history).toContain(
+      "error [GameLogWatcher] Found 2 log files, please enter one into settings:",
+    );
+    expect(logger.history).toContain(standalone);
+    expect(logger.history).toContain(steam);
+  });
+
   it("stops a read in progress without an error when reading is turned off", async () => {
     await fs.writeFile(file, "");
     await watcher.restart(file, true);
@@ -273,6 +303,51 @@ describe("GameLogWatcher after the log changes on disk", () => {
       expect(logger.history).toContain("Failed to read the log file: EPERM");
     },
   );
+});
+
+describe("GameLogWatcher after a failed open of a new log", () => {
+  // Deletes the log and writes it again, so the next change opens the new file with fs.open
+  async function replaceLog() {
+    await fs.writeFile(file, "");
+    await watcher.restart(file, true);
+    await fs.rm(file);
+    await fs.writeFile(file, "a new line\n");
+  }
+
+  it("logs the error and reads the new log at the next change", async () => {
+    await replaceLog();
+    const err = new Error("EACCES: permission denied, open");
+    vi.spyOn(fs, "open").mockRejectedValueOnce(
+      Object.assign(err, { code: "EACCES" }),
+    );
+
+    await files.change(file);
+    expect(logger.history).toContain(
+      "error [GameLogWatcher] Failed to read the log file: EACCES",
+    );
+    expect(server.gameLogLines()).toEqual([]);
+
+    await files.change(file);
+    expect(server.gameLogLines()).toEqual(["a new line"]);
+  });
+
+  it("closes the new log when reading is turned off while it opens", async () => {
+    await replaceLog();
+    const opened: fs.FileHandle[] = [];
+    const open = fs.open;
+    vi.spyOn(fs, "open").mockImplementationOnce(async (...args) => {
+      await watcher.restart(file, false);
+      const log = await open(...args);
+      opened.push(log);
+      return log;
+    });
+
+    await files.change(file);
+
+    expect(opened.map((log) => log.fd)).toEqual([-1]);
+    expect(server.gameLogLines()).toEqual([]);
+    expect(logger.history).not.toContain("The log file was replaced");
+  });
 });
 
 describe("the default FileWatch", () => {

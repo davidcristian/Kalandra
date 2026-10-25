@@ -70,7 +70,8 @@ replaces it with `vi.mock("electron", ...)`.
   feature is off. It delays the first write to check the line order, and keeps the files it opens to check which
   ones it closed.
 - `GameLogWatcher.test.ts` calls the change listener of a fake `FileWatch` or `fs.watchFile`, deletes a new log as
-  the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete.
+  the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete. It also fails that
+  open with EACCES, turns reading off while it runs, restarts with the same path and finds both default logs.
 
 ## vision/
 
