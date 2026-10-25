@@ -75,7 +75,9 @@ class ClientString(BaseClientString):
         if not self.keep_tooltip:
             out_values = [self.replace_tooltip_tags(x) for x in out_values]
 
-        if not self.keep_format_option:
+        if self.keep_format_option:
+            out_values = [self.keep_format_things(x) for x in out_values]
+        else:
             out_values = [self.replace_format_things(x) for x in out_values]
 
         if self.substring is not None:
@@ -130,6 +132,10 @@ class ClientString(BaseClientString):
                 f"Exceeded max iterations for pattern: {self.pattern_full.pattern}"
             )
         return line.replace("[", "").replace("]", "")
+
+    def keep_format_things(self, line: str) -> str:
+        """Returns the line with its {} placeholders kept for apply to fill."""
+        return line
 
     def replace_format_things(self, line: str) -> str:
         for _ in range(MAX_ITER):

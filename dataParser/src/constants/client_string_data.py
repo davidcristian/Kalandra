@@ -269,7 +269,7 @@ CLIENT_STRING_REGEX: list[RegexClientString] = [
     CapturePlaceholderClientString("MAP_BLIGHT_RAVAGED", ["UberInfectedMap"]),
     CapturePlaceholderClientString("ITEM_SYNTHESISED", ["SynthesisedItem"], trim=True),
     CapturePlaceholderClientString(
-        "FLASK_CHARGES", ["ItemDisplayChargesNCharges"], capture_str="\\\\d+"
+        "FLASK_CHARGES", ["ItemDisplayChargesNCharges"], capture_str="\\d+"
     ),
     ConstRegexClientString("METAMORPH_BRAIN", ".* Brain"),
     ConstRegexClientString("METAMORPH_EYE", ".* Eye"),

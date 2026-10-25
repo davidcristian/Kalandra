@@ -9,6 +9,30 @@ from models.client_string import ClientString
 
 logger = logging.getLogger(__name__)
 
+PLACEHOLDER: Pattern[str] = re.compile(r"\{[^{}]*\}")
+# A JavaScript regex literal reads these characters as syntax and cannot hold a line break
+JS_REGEX_ESCAPES = str.maketrans(
+    {c: "\\" + c for c in "\\^$.*+?()[]{}|/"}
+    | {"\n": "\\n", "\r": "\\r", "\u2028": "\\u2028", "\u2029": "\\u2029"}
+)
+
+
+def escape_js_regex(text: str) -> str:
+    """Returns the part of a JavaScript regex literal that matches text exactly."""
+    return text.translate(JS_REGEX_ESCAPES)
+
+
+def escape_outside_placeholders(line: str, placeholder: Callable[[str], str]) -> str:
+    """Returns the line with its text escaped for a regex and each {} placeholder passed to placeholder."""
+    parts: list[str] = []
+    end = 0
+    for match in PLACEHOLDER.finditer(line):
+        parts.append(escape_js_regex(line[end : match.start()]))
+        parts.append(placeholder(match.group()))
+        end = match.end()
+    parts.append(escape_js_regex(line[end:]))
+    return "".join(parts)
+
 
 class CapturePlaceholderClientString(ClientString, RegexClientString):
     format_pattern: Pattern[str] = re.compile(r"\{\d*\}")
@@ -52,10 +76,17 @@ class CapturePlaceholderClientString(ClientString, RegexClientString):
 
     @override
     def replace_format_things(self, line: str) -> str:
-        line = line.replace("(", "\\(").replace(")", "\\)")
-        line = re.sub(self.format_pattern, self.capture_str, line)
-        line = super().replace_format_things(line)
-        return line
+        return escape_outside_placeholders(line, self.capture_or_remove)
+
+    @override
+    def keep_format_things(self, line: str) -> str:
+        return escape_outside_placeholders(line, lambda placeholder: placeholder)
+
+    def capture_or_remove(self, placeholder: str) -> str:
+        """Returns the capture for a {0} or {} placeholder, and nothing for another, such as {0:+d}."""
+        if self.format_pattern.fullmatch(placeholder):
+            return self.capture_str
+        return ""
 
     @override
     def __repr__(self) -> str:
