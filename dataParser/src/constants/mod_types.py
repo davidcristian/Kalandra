@@ -11,6 +11,7 @@ MOD_TYPE = Literal[
     "sanctum",
     "skill",
     "pseudo",
+    "crafted",
 ]
 
 EXPLICIT: MOD_TYPE = "explicit"
@@ -23,6 +24,7 @@ DESECRATED: MOD_TYPE = "desecrated"
 SANCTUM: MOD_TYPE = "sanctum"
 SKILL: MOD_TYPE = "skill"
 PSEUDO: MOD_TYPE = "pseudo"
+CRAFTED: MOD_TYPE = "crafted"
 
 MOD_TYPES: list[MOD_TYPE] = [
     EXPLICIT,
@@ -34,6 +36,7 @@ MOD_TYPES: list[MOD_TYPE] = [
     SANCTUM,
     SKILL,
     PSEUDO,
+    CRAFTED,
 ]
 
 MOD_TYPES_SET: set[MOD_TYPE] = set(MOD_TYPES)

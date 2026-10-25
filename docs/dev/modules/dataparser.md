@@ -101,7 +101,9 @@ one JSON object per line.
 - `stats.ndjson`, one line per stat: `ref` (the English text), `better`, `matchers` (the text in this language, with
   `#` for a number) and `trade.ids` (the trade site's stat ids by type, or `null` for a stat without any, such as a
   logbook faction), plus `id`, `dp`, `fromAreaMods`, `trade.option` and `trade.inverted` where they apply. The parser
-  matches mod lines against `matchers`.
+  matches mod lines against `matchers`. The types of a trade id without a `|<value>` part are those in `MOD_TYPES`
+  (`src/constants/mod_types.py`), with `augment` written as `rune`. Any other type on such an id in the trade site's
+  `stats.json` stops the build with a `ValueError`.
 - `items.ndjson`, one line per item: `name` (this language), `refName` (English), `namespace`, `icon`, `tags`, `w`,
   `h`, and `craftable`, `unique`, `tradeTag`, `gem`, `armour` and `augment` where they apply.
 - `client_strings.js`, a JavaScript module whose default export maps app keys such as `RARITY_NORMAL` to the game's

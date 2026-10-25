@@ -716,6 +716,86 @@ def test_group_trade_stats_rejects_a_type_outside_mod_types():
         service.group_trade_stats(df)
 
 
+TRADE_SITE_TYPES = [
+    "pseudo",
+    "explicit",
+    "implicit",
+    "fractured",
+    "crafted",
+    "enchant",
+    "augment",
+    "desecrated",
+    "sanctum",
+    "skill",
+]
+DEXTERITY = "# to Dexterity"
+COOLDOWN = "#% increased Cooldown Recovery Rate"
+
+
+def trade_stat(mod_type: str, stat: str, ref: str) -> dict[str, str]:
+    prefix = "rune" if mod_type == "augment" else mod_type
+    return {"id": f"{prefix}.stat_{stat}", "text": ref, "ref": ref, "type": mod_type}
+
+
+CRAFTED_TRADE_STATS = pd.DataFrame(
+    [trade_stat(t, "3261801346", DEXTERITY) for t in TRADE_SITE_TYPES]
+    + [
+        trade_stat("crafted", "1004011302", COOLDOWN),
+        trade_stat("crafted", "3891355829|1", "Upgrades Radius to Medium"),
+    ]
+)
+
+
+def test_group_trade_stats_groups_crafted_rows_by_ref():
+    service = NdBuilderService("en", "noLookup")
+    is_value_stat = CRAFTED_TRADE_STATS["id"].str.contains("|", regex=False)
+    valueless = CRAFTED_TRADE_STATS[~is_value_stat]
+
+    result = service.group_trade_stats(valueless).set_index("ref")
+
+    assert result.loc[DEXTERITY, "crafted"] == ["crafted.stat_3261801346"]
+    assert result.loc[DEXTERITY, "explicit"] == ["explicit.stat_3261801346"]
+    assert result.loc[COOLDOWN, "crafted"] == ["crafted.stat_1004011302"]
+    assert result.loc[COOLDOWN, "explicit"] == []
+
+
+def test_get_output_ready_trade_stats_writes_crafted_ids_to_the_trade_dict():
+    service = NdBuilderService("en", "noLookup")
+    service.stats_combined_df = lambda: CRAFTED_TRADE_STATS.copy()
+
+    result = service.get_output_ready_trade_stats().set_index("ref")
+
+    assert result.loc[DEXTERITY, "trade"] == {
+        "ids": {
+            "explicit": ["explicit.stat_3261801346"],
+            "implicit": ["implicit.stat_3261801346"],
+            "fractured": ["fractured.stat_3261801346"],
+            "enchant": ["enchant.stat_3261801346"],
+            "rune": ["rune.stat_3261801346"],
+            "desecrated": ["desecrated.stat_3261801346"],
+            "sanctum": ["sanctum.stat_3261801346"],
+            "skill": ["skill.stat_3261801346"],
+            "pseudo": ["pseudo.stat_3261801346"],
+            "crafted": ["crafted.stat_3261801346"],
+        }
+    }
+    assert result.loc[DEXTERITY, "hash"] == [3261801346]
+    assert result.loc[COOLDOWN, "trade"] == {
+        "ids": {"crafted": ["crafted.stat_1004011302"]}
+    }
+    assert result.loc[COOLDOWN, "hash"] == [1004011302]
+    assert "Upgrades Radius to Medium" not in result.index
+
+
+def test_group_trade_stats_still_rejects_an_unknown_type():
+    service = NdBuilderService("en", "noLookup")
+    veiled = pd.DataFrame([trade_stat("veiled", "1", "A")])
+    df = pd.concat([CRAFTED_TRADE_STATS, veiled])
+
+    with pytest.raises(ValueError, match="MOD_TYPES"):
+        service.group_trade_stats(df)
+
+
 def test_value_trade_stats_df_extracts_values_and_hashes():
     service = NdBuilderService("ru", "new")
     service.stats_combined_df = MagicMock(
