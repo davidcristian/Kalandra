@@ -20,6 +20,7 @@ replaces it with `vi.mock("electron", ...)`.
   overlay window and a browser tab.
 - `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first, and
   which client receives a `last-active` event after a connect, a `CLIENT->MAIN::used-recently` message and a close.
+  After a close that leaves one client, it checks the `isOverlay` main reports for a browser and the overlay window.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
 - `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes and to
   `/events`, paths and methods that no route serves, and an upgrade request to another path.

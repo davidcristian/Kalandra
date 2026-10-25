@@ -28,12 +28,12 @@ vi.mock("electron", async () => {
   return { app: { getPath: () => userData, getVersion: () => "1.2.3" } };
 });
 
+const OVERLAY_USER_AGENT =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) kalandra/1.2.3 Chrome/138.0.7204.235 Electron/37.4.0 Safari/537.36";
+
 const logger = new Logger(new FakeServer());
 const opened: EventClient[] = [];
-let usedRecentlyWaiters: Array<{
-  isOverlay: boolean;
-  resolve: () => void;
-}> = [];
+const usedRecentlyWaiters: Array<(isOverlay: boolean) => void> = [];
 let port = 0;
 
 beforeAll(async () => {
@@ -43,13 +43,7 @@ beforeAll(async () => {
   };
   ({ port } = await startServer(updater, logger));
   onEventAnyClient("CLIENT->MAIN::used-recently", (e) => {
-    const matching = usedRecentlyWaiters.filter(
-      (w) => w.isOverlay === e.isOverlay,
-    );
-    usedRecentlyWaiters = usedRecentlyWaiters.filter(
-      (w) => w.isOverlay !== e.isOverlay,
-    );
-    for (const waiter of matching) waiter.resolve();
+    for (const resolve of usedRecentlyWaiters.splice(0)) resolve(e.isOverlay);
   });
 });
 
@@ -64,18 +58,18 @@ afterAll(() => {
 });
 
 // Opens a client and reads the two events main sends to each new client
-async function connect(): Promise<EventClient> {
-  const client = await EventClient.open(port);
+async function connect(userAgent?: string): Promise<EventClient> {
+  const client = await EventClient.open(port, userAgent);
   opened.push(client);
   await client.next();
   await client.next();
   return client;
 }
 
-// Resolves when a handler in main receives a used-recently event with this payload
-async function usedRecentlyHandled(isOverlay: boolean): Promise<void> {
-  await new Promise<void>((resolve) => {
-    usedRecentlyWaiters.push({ isOverlay, resolve });
+// Resolves the isOverlay of the next used-recently event that a handler in main receives
+async function nextUsedRecently(): Promise<boolean> {
+  return await new Promise<boolean>((resolve) => {
+    usedRecentlyWaiters.push(resolve);
   });
 }
 
@@ -119,12 +113,12 @@ describe("the last active client", () => {
   it("is the client that sent used-recently last", async () => {
     const first = await connect();
     const second = await connect();
-    const handled = usedRecentlyHandled(false);
+    const handled = nextUsedRecently();
     first.send({
       name: "CLIENT->MAIN::used-recently",
       payload: { isOverlay: false },
     });
-    await handled;
+    expect(await handled).toBe(false);
 
     sendEventTo("last-active", action("last active"));
     sendEventTo("broadcast", action("everyone"));
@@ -134,12 +128,24 @@ describe("the last active client", () => {
   });
 
   // The other tests' clients may still be closing, so main sees one client left only once all of them are gone
-  it("is the one client left after the others close, which main reports as the overlay window", async () => {
+  it("is the one client left after the others close, which main reports as a browser tab", async () => {
     const remaining = await connect();
-    const closing = await connect();
-    const handled = usedRecentlyHandled(true);
+    const closing = await connect(OVERLAY_USER_AGENT);
+    const handled = nextUsedRecently();
     closing.close();
-    await handled;
+    expect(await handled).toBe(false);
+
+    sendEventTo("last-active", action("last active"));
+
+    expect(await remaining.next()).toEqual(action("last active"));
+  });
+
+  it("is the overlay window when it is the one client left, which main reports as the overlay window", async () => {
+    const remaining = await connect(OVERLAY_USER_AGENT);
+    const closing = await connect();
+    const handled = nextUsedRecently();
+    closing.close();
+    expect(await handled).toBe(true);
 
     sendEventTo("last-active", action("last active"));
 

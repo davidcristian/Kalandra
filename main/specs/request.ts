@@ -178,9 +178,10 @@ export class EventClient {
   }
 
   // The message listener is added before the socket opens, so no event main sends on connect is missed
-  static async open(port: number): Promise<EventClient> {
+  static async open(port: number, userAgent?: string): Promise<EventClient> {
     const socket = new WebSocket(`ws://127.0.0.1:${port}/events`, {
       origin: `http://127.0.0.1:${port}`,
+      headers: userAgent ? { "user-agent": userAgent } : {},
     });
     const client = new EventClient(socket);
     await new Promise((resolve, reject) => {
