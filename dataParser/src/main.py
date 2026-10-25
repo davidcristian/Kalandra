@@ -3,6 +3,8 @@ import json
 import logging
 import shutil
 
+import pandas as pd
+from pandas.api.types import is_scalar
 from tqdm import tqdm
 
 from constants.client_string_data import (
@@ -22,6 +24,16 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+def write_ndjson(df: pd.DataFrame, path: str) -> None:
+    """Writes one JSON object per row, without the row's missing values."""
+    rows = df.where(df.notna(), None)
+    with open(path, "w", encoding="utf-8") as f:
+        for _, row in rows.iterrows():
+            # pandas 3 keeps NaN rather than None in a string column
+            obj = {k: v for k, v in row.items() if not (is_scalar(v) and pd.isna(v))}
+            f.write(f"{json.dumps(obj, ensure_ascii=False, allow_nan=False)}\n")
 
 
 def main(**kwargs: dict[str, bool | str]):
@@ -52,24 +64,8 @@ def main(**kwargs: dict[str, bool | str]):
             image_mode if lang is ENGLISH else "noLookup",
         )
 
-        stats = nd.build_stats_ndjson()
-        stats_o = stats.where(stats.notna(), None)
-        with open(f"output/{lang}/stats.ndjson", "w", encoding="utf-8") as f:
-            for _, row in stats_o.iterrows():
-                obj = {k: v for k, v in row.items() if v is not None}
-                f.write(f"{json.dumps(obj, ensure_ascii=False)}\n")
-
-        items = nd.build_items_ndjson()
-        items_o = items.where(items.notna(), None)
-        with open(f"output/{lang}/items.ndjson", "w", encoding="utf-8") as f:
-            for _, row in items_o.iterrows():
-                obj = {k: v for k, v in row.items() if v is not None}
-                try:
-                    f.write(f"{json.dumps(obj, ensure_ascii=False)}\n")
-                except Exception as e:
-                    print(e)
-                    print(obj)
-                    raise
+        write_ndjson(nd.build_stats_ndjson(), f"output/{lang}/stats.ndjson")
+        write_ndjson(nd.build_items_ndjson(), f"output/{lang}/items.ndjson")
 
         client_strings_builder = ClientStringsBuilder(lang)
         client_strings_js = client_strings_builder.build(

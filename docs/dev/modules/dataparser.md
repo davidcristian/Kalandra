@@ -96,7 +96,8 @@ icon.
 
 `output/<lang>/` for each language in `LANGUAGES` in `src/constants/lang.py`, the same nine as the app's list in
 [renderer-parser.md](renderer-parser.md#the-game-data). The two `.ndjson` files are NDJSON (newline-delimited JSON):
-one JSON object per line.
+one JSON object per line, written by `write_ndjson` in `src/main.py`. A field without a value is left out, and a NaN
+inside a value stops the build with a `ValueError`, since `JSON.parse` in the app cannot read `NaN`.
 
 - `stats.ndjson`, one line per stat: `ref` (the English text), `better`, `matchers` (the text in this language, with
   `#` for a number) and `trade.ids` (the trade site's stat ids by type, or `null` for a stat without any, such as a
