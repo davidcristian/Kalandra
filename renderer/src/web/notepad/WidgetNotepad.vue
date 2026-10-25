@@ -121,7 +121,7 @@ export default defineComponent({
     @apply border-white/30;
   }
 
-  &:placeholder {
+  &::placeholder {
     @apply text-gray-500;
   }
 }
