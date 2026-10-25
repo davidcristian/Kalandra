@@ -133,8 +133,10 @@ menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. 
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
 until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP tracker reads, with
 `FullCampaign.txt`, and a line that fails), `specs/web/map-check-marks.test.ts` (the Map check marks in English and
-German, before and after a conversion), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which the image strip uses to add an
-image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
+German, before and after a conversion), `specs/web/map-check-decisions.test.ts` (the mark each click sets in one
+profile, and the marks that have a color), `specs/web/map-check-stats.test.ts` (the rows `prepareMapStats()` lists for
+a Waystone and a Tablet, with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which
+the image strip uses to add an image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
 `specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
