@@ -150,3 +150,5 @@ layout and its reasons.
 - 086: [The committed data has five unique items without a name and 18 client strings nothing reads](tasks/086-unique-names-and-unread-client-strings.md)
 - 087: [The renderer build needs Vite's legacy CommonJS interop for vue3-apexcharts](tasks/087-legacy-commonjs-interop-for-apexcharts.md)
 - 088: [Two tips name controls by labels the app does not show](tasks/088-tips-name-labels-the-app-does-not-show.md)
+- 089: [The poedb button opens a flask's or a tablet's own page instead of its calculator](tasks/089-poe2db-flask-and-tablet-pages.md)
+- 090: [The XP tracker page describes Over in words that differ from its formula at a safe zone step](tasks/090-xp-tracker-over-wording.md)
