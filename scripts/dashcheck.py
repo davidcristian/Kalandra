@@ -11,6 +11,7 @@ from prosesources import markdown_prose
 from repofiles import GAME_DATA, RepoError, read_text, repo_files, under
 
 ALLOW = "dashcheck: allow"
+_ALLOW_WITH_REASON = re.compile(rf"{ALLOW}[,:]\s+\w")
 # Each dash as a character, and as the HTML character references that render it:
 # https://html.spec.whatwg.org/multipage/syntax.html#character-references
 DASHES = {
@@ -55,14 +56,17 @@ def checked_lines(name: str, text: str) -> list[tuple[int, str]]:
 
 
 def find_dashes(name: str, text: str) -> list[Problem]:
-    """Returns one problem per line that uses a dash and has no allow comment."""
-    return [
-        Problem(name, number, f"{kind}: {line.strip()[:100]}")
-        for number, line in checked_lines(name, text)
-        if ALLOW not in line
-        for kind, dash in DASHES.items()
-        if dash.search(line)
-    ]
+    """Returns the problems of each line that uses a dash and has no allow comment with its reason."""
+    problems: list[Problem] = []
+    for number, line in checked_lines(name, text):
+        kinds = [kind for kind, dash in DASHES.items() if dash.search(line)]
+        if not kinds or _ALLOW_WITH_REASON.search(line):
+            continue
+        if ALLOW in line:
+            problems.append(Problem(name, number, f"'{ALLOW}' needs ', <reason>' after it: {line.strip()[:100]}"))
+        else:
+            problems.extend(Problem(name, number, f"{kind}: {line.strip()[:100]}") for kind in kinds)
+    return problems
 
 
 def scan(root: Path, names: Sequence[str], exemptions: dict[str, str]) -> Scan:
@@ -108,7 +112,7 @@ def main(argv: Sequence[str] | None = None, exemptions: dict[str, str] = EXEMPTI
     if found.problems:
         print(
             f"\ndashcheck: {len(found.problems)} problem(s). Restructure the sentence rather than swapping in another "
-            f"mark; a range takes a hyphen. A dash that is game text or a symbol gets '{ALLOW}' and a reason.",
+            f"mark; a range takes a hyphen. A dash that is game text or a symbol gets '{ALLOW}, <reason>'.",
             file=sys.stderr,
         )
         return 1

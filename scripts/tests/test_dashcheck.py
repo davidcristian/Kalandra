@@ -39,6 +39,23 @@ class DashCheckTest(unittest.TestCase):
         self.assertEqual(code, 0, output)
         self.assertIn("dashcheck OK: 2 text files", output)
 
+    def test_reports_an_allow_comment_without_a_reason(self) -> None:
+        lines = [
+            f"const a = '{EN}'; /* {dashcheck.ALLOW} */",
+            f"const b = '{EM}'; // {dashcheck.ALLOW}",
+            f"const c = '{EM}'; // {dashcheck.ALLOW}:",
+            f"const d = '{EM}'; // {dashcheck.ALLOW}ed, a longer word",
+            f"const e = '{EM}'; // {dashcheck.ALLOW}: the game's item text",
+            f"const f = 1; // {dashcheck.ALLOW}",
+        ]
+        with repo({"a.ts": "\n".join(lines) + "\n"}) as root:
+            code, output = run(lambda argv: dashcheck.main(argv, {}), root)
+        self.assertEqual(code, 1)
+        reported = [line.split(": const")[0] for line in output.splitlines() if line.startswith("a.ts:")]
+        self.assertEqual(
+            reported, [f"a.ts:{number}: '{dashcheck.ALLOW}' needs ', <reason>' after it" for number in range(1, 5)]
+        )
+
     def test_an_exemption_covers_its_folder_and_must_cover_a_dash(self) -> None:
         exemptions = {"fixtures/": "copied game text", "gone.ts": "a file without dashes"}
         with repo({"fixtures/item.txt": f"Charm {EM} Unique\n", "gone.ts": "const a = 1;\n"}) as root:

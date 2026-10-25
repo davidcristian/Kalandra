@@ -47,7 +47,8 @@ the repo.
   or as an HTML character reference that renders it (`&mdash;`, `&ndash;`, `&#8212;`, `&#x2013;`). In markdown it
   skips code spans and fenced code. `EXEMPTIONS` names the other files of game text (the spec files that hold copied
   item text and client log lines, and one comment that quotes item text), each with its reason. An exemption that
-  covers no dash fails. A line that contains `dashcheck: allow` is skipped.
+  covers no dash fails. A line with `dashcheck: allow`, a comma or a colon and a reason is skipped, and a dash on a
+  line whose `dashcheck: allow` has no reason after it fails.
 - **`prosecheck.py`** reports a banned word, a spaced `--` and a spaced hyphen in prose. The first spaced `--` of a
   comment that starts with `eslint-disable` or `eslint-enable` is allowed, because ESLint reads the reason after it.
   A spaced hyphen is reported only between two words of two letters or more (`title - text`), so a list marker, a
@@ -155,7 +156,7 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 119 tests on 26 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 120 tests on 26 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
