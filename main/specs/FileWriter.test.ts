@@ -71,6 +71,17 @@ async function sendSessionStart(name: string) {
   });
 }
 
+async function sendRow(text: string) {
+  await server.emit("CLIENT->MAIN::write-data", { action: "log-item", text });
+}
+
+async function sendSessionStop() {
+  await server.emit("CLIENT->MAIN::write-data", {
+    action: "session",
+    start: false,
+  });
+}
+
 // Delays the first FileHandle write, so a write that main does not wait for ends up last
 async function delayFirstWrite() {
   const probe = await fs.open(path.join(folder, "probe"), "w");
@@ -299,6 +310,77 @@ describe("FileWriter writes", () => {
 
     expect(await readText(path.join(folder, "rolls.csv"))).toBe(
       "a header\na row\n",
+    );
+  });
+});
+
+describe("a Library session", () => {
+  it("closes its file at the stop, and logs a row that comes after", async () => {
+    await writer.restart(true, folder);
+    const opened = recordOpenedFiles();
+    await sendSessionStart("rolls");
+    await sendRow("a row");
+
+    await sendSessionStop();
+    await sendRow("a row after the stop");
+
+    expect(await readText(path.join(folder, "rolls.csv"))).toBe(
+      "a header\na row\n",
+    );
+    expect(opened.map((file) => file.fd)).toEqual([-1]);
+    expect(logger.history).toContain(
+      "error [FileWriter] Unable to write to channel item, channel closed.",
+    );
+  });
+
+  it("adds its rows to the file of an earlier session with the same name, without a second header", async () => {
+    await writer.restart(true, folder);
+    await sendSessionStart("rolls");
+    await sendRow("first");
+    await sendSessionStop();
+
+    await sendSessionStart("rolls");
+    await sendRow("second");
+    await sendSessionStop();
+
+    expect(await readText(path.join(folder, "rolls.csv"))).toBe(
+      "a header\nfirst\nsecond\n",
+    );
+  });
+
+  it("logs a stop when no session is open", async () => {
+    await writer.restart(true, folder);
+    await sendSessionStop();
+
+    expect(logger.history).toContain(
+      "error [FileWriter] Channel item already closed.",
+    );
+  });
+});
+
+describe("FileWriter while Item Data Collection is off", () => {
+  it("writes no row and no client log entry", async () => {
+    await writer.restart(false, folder);
+
+    await sendRow("a row");
+    await sendEntry(1);
+
+    expect(await fs.readdir(folder)).toEqual([]);
+  });
+});
+
+describe("a client log entry", () => {
+  it("is written and logged when its time is before the entry before it", async () => {
+    await writer.restart(true, folder);
+
+    await sendEntry(2);
+    await sendEntry(1);
+
+    expect(await readText(path.join(folder, "client-log.ndjson"))).toBe(
+      entryLines(2, 1),
+    );
+    expect(logger.history).toContain(
+      "warn [FileWriter] time just went backwards: 1 < 2",
     );
   });
 });

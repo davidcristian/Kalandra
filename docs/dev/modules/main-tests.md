@@ -66,8 +66,9 @@ replaces it with `vi.mock("electron", ...)`.
 - `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key
   codes it cannot read, and reads a file again only at a new path.
 - `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its
-  handlers' promises settle. It delays the first write to check the line order, and keeps the files it opens to
-  check which ones it closed.
+  handlers' promises settle. It stops sessions, starts one twice with the same name and sends events while the
+  feature is off. It delays the first write to check the line order, and keeps the files it opens to check which
+  ones it closed.
 - `GameLogWatcher.test.ts` calls the change listener of a fake `FileWatch` or `fs.watchFile`, deletes a new log as
   the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete.
 
