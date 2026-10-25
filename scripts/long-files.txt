@@ -14,7 +14,7 @@
 442 renderer/src/web/item-search/WidgetItemSearch.vue
 391 renderer/src/web/overlay/OverlayWindow.vue
 422 renderer/src/web/overlay/Widget.vue
-350 renderer/src/web/price-check/CheckedItem.vue
+340 renderer/src/web/price-check/CheckedItem.vue
 444 renderer/src/web/price-check/PriceCheckWindow.vue
 602 renderer/src/web/price-check/filters/FilterModifier.vue
 449 renderer/src/web/price-check/filters/FiltersBlock.vue

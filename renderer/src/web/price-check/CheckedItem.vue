@@ -87,14 +87,14 @@ import {
   CATEGORY_TO_TRADE_ID,
   createTradeRequest,
 } from "./trade/pathofexile-trade";
-import { AppConfig, TipsFrequency } from "@/web/Config";
+import { AppConfig } from "@/web/Config";
 import { FilterPreset } from "./filters/interfaces";
 import { PriceCheckWidget } from "../overlay/interfaces";
 import { useLeagues } from "@/web/background/Leagues";
-import { randomTip, TIP_FREQUENCY_MAP } from "../help/tips";
+import { createTipSchedule } from "../help/tips";
 
 let _showSupportLinksCounter = 0;
-let _showTipCounter = 15;
+const tipSchedule = createTipSchedule(15);
 
 export default defineComponent({
   name: "CheckedItem",
@@ -295,21 +295,11 @@ export default defineComponent({
           _showSupportLinksCounter = 0;
         } else {
           showSupportLinks.value = false;
-          if (
-            AppConfig().tipsFrequency !== TipsFrequency.Never &&
-            (AppConfig().tipsFrequency === TipsFrequency.Always ||
-              _showTipCounter >=
-                TIP_FREQUENCY_MAP[AppConfig().tipsFrequency]) &&
-            !cInteracted
-          ) {
-            _showTipCounter = 0;
-            showTip.value = randomTip();
-          } else {
-            showTip.value = 0;
-            if (cItem !== pItem) {
-              _showTipCounter += 1;
-            }
-          }
+          showTip.value = tipSchedule.next(
+            AppConfig().tipsFrequency,
+            cItem !== pItem,
+            Boolean(cInteracted),
+          );
 
           if (cItem !== pItem) {
             _showSupportLinksCounter += 1;

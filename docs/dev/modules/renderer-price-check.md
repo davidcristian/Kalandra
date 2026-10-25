@@ -36,6 +36,9 @@ that the route needs ([main.md](main.md)).
   Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
   the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
   ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).
+  Before a search, it shows a tip that `createTipSchedule()` in `help/tips.ts` picks: with every item at
+  **Always**, after 7, 20, 50 or 100 items without one at the other settings, and none at **Never**.
+  `specs/web/tips.test.ts` checks it.
 
 ### Filters (`filters/`)
 

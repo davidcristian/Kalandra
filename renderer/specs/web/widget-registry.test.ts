@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { defaultConfigMock } from "@specs/vitest.setup";
-import { AppConfig } from "@/web/Config";
+import { AppConfig, TipsFrequency } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
 import { registry } from "@/web/overlay/widget-registry";
 import { readMessages } from "./app-i18n";
@@ -151,5 +151,13 @@ describe("the test config", () => {
     expect(Object.keys(AppConfig()).sort()).toEqual(
       Object.keys(actual.defaultConfig()).sort(),
     );
+  });
+
+  it("has each value of TipsFrequency, which the tip schedule reads", () => {
+    const names = Object.entries(actual.TipsFrequency).filter(
+      ([, value]) => typeof value === "number",
+    );
+
+    expect(TipsFrequency).toEqual(Object.fromEntries(names));
   });
 });
