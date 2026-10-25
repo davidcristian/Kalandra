@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shutil
 from typing import Literal
 
 import pandas as pd
@@ -34,6 +35,19 @@ def get_script_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))
 
 
+def backup_cache(cache_dir: str | None = None) -> None:
+    """Copies the image cache to its backup file, or writes an empty backup when there is no cache."""
+    folder = cache_dir or get_script_dir()
+    cache_path = os.path.join(folder, ITEM_IMAGE_CACHE)
+    backup_path = os.path.join(folder, OLD_ITEM_IMAGE_CACHE)
+    if os.path.exists(cache_path):
+        _ = shutil.copyfile(cache_path, backup_path)
+    else:
+        with open(backup_path, "w", encoding="utf-8") as f:
+            json.dump({}, f)
+    logger.info(f"Saved the image cache from before this run to {backup_path}")
+
+
 class ImageProvider:
     def __init__(
         self, mode: MODE, cache_dir: str | None = None, net: RateLimiter | None = None
@@ -44,9 +58,6 @@ class ImageProvider:
         self.failed_in_a_row: int = 0
 
         self.cache: dict[str, str] = self.get_cache()
-
-        # backup prior cache
-        self.save_cache(self.cache, output_file=OLD_ITEM_IMAGE_CACHE)
 
     def get_cache(self) -> dict[str, str]:
         cache_path = os.path.join(self.cache_dir, ITEM_IMAGE_CACHE)

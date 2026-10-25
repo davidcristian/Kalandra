@@ -8,9 +8,11 @@ import requests
 from constants.filenames import ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE
 from services.image_provider import (
     MAX_FAILED_IN_A_ROW,
+    MODE,
     NOT_FOUND,
     ImageLookupError,
     ImageProvider,
+    backup_cache,
 )
 from services.rate_limiter import RateLimiter, RateLimitError
 from tests.fake_http import FakeClock, FakeResponse, FakeSession
@@ -38,20 +40,42 @@ def rings(*names: str) -> pd.DataFrame:
 
 
 def provider_for(
-    tmp_path: Path, responses: list[FakeResponse | Exception]
+    tmp_path: Path, responses: list[FakeResponse | Exception], mode: MODE = "new"
 ) -> tuple[ImageProvider, FakeSession]:
-    """Returns a provider in the new mode whose requests get the given responses in order."""
+    """Returns a provider whose requests get the given responses in order."""
     session = FakeSession(FakeClock(), responses)
-    return ImageProvider("new", str(tmp_path), RateLimiter(session=session)), session
+    return ImageProvider(mode, str(tmp_path), RateLimiter(session=session)), session
 
 
-def test_a_new_provider_creates_an_empty_cache_and_its_copy_in_the_given_folder(
+def test_a_new_provider_creates_an_empty_cache_in_the_given_folder(
     tmp_path: Path,
 ) -> None:
     provider = ImageProvider("noLookup", str(tmp_path))
 
     assert provider.cache == {}
+    assert [path.name for path in tmp_path.iterdir()] == [ITEM_IMAGE_CACHE]
     assert read_cache(tmp_path / ITEM_IMAGE_CACHE) == {}
+
+
+def test_the_backup_keeps_the_cache_from_before_the_run_after_each_build_saves_it(
+    tmp_path: Path,
+) -> None:
+    before = {"ITEM=Ruby Ring": NOT_FOUND}
+    _ = (tmp_path / ITEM_IMAGE_CACHE).write_text(json.dumps(before), encoding="utf-8")
+
+    backup_cache(str(tmp_path))
+    english, _ = provider_for(tmp_path, found("a1", RING_ICON), "missing")
+    _ = english.apply_images(rings("Ruby Ring"))
+    _ = ImageProvider("noLookup", str(tmp_path)).apply_images(rings("Ruby Ring"))
+
+    assert read_cache(tmp_path / ITEM_IMAGE_CACHE) == {"ITEM=Ruby Ring": RING_ICON}
+    assert read_cache(tmp_path / OLD_ITEM_IMAGE_CACHE) == before
+
+
+def test_the_backup_of_a_missing_cache_is_empty(tmp_path: Path) -> None:
+    backup_cache(str(tmp_path))
+
+    assert [path.name for path in tmp_path.iterdir()] == [OLD_ITEM_IMAGE_CACHE]
     assert read_cache(tmp_path / OLD_ITEM_IMAGE_CACHE) == {}
 
 
@@ -71,7 +95,6 @@ def test_no_lookup_sets_the_cached_icon_or_not_found_and_saves_the_cache(
 
     assert list(with_icons["icon"]) == [RING_ICON, NOT_FOUND]
     assert read_cache(tmp_path / ITEM_IMAGE_CACHE) == cache
-    assert read_cache(tmp_path / OLD_ITEM_IMAGE_CACHE) == cache
 
 
 @pytest.mark.parametrize(

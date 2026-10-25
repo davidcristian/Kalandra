@@ -3,11 +3,11 @@
 **Status:** open
 **Area:** dataparser
 **Origin:** [dataParser/src/services/image_provider.py](../../../../dataParser/src/services/image_provider.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-25
 
 `ImageProvider` in `image_provider.py` reads the item image cache `src/services/itemImageCache.json`,
-which is not committed. Its constructor creates that file when it is missing and writes a backup,
-`itemImageCache.old.json`. With the default `--image-mode noLookup`, `get_image()` returns
+which is not committed. Its constructor creates that file when it is missing, and `main()` in `main.py`
+copies it to a backup, `itemImageCache.old.json`, once per run. With the default `--image-mode noLookup`, `get_image()` returns
 `%NOT_FOUND%` for every item the cache does not hold. `build_items_ndjson()` in
 `nd_builder_service.py` then replaces the icon only for the items that the trade site's
 `static.json` has an image for. So a `noLookup` run without the cache writes `%NOT_FOUND%` for
@@ -29,3 +29,5 @@ the cache stays outside the repo, the cache. The `.gitkeep` files stay tracked.
 
 - 2026-10-18: Found while the game data update runbook was written, by running `git check-ignore`
   on the paths a run writes.
+- 2026-10-25: The backup moved from the `ImageProvider` constructor to `main()`. The other claims
+  still hold: no `.gitignore` matches these paths, and the count is still 445.

@@ -94,10 +94,11 @@ request, or a request that raises end the build. The cache is saved in every cas
 failure.
 
 Only the English build uses `--image-mode`. The other languages use `noLookup` and read the cache the English build
-saved. Each build first copies the cache to `src/services/itemImageCache.old.json`. Where the trade site's
-`static.json` has an image for an item, that image replaces the icon (`src/services/static_items.py`). An entry
-without an image, such as a list separator, leaves the item's icon unchanged. The cache is not in this repo, so a
-`noLookup` run without it writes `%NOT_FOUND%` for every other icon.
+saved. Each run copies the cache to `src/services/itemImageCache.old.json` once, before the English build, so the
+copy keeps the cache from before the run's lookups. Where the trade site's `static.json` has an image for an item,
+that image replaces the icon (`src/services/static_items.py`). An entry without an image, such as a list separator,
+leaves the item's icon unchanged. The cache is not in this repo, so a `noLookup` run without it writes `%NOT_FOUND%`
+for every other icon.
 
 ## Outputs
 

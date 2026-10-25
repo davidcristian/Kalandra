@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from constants.filenames import ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE
+from constants.filenames import ITEM_IMAGE_CACHE
 from services.image_provider import NOT_FOUND
 from services.nd_builder_service import NdBuilderService
 
@@ -1130,6 +1130,4 @@ def test_the_service_reads_and_writes_the_image_cache_only_to_apply_images(
 
     assert list(tmp_path.iterdir()) == []
     assert list(service.apply_images(items)["icon"]) == [NOT_FOUND]
-    assert sorted(path.name for path in tmp_path.iterdir()) == sorted(
-        [ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE]
-    )
+    assert [path.name for path in tmp_path.iterdir()] == [ITEM_IMAGE_CACHE]

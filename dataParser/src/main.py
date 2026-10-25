@@ -17,7 +17,7 @@ from constants.lang import ENGLISH, LANG, LANGUAGES
 from providers.game_api import GameDataProvider
 from providers.trade_api import TradeApiProvider, create_trade_session
 from services.client_strings_builder import ClientStringsBuilder
-from services.image_provider import MODE
+from services.image_provider import MODE, backup_cache
 from services.nd_builder_service import NdBuilderService
 from services.request_pacer import RequestPacer
 
@@ -60,6 +60,8 @@ def main(
         # One pacer for every language, so the pause also holds from one language to the next
         pull_inputs(GameDataProvider(), RequestPacer(create_trade_session()))
 
+    # Once per run, since every language's build saves the cache that the English build changed
+    backup_cache(image_cache_dir)
     run_on: list[LANG] = [ENGLISH, *[lang for lang in LANGUAGES if lang != ENGLISH]]
 
     for index, lang in enumerate(run_on):
