@@ -7,7 +7,7 @@ from stores.trade_store import TradeStore
 
 
 @pytest.fixture
-def mock_trade_data_items(tmp_path, monkeypatch):
+def mock_trade_data_items(tmp_path):
     mock_json = {
         "result": [
             {
@@ -38,9 +38,6 @@ def mock_trade_data_items(tmp_path, monkeypatch):
     data_dir.mkdir(parents=True)
     file_path = data_dir / "items.json"
     file_path.write_text(json.dumps(mock_json), encoding="utf-8")
-
-    monkeypatch.setattr("constants.lang.LANG", str)
-    monkeypatch.setattr("constants.filenames.ITEMS_JSON", "items.json")
 
     store = TradeStore("en")
     store.data_dir = str(data_dir)
@@ -90,7 +87,7 @@ def test_items_method(mock_trade_data_items):
 
 
 @pytest.fixture
-def mock_trade_data_stats(tmp_path, monkeypatch):
+def mock_trade_data_stats(tmp_path):
     mock_json = {
         "result": [
             {
@@ -143,9 +140,6 @@ def mock_trade_data_stats(tmp_path, monkeypatch):
     file_path = data_dir / "stats.json"
     file_path.write_text(json.dumps(mock_json), encoding="utf-8")
 
-    monkeypatch.setattr("constants.lang.LANG", str)
-    monkeypatch.setattr("constants.filenames.STATS_JSON", "stats.json")
-
     store = TradeStore("en")
     store.data_dir = str(data_dir)
 
@@ -187,7 +181,7 @@ def test_stats_method(mock_trade_data_stats):
 
 
 @pytest.fixture
-def mock_static_data_stats(tmp_path, monkeypatch):
+def mock_static_data_stats(tmp_path):
     mock_json = {
         "result": [
             {
@@ -229,9 +223,6 @@ def mock_static_data_stats(tmp_path, monkeypatch):
     data_dir.mkdir(parents=True)
     file_path = data_dir / "static.json"
     file_path.write_text(json.dumps(mock_json), encoding="utf-8")
-
-    monkeypatch.setattr("constants.lang.LANG", str)
-    monkeypatch.setattr("constants.filenames.STATIC_JSON", "static.json")
 
     store = TradeStore("en")
     store.data_dir = str(data_dir)
