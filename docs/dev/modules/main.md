@@ -216,6 +216,13 @@ restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main
 `../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned
 universal dmg on macOS, and publishes to GitHub releases.
 
+`overrides` in `package.json` sets `yauzl` to 3.x. Electron 40.10.2 unpacks its download with `extract-zip` 2.0.1,
+which depends on yauzl 2. On Node 24.16 and 24.17, and on Node 26.1 or newer, yauzl 2 stops partway through the
+archive, so Electron's install script exits without the binary
+([nodejs/node#63487](https://github.com/nodejs/node/issues/63487)). Electron 40.10.3 and newer unpack with
+`@electron-internal/extract-zip`, which uses no yauzl: remove the override with that update, once `npm ls yauzl`
+lists nothing without it.
+
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
 `--coverage`, which fails below the floor in `main/vitest.config.ts` (72.9% of the lines of `src/` on 22 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and
