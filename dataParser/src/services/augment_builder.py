@@ -147,12 +147,10 @@ class AugmentBuilder:
         logger.debug(soul_core_categories["Classes"])
         return soul_core_categories["Classes"].to_dict()
 
-    def first_non_negated(self, matchers: list[dict[str, str | int | bool]]):
-        """
-        Returns the first dictionary in 'matchers' list where 'negated' is either absent or False.
-        :param matchers: List of dictionaries to search.
-        :return: The first non-negated dictionary or None if all are negated.
-        """
+    @staticmethod
+    def first_non_negated(matchers: list[dict[str, str | int | bool]]):
+        """Returns the shortest matcher text: first without a value or negation, then
+        without a value, then any."""
 
         sorted_matchers = sorted(
             matchers,
@@ -165,7 +163,10 @@ class AugmentBuilder:
         for matcher in sorted_matchers:
             if not matcher.get("value"):
                 return matcher["string"]
-        raise ValueError("No non-negated matcher found")
+        # A warping rune stat, such as "Can roll Soul modifiers", has only a matcher for value 1
+        if sorted_matchers:
+            return sorted_matchers[0]["string"]
+        raise ValueError("Stat has no matchers")
 
     def rune_stat_id(self, ids: dict[str, dict[str, list[str]]] | None):
         return (ids.get("ids") or {}).get("rune") if ids else None
