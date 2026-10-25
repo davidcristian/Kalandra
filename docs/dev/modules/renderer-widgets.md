@@ -129,7 +129,9 @@ counts only the `.ts` files of `src/` (`coverage.include` in `vitest.config.ts`)
 loads every widget component and checks the registered types and the invariants above on the widgets of
 `defaultConfig()`: one entry per single widget, a registered component and valid `Widget` fields for each, the
 menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. Widget logic outside components is tested in
-`specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
+`specs/web/item-check.test.ts` (`hotkeyable-actions.ts`: the poe2db page of each item kind, in English and
+Japanese, and the stash search for the same price note, which adds the name up to 50 characters),
+`specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`: the kept modifier kinds and the columns of a profile), `specs/web/library/itemDiff.test.ts`
 (`diffItem()`, the prefixes and suffixes a logged Waystone gained and lost, and the CSV row they make),
 `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
