@@ -19,13 +19,21 @@ from constants.filenames import (
 from constants.known_stats import (
     SAME_TRANSLATIONS_DIFFERENT_STATS,
     TRADE_INVERTED,
-    UNIQUE_ITEMS_FIXED_STATS,
 )
 from constants.lang import ENGLISH, LANG
 from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
-from models.matcher import Matcher
 from services.image_provider import MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
+from services.nd_builder_functions import (
+    craftable,
+    id_list,
+    ids_or_empty,
+    matcher_key,
+    namespace,
+    sort_matchers,
+    trade_hash,
+    unique_field,
+)
 from services.specific_column_service import SpecificColumnService
 from services.static_items import add_static_data
 from services.value_converter_service import ValueConverterService
@@ -105,19 +113,6 @@ class NdBuilderService:
             ]
         ]
         ndjson["better"] = ndjson["better"].fillna(1).astype(int)
-
-        def custom_sort_key(matcher: Matcher) -> tuple[int, int]:
-            if "negate" in matcher:
-                group = 1
-            elif "value" in matcher:
-                group = 2
-            else:
-                group = 0
-            return (group, len(matcher["string"]))
-
-        def sort_matchers(matchers: list[Matcher]) -> list[Matcher]:
-            return sorted(matchers, key=custom_sort_key)
-
         ndjson["matchers"] = ndjson["matchers"].apply(sort_matchers)
         self.stats = ndjson.sort_values(by="ref").drop(columns=["hash"])
         return self.stats
@@ -202,23 +197,12 @@ class NdBuilderService:
             value_trade_stats_df["id"].str.split("\\|").str[-1]
         )
         value_trade_stats_df["id"] = value_trade_stats_df["id"].str.split("\\|").str[0]
-
-        def trade_hash(row: pd.Series) -> int:
-            return int(row["id"].split("_")[-1])
-
         value_trade_stats_df["hash"] = value_trade_stats_df.apply(trade_hash, axis=1)
         return value_trade_stats_df
 
     def group_trade_stats(self, in_df: pd.DataFrame) -> pd.DataFrame:
         if set(in_df.columns) != {"id", "text", "ref", "type"}:
             raise ValueError(f"unexpected trade stat columns {sorted(in_df.columns)}")
-
-        def id_list(ids: pd.Series) -> list[str]:
-            return list(ids)
-
-        def ids_or_empty(ids: list[str] | str) -> list[str]:
-            return ids if isinstance(ids, list) else []
-
         grouped_trade_stats_df = in_df.pivot_table(
             index=["ref"],
             columns="type",
@@ -314,10 +298,6 @@ class NdBuilderService:
 
         logger.info(f"Applying images at level {self.image_mode}")
         images_added = self.apply_images(cleaned_items)
-
-        def craftable(category: str) -> dict[str, str]:
-            return {"category": category}
-
         images_added.loc[images_added["namespace"] != "UNIQUE", "craftable"] = (
             images_added.loc[images_added["namespace"] != "UNIQUE", "category"].apply(
                 craftable
@@ -381,15 +361,6 @@ class NdBuilderService:
         )[["type", "namespace", "Text2", "Text"]].rename(
             {"Text2": "name", "Text": "refName"}, axis=1
         )
-
-        def unique_field(row: pd.Series) -> dict[str, object]:
-            if row["refName"] not in UNIQUE_ITEMS_FIXED_STATS:
-                return {"base": row["type"]}
-            return {
-                "base": row["type"],
-                "fixedStats": UNIQUE_ITEMS_FIXED_STATS[row["refName"]],
-            }
-
         named_unique_items["unique"] = named_unique_items.apply(unique_field, axis=1)
         combined_unique = joined_base.merge(
             named_unique_items, on="type", how="right"
@@ -402,10 +373,6 @@ class NdBuilderService:
         non_unique_mask = ts_items["unique"].eq(False)
 
         non_unique_items = ts_items.loc[non_unique_mask].copy()
-
-        def namespace(trade_category: str) -> str:
-            return "GEM" if trade_category == "gem" else "ITEM"
-
         non_unique_items["namespace"] = non_unique_items["id"].apply(namespace)
         non_unique_items.loc[
             non_unique_items["type"].str.startswith("Uncut"), "namespace"
@@ -488,13 +455,6 @@ class NdBuilderService:
     def get_refs_to_merge(self, in_df: pd.DataFrame) -> pd.Series:
         """get groups of rows(refs) that have any same matchers"""
         matchers_exploded = in_df.explode("matchers")
-
-        # make all matchers hashable, and where currently nan(pseudos) make empty frozenset
-        def matcher_key(matcher: Matcher | float) -> frozenset[tuple[str, object]]:
-            if isinstance(matcher, dict):
-                return frozenset(matcher.items())
-            return frozenset([])
-
         matchers_exploded["matchers"] = matchers_exploded["matchers"].apply(matcher_key)
         # put similar matchers in the same group, all other columns into a list
         matchers_grouped = matchers_exploded.groupby("matchers").agg(list).reset_index()
