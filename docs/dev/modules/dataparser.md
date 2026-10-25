@@ -122,7 +122,9 @@ command and the trade site requests, and its description tests read the sample f
 `tests/integration/` reads real files, and `tests/test_main.py` runs `main()` end to end. The hooks in
 `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`, and the
 pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions and no
-`log.warn`. CI runs neither: `.github/workflows/test.yml` has no job for `dataParser/`, and the root
+`log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root.
+pre-commit runs every hook from the repo root, so the config's top-level `files: ^dataParser/` keeps them to this
+folder. CI runs neither: `.github/workflows/test.yml` has no job for `dataParser/`, and the root
 `.pre-commit-config.yaml` does not include these hooks.
 
 A fresh clone cannot pass the tests as of 18 Oct 2026:

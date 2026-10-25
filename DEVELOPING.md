@@ -89,7 +89,7 @@ part alone:
 | Price service | `python -m coverage run -m unittest discover -s tests`, then `python -m coverage report`, in `priceService/` |
 | Scripts | the same two commands in `scripts/` |
 | Docs site | `npm run build` in `docs/` |
-| Data tool | `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml`, in `dataParser/` |
+| Data tool | `python -m pytest` in `dataParser/`, then `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root |
 
 - `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use
   `npx vitest run` there.
