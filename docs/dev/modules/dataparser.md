@@ -90,11 +90,15 @@ copy, and its error ends the pull. The folder `data/json/fr/` is not in the repo
 - `all` looks up every item.
 
 A lookup is a trade search and a fetch on `www.pathofexile.com`, in the league that `SEARCH_URL` names, through the
-tool's own `RateLimiter` (`src/services/rate_limiter.py`). A lookup that gets a status other than 200 or 429, or an
-icon URL outside `https://web.poecdn.com/gen/image`, logs `Image lookup failed for <item>: <reason>` and caches
-`%NOT_FOUND%` for the item, so `missing` looks it up again. Five such failures in a row, three 429 responses to one
-request, or a request that raises end the build. The cache is saved in every case, with the icons found before the
-failure.
+tool's own `RateLimiter` (`src/services/rate_limiter.py`). After each response it reads the `X-Rate-Limit-Ip` and
+`X-Rate-Limit-Ip-State` headers. With T as twice the seconds per request a rule allows, it waits 1.4 T when the
+previous response of the same policy came at most 1.5 T before, 3 T when the rule's count is at 90% of its limit, and
+the rule's full penalty when the state reports a restriction.
+
+A lookup that gets a status other than 200 or 429, or an icon URL outside `https://web.poecdn.com/gen/image`, logs
+`Image lookup failed for <item>: <reason>` and caches `%NOT_FOUND%` for the item, so `missing` looks it up again. Five
+such failures in a row, three 429 responses to one request, or a request that raises end the build. The cache is saved
+in every case, with the icons found before the failure.
 
 Only the English build uses `--image-mode`. The other languages use `noLookup` and read the cache the English build
 saved. Each run copies the cache to `src/services/itemImageCache.old.json` once, before the English build, so the

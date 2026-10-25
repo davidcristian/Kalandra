@@ -1,9 +1,8 @@
 import logging
 import math
+import time
 from collections import defaultdict
-from collections.abc import Mapping
-from datetime import datetime
-from time import sleep
+from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 
 import cloudscraper
@@ -65,13 +64,21 @@ class RateLimit:
 
 
 class RateLimiter:
-    def __init__(self, debug=False, session: Session | None = None):
+    def __init__(
+        self,
+        debug=False,
+        session: Session | None = None,
+        sleep: Callable[[float], None] = time.sleep,
+        clock: Callable[[], float] = time.monotonic,
+    ):
         self.limits = defaultdict()
         self.session: Session = (
             session
             if session is not None
             else cloudscraper.create_scraper(interpreter="nodejs", debug=debug)
         )
+        self.sleep: Callable[[float], None] = sleep
+        self.clock: Callable[[], float] = clock
 
     def wait(self, duration: int | float):
         """Wait for a specified duration.
@@ -83,7 +90,7 @@ class RateLimiter:
         """
         if duration <= 0:
             raise ValueError(f"cannot wait for {duration} seconds")
-        sleep(duration)
+        self.sleep(duration)
 
     def parse_window_limit(self, window: str) -> RateLimit:
         """Takes a string in the format "limit:interval:penalty" and returns a RateLimit object.
@@ -172,13 +179,16 @@ class RateLimiter:
                 f"Rate limit exceeded. Waiting for full penalty of {limit.penalty} seconds. RateLimit: {limit}, State: {state}"
             )
 
-    def wait_if_needed(self, limit: RateLimit, state: RateLimit, policy: str):
-        # If we are less than 1.2x the average rate since last update, wait for 1.1x the average rate
+    def wait_if_needed(
+        self, limit: RateLimit, state: RateLimit, last_update: float | None
+    ):
+        # average_request_rate is twice the seconds per request that the limit allows. When the
+        # previous response of the policy came at most 1.5 times it ago, wait 1.4 times it.
         average_request_rate = limit.window / limit.max * 2
-        last_update: datetime = self.limits[policy]["last_update"]
-        time_since_last_update = (datetime.now() - last_update).total_seconds()
-        if time_since_last_update <= average_request_rate * 1.5:
-            # Should almost always happen for limit with the longest average request rate
+        if (
+            last_update is not None
+            and self.clock() - last_update <= average_request_rate * 1.5
+        ):
             logger.debug(f"Waiting for {average_request_rate * 1.4} | {limit}, {state}")
             self.wait(average_request_rate * 1.4)
 
@@ -199,20 +209,21 @@ class RateLimiter:
         if policy is None or rules is None or limit is None or state is None:
             raise ValueError("a rate limit header named in the response is missing")
         rate_limits = self.get_limits(limit, state)
+        previous = self.limits.get(policy, {})
         self.limits[policy] = {
             "policy": policy,
             "rules": rules,
             "limit": limit,
             "state": state,
             "rate_limits": rate_limits,
-            "last_update": datetime.now(),
-            "prev_state": self.limits.get(policy, {}).get("state"),
-            "prev_rate_limits": self.limits.get(policy, {}).get("rate_limits"),
+            "last_update": self.clock(),
+            "prev_state": previous.get("state"),
+            "prev_rate_limits": previous.get("rate_limits"),
         }
         rate_limits.reverse()
         for limit, state in rate_limits:
             self.wait_if_exceeded(limit, state)
-            self.wait_if_needed(limit, state, policy)
+            self.wait_if_needed(limit, state, previous.get("last_update"))
         logger.debug(f"Current rate limits: {self.limits}")
 
     def handle_headers(self, headers: dict[str, str], status_code: int):
