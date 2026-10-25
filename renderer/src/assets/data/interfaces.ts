@@ -177,18 +177,11 @@ export interface TranslationDict {
   ELDRITCH_MOD_R5: string;
   ELDRITCH_MOD_R6: string;
   SENTINEL_CHARGE: string;
-  SHAPER_MODS: string[];
-  ELDER_MODS: string[];
-  CRUSADER_MODS: string[];
-  HUNTER_MODS: string[];
-  REDEEMER_MODS: string[];
-  WARLORD_MODS: string[];
   DELVE_MODS: string[];
   VEILED_MODS: string[];
   INCURSION_MODS: string[];
   FOIL_UNIQUE: string;
   UNMODIFIABLE: string;
-  REQUIREMENTS: string;
   REQUIRES: string;
   CHARM_SLOTS: string;
   BASE_SPIRIT: string;
@@ -207,21 +200,10 @@ export interface TranslationDict {
   SPEED_TAG: string;
   ATTRIBUTE_TAG: string;
   MINION_TAG: string;
-  // ---
-  CHAT_SYSTEM: RegExp;
-  CHAT_TRADE: RegExp;
-  CHAT_GLOBAL: RegExp;
-  CHAT_PARTY: RegExp;
-  CHAT_GUILD: RegExp;
-  CHAT_WHISPER_TO: RegExp;
-  CHAT_WHISPER_FROM: RegExp;
-  CHAT_WEBTRADE_GEM: RegExp;
-  // ---
   FIRE_DAMAGE: string;
   LIGHTNING_DAMAGE: string;
   COLD_DAMAGE: string;
   PRICE_NOTE: string;
-  WAYSTONE_TIER: string;
   WAYSTONE_REVIVES: string;
   WAYSTONE_PACK_SIZE: string;
   WAYSTONE_MAGIC_MONSTERS: string;
@@ -235,7 +217,6 @@ export interface TranslationDict {
   TIMELESS_NOTABLE_PASSIVES: string;
   GRANTS_SKILL: string;
   RELOAD_SPEED: string;
-  FRACTURED_ITEM: string;
   SANCTIFIED: string;
   HYPHEN: string;
   LOG_LEVEL_UP: RegExp;
@@ -245,7 +226,6 @@ export interface TranslationDict {
   ENCHANT_MODIFIER: string;
   CORRUPTED_MODIFIER: string;
   REQUIRES_LINE: RegExp;
-  UNIQUE_MODIFIER: string;
   VAAL_UNIQUE_MODIFIER: string;
   TRIAL_COUNT: string;
   ULTIMATUM_VICTORIOUS: string;

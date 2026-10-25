@@ -1,6 +1,13 @@
+import re
+from pathlib import Path
+
 import pytest
 
-from constants.client_string_data import CLIENT_STRING_KEY_VALUES, CLIENT_STRING_REGEX
+from constants.client_string_data import (
+    CLIENT_STRING_ARRAYS,
+    CLIENT_STRING_KEY_VALUES,
+    CLIENT_STRING_REGEX,
+)
 from constants.lang import (
     CHINESE,
     ENGLISH,
@@ -11,8 +18,33 @@ from constants.lang import (
     SPANISH,
 )
 
+INTERFACES = (
+    Path(__file__).parents[4] / "renderer" / "src" / "assets" / "data" / "interfaces.ts"
+)
+
+
+def translation_dict_keys() -> set[str]:
+    """Returns the keys of the TranslationDict type that the app reads client_strings.js with."""
+    text = INTERFACES.read_text(encoding="utf-8")
+    body = text.split("export interface TranslationDict {", 1)[1].split("\n}", 1)[0]
+    return set(re.findall(r"^\s*(\w+):", body, re.MULTILINE))
+
+
+def test_every_key_the_tool_writes_is_a_key_of_the_app_translation_dict():
+    written = {
+        s.my_key
+        for s in [
+            *CLIENT_STRING_KEY_VALUES,
+            *CLIENT_STRING_ARRAYS,
+            *CLIENT_STRING_REGEX,
+        ]
+    }
+
+    assert len(translation_dict_keys()) > 100
+    assert written - translation_dict_keys() == set()
+
+
 ENGLISH_WAYSTONE_CLIENT_STRINGS = {
-    "ItemDisplayMapTier": "Waystone Tier",
     "NumberOfPortalsPerWaystone": "[LimitedRespawn|Revives Available]",
     "ItemDisplayMapPack": "[Pack|Pack Size]",
     "ItemDisplayMapMagicMonsterQuantityBonus": "Magic Monsters",
@@ -31,7 +63,6 @@ def test_waystone_client_strings_read_the_ids_of_the_current_game():
     }
 
     assert values == {
-        "WAYSTONE_TIER": "Waystone Tier: ",
         "WAYSTONE_REVIVES": "Revives Available: ",
         "WAYSTONE_PACK_SIZE": "Pack Size: ",
         "WAYSTONE_MAGIC_MONSTERS": "Magic Monsters: ",

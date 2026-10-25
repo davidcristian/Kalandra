@@ -154,11 +154,9 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
         trim=True,
     ),
     ClientString("UNMODIFIABLE", ["ItemPopupUnmodifiable"]),
-    ClientString("REQUIREMENTS", ["ItemPopupRequirements"]),
     ClientString("CHARM_SLOTS", ["ItemDisplayBeltCharmSlots"], "{0}: "),
     ClientString("BASE_SPIRIT", ["ItemDisplaySpiritValue"], "{0}: "),
     ClientString("PRICE_NOTE", ["ItemDisplayStringNote"], "{0}: "),
-    ClientString("WAYSTONE_TIER", ["ItemDisplayMapTier"], "{0}: "),
     ClientString("TIMELESS_RADIUS", ["JewelRadiusLabel"], "{0}: "),
     ClientString("REQUIRES", ["ItemRequirementsLabel"]),
     ClientString(
@@ -173,7 +171,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ),
     ClientString("GRANTS_SKILL", ["ItemDisplayGrantsSkill"], "{0}: "),
     ClientString("RELOAD_SPEED", ["SkillPopupReloadTime"], "{0}: "),
-    ClientString("FRACTURED_ITEM", ["ItemPopupFracturedItem"]),
     ClientString("SANCTIFIED", ["ItemPopupSanctified"]),
     ClientString("HYPHEN", ["ItemDisplayWeaponDamageRange"], trim=True),
     ClientString("WAYSTONE_REVIVES", ["NumberOfPortalsPerWaystone"], "{0}: "),
@@ -187,7 +184,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("WAYSTONE_DROP_CHANCE", ["ItemDisplayMapWaystoneDropChance"], "{0}: "),
     ClientString("WAYSTONE_RARITY", ["ItemDisplayMapItemRarity"], "{0}: "),
     ClientString("DOUBLE_CORRUPTED", ["ItemPopupDoubleCorrupted"]),
-    ClientString("UNIQUE_MODIFIER", ["ModDescriptionLineUnique"]),
     ClientString("VAAL_UNIQUE_MODIFIER", ["ModDescriptionLineVaalUnique"]),
     ClientString("TRIAL_COUNT", ["ItemDisplaySanctumFloors"], "{0}: "),
     ClientString("ULTIMATUM_VICTORIOUS", ["ItemDisplayUltimatumBossHintVictorious"]),
@@ -196,42 +192,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
 ]
 
 CLIENT_STRING_ARRAYS: list[ArrayClientString] = [
-    ArrayClientString(
-        [
-            ConstClientString("SHAPER_MODS", "of Shaping"),
-            ConstClientString("SHAPER_MODS", "The Shaper's"),
-        ]
-    ),
-    ArrayClientString(
-        [
-            ConstClientString("ELDER_MODS", "of the Elder"),
-            ConstClientString("ELDER_MODS", "The Elder's"),
-        ]
-    ),
-    ArrayClientString(
-        [
-            ConstClientString("CRUSADER_MODS", "Crusader's"),
-            ConstClientString("CRUSADER_MODS", "of the Crusade"),
-        ]
-    ),
-    ArrayClientString(
-        [
-            ConstClientString("HUNTER_MODS", "Hunter's"),
-            ConstClientString("HUNTER_MODS", "of the Hunt"),
-        ]
-    ),
-    ArrayClientString(
-        [
-            ConstClientString("REDEEMER_MODS", "Redeemer's"),
-            ConstClientString("REDEEMER_MODS", "of Redemption"),
-        ]
-    ),
-    ArrayClientString(
-        [
-            ConstClientString("WARLORD_MODS", "Warlord's"),
-            ConstClientString("WARLORD_MODS", "of the Conquest"),
-        ]
-    ),
     ArrayClientString(
         [
             ConstClientString("DELVE_MODS", "Subterranean"),
@@ -264,7 +224,6 @@ CLIENT_STRING_ARRAYS: list[ArrayClientString] = [
 CLIENT_STRING_REGEX: list[RegexClientString] = [
     CapturePlaceholderClientString("ITEM_SUPERIOR", ["QualityItem"]),
     CapturePlaceholderClientString("ITEM_EXCEPTIONAL", ["ExceptionalItem"]),
-    ConstRegexClientString("ITEM_RUNEFORGED", output="Runeforged (.*)"),
     CapturePlaceholderClientString("MAP_BLIGHTED", ["InfectedMap"]),
     CapturePlaceholderClientString("MAP_BLIGHT_RAVAGED", ["UberInfectedMap"]),
     CapturePlaceholderClientString("ITEM_SYNTHESISED", ["SynthesisedItem"], trim=True),
@@ -306,30 +265,6 @@ CLIENT_STRING_REGEX: list[RegexClientString] = [
         "EXARCH_IMPLICIT",
         ["ModDescriptionLineCleansingFireImplicit"],
         capture_str="(?<rank>.+)",
-    ),
-    ConstRegexClientString("CHAT_SYSTEM", ": (?<body>.+)"),
-    ConstRegexClientString(
-        "CHAT_TRADE", "\\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)"
-    ),
-    ConstRegexClientString(
-        "CHAT_GLOBAL", "#(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)"
-    ),
-    ConstRegexClientString(
-        "CHAT_PARTY", "%(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)"
-    ),
-    ConstRegexClientString(
-        "CHAT_GUILD", "&(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)"
-    ),
-    CapturePlaceholderClientString(
-        "CHAT_WHISPER_TO", ["ChatBoxTo"], "@{0} (?<char_name>.+?): (?<body>.+)"
-    ),
-    CapturePlaceholderClientString(
-        "CHAT_WHISPER_FROM",
-        ["ChatBoxFrom"],
-        "@{0} (?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)",
-    ),
-    ConstRegexClientString(
-        "CHAT_WEBTRADE_GEM", "level (?<gem_lvl>\\d+) (?<gem_qual>\\d+)% (?<gem_name>.+)"
     ),
     CapturePlaceholderClientString(
         "LOG_LEVEL_UP",

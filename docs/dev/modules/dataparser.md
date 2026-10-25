@@ -140,7 +140,8 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   text in this language, as a string, an array or a regular expression. `TranslationDict` in
   `renderer/src/assets/data/interfaces.ts` types it. A client string is a piece of text from the game's
   `ClientStrings` table. Each key comes from an entry in `CLIENT_STRING_KEY_VALUES`, `CLIENT_STRING_ARRAYS` or
-  `CLIENT_STRING_REGEX` in `src/constants/client_string_data.py`. An entry names the `ClientStrings` ids its text is
+  `CLIENT_STRING_REGEX` in `src/constants/client_string_data.py`, and each key must be a key of `TranslationDict`,
+  which `tests/unit/constants/test_client_string_data.py` checks. An entry names the `ClientStrings` ids its text is
   built from, or gives a fixed text (`ConstClientString` and `ConstRegexClientString`). A regular expression built
   from game text (`CapturePlaceholderClientString`) matches that text literally: the tool escapes each character
   that a JavaScript regex reads as syntax, and `/` and line breaks, and puts a capture group or the entry's `format`

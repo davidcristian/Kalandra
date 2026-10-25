@@ -26,7 +26,7 @@ Presets in the game's language are not possible yet, for two reasons:
 | --- | --- | --- |
 | Dump sorting | `Currency` | `RARITY_CURRENCY` |
 | Dump sorting | `"Rarity: Normal"` | `RARITY` followed by `RARITY_NORMAL` |
-| Dump sorting | `"Waystone Tier"` | `WAYSTONE_TIER` without its `: ` |
+| Dump sorting | `"Waystone Tier"` | the game's client string `ItemDisplayMapTier`, which the data tool no longer writes as `WAYSTONE_TIER` |
 | Dump sorting | `Trials:` | the end of `TRIAL_COUNT` (`Number of Trials: `), a cut that does not work in another language's word order |
 | Dump sorting | `"Martial Weapon"`, `Jewel` | none; the game file they would come from is not known |
 | Map rolling | `"Increased Pack Size"`, `"Additional Packs"`, `"Less Recovery Rate"` | parts of Waystone modifier texts in `stats.ndjson`, such as `#% increased Pack Size`, `Area contains # additional packs of Beasts` and `Players have #% less Recovery Rate of Life and Energy Shield`; no client string, and a part of a stat text has no matching part in another language |
@@ -43,3 +43,5 @@ the note in docs/stash-search.md changes. A change to `defaultConfig()` follows 
 
 - 2026-10-21: Found while the first search of a new Stash search widget was moved to the client
   strings. The client strings have no text for most presets, and this clone cannot run `dataParser`.
+- 2026-10-25: The data tool stopped writing `WAYSTONE_TIER`, which nothing read. The table now names
+  its game client string id instead.

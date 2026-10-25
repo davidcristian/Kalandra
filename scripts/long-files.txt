@@ -1,7 +1,7 @@
 # Source files that were over 300 lines when linecap.py was added, with their line counts.
 # Each file must have exactly the count written here. Lower a count when a file shrinks, and remove the
 # file once it is within the limit. Raising a count needs its reason in the commit body.
-366 dataParser/src/constants/client_string_data.py
+301 dataParser/src/constants/client_string_data.py
 360 dataParser/src/constants/css_rules.py
 510 dataParser/src/services/nd_builder_service.py
 337 ipc/types.ts
