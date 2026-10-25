@@ -42,7 +42,7 @@ def test_agg_by_hash_calls_simple_or_not(hash_val, should_call_simple):
 
         if should_call_simple:
             svc.simple_agg.assert_called_once_with(df)
-            assert out.iloc[0]["called"] == True
+            assert out.iloc[0]["called"]
         else:
             svc.simple_agg.assert_not_called()
 

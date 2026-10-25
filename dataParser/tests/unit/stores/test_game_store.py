@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
-from constants.filenames import STAT_DESCRIPTION_FILES
 from stores.game_store import GameStore
 
 

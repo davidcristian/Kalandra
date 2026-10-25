@@ -1,5 +1,3 @@
-from math import exp
-
 import pandas as pd
 
 from constants.filenames import EXPEDITION_FACTIONS

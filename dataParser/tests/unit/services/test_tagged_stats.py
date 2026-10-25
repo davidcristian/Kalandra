@@ -1,9 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pandas as pd
-import pytest
 
-from constants.filenames import MODS, STAT_DESCRIPTIONS, STATS, TAGS
+from constants.filenames import MODS, STATS, TAGS
 from services.tagged_stats import TaggedStats
 
 
