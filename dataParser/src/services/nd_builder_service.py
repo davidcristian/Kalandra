@@ -36,6 +36,7 @@ from services.nd_builder_functions import (
 )
 from services.specific_column_service import SpecificColumnService
 from services.static_items import add_static_data
+from services.unique_names import name_uniques
 from services.value_converter_service import ValueConverterService
 from stores.game_store import GameStore
 from stores.trade_store import TradeStore
@@ -336,27 +337,17 @@ class NdBuilderService:
 
     def unique_items(self) -> pd.DataFrame:
         ts_items = self.ref_trade_store.items()
-        words = self.game_store.get(WORDS)
         joined_base = self.get_items_base_types()
 
         unique_mask = ts_items["unique"].eq(True)
         unique_items = ts_items.loc[unique_mask].copy()
         unique_items["namespace"] = "UNIQUE"
 
-        # Trade site names that differ from the name in the game's Words table
-        outdated_names = {
-            "Sekhema's Resolve": "Sekhema's Resolve Fire",
-            "The Road Warrior": "The Immortan",
-            "Byrnabas": "Brynabas",
-            "Splinter of Lorrata": "Splinter of Loratta",
-        }
-        unique_items["name"] = unique_items["name"].replace(outdated_names)
-
-        named_unique_items = unique_items.merge(
-            words[["Text", "Text2"]], left_on="name", right_on="Text", how="left"
-        )[["type", "namespace", "Text2", "Text"]].rename(
-            {"Text2": "name", "Text": "refName"}, axis=1
-        )
+        named_unique_items = name_uniques(
+            unique_items,
+            self.ref_game_store.get(WORDS),
+            self.game_store.get(WORDS),
+        )[["type", "namespace", "name", "refName"]]
         named_unique_items["unique"] = named_unique_items.apply(unique_field, axis=1)
         combined_unique = joined_base.merge(
             named_unique_items, on="type", how="right"

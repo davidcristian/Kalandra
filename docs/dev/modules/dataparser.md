@@ -132,7 +132,10 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   (`src/constants/mod_types.py`), with `augment` written as `rune`. Any other type on such an id in the trade site's
   `stats.json` stops the build with a `ValueError`.
 - `items.ndjson`, one line per item: `name` (this language), `refName` (English), `namespace`, `icon`, `tags`, `w`,
-  `h`, and `craftable`, `unique`, `tradeTag`, `gem`, `armour` and `augment` where they apply.
+  `h`, and `craftable`, `unique`, `tradeTag`, `gem`, `armour` and `augment` where they apply. A unique's `refName`
+  is its name on the English trade site, and its `name` is the `Text2` of the game's `Words` row whose English
+  `Text2` is that name (`src/services/unique_names.py`). `Text` is the game's internal name, which keeps an old name
+  after a rename. A unique without such a row is left out and logged as `No unique named <name> ...`.
 - `client_strings.js`, a JavaScript module whose default export maps app keys such as `RARITY_NORMAL` to the game's
   text in this language, as a string, an array or a regular expression. `TranslationDict` in
   `renderer/src/assets/data/interfaces.ts` types it. A client string is a piece of text from the game's

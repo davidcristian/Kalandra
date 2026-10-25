@@ -3,7 +3,7 @@
 # file once it is within the limit. Raising a count needs its reason in the commit body.
 366 dataParser/src/constants/client_string_data.py
 360 dataParser/src/constants/css_rules.py
-519 dataParser/src/services/nd_builder_service.py
+510 dataParser/src/services/nd_builder_service.py
 337 ipc/types.ts
 308 main/src/shortcuts/Shortcuts.ts
 487 renderer/src/assets/data/index.ts

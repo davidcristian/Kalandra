@@ -51,11 +51,8 @@ def test_main_writes_the_stats_and_items_of_each_language(build: Path, lang: str
     assert len(stats) > 1000
     assert all({"ref", "better", "matchers"} <= stat.keys() for stat in stats)
     assert len(items) > 1000
-    assert all({"namespace", "w", "h"} <= item.keys() for item in items)
-    # A unique item the game's Words table does not name is written without a name
     assert all(
-        {"name", "refName"} <= item.keys() or item["namespace"] == "UNIQUE"
-        for item in items
+        {"name", "refName", "namespace", "w", "h"} <= item.keys() for item in items
     )
     assert "export default {" in client_strings
 
