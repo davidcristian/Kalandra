@@ -107,7 +107,9 @@ that the route needs ([main.md](main.md)).
   A ref is `<namespace>::<refName>` from the English `items.ndjson`, and a unique adds ` // <base item>`.
   The source of the groups is `item-drop.jsonc`, the same list with `//#region` comment lines. A change is made
   there and copied to `item-drop.json`, the file the app loads, without the comments. `specs/data/itemDrop.test.ts`
-  checks that the two files hold the same groups and that the item data contains every ref in them.
+  checks that the two files hold the same groups and that the item data contains every ref in them. It also
+  checks that each group has a non-empty `query` list and an `items` list of refs, and that no ref is in the
+  `query` of two groups, since the panel shows only the first group whose `query` has the item.
   `unidentified-resolver/` picks the unique for an unidentified item.
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again and shows how many of their entries are new. The lists are English, so they help only an English

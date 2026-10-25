@@ -37,6 +37,26 @@ describe("item-drop.json", () => {
     expect(refs.filter((ref) => !inItemData(ref))).toEqual([]);
   });
 
+  it("has a list of refs to look up and a list of refs to show in each group", () => {
+    const invalid = ITEM_DROP.filter(
+      (entry) =>
+        !Array.isArray(entry.query) ||
+        entry.query.length === 0 ||
+        !Array.isArray(entry.items) ||
+        ![...entry.query, ...entry.items].every(
+          (ref) => typeof ref === "string",
+        ),
+    );
+
+    expect(invalid).toEqual([]);
+  });
+
+  it("looks up each ref in one group, since the panel shows the first group that has it", () => {
+    const refs = ITEM_DROP.flatMap((entry) => entry.query);
+
+    expect(refs.filter((ref, i) => refs.indexOf(ref) !== i)).toEqual([]);
+  });
+
   it("holds the groups of item-drop.jsonc in the same order", () => {
     expect(ITEM_DROP).toEqual(readItemDropSource());
   });

@@ -102,6 +102,8 @@ The map has 23 entries on 18 Oct 2026, which `tests/test_transform.py` checks. A
 new entry. The service image copies the file when it is built, so the service fetches a new category only after a
 deploy with `--build`. A `schemaVersion` other than 1 stops the service at start (`load_categories` raises
 `SnapshotError`) and makes the app find no price in the price file (`splitJsonBlob` returns an empty list).
+`renderer/specs/data/namespace-map.test.ts` checks the schema version, the four fields of each entry with the values
+above, a `url` in lowercase words joined by `-`, and that no two entries have the same `type`.
 
 ### Environment
 
@@ -195,8 +197,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
 floor in `priceService/.coveragerc`, 99.5% of lines and branches on 21 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
-`pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts` and
-`renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by `npx vitest run` in `renderer/`.
+`pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts`,
+`renderer/specs/data/namespace-map.test.ts` and `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by
+`npx vitest run` in `renderer/`.
 
 **Dependencies.** The Python standard library and poe.ninja's PoE 2 economy API. The deployment uses Docker
 Compose, nginx and Cloudflare Tunnel ([price-service-deploy.md](../runbooks/price-service-deploy.md)).

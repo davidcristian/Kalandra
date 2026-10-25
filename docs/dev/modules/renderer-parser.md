@@ -75,7 +75,8 @@ for a key a language lacks, and the `:` keys of `useI18nNs(name)`, which read `n
 
 - `init(lang)` runs once from `renderer/src/main.ts`. It loads `CLIENT_STRINGS_REF` (the English client strings),
   `item-drop.json` and `patrons.json`, then calls `loadForLang(lang)`. A change to the language setting calls
-  `loadForLang` again.
+  `loadForLang` again. `specs/data/patrons.test.ts` checks that each `patrons.json` row has a name used once, a
+  whole number of months and a `style` from 1 to 5, the tiers the Settings window shows.
 - `loadForLang(lang)` loads `CLIENT_STRINGS` from `data/<lang>/client_strings.js` (through
   `client-string-loader.ts`), the items and the stats, builds the rune, soul core and catalyst lookups
   (`loadUltraLateItems`), and loads the trade site's item and stat lists through `useTradeData()` in
@@ -102,7 +103,7 @@ The files, per language under `renderer/public/data/<lang>/`:
 | `items.ndjson` | one `BaseType` JSON object per line | `dataParser` |
 | `stats.ndjson` | one `Stat` per line: its `ref`, its matchers (the stat texts with `#` for each number) and its trade ids by modifier type, or `null` for a stat without any | `dataParser` |
 | `*.index.bin` | sorted pairs of a 32-bit FNV-1a hash and the start of a line in the `.ndjson` file, as a JavaScript string index | `npm run make-index-files` |
-| `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)). A translation has the placeholders, such as `{0}`, of the English text, which `specs/web/i18n-placeholders.test.ts` checks. `specs/web/i18n-keys.test.ts` checks that the English file defines each literal key that `src/` passes to `t()` and each key of a translation, apart from those [task 019](../refinements/tasks/019-ui-text-not-in-app-i18n.md) lists. It also checks that `src/` names each English key in a quoted string or builds it from a key prefix the test lists, apart from two keys kept for tasks 016 and 019 | by hand |
+| `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)). A translation has the placeholders, such as `{0}`, of the English text, which `specs/web/i18n-placeholders.test.ts` checks. `specs/web/i18n-keys.test.ts` checks that the English file defines each literal key that `src/` passes to `t()` and each key of a translation, apart from those [task 019](../refinements/tasks/019-ui-text-not-in-app-i18n.md) lists. It also checks that `src/` names each English key in a quoted string or builds it from a key prefix the test lists, apart from two keys kept for tasks 016 and 019. `specs/web/i18n-syntax.test.ts` checks that each file holds only texts and groups of texts, and that vue-i18n compiles each text, since `t()` throws on a syntax error such as an unclosed `{` | by hand |
 
 A lookup hashes its key with `@sindresorhus/fnv1a`, binary searches the index file, and parses the line that
 starts there. The item index files have one row per namespace and `refName`, so items that share a translated name
