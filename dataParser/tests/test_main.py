@@ -7,7 +7,7 @@ import pytest
 
 from constants.filenames import ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE
 from constants.lang import ENGLISH, LANGUAGES
-from main import main, pull_inputs, write_ndjson
+from main import main, pull_inputs, write_ndjson, write_text
 from providers.game_api import GameDataProvider
 from services.request_pacer import RequestPacer
 from tests.fake_http import FakeClock, FakeResponse, FakeSession
@@ -138,3 +138,27 @@ def test_write_ndjson_raises_on_a_nan_inside_a_value(tmp_path):
 
     with pytest.raises(ValueError, match="JSON"):
         write_ndjson(df, str(tmp_path / "stats.ndjson"))
+
+
+def test_write_text_writes_the_text_as_utf8(tmp_path: Path):
+    path = tmp_path / "client_strings.js"
+
+    write_text(str(path), 'export default { a: "é" }')
+
+    assert path.read_text(encoding="utf-8") == 'export default { a: "é" }'
+
+
+def test_write_text_logs_a_failed_write_and_raises_it_again(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+    capsys: pytest.CaptureFixture[str],
+):
+    path = tmp_path / "client_strings.js"
+
+    # A lone surrogate has no UTF-8 form
+    with pytest.raises(UnicodeEncodeError):
+        write_text(str(path), 'export default { a: "\ud800" }')
+
+    assert [record.levelname for record in caplog.records] == ["ERROR"]
+    assert caplog.records[0].getMessage().startswith(f"Failed to write {path}: ")
+    assert capsys.readouterr().out == ""

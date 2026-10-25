@@ -37,6 +37,16 @@ def write_ndjson(df: pd.DataFrame, path: str) -> None:
             f.write(f"{json.dumps(obj, ensure_ascii=False, allow_nan=False)}\n")
 
 
+def write_text(path: str, text: str) -> None:
+    """Writes text to path as UTF-8, and logs the path before it raises a failed write again."""
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            _ = f.write(text)
+    except (OSError, UnicodeEncodeError) as error:
+        logger.error(f"Failed to write {path}: {error}")
+        raise
+
+
 def pull_inputs(
     game_data: GameDataProvider, pacer: RequestPacer, json_dir: str | None = None
 ) -> None:
@@ -89,15 +99,7 @@ def main(
             array_strings=CLIENT_STRING_ARRAYS,
             regex_strings=CLIENT_STRING_REGEX,
         )
-        with open(
-            os.path.join(lang_dir, "client_strings.js"), "w", encoding="utf-8"
-        ) as f:
-            try:
-                f.write(client_strings_js)
-            except Exception as e:
-                print(e)
-                print(client_strings_js)
-                raise
+        write_text(os.path.join(lang_dir, "client_strings.js"), client_strings_js)
 
         # Copy files into the app's data folder
         if push:

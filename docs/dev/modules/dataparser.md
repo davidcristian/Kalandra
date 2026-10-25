@@ -120,7 +120,8 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   `renderer/src/assets/data/interfaces.ts` types it. A client string is a piece of text from the game's
   `ClientStrings` table. Each key comes from an entry in `CLIENT_STRING_KEY_VALUES`, `CLIENT_STRING_ARRAYS` or
   `CLIENT_STRING_REGEX` in `src/constants/client_string_data.py`. An entry names the `ClientStrings` ids its text is
-  built from, or gives a fixed text (`ConstClientString` and `ConstRegexClientString`).
+  built from, or gives a fixed text (`ConstClientString` and `ConstRegexClientString`). A write that fails, such as on
+  text with no UTF-8 form, logs `Failed to write <path>: <error>` and stops the build.
 
 `dataParser/output/` is tracked by git, and `--push` copies from it. On 18 Oct 2026 the app's data is newer than this
 output: `wc -l` gives 1936 lines for `dataParser/output/en/stats.ndjson` and 2526 for
