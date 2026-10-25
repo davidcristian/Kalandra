@@ -63,7 +63,7 @@ export function pushHostConfig() {
 
 export async function initConfig() {
   Host.onEvent("MAIN->CLIENT::config-changed", (e) => {
-    _lastSavedConfig = JSON.parse(e.contents); // should be a deep copy
+    _lastSavedConfig = JSON.parse(e.contents);
     updateConfig(JSON.parse(e.contents));
   });
 
@@ -150,7 +150,7 @@ export interface Config {
   enableAlphas: boolean;
   alphas: Array<"library">;
   tipsFrequency: TipsFrequency;
-  readClientLog: boolean; // default to false, opt-in only
+  readClientLog: boolean;
 }
 
 export const defaultConfig = (): Config => ({
@@ -223,10 +223,10 @@ export const defaultConfig = (): Config => ({
     },
     [],
   ),
-  enableAlphas: false, // default to false, opt-in only
+  enableAlphas: false,
   alphas: [],
   tipsFrequency: TipsFrequency.Normal,
-  readClientLog: false, // default to false, opt-in only
+  readClientLog: false,
 });
 
 function upgradeConfig(_config: Config): Config {
