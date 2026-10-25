@@ -30,13 +30,19 @@ maintainer can run this check.
   `× N` does not show.
 - A search response has the `x-rate-limit-*` headers that `adjustRateLimits` reads
   ([ADR-0005](../../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
+- The page's `Content-Security-Policy`
+  ([architecture.md](../../architecture.md#the-boundary-between-the-processes)) leaves the built-in
+  browser working: in Electron 44, a `<webview>` on a page with the policy loaded two local pages
+  at full height, but no check loaded the trade site or its sign-in pages. The overlay's console
+  shows no policy error but one `script-src` error at load, from vuedraggable.
 
 **Do.** Tick Enable builtin browser in Settings, Price check, so that Trade opens the built-in
 browser, and sign in there. Price check items in a public league, then in the private league,
 which goes in the "or Private League" field of Settings, Price check. Read one search response's
-headers in the developer tools, Network tab: a dev run opens them at start, and
-[003](003-overlay-key-and-focus.md) checks Ctrl + Shift + I in a packaged build. Never send
-requests on purpose to exceed the limits ([AGENTS.md](../../../../AGENTS.md#safety)).
+headers in the developer tools, Network tab, and the policy errors in the Console tab: a dev run
+opens them at start, and [003](003-overlay-key-and-focus.md) checks Ctrl + Shift + I in a
+packaged build. Never send requests on purpose to exceed the limits
+([AGENTS.md](../../../../AGENTS.md#safety)).
 
 **Pass.** Each claim holds.
 

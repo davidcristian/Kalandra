@@ -85,6 +85,14 @@ A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only
 | `/proxy/<host>/<path>` | Returns 403 without the `x-kalandra-proxy` request header, which a page on another site cannot send. Forwards the request to `https://<host>/<path>` when `<host>` is in `PROXY_HOSTS` in `main/src/proxy.ts`, and destroys it otherwise. | `Host.proxy()`, which sends the header |
 | any other path | Returns the built renderer file from the folder that holds the bundled `main.js`, where electron-builder puts `renderer/dist`, or 404 for a missing file or a path outside that folder. This includes a path that only starts like a route, such as `/config?x` or `/uploads`. In development, Vite serves the renderer files and main returns 404. | |
 
+Every response that passes the check has the page's `Content-Security-Policy` header, `CONTENT_SECURITY_POLICY` in
+`renderer/content-security-policy.ts`, and Vite's dev server sends the same header (`server.headers` in
+`renderer/vite.config.mts`). The page runs scripts, loads fonts and connects, the `/events` WebSocket included, only on
+its own origin, and loads images from its own origin and `web.poecdn.com`. Inline styles are allowed, because ApexCharts
+and Electron's `<webview>` add `<style>` elements, and the built-in browser's frame loses its height without them.
+`frame-src` does not apply to the `<webview>`: in Electron 44 it loaded pages from two other origins under
+`frame-src 'none'`. A new host or inline script the page needs is a change to that policy.
+
 A *client* is a page connected to `/events`: the overlay window, or a browser tab. Each event name starts with
 its direction:
 
@@ -229,6 +237,7 @@ renderer/          the Vue 3 page: Vite, Tailwind, Vitest
   src/assets/      the game data loader and make-index-files.mjs
   public/data/     the game data per language, app_i18n.json per language, namespaceMap.json
   specs/           Vitest tests, parser cases with real item text, saved trade responses
+  content-security-policy.ts  the page's Content-Security-Policy, which main's server and Vite send
 ipc/               types.ts, KeyToCode.ts and library.ts, imported by both processes
 dataParser/        the Python game data generator, run by hand; output/ holds its last output
 priceService/      the Python price file service, deployed outside the app

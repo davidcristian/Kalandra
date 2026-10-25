@@ -23,7 +23,8 @@ replaces it with `vi.mock("electron", ...)`.
   After a close that leaves one client, it checks the `isOverlay` main reports for a browser and the overlay window.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
 - `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes and to
-  `/events`, paths and methods that no route serves, and an upgrade request to another path.
+  `/events`, paths and methods that no route serves, and an upgrade request to another path. It reads each directive
+  of the `Content-Security-Policy` header on the page, a static file and an upload.
 - `proxy.test.ts` sends `/proxy` requests through the server's request check, with and without the `x-kalandra-proxy`
   header, from another origin and for hosts that differ from the list in case, a port, user info or a suffix. A fake
   `net.request` answers with the request and body it was given, or fails. It sends the page's `cookie` header to a trade

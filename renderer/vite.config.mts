@@ -1,6 +1,7 @@
 import path from "path";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { CONTENT_SECURITY_POLICY } from "./content-security-policy.ts";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -42,6 +43,7 @@ export default defineConfig({
     extensions: [".ts", ".js", ".vue", ".json"],
   },
   server: {
+    headers: { "content-security-policy": CONTENT_SECURITY_POLICY },
     proxy: {
       "^/(config|uploads|proxy)": { target: "http://127.0.0.1:8584" },
       "/events": { ws: true, target: "http://127.0.0.1:8584" },

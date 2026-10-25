@@ -7,7 +7,13 @@
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true
   },
-  "include": ["vite.config.mts", "vitest.config.ts"]
+  "include": [
+    "vite.config.mts",
+    "vitest.config.ts",
+    "content-security-policy.ts"
+  ]
 }

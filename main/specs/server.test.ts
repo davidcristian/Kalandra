@@ -15,7 +15,7 @@ import { addFileUploadRoutes } from "../src/host-files/file-uploads";
 import { Logger } from "../src/RemoteLogger";
 import { httpRoutes, server } from "../src/server";
 import { FakeServer } from "./fake-server";
-import { get, openSocket, sendMethod } from "./request";
+import { get, getHeaders, openSocket, sendMethod } from "./request";
 
 vi.mock("electron", async () => {
   const fs = await import("node:fs");
@@ -103,6 +103,39 @@ describe("a request that no route serves", () => {
     vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
     expect((await get(port, "/listen-option.ts")).status).toBe(404);
   });
+});
+
+// A browser applies the first directive of a repeated name and ignores the others
+function policyDirectives(
+  header: string | string[] | undefined,
+): Record<string, string[]> {
+  const directives: Record<string, string[]> = {};
+  if (typeof header !== "string") return directives;
+  for (const directive of header.split(";")) {
+    const [name, ...sources] = directive.trim().split(/\s+/);
+    if (name && !(name in directives)) directives[name] = sources;
+  }
+  return directives;
+}
+
+describe("the Content-Security-Policy header", () => {
+  it.each(["/", "/index.html", "/listen-option.ts", "/uploads/image.png"])(
+    "is sent with %s",
+    async (urlPath) => {
+      const { headers } = await getHeaders(port, urlPath);
+      expect(policyDirectives(headers["content-security-policy"])).toEqual({
+        "default-src": ["'self'"],
+        "script-src": ["'self'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "img-src": ["'self'", "https://web.poecdn.com"],
+        "font-src": ["'self'"],
+        "connect-src": ["'self'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "frame-ancestors": ["'none'"],
+      });
+    },
+  );
 });
 
 describe("the request check", () => {

@@ -18,6 +18,7 @@ import {
 import { sendFile } from "./served-file";
 import { isAllowedRequest } from "./request-origin";
 import { clientLogWriter } from "./client-log-writer";
+import { CONTENT_SECURITY_POLICY } from "../../renderer/content-security-policy";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
 
@@ -35,6 +36,7 @@ export const server = createServer((req, res) => {
     res.end();
     return;
   }
+  res.setHeader("content-security-policy", CONTENT_SECURITY_POLICY);
   httpRoutes.emit("request", req, res);
 });
 const websocketServer = new WebSocketServer({ noServer: true });

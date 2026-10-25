@@ -26,17 +26,18 @@ The entry, the server and the app services, in `main/src/`:
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and returns
-  403 otherwise. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route answers every path the
-  other routes do not, so no request is left without a response. The target `"broadcast"` sends to every client, and
-  `"last-active"` to the last active client: the one that connected or sent `CLIENT->MAIN::used-recently` last, or the
-  one client left after a close, for which main emits `used-recently` with `isOverlay` true for the overlay window, by
-  its User-Agent, and false for a browser. A new client receives the log history and the current updater state, which
-  the first update check can change after the page reads `GET /config`. An `OVERLAY->MAIN::` message is ignored and
-  logged unless the client's WebSocket upgrade request has `Electron` in its User-Agent, as the overlay window's does. A
-  message that is not JSON, has no string `name` or names an event without a handler is ignored with a `warn [server]`
-  line, and a handler that throws is logged. It passes on a `client-log-event` only from the client `clientLogWriter()`
-  returns, because every page parses the game log and sends the same entries. The routes are in
-  [architecture.md](../architecture.md#the-boundary-between-the-processes).
+  403 otherwise. Each response it passes on has the page's `Content-Security-Policy` header from
+  `renderer/content-security-policy.ts`. `addFileUploadRoutes()` and `HttpProxy` take `httpRoutes`. The static route
+  answers every path the other routes do not, so no request is left without a response. The target `"broadcast"` sends
+  to every client, and `"last-active"` to the last active client: the one that connected or sent
+  `CLIENT->MAIN::used-recently` last, or the one client left after a close, for which main emits `used-recently` with
+  `isOverlay` true for the overlay window, by its User-Agent, and false for a browser. A new client receives the log
+  history and the current updater state, which the first update check can change after the page reads `GET /config`. An
+  `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its
+  User-Agent, as the overlay window's does. A message that is not JSON, has no string `name` or names an event without a
+  handler is ignored with a `warn [server]` line, and a handler that throws is logged. It passes on a `client-log-event`
+  only from the client `clientLogWriter()` returns, because every page parses the game log and sends the same entries.
+  The routes and the policy are in [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `client-log-writer.ts`: `clientLogWriter(clients, isOverlay, lastActive)` returns the newest overlay window, or
   `lastActive` when no overlay window is connected.
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
@@ -227,24 +228,22 @@ fails. A gem search waits for the last change and fails when that change failed.
   `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and
   ESLint fails on a new empty `catch` block or `.catch()` handler.
 
-**Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time Electron 44, and the native
-modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle leaves out with `electron`. Both
-modules load prebuilt Node-API binaries, which load in a new Electron version without a rebuild. The bundle includes
-`electron-updater`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `main.ts` imports `electron-devtools-installer` inside
-its `VITE_DEV_SERVER_URL` check, which the production build defines as `null`, so only a development bundle has it.
-`build/script.mjs` bundles `dist/main.js` and `dist/vision.js` with esbuild; in development it sets
-`VITE_DEV_SERVER_URL` to `http://localhost:5173` and restarts Electron after each rebuild. `electron-builder.yml`
-packages `dist/main.js`, `dist/vision.js` and `../renderer/dist` as an NSIS installer and a portable build on Windows,
-an AppImage on Linux and an unsigned universal dmg on macOS, and publishes to GitHub releases.
-
-The `electron` package has no install script. `require("electron")` downloads the Electron binary the first time it
-runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
+**Dependencies.** `ipc/types.ts`, `ipc/KeyToCode.ts` and `renderer/content-security-policy.ts`, by relative path. At run
+time Electron 44, and the native modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle
+leaves out with `electron`. Both modules load prebuilt Node-API binaries, which load in a new Electron version without a
+rebuild. The bundle includes `electron-updater`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `main.ts` imports
+`electron-devtools-installer` inside its `VITE_DEV_SERVER_URL` check, which the production build defines as `null`, so
+only a development bundle has it. `build/script.mjs` bundles `dist/main.js` and `dist/vision.js` with esbuild; in
+development it sets `VITE_DEV_SERVER_URL` to `http://localhost:5173` and restarts Electron after each rebuild.
+`electron-builder.yml` packages `dist/main.js`, `dist/vision.js` and `../renderer/dist` as an NSIS installer and a
+portable build on Windows, an AppImage on Linux and an unsigned universal dmg on macOS, and publishes to GitHub
+releases. The `electron` package has no install script. `require("electron")` downloads the Electron binary the first
+time it runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
 `--coverage`, which fails below the floor in `main/vitest.config.ts` (85.6% of the lines of `src/` on 25 Oct 2026).
-[main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and
-the production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
-`eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
-capture and OCR need the game:
-[runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them, [host/index.md](../host/index.md)
-lists every host check, and each task's Status line says whether it still has to run.
+[main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and the
+production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
+`eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard capture
+and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,
+[host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it still has to run.

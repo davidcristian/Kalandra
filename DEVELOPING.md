@@ -51,7 +51,7 @@ You should see:
 - The overlay appears only over a window titled `Path of Exile 2`. Without the game, open
   `http://localhost:5173` in a browser to work on the page against the running main process.
 
-Two more facts about a dev run:
+Three more facts about a dev run:
 
 - **The config is read and never written.** Main reads `apt-data/config.json` from Electron's
   `userData` folder, but `ConfigStore` (`main/src/host-files/ConfigStore.ts`) does not save while
@@ -60,6 +60,10 @@ Two more facts about a dev run:
   files into `renderer/public/data/<lang>/`, which git ignores. Run it again after any change to
   the data there. What the files hold, and the list of languages, is in
   [renderer-parser.md](docs/dev/modules/renderer-parser.md#the-game-data).
+- **The page has the packaged app's Content-Security-Policy.** Vite sends the header from
+  `renderer/content-security-policy.ts`, so a policy error in the console is one the packaged app
+  has too. One `script-src` error at load is expected: vuedraggable's bundle tries `new Function`
+  once and uses `window` when the policy blocks it.
 
 When Electron starts and quits at once, another copy of Kalandra is running: `main/src/main.ts`
 calls `app.requestSingleInstanceLock()` and exits when another copy holds it. Quit the other copy
@@ -96,8 +100,9 @@ part alone:
 - `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle. Only `npm run dev`
   imports `electron`, so the build works without the Electron binary.
 - `npm run check-types` in `renderer/`, which a pre-commit hook runs, checks `src/` and `specs/`
-  with `tsconfig.json`, then `vite.config.mts` and `vitest.config.ts` with `tsconfig.node.json`.
-  `npm run build` there checks only `src/` and `specs/`.
+  with `tsconfig.json`, then `vite.config.mts`, `vitest.config.ts` and
+  `content-security-policy.ts` with `tsconfig.node.json`. `npm run build` there checks only `src/`
+  and `specs/`.
 - `--coverage` and `coverage report` fail when a suite covers less than the floor in its config:
   `vitest.config.ts` in `renderer/` and `main/`, and `.coveragerc` in `priceService/` and
   `scripts/`. Vitest counts every `.ts` file under `src/`, so a `.ts` file no test loads counts
