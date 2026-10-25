@@ -27,7 +27,10 @@ Each cycle writes into `PRICE_OUTPUT_DIR`:
   order (`MAX_LEAGUES` in `ninja.py`). The name is the league id in lowercase letters and digits only:
   `HC Runes of Aldur` is `hcrunesofaldur.json`. `league_file_name` in `transform.py` and `leagueFileName` in
   `renderer/src/web/background/price-source.ts` compute it, and both test suites check them against
-  `tests/fixtures/league_files.json`. A league id with no letter or digit is skipped.
+  `tests/fixtures/league_files.json`. A league id with no letter or digit is skipped, and so is one whose name
+  would be `index.json`. When two league ids give the same name, such as `Runes of Aldur` and `Runes-of-Aldur`, the
+  first in poe.ninja's list keeps the file and the other is skipped before any request for it (`claim_file_name` in
+  `service.py`). A skipped league is logged and listed in `failed`.
 - `index.json`: `generatedAt` (UTC, ISO 8601 to the second), `leagues` (an `{"id", "file"}` pair for each file
   written in this cycle) and `failed` (the league ids skipped in this cycle). The app does not read it. The health
   check in `compose.yaml` and the deploy runbook do.
@@ -193,7 +196,7 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 63 tests on 21 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 65 tests on 26 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
 floor in `priceService/.coveragerc`, 99.5% of lines and branches on 21 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in

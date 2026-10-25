@@ -90,6 +90,26 @@ class RunCycleTest(unittest.TestCase):
         self.assertEqual(len(get.calls), 3)
         self.assertEqual({path.name: path.read_text("utf-8") for path in self.output.iterdir()}, written)
 
+    def test_skips_a_league_whose_file_name_is_the_index_or_an_earlier_leagues(self) -> None:
+        routes = league_routes()
+        routes["/leagues"] = [ok([{"id": "Runes of Aldur"}, {"id": "Index"}, {"id": "Runes-of-Aldur"}])]
+        get = FakeGet(routes)
+        ninja = NinjaClient(get, user_agent="test", sleep=lambda _: None)
+        with self.assertLogs("price_service.service", "WARNING") as logs:
+            index = run_cycle(ninja, CATEGORIES, self.output, now=lambda: NOW)
+        skipped = "WARNING:price_service.service:league {!r} skipped: {}"
+        self.assertEqual(
+            logs.output,
+            [
+                skipped.format("Index", "league id 'Index' gives the file name of the index"),
+                skipped.format("Runes-of-Aldur", "runesofaldur.json is already the file of league 'Runes of Aldur'"),
+            ],
+        )
+        self.assertEqual(index["leagues"], [{"id": "Runes of Aldur", "file": "runesofaldur.json"}])
+        self.assertEqual(index["failed"], ["Index", "Runes-of-Aldur"])
+        self.assertEqual(sorted(path.name for path in self.output.iterdir()), ["index.json", "runesofaldur.json"])
+        self.assertEqual(len(get.calls), 1 + len(CATEGORIES))
+
     def test_keeps_the_old_file_of_a_league_with_a_category_it_cannot_convert(self) -> None:
         (self.output / "bad.json").write_text("old", encoding="utf-8")
         in_chaos: Json = {"core": {"primary": "chaos", "rates": {}}, "lines": [{"name": "Rune", "primaryValue": 1}]}

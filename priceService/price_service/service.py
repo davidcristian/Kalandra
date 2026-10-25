@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .ninja import NinjaClient, NinjaError, StopCycleError
 from .transform import (
+    INDEX_FILE,
     Category,
     Json,
     SnapshotError,
@@ -22,6 +23,20 @@ from .transform import (
 CORE_CATEGORY = "Currency"
 
 log = logging.getLogger(__name__)
+
+
+class FileNameTakenError(ValueError):
+    """Two league ids in one cycle give the same file name."""
+
+
+def claim_file_name(league: str, claimed: dict[str, str]) -> str:
+    """Returns a league's file name and records it in claimed; raises FileNameTakenError if another league has it."""
+    name = league_file_name(league)
+    first = claimed.setdefault(name, league)
+    if first != league:
+        msg = f"{name} is already the file of league {first!r}"
+        raise FileNameTakenError(msg)
+    return name
 
 
 def build_league(client: NinjaClient, categories: list[Category], league: str) -> str:
@@ -57,22 +72,26 @@ def run_cycle(
     output: Path,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
 ) -> Json:
-    """Writes a price file per league and an index.json; a failed league keeps its old file."""
+    """Writes a price file per league and an index.json; a failed league keeps its old file.
+
+    When two leagues give the same file name, the first in poe.ninja's list keeps it and the other is skipped.
+    """
     written: list[Json] = []
     failed: list[str] = []
+    claimed: dict[str, str] = {}
     for league in client.leagues():
         try:
-            name = league_file_name(league)
+            name = claim_file_name(league, claimed)
             write_atomic(output, name, build_league(client, categories, league))
-        # ValueError includes SnapshotError. A value that the conversion to divines makes too large for a float
-        # raises OverflowError, an ArithmeticError, or makes price_file raise ValueError
+        # ValueError includes SnapshotError and FileNameTakenError. A value that the conversion to divines makes too
+        # large for a float raises OverflowError, an ArithmeticError, or makes price_file raise ValueError
         except (NinjaError, ValueError, ArithmeticError) as error:
             log.warning("league %r skipped: %s", league, error)
             failed.append(league)
             continue
         written.append({"id": league, "file": name})
     index: Json = {"generatedAt": now().isoformat(timespec="seconds"), "leagues": written, "failed": failed}
-    write_atomic(output, "index.json", json.dumps(index, ensure_ascii=False, indent=2))
+    write_atomic(output, INDEX_FILE, json.dumps(index, ensure_ascii=False, indent=2))
     log.info("wrote %d leagues, %d failed", len(written), len(failed))
     return index
 

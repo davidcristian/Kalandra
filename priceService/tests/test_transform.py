@@ -61,6 +61,14 @@ class LeagueFileNameTest(unittest.TestCase):
         with self.assertRaises(SnapshotError):
             league_file_name("../ /")
 
+    def test_rejects_an_id_that_gives_the_name_of_the_index(self) -> None:
+        for league_id in ("Index", "IN-DEX", "index"):
+            with (
+                self.subTest(league_id=league_id),
+                self.assertRaisesRegex(SnapshotError, f"^league id '{league_id}' gives the file name of the index$"),
+            ):
+                league_file_name(league_id)
+
 
 class ExchangeTest(unittest.TestCase):
     def setUp(self) -> None:

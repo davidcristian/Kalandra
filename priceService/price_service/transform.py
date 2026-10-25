@@ -9,6 +9,7 @@ from typing import TypeGuard, cast
 Json = dict[str, object]
 
 EMPTY_SPARKLINE: Json = {"totalChange": 0, "data": []}
+INDEX_FILE = "index.json"
 SCHEMA_VERSION = 1
 
 log = logging.getLogger(__name__)
@@ -60,12 +61,16 @@ def load_categories(text: str) -> list[Category]:
 
 
 def league_file_name(league_id: str) -> str:
-    """Returns a league's file name: its id in lowercase letters and digits only."""
+    """Returns a league's file name: its id in lowercase letters and digits only, never the name of the index."""
     slug = re.sub(r"[^a-z0-9]", "", league_id.lower())
     if not slug:
         msg = f"league id has no letters or digits: {league_id!r}"
         raise SnapshotError(msg)
-    return f"{slug}.json"
+    name = f"{slug}.json"
+    if name == INDEX_FILE:
+        msg = f"league id {league_id!r} gives the file name of the index"
+        raise SnapshotError(msg)
+    return name
 
 
 def _is_number(value: object) -> TypeGuard[float]:
