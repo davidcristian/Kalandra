@@ -135,6 +135,8 @@ image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds 
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
 `specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
+`specs/web/settings/utils.test.ts` (`settings/utils.ts`: the page props, the field models, `findWidget`, and
+`disableWidget` and `enableWidget`, which add `menu::skip` once and remove every copy),
 `specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
 share in the edited config), `specs/web/stash-search.test.ts` (`stash-search/widget.ts`, the search of a new
 Stash search widget in three languages) and
