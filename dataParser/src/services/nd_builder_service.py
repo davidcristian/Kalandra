@@ -367,7 +367,7 @@ class NdBuilderService:
         words = self.game_store.get(WORDS)
         joined_base = self.get_items_base_types()
 
-        unique_mask = ts_items["unique"] == True  # noqa: E712
+        unique_mask = ts_items["unique"].eq(True)
         unique_items = ts_items.loc[unique_mask].copy()
         unique_items["namespace"] = "UNIQUE"
 
@@ -403,7 +403,7 @@ class NdBuilderService:
     def non_unique_items(self) -> pd.DataFrame:
         ts_items = self.ref_trade_store.items()
         joined_base = self.get_items_base_types()
-        non_unique_mask = ts_items["unique"] == False  # noqa: E712
+        non_unique_mask = ts_items["unique"].eq(False)
 
         non_unique_items = ts_items.loc[non_unique_mask].copy()
 
