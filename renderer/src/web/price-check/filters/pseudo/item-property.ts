@@ -470,7 +470,7 @@ function mapProps(ctx: FiltersCreationContext) {
   }
 
   if (item.mapMagicMonsters) {
-    // doesn't exist in 0.5.2
+    // Older waystones print Magic Monsters, which shares the trade id of Monster Effectiveness
     const magicMonsters = calcPropBounds(
       item.mapMagicMonsters,
       { flat: [], incr: [] },
@@ -491,7 +491,7 @@ function mapProps(ctx: FiltersCreationContext) {
   }
 
   if (item.mapRareMonsters) {
-    // doesn't exist in 0.5.2
+    // Older waystones print Rare Monsters, which shares the trade id of Monster Rarity
     const rareMonsters = calcPropBounds(
       item.mapRareMonsters,
       { flat: [], incr: [] },
@@ -552,7 +552,7 @@ function mapProps(ctx: FiltersCreationContext) {
   }
 
   if (item.mapGold) {
-    // doesn't exist in 0.5.2
+    // The parser never sets mapGold: client_strings.js has no string for a waystone's gold
     const gold = calcPropBounds(item.mapGold, { flat: [], incr: [] }, item);
     ctx.filters.push(
       propToFilter(
@@ -569,7 +569,7 @@ function mapProps(ctx: FiltersCreationContext) {
   }
 
   if (item.mapMonsterRarity) {
-    const itemRarity = calcPropBounds(
+    const monsterRarity = calcPropBounds(
       item.mapMonsterRarity,
       { flat: [], incr: [] },
       item,
@@ -578,10 +578,10 @@ function mapProps(ctx: FiltersCreationContext) {
       propToFilter(
         {
           ref: "Monster Rarity: #%",
-          // yes rare monsters replaced trade id
+          // The trade site names this filter Monster Rarity
           tradeId: "item.map_rare_monsters",
-          roll: itemRarity.roll,
-          sources: itemRarity.sources,
+          roll: monsterRarity.roll,
+          sources: monsterRarity.sources,
           disabled: true,
         },
         ctx,
@@ -590,7 +590,7 @@ function mapProps(ctx: FiltersCreationContext) {
   }
 
   if (item.mapEffectiveness) {
-    const itemRarity = calcPropBounds(
+    const effectiveness = calcPropBounds(
       item.mapEffectiveness,
       { flat: [], incr: [] },
       item,
@@ -599,10 +599,10 @@ function mapProps(ctx: FiltersCreationContext) {
       propToFilter(
         {
           ref: "Monster Effectiveness: #%",
-          // yes magic monsters
+          // The trade site names this filter Monster Effectiveness
           tradeId: "item.map_magic_monsters",
-          roll: itemRarity.roll,
-          sources: itemRarity.sources,
+          roll: effectiveness.roll,
+          sources: effectiveness.sources,
           disabled: true,
         },
         ctx,

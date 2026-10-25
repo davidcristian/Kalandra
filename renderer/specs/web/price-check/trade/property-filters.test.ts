@@ -7,8 +7,8 @@ import {
   RareMap,
   RareMapFakeAllProps,
   SpectreIncSpirit,
+  TestItem,
 } from "@specs/Parser/items";
-import type { TestItem } from "@specs/Parser/items";
 import { init } from "@/assets/data";
 import { parseClipboard } from "@/parser";
 import {
@@ -88,6 +88,19 @@ describe("the item property filters of a trade search", () => {
     expect(
       search(RareMapFakeAllProps).filters.map_filters?.filters,
     ).toMatchObject({ map_iir: { min: 17 } });
+  });
+
+  it("sends the Monster Rarity and Monster Effectiveness of a Waystone with the trade site's ids", () => {
+    const current = new TestItem(
+      RareMapFakeAllProps.rawText
+        .replace("Magic Monsters: +30% (augmented)\n", "")
+        .replace("Rare Monsters: +71% (augmented)\n", ""),
+    );
+
+    expect(search(current).filters.map_filters?.filters).toMatchObject({
+      map_rare_monsters: { min: 32 },
+      map_magic_monsters: { min: 45 },
+    });
   });
 
   it("sends the maximum the user sets", () => {
