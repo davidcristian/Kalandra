@@ -117,6 +117,8 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
 [make-index-files.mjs](../../../renderer/src/assets/make-index-files.mjs) writes `stats-ref`,
 `stats-matcher`, `items-name` and `items-ref` for each language in its `LANGUAGES` list: `en`, `ru`, `cmn-Hant`,
 `ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.
+It exits with code 1 and names the file and line of an `items.ndjson` record without `refName`, which the item
+indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
 `renderer/public/data/th/` has only `app_i18n.json`.
 
 ## Invariants

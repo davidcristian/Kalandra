@@ -74,16 +74,23 @@ for (const lang of LANGUAGES) {
   /** @type{Array<{ hashName: number, hashRefName: number, start: number }>} */
   let lineStarts;
   {
-    const ndjson = fs.readFileSync(`./public/data/${lang}/items.ndjson`, {
-      encoding: "utf-8",
-    });
+    const file = `public/data/${lang}/items.ndjson`;
+    const ndjson = fs.readFileSync(`./${file}`, { encoding: "utf-8" });
     let start = 0;
+    let line = 0;
     /** @type{Map<string, typeof lineStarts[number]>} */
     const startsByName = new Map();
     while (start !== ndjson.length) {
       const end = ndjson.indexOf("\n", start);
+      line += 1;
       /** @type {import('./data/interfaces').BaseType} */
       const item = JSON.parse(ndjson.slice(start, end));
+      if (!item.refName) {
+        console.error(
+          `${file}:${line}: the item has no refName, and the item indexes find each item by its refName`,
+        );
+        process.exit(1);
+      }
       const key = `${item.namespace}::${item.refName}`;
       if (!startsByName.has(key)) {
         startsByName.set(key, {

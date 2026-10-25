@@ -106,7 +106,7 @@ On 18 Oct 2026 the last two print 445 and 16.
 
    It writes the `*.index.bin` files next to each language's data, as
    [renderer-parser.md](../modules/renderer-parser.md#the-game-data) describes. Git ignores them, and the tests and
-   the build read them.
+   the build read them. It fails on an item without `refName` and names its file and line.
 
 7. **Run the renderer checks.** In `renderer/`: `npm run lint`, `npx vitest run` and `npm run build`. The parser
    tests in `renderer/specs/Parser/` parse real copied item text with the English data, and a failure names the test
