@@ -8,16 +8,14 @@ logger = logging.getLogger(__name__)
 
 
 class CssRule:
-    # the css that will be applied to all matching rows
     css: str
-    # selector for the element on trade site
+    # A selector of a stat's element on the trade site, with {0} for the stat hash
     css_selector: str
-    # function that determines if the row should be included in this rule
+    # Takes a stat's ref, hash, tags and id, and returns whether the rule applies to the stat
     row_selector: Callable[[str, int, list[str], str], bool]
 
     name: str
-    # None if always on
-    # string for the bool option to disable
+    # The user style checkbox that turns the rule on and off, or None for a rule that is always on
     disableSelector: str | None
 
     def __init__(
@@ -48,7 +46,6 @@ class CssRule:
             return f"/* {self.name}: matches no stat */"
 
         out: list[str] = [f"/* {self.name} */"]
-        # all but last
         for hash in my_hashes[:-1]:
             out.append(self.css_selector.format(hash) + ", ")
 

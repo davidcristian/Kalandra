@@ -1,13 +1,12 @@
-"""Names of various files that are generated/constant"""
+"""The names of the files the build reads: trade data, game tables, stat descriptions and the image cache."""
 
 from typing import Literal
 
-# Trade API files
+# The trade site's data files in data/json/<lang>/
 ITEMS_JSON = "items.json"
 STATS_JSON = "stats.json"
 STATIC_JSON = "static.json"
 
-# Game API tables
 GAME_API_TABLES_TYPE = Literal[
     "ArmourTypes.json",
     "BaseItemTypes.json",
@@ -88,7 +87,6 @@ GAME_API_TABLES = (
 )
 
 
-# Stat Description Files
 STAT_DESCRIPTION_FILES_TYPE = Literal[
     "data@StatDescriptions@active_skill_gem_stat_descriptions.csd",
     "data@StatDescriptions@advanced_mod_stat_descriptions.csd",

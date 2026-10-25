@@ -96,30 +96,13 @@ class RateLimiter:
         self.clock: Callable[[], float] = clock
 
     def wait(self, duration: int | float) -> None:
-        """Wait for a specified duration.
-
-        Parameters
-        ----------
-        duration : int | float
-            The duration to wait in seconds.
-        """
+        """Sleeps for duration seconds, and raises ValueError when duration is not above 0."""
         if duration <= 0:
             raise ValueError(f"cannot wait for {duration} seconds")
         self.sleep(duration)
 
     def parse_window_limit(self, window: str) -> RateLimit:
-        """Takes a string in the format "limit:interval:penalty" and returns a RateLimit object.
-
-        Parameters
-        ----------
-        window : str
-            The string to parse.
-
-        Returns
-        -------
-        RateLimit
-            The parsed RateLimit object.
-        """
+        """Returns the RateLimit of one "limit:interval:penalty" entry of a rate limit header."""
         split_window = window.split(":")
         if len(split_window) != 3:
             raise ValueError(f"rate limit {window!r} is not limit:interval:penalty")
@@ -130,18 +113,7 @@ class RateLimiter:
         )
 
     def parse_rate_limit(self, limit: str) -> list[RateLimit]:
-        """Takes a csv string of rate limits and returns a list of RateLimit objects.
-
-        Parameters
-        ----------
-        limit : str
-            csv string of rate limits
-
-        Returns
-        -------
-        list[RateLimit]
-            The parsed list of RateLimit objects.
-        """
+        """Returns the RateLimit of each comma-separated entry of a rate limit header."""
         split_limit = limit.split(",")
         windows: list[RateLimit] = []
         for window in split_limit:
@@ -149,21 +121,7 @@ class RateLimiter:
         return windows
 
     def get_limits(self, limit: str, state: str) -> list[tuple[RateLimit, RateLimit]]:
-        """Takes a group of rate limits and the current state of rate limits from the server and returns a paired list of RateLimit objects.
-
-        Parameters
-        ----------
-        limit : str
-            csv of rate limits
-        state : str
-            csv of the limits but with the current state according to the server
-
-        Returns
-        -------
-        list[tuple[RateLimit, RateLimit]]
-            The paired list of RateLimit objects. The first element in the tuple is the limit and the second element is the state.
-        """
-        # limits follow format: "limit:interval:penalty"
+        """Pairs each entry of the limit header with the state entry in its place, and raises ValueError when their windows differ."""
         limits = self.parse_rate_limit(limit)
         states = self.parse_rate_limit(state)
 
@@ -175,21 +133,10 @@ class RateLimiter:
         return limit_groups
 
     def wait_if_exceeded(self, limit: RateLimit, state: RateLimit) -> None:
-        """Waits using time.sleep if the server says we are on a penalty currently. Will wait for the FULL penalty, not just what the server says is remaining.
-
-        Parameters
-        ----------
-        limit : RateLimit
-            A specific period limit
-        state : RateLimit
-            The current state of the limit
-        """
-        # If the server says we are on penalty
+        """Waits the rule's full penalty, not only the seconds left, when the state reports a restriction."""
         if state.penalty > 0:
-            # Wait for the full penalty
             self.wait(limit.penalty)
-            # It should be safe to assume this will never occur, and thus should raise an error
-            # Since waiting though, we will just log an error
+            # The waits of wait_if_needed should prevent a restriction, so one is logged as an error
             logger.error(
                 f"Rate limit exceeded. Waiting for full penalty of {limit.penalty} seconds. RateLimit: {limit}, State: {state}"
             )
@@ -197,22 +144,20 @@ class RateLimiter:
     def wait_if_needed(
         self, limit: RateLimit, state: RateLimit, last_update: float | None
     ) -> None:
-        # average_request_rate is twice the seconds per request that the limit allows. When the
-        # previous response of the policy came at most 1.5 times it ago, wait 1.4 times it.
-        average_request_rate = limit.window / limit.max * 2
+        two_request_seconds = limit.window / limit.max * 2
         if (
             last_update is not None
-            and self.clock() - last_update <= average_request_rate * 1.5
+            and self.clock() - last_update <= two_request_seconds * 1.5
         ):
-            logger.debug(f"Waiting for {average_request_rate * 1.4} | {limit}, {state}")
-            self.wait(average_request_rate * 1.4)
+            logger.debug(f"Waiting for {two_request_seconds * 1.4} | {limit}, {state}")
+            self.wait(two_request_seconds * 1.4)
 
-        # If we are close to exceeding this limit, wait 3x the average rate
+        # The max of a state entry is the number of requests so far in its window
         if state.max >= math.floor(limit.max * 0.9):
             logger.warning(
-                f"Close to exceeding limit, waiting for {average_request_rate * 3} | {limit}, {state}"
+                f"Close to exceeding limit, waiting for {two_request_seconds * 3} | {limit}, {state}"
             )
-            self.wait(average_request_rate * 3)
+            self.wait(two_request_seconds * 3)
 
     def wait_limit(
         self,
@@ -243,7 +188,7 @@ class RateLimiter:
         logger.debug(f"Current rate limits: {self.limits}")
 
     def handle_headers(self, headers: Mapping[str, str], status_code: int) -> None:
-        """Handles the headers returned from the server."""
+        """After a 429, sleeps for the seconds in Retry-After, then waits as the IP rate limit headers ask."""
         if status_code == 429:
             logger.error("Rate limit exceeded.")
             retry_after = headers.get("Retry-After")

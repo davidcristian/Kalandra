@@ -1,6 +1,4 @@
-"""
-Retrieves all data that is sourced from the trade site
-"""
+"""Pulls the trade site's data files for one language, checks them and saves them."""
 
 import json
 import logging

@@ -76,7 +76,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ConstClientString("RUNIC_WARD", "Runic Ward: "),
     ClientString("BLOCK_CHANCE", ["ItemDisplayShieldBlockChance"], "{0}: "),
     ClientString("CORRUPTED", ["ItemPopupCorrupted"]),
-    # skip regex ones
     ClientString("INFLUENCE_SHAPER", ["ItemPopupShaperItem"]),
     ClientString("INFLUENCE_ELDER", ["ItemPopupElderItem"]),
     ClientString("INFLUENCE_CRUSADER", ["ItemPopupCrusaderItem"]),
@@ -84,16 +83,12 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("INFLUENCE_REDEEMER", ["ItemPopupRedeemerItem"]),
     ClientString("INFLUENCE_WARLORD", ["ItemPopupWarlordItem"]),
     ClientString("SECTION_SYNTHESISED", ["ItemPopupSynthesisedItem"]),
-    # skip regex
     ClientString("VEILED_PREFIX", ["ItemDisplayVeiledPrefix"]),
     ClientString("VEILED_SUFFIX", ["ItemDisplayVeiledSuffix"]),
-    # regex
     ClientString("METAMORPH_HELP", ["MetamorphosisItemisedMapBoss"]),
     ClientString("BEAST_HELP", ["ItemDescriptionItemisedCapturedMonster"]),
     ClientString("VOIDSTONE_HELP", ["PrimordialWatchstoneDescriptionText"]),
-    # regex (metamorph)
     ClientString("CANNOT_USE_ITEM", ["ItemPopupCannotUseItem"]),
-    # regex (gems)
     ClientString("AREA_LEVEL", ["ItemDisplayHeistContractLevel"], "{0}: "),
     ClientString("HEIST_WINGS_REVEALED", ["ItemDisplayHeistBlueprintWings"], "{0}: "),
     ClientString("HEIST_TARGET", ["ItemDisplayHeistContractObjective"]),
@@ -102,7 +97,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("HEIST_BLUEPRINT_GEMS", ["HeistBlueprintRewardReliquary"]),
     ClientString("HEIST_BLUEPRINT_REPLICAS", ["HeistBlueprintRewardLibrary"]),
     ClientString("MIRRORED", ["ItemPopupMirrored"]),
-    # regex (mod description)
     ClientString(
         "PREFIX_MODIFIER",
         ["ModDescriptionLinePrefix"],
@@ -146,7 +140,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("CORRUPTED_IMPLICIT", ["ModDescriptionLineCorruptedImplicit"]),
     ClientString("INCURSION_OPEN", ["ItemDescriptionIncursionAccessibleRooms"]),
     ClientString("INCURSION_OBSTRUCTED", ["ItemDescriptionIncursionInaccessibleRooms"]),
-    # regex eater exarch implicit
     ClientString("ELDRITCH_MOD_R1", ["EldritchCurrencyTier1"]),
     ClientString("ELDRITCH_MOD_R2", ["EldritchCurrencyTier2"]),
     ClientString("ELDRITCH_MOD_R3", ["EldritchCurrencyTier3"]),
@@ -154,7 +147,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("ELDRITCH_MOD_R5", ["EldritchCurrencyTier5"]),
     ClientString("ELDRITCH_MOD_R6", ["EldritchCurrencyTier6"]),
     ClientString("SENTINEL_CHARGE", ["ItemDisplaySentinelDroneDurability"], "{0}: "),
-    # Arrays for influence mod prefix suffixes
     ClientString(
         "FOIL_UNIQUE",
         ["ItemPopupFoilUniqueVariant"],
@@ -162,7 +154,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
         trim=True,
     ),
     ClientString("UNMODIFIABLE", ["ItemPopupUnmodifiable"]),
-    # regex (chat)
     ClientString("REQUIREMENTS", ["ItemPopupRequirements"]),
     ClientString("CHARM_SLOTS", ["ItemDisplayBeltCharmSlots"], "{0}: "),
     ClientString("BASE_SPIRIT", ["ItemDisplaySpiritValue"], "{0}: "),

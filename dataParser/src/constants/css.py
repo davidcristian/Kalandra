@@ -38,15 +38,15 @@ CSS_DEFAULT = """
 }
 """
 
-# Mostly from COE, but any on trade by default are used
-LIFE_COLOR = "#d14e4e"  # trade, coe is #ff00cc
+# Craft of Exile's colors, except where the trade site has a color of its own
+LIFE_COLOR = "#d14e4e"  # the trade site's color; Craft of Exile uses #ff00cc
 MANA_COLOR = "#00d0dd"
 SPEED_COLOR = "#00ffc0"
 PHYSICAL_COLOR = "#0d8800"
 CHAOS_COLOR = "#8a00ff"
-FIRE_COLOR = "#b97123"  # trade, coe is #FF0000
-COLD_COLOR = "#3f6db3"  # trade, coe is #5599FF
-LIGHTNING_COLOR = "#adaa47"  # trade, coe is #FFF000
+FIRE_COLOR = "#b97123"  # the trade site's color; Craft of Exile uses #FF0000
+COLD_COLOR = "#3f6db3"  # the trade site's color; Craft of Exile uses #5599FF
+LIGHTNING_COLOR = "#adaa47"  # the trade site's color; Craft of Exile uses #FFF000
 CRITICAL_COLOR = "#a8ff00"
 ATTACK_COLOR = "#ff9000"
 DAMAGE_COLOR = "#ffb4b4"
@@ -58,7 +58,7 @@ CASTER_COLOR = "#bc00dd"
 MINION_COLOR = "#ff5eb5"
 DEFENCES_COLOR = "#dddddd"
 POISON_COLOR = AILMENT_COLOR
-GEM_COLOR = "#d2eaa0"  # most +levels are not tagged as gem
+GEM_COLOR = "#d2eaa0"  # the game tags few of the stats that add gem levels as gem
 STR_COLOR = "#ff0000"
 DEX_COLOR = "#22ff22"
 INT_COLOR = "#5555ff"

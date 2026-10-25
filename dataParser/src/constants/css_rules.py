@@ -14,6 +14,8 @@ def tag_rule(
     )
 
 
+# UserStylesBuilder writes the rules in reverse order, so when several rules match a stat,
+# the first of them in its list sets the color
 TAG_ONLY_RULES: list[CssRule] = [
     CssRule(
         f"color: {t.GEM_TAG};",
@@ -159,21 +161,18 @@ TAG_ONLY_RULES: list[CssRule] = [
         tag_rule([t.DEFENCES_TAG]),
         f"All {t.DEFENCES_TAG} tagged stats",
     ),
-    # fall through, should likely not match much, not matched above
     CssRule(
         f"color: {t.ELEMENTAL_TAG};",
         c.CSS_SELECTOR,
         tag_rule([t.ELEMENTAL_TAG]),
         f"All {t.ELEMENTAL_TAG} tagged stats",
     ),
-    # fall through, should likely not match much, not matched above
     CssRule(
         f"color: {t.RESISTANCE_TAG};",
         c.CSS_SELECTOR,
         tag_rule([t.RESISTANCE_TAG]),
         f"All {t.RESISTANCE_TAG} tagged stats",
     ),
-    # max res so different
     CssRule(
         "text-decoration: underline;",
         c.CSS_SELECTOR,
@@ -182,7 +181,6 @@ TAG_ONLY_RULES: list[CssRule] = [
     ),
 ]
 
-# Same as TAG_ONLY_RULES but only applies to compact views
 COMPACT_TAG_ONLY_RULES: list[CssRule] = [
     CssRule(r.css, c.CSS_SELECTOR_COMPACT, r.row_selector, r.name)
     for r in TAG_ONLY_RULES
@@ -341,21 +339,18 @@ OPINIONATED_RULES: list[CssRule] = [
         tag_rule([t.DEFENCES_TAG]),
         f"All {t.DEFENCES_TAG} tagged stats",
     ),
-    # fall through, should likely not match much, not matched above
     CssRule(
         f"color: {t.ELEMENTAL_TAG};",
         m.CSS_SELECTOR,
         tag_rule([t.ELEMENTAL_TAG]),
         f"All {t.ELEMENTAL_TAG} tagged stats",
     ),
-    # fall through, should likely not match much, not matched above
     CssRule(
         f"color: {t.RESISTANCE_TAG};",
         m.CSS_SELECTOR,
         tag_rule([t.RESISTANCE_TAG]),
         f"All {t.RESISTANCE_TAG} tagged stats",
     ),
-    # max res so different
     CssRule(
         "text-decoration: underline;",
         m.CSS_SELECTOR,

@@ -49,8 +49,8 @@ def namespace(trade_category: str) -> str:
     return "GEM" if trade_category == "gem" else "ITEM"
 
 
-# make all matchers hashable, and where currently nan(pseudos) make empty frozenset
 def matcher_key(matcher: Matcher | float) -> frozenset[tuple[str, object]]:
+    """Returns a matcher as a hashable set of its items, or an empty set for the NaN of a stat without matchers."""
     if isinstance(matcher, dict):
         return frozenset(matcher.items())
     return frozenset([])

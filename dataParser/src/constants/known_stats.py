@@ -1,4 +1,4 @@
-"""all the stats that have special handling"""
+"""The hashes of the stats that the build handles in a special way, and the sets that name each way."""
 
 from constants.lang import KOREAN, LANG, RUSSIAN
 
@@ -42,7 +42,7 @@ GEAR_LIFE_LEECH = 2557965901
 WEAPON_MANA_LEECH = 669069897
 GEAR_MANA_LEECH = 707457662
 
-# value stats
+# Stats whose trade site ids end in |<value>
 JEWEL_RADIUS_CHANGE = 3891355829
 JEWEL_RING_RADIUS = 3642528642
 ALLOCATES_NOTABLE = 2954116742
@@ -51,13 +51,8 @@ UNIQUE_JEWEL_PLUS_LEVEL = 448592698
 DISCONNECTED_PASSIVES_AROUND_KEYSTONE = 2422708892
 TIME_LOST_HISTORIC_JEWEL = 3418580811
 
-# =============================================================================
-#
-#
-#
-# =============================================================================
-
-"""For stats where we want lower/negative values"""
+# The `better` in stats.ndjson of the stats where a lower value is better (-1) or values
+# cannot be compared (0). Every other stat gets 1.
 BETTER_LOOKUP: dict[int, int] = {
     REDUCED_ATTRIBUTE_REQUIREMENTS: -1,
     SANCTUM_REDUCED_GOLD_MERCHANT_COST: -1,
@@ -85,16 +80,8 @@ BETTER_LOOKUP: dict[int, int] = {
     RITUAL_TABLET_DEFER_COST: -1,
 }
 
-"""
-For stats where we want lower/negative values
-BUT the trade site shows the 'better' version of the string
-ex:
-    trade site shows                  , positive negative better on trade site
-    #% increased Attribute Requirements, negative better -> so it is in BETTER_LOOKUP
-    #% increased Charges per Use      , negative better -> so it is in BETTER_LOOKUP
-    #% reduced Charm Charges Used     , positive better -> so it is in FLIPPED_NEGATE
-                                    Trade site shows the negated version, and takes positive numbers
-"""
+# Stats where a lower value is better but the trade site shows the reduced form, such as
+# "#% reduced Charm Charges used", so a trade search sends the negated value
 TRADE_INVERTED: set[int] = {
     FLASK_CHARGES_USED,
     CHARM_CHARGES_USED,

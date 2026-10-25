@@ -62,21 +62,15 @@ def test_get_description_parses_a_file_in_the_store_language(
 @patch("stores.game_store.GameStore.get_description")
 @patch("stores.game_store.STAT_DESCRIPTION_FILES", new=["file1.json", "file2.json"])
 def test_get_all_descriptions(mock_get_description):
-    # Mock data to simulate the descriptions
     mock_df1 = pd.DataFrame({"desc": ["description1", "description2"]})
     mock_df2 = pd.DataFrame({"desc": ["description3", "description4"]})
 
-    # Set the side effect of the mock to the list of mock DataFrames
     mock_get_description.side_effect = [mock_df1, mock_df2]
 
-    # Create an instance of GameStore
     store = GameStore("en")
 
-    # Call the method under test
     result = store.get_all_descriptions()
 
-    # Concatenate the mock DataFrames to form the expected result
     expected_result = pd.concat([mock_df1, mock_df2])
 
-    # Assert that the result matches the expected DataFrame
     pd.testing.assert_frame_equal(result, expected_result)

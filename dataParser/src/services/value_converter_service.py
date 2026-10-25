@@ -160,7 +160,7 @@ class ValueConverterService:
             else int(in_df["value"].max()) - 1
         )
         if len(advanced_desc_array) != max_value:
-            # error case, just return simple agg
+            # Without one advanced text per value, the matchers keep the trade site's texts
             return self.simple_agg(in_df)
         out: list[dict[str, object]] = []
         for row in value_stat_rows(in_df):

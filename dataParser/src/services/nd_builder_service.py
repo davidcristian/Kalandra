@@ -66,12 +66,9 @@ class NdBuilderService:
 
     def build_stats_ndjson(self) -> pd.DataFrame:
         logger.info("Building stats")
-        # Get all required data
-        # Data from Trade API
         logger.info("Importing trade site data")
         valueless_trade_stats_df = self.get_output_ready_trade_stats()
         value_trade_stats_df = self.get_output_value_stats()
-        # Data from Descriptions
         logger.info("Importing descriptions")
         desc_df = self.descriptions_hashed()
 
@@ -108,7 +105,6 @@ class NdBuilderService:
                 "trade",
                 "fromAreaMods",
                 "id",
-                # Hash is here and dropped later to not copy values of a slice
                 "hash",
             ]
         ]
@@ -347,7 +343,7 @@ class NdBuilderService:
         unique_items = ts_items.loc[unique_mask].copy()
         unique_items["namespace"] = "UNIQUE"
 
-        # Edge case fix: Rename specific items
+        # Trade site names that differ from the name in the game's Words table
         outdated_names = {
             "Sekhema's Resolve": "Sekhema's Resolve Fire",
             "The Road Warrior": "The Immortan",
@@ -444,7 +440,6 @@ class NdBuilderService:
 
         def update_matchers(row: pd.Series) -> object:
             if isinstance(row["matchers"], list) and len(row["matchers"]) == 0:
-                # Check if ref is in the dictionary
                 if row["ref"] in ref_matchers_dict:
                     return ref_matchers_dict[row["ref"]]
             return row["matchers"]
@@ -453,20 +448,17 @@ class NdBuilderService:
         return joined_df_i
 
     def get_refs_to_merge(self, in_df: pd.DataFrame) -> pd.Series:
-        """get groups of rows(refs) that have any same matchers"""
+        """Returns the sets of refs whose rows share at least one matcher."""
         matchers_exploded = in_df.explode("matchers")
         matchers_exploded["matchers"] = matchers_exploded["matchers"].apply(matcher_key)
-        # put similar matchers in the same group, all other columns into a list
         matchers_grouped = matchers_exploded.groupby("matchers").agg(list).reset_index()
 
-        # make matchers into a list
         matchers_grouped["matchers"] = matchers_grouped["matchers"].apply(list)
-        # any here with some count of matchers means they found some similar (0 catches everything else)
-        # any with more than 1 ref, means they are from two different rows
+        # An empty key holds the stats without matchers, and a key with one ref has no row to merge with
         refs_to_merge = matchers_grouped.loc[
             (matchers_grouped["matchers"].str.len() > 0)
             & (matchers_grouped["ref"].str.len() > 1)
-        ]["ref"].apply(set)  # convert to set for easier lookup later
+        ]["ref"].apply(set)
         return refs_to_merge
 
     def dedupe_matchers(self, in_df: pd.DataFrame) -> pd.DataFrame:
@@ -479,7 +471,7 @@ class NdBuilderService:
         data_without_saved_refs = in_df.loc[~in_df["ref"].isin(refs_set)].copy()
 
         def custom_fn(df: pd.DataFrame) -> pd.Series:
-            """Add a column for the custom groupings"""
+            """Returns the position in refs_to_merge of the set that holds each row's ref."""
 
             def find_index(c: str) -> int:
                 for index, val in enumerate(refs_to_merge):
@@ -488,7 +480,6 @@ class NdBuilderService:
                 return -1
 
             r = df["ref"]
-            # basically grouping by the index of the ref (in a set) in the list incoming
             new_series = r.apply(find_index)
             return new_series
 

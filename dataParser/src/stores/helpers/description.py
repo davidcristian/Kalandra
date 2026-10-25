@@ -153,12 +153,9 @@ class Description:
         return line
 
     def replace_placeholders(self, line: str) -> str:
-        # NOTE: May need to move to be after combining with trade stuff
-        # Replace {0}, {0:+d}, {:+d}, etc.
+        """Returns the line with # in place of each value placeholder, such as {0}, {0:+d}, {} or %1%."""
         line = re.sub(r"\{(?:[0-9]+)?(?:\:[^}]+)?\}", "#", line)
-        # Replace bare {} placeholders
         line = re.sub(r"\{\}", "#", line)
-        # Replace %1%, %2%, etc.
         line = re.sub(r"%[0-9]+%", "#", line)
         return line
 
@@ -206,7 +203,7 @@ class Description:
             out["string"] = line_string
             if value is not None:
                 if id == RECOVERY_APPLIED_INSTANTLY and value == 100:
-                    # Instant Recovery is a different trade ID so dont include this matcher
+                    # Instant recovery has a trade stat of its own, so this line gets no matcher
                     continue
                 out["value"] = value
             negate = self.parse_negate(flags)
@@ -239,12 +236,11 @@ class Description:
         ):
             return int(placeholder)
         if id == 2342939473 or id == 4267306471:
-            # current_energy_shield_%_as_elemental_damage_reduction viper_strike_dual_wield_damage_+%_final
+            # current_energy_shield_%_as_elemental_damage_reduction and viper_strike_dual_wield_damage_+%_final
             return None
 
         if id == 2055966527 and value_placeholders == ("#", "#", "!0"):
-            # bleed_on_hit_with_attacks_%
-            # # # !0 "[Attack|Attacks] cannot cause [Bleeding|Bleeding]"
+            # The line # # !0 "[Attack|Attacks] cannot cause [Bleeding|Bleeding]" of bleed_on_hit_with_attacks_%
             return 0
 
         mapping = {

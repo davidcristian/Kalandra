@@ -98,7 +98,6 @@ def main(
         )
         write_text(os.path.join(lang_dir, "client_strings.js"), client_strings_js)
 
-        # Copy files into the app's data folder
         if push:
             logger.info("Copying files to renderer/public/data")
             for name in ("stats.ndjson", "items.ndjson", "client_strings.js"):

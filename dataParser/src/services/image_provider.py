@@ -31,7 +31,7 @@ class ImageLookupError(Exception):
 
 
 def get_script_dir() -> str:
-    """Returns the directory where the script is located."""
+    """Returns the folder of this module, which holds the image cache by default."""
     return os.path.dirname(os.path.realpath(__file__))
 
 
@@ -62,12 +62,10 @@ class ImageProvider:
     def get_cache(self) -> dict[str, str]:
         cache_path = os.path.join(self.cache_dir, ITEM_IMAGE_CACHE)
 
-        # Check if the file exists and create it if it doesn't
         if not os.path.exists(cache_path):
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump({}, f)
 
-        # Read and return the contents of the file
         with open(cache_path, "r", encoding="utf-8") as f:
             return json.loads(f.read())
 
@@ -96,8 +94,7 @@ class ImageProvider:
 
         if (
             self.mode == "all"
-            or save_name
-            not in self.cache  # mode = new (or missing and it isn't in cache)
+            or save_name not in self.cache
             or (self.mode == "missing" and self.cache[save_name] == NOT_FOUND)
         ):
             image_url = self.look_up(item)

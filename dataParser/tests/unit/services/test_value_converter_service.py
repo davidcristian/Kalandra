@@ -300,7 +300,6 @@ def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():
 
 
 def test_historic_agg_integration():
-    # Create mock data
     df = pd.DataFrame(
         [
             {
