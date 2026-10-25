@@ -104,6 +104,12 @@ repos:
         language: python
         pass_filenames: false
         always_run: true
+    -   id: allowscripts
+        name: allowScripts entries
+        entry: python scripts/allowscripts.py
+        language: python
+        pass_filenames: false
+        files: (^|/)package(-lock)?\.json$|^scripts/(allowscripts|repofiles)\.py$
     -   id: commitlint
         name: Commit message rules
         entry: python scripts/commitlint.py

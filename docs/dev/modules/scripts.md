@@ -3,8 +3,9 @@
 **Purpose.** `scripts/` holds the command line tools that check the repo itself against
 [AGENTS.md](../../../AGENTS.md). `check.py` runs every check a machine can run, `linecap.py`, `dashcheck.py` and
 `prosecheck.py` check the line limits, the dash rule and the banned words, `linkcheck.py` and `backlogcheck.py` check
-the developer docs, `versioncheck.py` checks that the five version places match, `commitlint.py` checks a commit
-message, and `ci_paths.py` picks the CI jobs a change affects.
+the developer docs, `versioncheck.py` checks that the five version places match, `allowscripts.py` checks the
+`allowScripts` entries against the lock files, `commitlint.py` checks a commit message, and `ci_paths.py` picks the
+CI jobs a change affects.
 The scripts are Python, use only the standard library, and run from the repo root. The decision is
 [ADR-0010](../adr/ADR-0010-scripts-check-the-written-rules.md).
 
@@ -89,6 +90,22 @@ five files that [the release runbook](../runbooks/release.md#the-five-version-pl
 - A file that is missing or is not UTF-8, a JSON file that does not parse, or a package file with no version string
   where npm writes one prints `versioncheck: <problem>` and exits with 2.
 
+### allowscripts.py
+
+The pre-commit hook runs `python scripts/allowscripts.py` when a `package.json`, a `package-lock.json` or the script
+changes. It reads each `package.json` that git lists with a `package-lock.json` next to it, and checks every key of
+its `allowScripts` field against the lock's `packages` that have `"hasInstallScript": true`
+([DEVELOPING.md](../../../DEVELOPING.md#dependencies)).
+
+- A key `name@version` with an exact version must match a locked package of that name and version. A key with no
+  version or with a range, such as `pkg@1 || 2`, must match the name alone. A locked alias counts under its folder
+  name and under the real name the lock gives it. `true` and `false` entries are checked alike.
+- It prints one line per entry that matches nothing, which names the versions the lock has and the `npm` command
+  that fixes it, and exits with 1. Otherwise it prints `allowscripts OK: <n> allowScripts entries match their lock
+  files` and exits with 0.
+- A file that does not parse, a file that is not a JSON object, an `allowScripts` that is not an object, no entry
+  in any folder, or a git failure prints `allowscripts: <problem>` and exits with 2.
+
 ### ci_paths.py
 
 The Changed paths job of `.github/workflows/test.yml` passes the changed paths on stdin to
@@ -135,11 +152,11 @@ breaks and exits with 1, or exits with 0.
 
 ## Tests
 
-`python -m unittest discover -s tests` in `scripts/`, 105 tests on 22 Oct 2026. `tests/support.py` builds a temporary
+`python -m unittest discover -s tests` in `scripts/`, 114 tests on 25 Oct 2026. `tests/support.py` builds a temporary
 git repo for each test that runs a script's `main()`, and the `check.py` tests run steps that start the current
 Python with `-c`, so the tests need git but no Node and no network. The pre-commit hooks run Ruff and Pyright in
 strict mode on `scripts/`: `scripts/ruff.toml` extends `priceService/ruff.toml` and allows `print`, and
 `pyrightconfig.json` at the repo root covers both folders. CI runs the tests under coverage.py and fails below the
-floor in `scripts/.coveragerc`, 97.5% of lines and branches on 22 Oct 2026.
+floor in `scripts/.coveragerc`, 97.6% of lines and branches on 25 Oct 2026.
 
 **Dependencies.** Python 3.12 or newer and git. `check.py` also starts `pre-commit`, `npm` and `npx`.
