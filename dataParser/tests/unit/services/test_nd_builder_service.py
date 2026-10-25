@@ -539,20 +539,53 @@ def test_clean_up_ndjson_drops_hash_and_sorts():
     assert out["better"].dtype == int
 
 
-def test_get_output_ready_trade_stats_calls_methods_in_order():
-    service = NdBuilderService("ru", "new")
-    service.valueless_trade_stats_df = MagicMock(return_value="valueless")
-    service.group_trade_stats = MagicMock(return_value="grouped")
-    service.add_hash_to_trade_stats = MagicMock(return_value="hashed")
-    service.convert_to_trade_out = MagicMock(return_value="converted")
+@patch("services.nd_builder_service.MOD_TYPES", ["explicit", "implicit"])
+def test_get_output_ready_trade_stats_groups_the_ids_of_each_valueless_stat():
+    ref_stats = pd.DataFrame(
+        [
+            {
+                "id": "explicit.stat_3299347043",
+                "text": "# to maximum Life",
+                "type": "explicit",
+            },
+            {
+                "id": "implicit.stat_3299347043",
+                "text": "# to maximum Life",
+                "type": "implicit",
+            },
+            {
+                "id": "explicit.stat_1050105434",
+                "text": "# to maximum Mana",
+                "type": "explicit",
+            },
+            {
+                "id": "explicit.stat_2954116742|1",
+                "text": "Allocates #",
+                "type": "explicit",
+            },
+        ]
+    )
+    service = setup_stats_combined_df_tests(ref_stats, ref_stats[["id", "text"]])
 
     result = service.get_output_ready_trade_stats()
 
-    service.valueless_trade_stats_df.assert_called_once()
-    service.group_trade_stats.assert_called_once_with("valueless")
-    service.add_hash_to_trade_stats.assert_called_once_with("grouped")
-    service.convert_to_trade_out.assert_called_once_with("hashed")
-    assert result == "converted"
+    assert result.to_dict("records") == [
+        {
+            "ref": "# to maximum Life",
+            "hash": [3299347043],
+            "trade": {
+                "ids": {
+                    "explicit": ["explicit.stat_3299347043"],
+                    "implicit": ["implicit.stat_3299347043"],
+                }
+            },
+        },
+        {
+            "ref": "# to maximum Mana",
+            "hash": [1050105434],
+            "trade": {"ids": {"explicit": ["explicit.stat_1050105434"]}},
+        },
+    ]
 
 
 @patch("services.nd_builder_service.MOD_TYPES", ["explicit", "crafted"])

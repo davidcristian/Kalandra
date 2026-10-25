@@ -10,41 +10,93 @@ from constants.filenames import (
 )
 from constants.known_stats import (
     ALLOCATES_NOTABLE,
+    BETTER_LOOKUP,
+    DISCONNECTED_PASSIVES_AROUND_KEYSTONE,
     JEWEL_RADIUS_CHANGE,
     JEWEL_RING_RADIUS,
     SUPPORTED_VALUES,
     TIME_LOST_HISTORIC_JEWEL,
+    UNIQUE_JEWEL_PLUS_LEVEL,
     VALUE_TO_DESCRIPTION_ID,
     VALUE_TO_REF,
 )
+from constants.lang import ENGLISH
 from services.value_converter_service import ValueConverterService
 
 
+def make_service() -> ValueConverterService:
+    """Returns an English service with no blight oils, without reading the blight tables."""
+    with patch.object(ValueConverterService, "get_blight", return_value={}):
+        return ValueConverterService(lang=ENGLISH)
+
+
 @pytest.mark.parametrize(
-    "hash_val,should_call_simple",
+    "hash_val",
     [
-        (JEWEL_RADIUS_CHANGE, True),
-        (JEWEL_RING_RADIUS, True),
-        (ALLOCATES_NOTABLE, True),
-        (TIME_LOST_HISTORIC_JEWEL, False),
-        (999999, False),
+        JEWEL_RADIUS_CHANGE,
+        JEWEL_RING_RADIUS,
+        ALLOCATES_NOTABLE,
+        DISCONNECTED_PASSIVES_AROUND_KEYSTONE,
+        UNIQUE_JEWEL_PLUS_LEVEL,
     ],
 )
-def test_agg_by_hash_calls_simple_or_not(hash_val, should_call_simple):
-    with patch.object(ValueConverterService, "get_blight", return_value={}):
-        svc = ValueConverterService(lang=MagicMock())
-        svc.simple_agg = MagicMock(return_value=pd.DataFrame([{"called": True}]))
-        svc.historic_agg = MagicMock(return_value=pd.DataFrame([{"called": True}]))
-        df = pd.DataFrame([{"text": "dummy", "value": 1, "type": "x", "id": 123}])
-        df.index = [hash_val]
+def test_agg_by_hash_builds_one_option_stat_from_the_rows_of_a_value_stat(hash_val):
+    rows = pd.DataFrame(
+        [
+            {"text": "Second", "value": 2, "type": "explicit", "id": "explicit.stat_1"},
+            {"text": "First", "value": 1, "type": "explicit", "id": "explicit.stat_1"},
+        ],
+        index=[hash_val, hash_val],
+    )
 
-        out = svc.agg_by_hash(df)
+    out = make_service().agg_by_hash(rows)
 
-        if should_call_simple:
-            svc.simple_agg.assert_called_once_with(df)
-            assert out.iloc[0]["called"]
-        else:
-            svc.simple_agg.assert_not_called()
+    assert out.to_dict("records") == [
+        {
+            "ref": VALUE_TO_REF[hash_val],
+            "id": VALUE_TO_DESCRIPTION_ID[hash_val],
+            "hash": hash_val,
+            "better": BETTER_LOOKUP.get(hash_val, 1),
+            "trade": {"ids": {"explicit": ["explicit.stat_1"]}, "option": True},
+            "matchers": [
+                {"string": "First", "value": 1},
+                {"string": "Second", "value": 2},
+            ],
+        }
+    ]
+
+
+def test_agg_by_hash_builds_one_stat_per_row_of_a_historic_jewel():
+    rows = pd.DataFrame(
+        [
+            {
+                "ref": "Glorifying the defilement of # souls in tribute to Ulaman\nmore",
+                "text": "Glorifying the defilement of # souls in tribute to Ulaman",
+                "value": 28,
+                "type": "explicit",
+                "id": "explicit.stat_3418580811",
+            }
+        ],
+        index=[TIME_LOST_HISTORIC_JEWEL],
+    )
+
+    out = make_service().agg_by_hash(rows)
+
+    assert out["ref"].tolist() == [
+        "Glorifying the defilement of # souls in tribute to Ulaman"
+    ]
+    assert out["trade"].tolist() == [
+        {"ids": {"explicit": ["explicit.stat_3418580811|28"]}}
+    ]
+    assert "advanced" in out["matchers"].tolist()[0][0]
+
+
+def test_agg_by_hash_returns_the_rows_of_another_stat_unchanged():
+    rows = pd.DataFrame(
+        [{"text": "dummy", "value": 1, "type": "explicit", "id": 123}], index=[999999]
+    )
+
+    pd.testing.assert_frame_equal(make_service().agg_by_hash(rows), rows)
 
 
 def test_simple_agg_notable_blight_lookup():
@@ -184,70 +236,67 @@ def test_get_blight_correct_output_structure():
     }
 
 
-def test_agg_by_hash_called_with_grouped_data():
-    # Create mock data
-    df = pd.DataFrame(
+def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():
+    ring_id = f"explicit.stat_{JEWEL_RING_RADIUS}"
+    notable_id = f"enchant.stat_{ALLOCATES_NOTABLE}"
+    stats = pd.DataFrame(
         [
             {
-                "hash": TIME_LOST_HISTORIC_JEWEL,
-                "text": "example",
-                "ref": "example",
-                "value": 100,
-                "type": "mod",
-                "id": "explicit.stat_3418580811",
+                "hash": JEWEL_RING_RADIUS,
+                "text": "Small Ring",
+                "value": 2,
+                "type": "explicit",
+                "id": ring_id,
             },
             {
-                "hash": TIME_LOST_HISTORIC_JEWEL,
-                "text": "Something else",
-                "ref": "Something else",
-                "value": 100,
-                "type": "mod",
-                "id": "explicit.stat_3418580811",
+                "hash": JEWEL_RING_RADIUS,
+                "text": "Tiny Ring",
+                "value": 1,
+                "type": "explicit",
+                "id": ring_id,
             },
             {
                 "hash": ALLOCATES_NOTABLE,
                 "text": "Allocates #",
-                "ref": "Allocates #",
                 "value": 200,
-                "type": "mod",
-                "id": "explicit.stat_2954116742",
+                "type": "enchant",
+                "id": notable_id,
+            },
+            {
+                "hash": 999999,
+                "text": "Unsupported",
+                "value": 1,
+                "type": "explicit",
+                "id": "explicit.stat_999999",
             },
         ]
     )
 
-    mock_return = pd.DataFrame(
-        [
-            {
-                "ref": "ref1",
-                "better": 1,
-                "matchers": [{"string": "example", "value": 100}],
-                "trade": {"ids": {"mod": [1]}},
-                "id": "desc1",
-                "hash": TIME_LOST_HISTORIC_JEWEL,
-            }
-        ]
-    )
+    out = make_service().convert_value_stats_to_trade(stats)
 
-    expected_df1 = df[df["hash"] == TIME_LOST_HISTORIC_JEWEL].set_index("hash")
-    expected_df2 = df[df["hash"] == ALLOCATES_NOTABLE].set_index("hash")
-
-    with patch.multiple(
-        ValueConverterService,
-        agg_by_hash=MagicMock(return_value=mock_return),
-        get_blight=MagicMock(return_value={}),
-    ):
-        svc = ValueConverterService(lang="en")
-        svc.convert_value_stats_to_trade(df)
-
-        # Assert agg_by_hash is called twice
-        assert svc.agg_by_hash.call_count == 2
-
-        # Check each call's DataFrame
-        first_call_df = svc.agg_by_hash.call_args_list[1][0][0]
-        second_call_df = svc.agg_by_hash.call_args_list[0][0][0]
-
-        pd.testing.assert_frame_equal(first_call_df, expected_df1)
-        pd.testing.assert_frame_equal(second_call_df, expected_df2)
+    assert out.to_dict("records") == [
+        {
+            "ref": VALUE_TO_REF[ALLOCATES_NOTABLE],
+            "dp": None,
+            "better": 0,
+            "matchers": [{"string": "Allocates #", "value": 200}],
+            "trade": {"ids": {"enchant": [notable_id]}, "option": True},
+            "id": VALUE_TO_DESCRIPTION_ID[ALLOCATES_NOTABLE],
+            "hash": [ALLOCATES_NOTABLE],
+        },
+        {
+            "ref": VALUE_TO_REF[JEWEL_RING_RADIUS],
+            "dp": None,
+            "better": 0,
+            "matchers": [
+                {"string": "Tiny Ring", "value": 1},
+                {"string": "Small Ring", "value": 2},
+            ],
+            "trade": {"ids": {"explicit": [ring_id]}, "option": True},
+            "id": VALUE_TO_DESCRIPTION_ID[JEWEL_RING_RADIUS],
+            "hash": [JEWEL_RING_RADIUS],
+        },
+    ]
 
 
 def test_historic_agg_integration():

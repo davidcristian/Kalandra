@@ -1,38 +1,62 @@
-from unittest.mock import MagicMock, patch
+from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
+import pytest
 
+from constants.lang import CHINESE, ENGLISH, GERMAN
+from stores import game_store
 from stores.game_store import GameStore
+from stores.helpers.description import Description
 
 
-@patch("stores.game_store.os.path.join")
-@patch("stores.game_store.pd.read_json")
-def test_get(mock_read_json, mock_path_join):
-    mock_path_join.return_value = "/fake/path/file.json"
-    mock_df = pd.DataFrame({"col": [1, 2]})
-    mock_read_json.return_value = mock_df
-
-    store = GameStore("en")
-    result = store.get("some_file.json")
-
-    mock_path_join.assert_called()
-    mock_read_json.assert_called_with("/fake/path/file.json")
-    pd.testing.assert_frame_equal(result, mock_df)
+def test_a_store_reads_the_tables_of_its_language_folder() -> None:
+    assert Path(GameStore(ENGLISH).data_dir).name == "English"
+    assert Path(GameStore(CHINESE).data_dir).name == "Traditional Chinese"
 
 
-@patch("stores.game_store.Description")
-def test_get_description(mock_description_cls):
-    mock_desc = MagicMock()
-    mock_df = pd.DataFrame({"desc": ["a", "b"]})
-    mock_desc.to_dataframe.return_value = mock_df
-    mock_description_cls.return_value = mock_desc
+def test_get_reads_a_table_from_the_data_folder(tmp_path: Path) -> None:
+    _ = (tmp_path / "Tags.json").write_text(
+        '[{"_index": 0, "Id": "ring"}, {"_index": 1, "Id": "amulet"}]',
+        encoding="utf-8",
+    )
+    store = GameStore(ENGLISH)
+    store.data_dir = str(tmp_path)
 
-    store = GameStore("en")
-    result = store.get_description("desc_file.json")
+    result = store.get("Tags.json")
 
-    mock_desc.load.assert_called()
-    mock_desc.to_dataframe.assert_called()
-    pd.testing.assert_frame_equal(result, mock_df)
+    pd.testing.assert_frame_equal(
+        result, pd.DataFrame({"_index": [0, 1], "Id": ["ring", "amulet"]})
+    )
+
+
+def test_get_description_parses_a_file_in_the_store_language(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = Path("tests/data/cases/one_description_test.csd")
+    _ = (tmp_path / case.name).write_text(
+        case.read_text(encoding="utf-8"), encoding="utf-16"
+    )
+
+    class TmpDescription(Description):
+        """Reads its file from tmp_path."""
+
+        def __init__(self, lang, filename):
+            super().__init__(lang, filename)
+            self.data_dir = str(tmp_path)
+
+    monkeypatch.setattr(game_store, "Description", TmpDescription)
+
+    result = GameStore(GERMAN).get_description(case.name)
+
+    assert result["id"].tolist() == ["+1_spirit_per_X_evasion_rating_on_body_armour"]
+    assert result["matchers"].tolist() == [
+        [
+            {
+                "string": "1 zu Wille für jede # Ausweichwert auf der ausgerüsteten Körperrüstung"
+            }
+        ]
+    ]
 
 
 @patch("stores.game_store.GameStore.get_description")

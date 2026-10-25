@@ -428,16 +428,14 @@ def test_replace_placeholders(matcher, expected):
     assert desc.replace_placeholders(matcher) == expected
 
 
-def test_parse_matcher_calls_properly():
+def test_parse_matcher_replaces_tags_placeholders_and_line_breaks():
     desc = Description("en", "dummy.csd")
-    desc.replace_attribute_tags = Mock(return_value="after_attr")
-    desc.replace_placeholders = Mock(return_value="after_placeholders")
 
-    result = desc.parse_matcher("input_line")
+    matcher = desc.parse_matcher(
+        "[Attack|Attacks] deal {0}% more [Fire] Damage\\!per [Resonance] \\!of any type"
+    )
 
-    desc.replace_attribute_tags.assert_called_once_with("input_line")
-    desc.replace_placeholders.assert_called_once_with("after_attr")
-    assert result == "after_placeholders"
+    assert matcher == "Attacks deal #% more Fire Damage\nper Resonance\nof any type"
 
 
 def test_load_drops_pre_description_lines(tmp_path):
