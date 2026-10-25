@@ -187,18 +187,15 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("SANCTIFIED", ["ItemPopupSanctified"]),
     ClientString("HYPHEN", ["ItemDisplayWeaponDamageRange"], trim=True),
     ClientString("WAYSTONE_REVIVES", ["NumberOfPortalsPerWaystone"], "{0}: "),
-    ClientString("WAYSTONE_PACK_SIZE", ["ItemDisplayMapPackSizeIncrease"], "{0}: "),
+    ClientString("WAYSTONE_PACK_SIZE", ["ItemDisplayMapPack"], "{0}: "),
     ClientString(
         "WAYSTONE_MAGIC_MONSTERS", ["ItemDisplayMapMagicMonsterQuantityBonus"], "{0}: "
     ),
     ClientString(
         "WAYSTONE_RARE_MONSTERS", ["ItemDisplayMapRareMonsterQuantityBonus"], "{0}: "
     ),
-    ClientString(
-        "WAYSTONE_DROP_CHANCE", ["ItemDisplayMapMapItemDropChanceIncrease"], "{0}: "
-    ),
-    ClientString("WAYSTONE_RARITY", ["ItemDisplayMapRarityIncrease"], "{0}: "),
-    ClientString("WAYSTONE_GOLD", ["ItemDisplayMapGoldQuantityIncrease"], "{0}: "),
+    ClientString("WAYSTONE_DROP_CHANCE", ["ItemDisplayMapWaystoneDropChance"], "{0}: "),
+    ClientString("WAYSTONE_RARITY", ["ItemDisplayMapItemRarity"], "{0}: "),
     ClientString("DOUBLE_CORRUPTED", ["ItemPopupDoubleCorrupted"]),
     ClientString("UNIQUE_MODIFIER", ["ModDescriptionLineUnique"]),
     ClientString("VAAL_UNIQUE_MODIFIER", ["ModDescriptionLineVaalUnique"]),
