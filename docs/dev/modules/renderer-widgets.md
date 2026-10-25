@@ -131,6 +131,8 @@ loads every widget component and checks the registered types and the invariants 
 menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`: the poe2db page of each item kind, in English and
 Japanese, and the stash search for the same price note, which adds the name up to 50 characters),
+`specs/web/item-check-hotkeys.test.ts` (the pages and the stash search that the item check hotkeys open for item
+text from a fake host, and nothing for text that is not an item),
 `specs/web/library/libraryChaos.test.ts` (`library/widget.ts`: the kept modifier kinds and the columns of a
 profile), `specs/web/library/itemDiff.test.ts` (`diffItem()`, the prefixes and suffixes a logged Waystone gained
 and lost, and the CSV row they make), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a
