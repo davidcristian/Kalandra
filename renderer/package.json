@@ -41,14 +41,12 @@
     "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
-    "node-fetch": "^3.3.2",
     "postcss": "^8.2.14",
     "prettier": "3.4.2",
     "typescript": "5.6.x",
     "vite": "^5.0.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.1.11",
-    "vitest-mock-extended": "^3.1.0",
     "vue-tsc": "^2.0.0"
   },
   "optionalDependencies": {
