@@ -240,7 +240,7 @@ The `electron` package has no install script. `require("electron")` downloads th
 runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.1% of the lines of `src/` on 25 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.3% of the lines of `src/` on 25 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and
 the production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
 `eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard
