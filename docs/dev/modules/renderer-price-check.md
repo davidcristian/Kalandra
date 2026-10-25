@@ -33,6 +33,9 @@ that the route needs ([main.md](main.md)).
   `tradeTag` and `trade` for the rest. The window searches at once when "Perform an auto search, when pressing"
   is on for the key used (`smartInitialSearch`, `lockedInitialSearch`) and the item is unique, unidentified,
   veiled, a heist blueprint, a sanctum relic, a charm, or of a category not in `CATEGORY_TO_TRADE_ID`.
+  Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
+  the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
+  ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).
 
 ### Filters (`filters/`)
 
@@ -224,6 +227,7 @@ with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header t
 timers. `listing-markers.test.ts` there checks which column shows a listing's markers, and `trade-response.test.ts`
 reads hand-written responses with `readTradeData` and answers each trade site request with a web page.
 `listing-properties.test.ts` there reads a listing's item level, quality and gem level by property type, and
-`prop-set.test.ts` checks the paths `propSet` accepts with `expectTypeOf`, which `tsc` checks. No test calls a live
-site.
+`prop-set.test.ts` checks the paths `propSet` accepts with `expectTypeOf`, which `tsc` checks.
+`specs/web/watch-order.test.ts` mounts a component with a fake renderer and checks that Vue runs its watchers in
+the order they are defined. No test calls a live site.
 `Leagues.ts` and `poeprices.ts` have no test file of their own.

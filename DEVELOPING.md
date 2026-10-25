@@ -174,6 +174,10 @@ and lists the skipped ones at the end of the install; `npm install-scripts ls` l
   `docs/`, and the tests and builds pass without them.
 - An `overrides` entry has its reason in the module doc of its folder, as `yauzl` has in
   [main.md](docs/dev/modules/main.md).
+- A Vue update in `renderer/` must keep the watchers of a component in the order they are
+  defined, which `CheckedItem.vue` needs
+  ([renderer-price-check.md](docs/dev/modules/renderer-price-check.md)).
+  `specs/web/watch-order.test.ts` there fails on a Vue that changes the order.
 
 ## Procedures
 
