@@ -27,9 +27,9 @@ const HARDCODED_HIGH_VALUE_OILS = new Set([
 export function decodeOils(calc: StatCalculated): string[] | undefined {
   if (calc.type !== ModifierType.Enchant) return;
 
-  // try Amulet enchant
+  // An amulet anointment
   let encoded = calc.sources[0].stat.translation.oils;
-  // else try Ring enchant
+  // Otherwise a ring anointment
   if (!encoded && calc.stat.anointments) {
     if (calc.stat.anointments.length === 1) {
       encoded = calc.stat.anointments[0].oils;

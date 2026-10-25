@@ -32,7 +32,9 @@ export function likelyFinishedItem(item: ParsedItem) {
   return (
     item.rarity === ItemRarity.Unique ||
     item.statsByType.some((calc) => calc.type === ModifierType.Crafted) ||
-    (item.quality === 20 && !item.qualityType) || // quality > 20 can be used for selling bases, quality < 20 drops sometimes
+    // Quality of exactly 20 marks a finished item: items drop with less, and a base with more
+    // sells for crafting
+    (item.quality === 20 && !item.qualityType) ||
     !itemIsModifiable(item)
   );
 }
@@ -42,18 +44,13 @@ export function hasCraftingValue(item: ParsedItem) {
   const itemLevelCap = maxUsefulItemLevel(item.category);
   return (
     itemIsModifiable(item) &&
-    // Base useful crafting item (synth and influence not in poe2 yet though)
     (item.isSynthesised ||
       item.isFractured ||
       item.influences.length ||
-      // Clusters (deprecated)
       item.category === ItemCategory.ClusterJewel ||
-      // Jewels
       (item.category === ItemCategory.Jewel &&
         item.rarity === ItemRarity.Magic) ||
-      // High ilvl (minus 15, seems like low ilevel ones still kinda sell?)
       (itemLevelCap !== 1 && item.itemLevel! >= itemLevelCap - 15) ||
-      // is exceptional item
       (item.augmentSockets &&
         item.augmentSockets.current > item.augmentSockets.normal) ||
       (item.quality && item.quality > 20))

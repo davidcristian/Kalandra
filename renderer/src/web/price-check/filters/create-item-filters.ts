@@ -60,7 +60,7 @@ export function createFilters(
   if (item.category === ItemCategory.CapturedBeast) {
     filters.searchExact = {
       baseType: item.info.name,
-      baseTypeTrade: item.info.refName, // NOTE: always English on trade
+      baseTypeTrade: item.info.refName, // The trade site takes the English name
     };
     return filters;
   }
@@ -103,7 +103,6 @@ export function createFilters(
     return filters;
   }
 
-  // "endgame" items (map-like items) (also uniques??)
   if (item.category === ItemCategory.Map) {
     if (item.rarity === ItemRarity.Unique && item.info.unique) {
       filters.searchExact = {
@@ -179,20 +178,19 @@ export function createFilters(
 
   if (item.quality) {
     if (item.quality >= 20 && item.category === ItemCategory.Flask) {
-      // show if 20 but only enable if greater than 20
       filters.quality = {
         value: item.quality,
         disabled: item.quality <= 20,
       };
     } else if (
-      // Require Exceptional quality for non-flasks (most will be 20 anyways so can be ignored)
+      // Only exceptional quality counts, since most items have 20
       item.quality > 20 &&
       item.category &&
       CATEGORIES_WITH_USEFUL_QUALITY.has(item.category)
     ) {
       filters.quality = {
         value: item.quality,
-        // Not by default if rare, since most of craft is likely already done (and don't care about it on finished items)
+        // Off for a rare, which is most likely finished, so its quality does not matter to a buyer
         disabled: item.rarity === ItemRarity.Rare,
       };
     } else if (item.category === ItemCategory.Charm) {
@@ -237,7 +235,7 @@ export function createFilters(
 
   if (
     !item.isUnmodifiable &&
-    // Ignore waystones now(prev tablets) since if  there is one that is corrupted with right mods buyer wont care
+    // A buyer of a waystone with the right modifiers does not care whether it is corrupted
     item.category !== ItemCategory.Map &&
     (item.rarity === ItemRarity.Normal ||
       item.rarity === ItemRarity.Magic ||
@@ -259,14 +257,14 @@ export function createFilters(
     item.info.refName !== "Idol of Estazunti" &&
     opts.exact
   ) {
-    // Since chance orbs only work on normal items
+    // An Orb of Chance works only on a normal item, so the rarity matters
     filters.rarity = {
       value: "normal",
     };
   } else if (
     item.rarity === ItemRarity.Magic &&
     opts.exact &&
-    // Ignore tablet since they should be compared to rare ones
+    // A magic tablet is searched with rare tablets too
     item.category !== ItemCategory.Tablet
   ) {
     filters.rarity = {
@@ -315,7 +313,6 @@ export function createFilters(
           disabled: !opts.exact,
         };
       } else {
-        // TODO limit level by item type
         filters.itemLevel = {
           value: Math.min(item.itemLevel, maxUsefulItemLevel(item.category)),
           disabled:
@@ -501,7 +498,7 @@ export function areaLevelByAscendancyPoints(refName: string, points: number) {
   }
 
   const maxPossiblePoints = refName === "Inscribed Ultimatum" ? 3 : 4;
-  // cases not possible
+  // Input outside the possible range
   if (points < 1) {
     return 1;
   } else if (points > maxPossiblePoints) {
@@ -523,7 +520,7 @@ export function ascendancyPointsByAreaLevel(
 
   const maxPossiblePoints = refName === "Inscribed Ultimatum" ? 3 : 4;
 
-  // cases not possible
+  // Input outside the possible range
   if (areaLevel < 1) {
     return 1;
   } else if (areaLevel > 80) {

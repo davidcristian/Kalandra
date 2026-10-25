@@ -65,26 +65,7 @@ function createMagebloodFilters(
     statsByType,
   };
 
-  /** --------
-   *  { Implicit Modifier }
-   *  20% of Flask Recovery applied Instantly
-   *  { Implicit Modifier — Charm }
-   *  Has 3(1-3) Charm Slots
-   *  --------
-   *  { Unique Modifier }
-   *  Legacy of Topaz(Amethyst-Topaz) — Unscalable Value
-   *  { Unique Modifier }
-   *  Legacy of Topaz(Amethyst-Topaz) — Unscalable Value
-   *  { Unique Modifier }
-   *  Legacy of Gold(Amethyst-Topaz) — Unscalable Value
-   *  { Unique Modifier }
-   *  Legacy of Topaz(Amethyst-Topaz) — Unscalable Value
-   *  { Unique Modifier }
-   *  All Mage's Legacies have 40(25-50)% increased effect per duplicate Mage's Legacy you have
-   *  --------
-   */
-
-  // push all but the "Legacy of #" stats
+  // Every stat but the Legacy of # lines, which get filters of their own below
   ctx.filters.push(
     ...ctx.statsByType
       .filter(

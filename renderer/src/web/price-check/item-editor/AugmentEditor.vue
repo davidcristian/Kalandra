@@ -2,7 +2,6 @@
   <div v-if="item?.augmentSockets" class="p-2">
     <div class="flex flex-row justify-between">
       <div class="grid grid-cols-6 gap-2">
-        <!-- List of current augments -->
         <template
           v-for="(augment, index) of item.augmentSockets.augments"
           :key="`${index}+${augment?.refName}`"
@@ -27,7 +26,6 @@
         </template>
       </div>
       <div class="flex items-center gap-x-1">
-        <!-- price of augments -->
         <i class="fas fa-arrow-right text-gray-600 px-1 text-sm" />
         <item-sum-price
           :items="
@@ -40,7 +38,6 @@
     </div>
     <hr class="my-2 border-gray-700" />
     <div>
-      <!-- augment adding section -->
       <ui-tabs v-if="displayGroups" v-model="mainTab" :tabs="tabs.main">
         <template #default="{ selected }">
           <ui-tabs
@@ -252,7 +249,6 @@ export default defineComponent({
         )
           return;
 
-        // replace augment
         useAugment(props.item, selectedAugment.value, index);
       },
       selectAugment: (augment: EditorItem) => {

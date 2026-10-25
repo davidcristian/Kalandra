@@ -36,7 +36,7 @@ import { defineComponent, PropType, computed, ref, watch } from "vue";
 import { FilterNumeric } from "./interfaces";
 
 export default defineComponent({
-  emits: [], // mutates filter
+  emits: [], // The button changes the filter instead of emitting events
   props: {
     filter: {
       type: Object as PropType<FilterNumeric>,

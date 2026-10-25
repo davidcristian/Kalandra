@@ -136,7 +136,7 @@ const PSEUDO_RULES: PseudoRule[] = [
     group: "to_all_attrs",
     stats: [
       { ref: stat("# to all Attributes") },
-      // NOTE: not including other sources from `ATTRIBUTES_INFO`
+      // Only this stat counts, not the other stats in `ATTRIBUTES_INFO`
     ],
   },
   {
@@ -186,7 +186,7 @@ const PSEUDO_RULES: PseudoRule[] = [
   {
     pseudo: stat("+# total maximum Energy Shield"),
     stats: [
-      { ref: stat("# to maximum Energy Shield") }, // global
+      { ref: stat("# to maximum Energy Shield") }, // The global stat, not the local one of armour
     ],
   },
   {
@@ -373,7 +373,6 @@ export function filterPseudo(ctx: FiltersCreationContext) {
       const info = RESISTANCES_INFO.find(
         (info) => info.ref === source.stat.stat.ref,
       );
-      // shouldn't skip any
       if (!info) continue;
 
       if (info.elements.length === 3) {
@@ -406,7 +405,6 @@ export function filterPseudo(ctx: FiltersCreationContext) {
     };
 
     if (totalRoll.value === 0) {
-      // dont even bother if have none
       ctx.filters = ctx.filters.filter((f) => f !== filter);
       return;
     }

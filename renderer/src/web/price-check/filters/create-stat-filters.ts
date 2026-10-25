@@ -50,8 +50,6 @@ export function createExactStatFilters(
     item.rarity === ItemRarity.Unique &&
     !item.isSynthesised
   ) {
-    // want implicit here
-
     return statsByType
       .filter((mod) => mod.type === ModifierType.Implicit)
       .map((mod) => calculatedStatToFilter(mod, searchInRange, item))
@@ -104,7 +102,7 @@ export function createExactStatFilters(
     statsByType: statsByType.filter((calc) => keepByType.includes(calc.type)),
   };
 
-  // want to get "uses remaining" pseudo for tablets
+  // A tablet's "# uses remaining" filter comes from filterPseudo
   if (item.category === ItemCategory.Tablet) {
     filterPseudo(ctx);
   }
@@ -116,14 +114,12 @@ export function createExactStatFilters(
   );
 
   for (const filter of ctx.filters) {
-    // show all mods for exact
     filter.hidden = undefined;
 
-    // skip these
+    // Left off: a tablet's implicits, and the explicit filters of a fractured item, which
+    // searches its fractured modifiers instead
     if (
-      // Should select only fractured explicit
       (ctx.item.isFractured && filter.tag === FilterTag.Explicit) ||
-      // Dont show implicit for tablets
       (item.category === ItemCategory.Tablet &&
         filter.tag === FilterTag.Implicit)
     ) {
@@ -148,8 +144,7 @@ export function createExactStatFilters(
     }
   }
 
-  // fractured but no mods are actually fractured
-  // game bug associated with this is fixed, nearly no cost to keeping this though
+  // Older game versions copied a fractured item without marking its fractured modifier
   if (
     ctx.item.isFractured &&
     !ctx.filters.some((f) => f.tag === FilterTag.Fractured)
@@ -235,7 +230,8 @@ export function initUiModFilters(
 
   if (item.info.refName !== "Split Personality") {
     filterItemProp(ctx);
-    // TODO: see if there are other options here, don't want to include trade site uniques with random augments
+    // No pseudo filters for a unique that can have sockets, since the trade site's totals
+    // also count the augments of each listed unique
     if (item.rarity !== ItemRarity.Unique || !getMaxSockets(item)) {
       filterPseudo(ctx);
     }
@@ -248,7 +244,8 @@ export function initUiModFilters(
         mod.type !== ModifierType.Desecrated &&
         mod.type !== ModifierType.Crafted,
     );
-    // since sources are merged, need to filter out the explicit ones here and
+    // The sources of a stat can come from several modifier types, so each of these keeps
+    // only the sources of its own type
     const statsWithAllSources = item.statsByType.filter(
       (mod) =>
         mod.type === ModifierType.Fractured ||
@@ -264,7 +261,6 @@ export function initUiModFilters(
         sources: filteredSources,
       };
     });
-    // since filtered now, below calcStatToFilter should only include the correct rolls for special ones
     ctx.statsByType.push(...statsFilteredSources);
   }
 
@@ -300,7 +296,7 @@ export function shortRollToFilter(
   percent: number,
   item: ParsedItem,
 ): StatFilterRoll {
-  // NOTE: assuming no dp since currently only for ele rolls
+  // Only the elemental damage filters call this: their rolls have no decimals and are not negated
   const dp = false;
   const filterBounds = {
     min: percentRoll(roll.min, -0, Math.floor, dp),
@@ -324,12 +320,10 @@ export function shortRollToFilter(
         ? filterBounds
         : undefined,
     dp,
-    // NOTE: currently only for ele rolls so we know it's not negated
     isNegated: false,
     tradeInvert: false,
   };
-  // NOTE: currently only for ele rolls so we know better is 1
-  filterFillMinMax(filterRoll, 1);
+  filterFillMinMax(filterRoll, StatBetter.PositiveRoll);
   return filterRoll;
 }
 
@@ -416,7 +410,7 @@ export function calculatedStatToFilter(
         CLIENT_STRINGS.VEILED_MODS.includes(s.modifier.info.name!),
       )
     ) {
-      // can't drop from ground, so don't show
+      // A veiled modifier keeps its tag
     } else if (
       sources.some((s) =>
         CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!),
@@ -668,7 +662,6 @@ export function finalFilterTweaks(ctx: FiltersCreationContext) {
         (mod) => mod.stat.ref === filter.statRef,
       )!;
       if (mod.stat.trade.ids?.[ModifierType.Explicit]) {
-        // hide only if fractured or desecrated mod has corresponding explicit variant
         filter.hidden = "filters.hide_for_crafting";
       }
     } else if (filter.tag === FilterTag.Skill && filter.roll) {
@@ -687,7 +680,7 @@ export function finalFilterTweaks(ctx: FiltersCreationContext) {
       }
     }
     if (ctx.item.category === ItemCategory.Tablet) {
-      // never hide uses remaining on tablets, even unique ones
+      // Shown even on a unique tablet, whose fixed rolls are hidden
       if (filter.statRef === "# uses remaining") {
         filter.hidden = undefined;
       }
@@ -747,13 +740,10 @@ function applyClusterJewelRules(filters: StatFilter[]) {
     if (filter.statRef === "Adds # Passive Skills") {
       filter.disabled = false;
 
-      // 4 is [_, 5]
       if (filter.roll!.value === 4) {
         filter.roll!.max = 5;
-        // 5 is [5, 5]
       } else if (filter.roll!.value === 5) {
         filter.roll!.min = filter.roll!.default.min;
-        // 3, 6, 10, 11, 12 are [n, _]
       } else if (
         filter.roll!.value === 3 ||
         filter.roll!.value === 6 ||
@@ -764,7 +754,7 @@ function applyClusterJewelRules(filters: StatFilter[]) {
         filter.roll!.min = filter.roll!.default.min;
         filter.roll!.max = undefined;
       }
-      // else 2, 8, 9 are [_ , n]
+      // Other values keep the range that calculatedStatToFilter set
     }
   }
 }
@@ -784,10 +774,8 @@ function hideAllAugments(filters: StatFilter[]) {
       filter.tag === FilterTag.Augment ||
       filter.tag === FilterTag.AddedAugment
     ) {
-      // disable all
       filter.disabled = true;
 
-      // don't hide some specific ones
       if (
         filter.statRef ===
         "Destroys all Augment Sockets on the item to create a Jewel Socket"
@@ -795,7 +783,6 @@ function hideAllAugments(filters: StatFilter[]) {
         continue;
       }
 
-      // hide rest
       filter.hidden = "filters.hide_const_roll";
     }
   }

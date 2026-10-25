@@ -70,7 +70,6 @@
           :filter="filters.quality"
           :name="t('item.quality')"
         />
-        <!-- Implicitly should only be tier or plain unid from create-item-filters -->
         <filter-btn-numeric
           v-if="filters.unidentifiedTier"
           :filter="filters.unidentifiedTier"
@@ -156,7 +155,6 @@
         </popover>
       </div>
     </div>
-    <!-- Handled parse error -->
     <div
       v-if="!statsVisibility.disabled && hasStats"
       class="mb-4"
@@ -337,7 +335,7 @@ export default defineComponent({
 
     const showItemEditor = computed(() => {
       if (!itemIsModifiable(props.item)) {
-        // can still change socketed items on non-modifiable items
+        // A non-modifiable item can still change the augments in its sockets
         return (props.item.augmentSockets?.augments.length ?? 0) > 0
           ? getItemEditorType(props.item)
           : ItemEditorType.None;
@@ -388,13 +386,10 @@ export default defineComponent({
       }),
       showMissingFracturedWarning: computed(() => {
         return (
-          // is fractured
           props.item.isFractured &&
-          // on base item preset
           props.presets.some(
             (p) => p.id === "filters.preset_base_item" && p.active,
           ) &&
-          // but item itself has no fractured mods
           !props.item.statsByType.some(
             (calc) => calc.type === ModifierType.Fractured,
           )

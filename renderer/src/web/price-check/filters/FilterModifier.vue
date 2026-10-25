@@ -298,7 +298,7 @@ export default defineComponent({
     });
 
     const inputMin = computed({
-      // this can be undefined
+      // Returns undefined when the roll has no minimum
       get(): number | "" {
         return props.filter.roll!.min!;
       },
@@ -307,7 +307,7 @@ export default defineComponent({
       },
     });
     const inputMax = computed({
-      // this can be undefined
+      // Returns undefined when the roll has no maximum
       get(): number | "" {
         return props.filter.roll!.max!;
       },
@@ -330,7 +330,6 @@ export default defineComponent({
       inputMin,
       inputMax,
       tag: computed(() => props.filter.tag),
-      // TODO: change
       changeStep: computed(() => (props.filter.roll!.dp ? 0.01 : 1)),
       showInputs: computed(
         () => props.filter.roll != null && !props.filter.oils,

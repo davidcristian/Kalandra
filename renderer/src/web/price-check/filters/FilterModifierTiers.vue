@@ -61,7 +61,6 @@ export default defineComponent({
           else if (alwaysShowTier.value)
             out.push({ type: "tier-3-plus", tier });
         } else if (tier >= 2) {
-          // fractured, explicit-* filters
           out.push({ type: "not-tier-1", tier });
         }
       }

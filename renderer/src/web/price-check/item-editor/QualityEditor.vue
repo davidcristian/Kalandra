@@ -20,7 +20,6 @@
         </div>
       </div>
       <div class="flex items-center gap-x-1">
-        <!-- price of augments -->
         <item-quick-price
           :item-img="selectedCatalyst?.icon"
           :show-img="selectedCatalyst !== undefined"

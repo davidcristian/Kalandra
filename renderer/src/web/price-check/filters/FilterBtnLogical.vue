@@ -22,7 +22,7 @@ import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   filter: {
-    type: Object as PropType<{ disabled: boolean }>, // will be mutated directly, instead of emit
+    type: Object as PropType<{ disabled: boolean }>, // The button changes it instead of emitting an event
     required: true,
   },
   text: { type: String, required: true },

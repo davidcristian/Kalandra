@@ -52,7 +52,6 @@ export function applyCatalyst(
   catalyst: BaseType,
   quality: number,
 ) {
-  // deep copy
   const oldItem = JSON.parse(JSON.stringify(item)) as ParsedItem;
 
   if (item.qualityType) {

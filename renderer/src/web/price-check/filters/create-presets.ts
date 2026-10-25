@@ -60,7 +60,6 @@ export function createPresets(
     return createUniquePresets(item, opts);
   }
 
-  // TODO: pseudo change here
   const pseudoPreset: FilterPreset = {
     id: "filters.preset_pseudo",
     filters: createFilters(item, { ...opts, exact: false }),

@@ -49,7 +49,7 @@ export default defineComponent({
       if (!filter.additionalInfo?.elementalInfo) return;
       const selectedRoll =
         filter.additionalInfo.elementalInfo[INTERNAL_TRADE_IDS[12 + value]];
-      // User is telling us they only want to block other elemental types
+      // A right click only leaves out the other elements, so the roll has no range
       selectedRoll.min = "";
       selectedRoll.max = "";
       filter.roll = selectedRoll;

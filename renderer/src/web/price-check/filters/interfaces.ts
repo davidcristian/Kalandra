@@ -93,8 +93,8 @@ export interface FilterNumeric {
 
 export interface StatFilterRoll {
   value: number;
-  min: number | "" | undefined; // NOTE: mutable in UI
-  max: number | "" | undefined; // NOTE: mutable in UI
+  min: number | "" | undefined; // The filter UI changes it
+  max: number | "" | undefined; // The filter UI changes it
   default: { min: number; max: number };
   bounds?: { min: number; max: number };
   tradeInvert?: boolean;
@@ -111,10 +111,10 @@ export interface StatFilter {
   sources: StatCalculated["sources"];
   roll?: StatFilterRoll;
   option?: {
-    value: number; // NOTE: mutable in UI
+    value: number; // The filter UI changes it
   };
   hidden?: string;
-  disabled: boolean; // NOTE: mutable in UI
+  disabled: boolean; // The filter UI changes it
   additionalInfo?: {
     elementalInfo?: {
       [key: string]: StatFilterRoll;
@@ -125,7 +125,6 @@ export interface StatFilter {
 }
 
 export const _INTERNAL_TRADE_IDS = [
-  // #region DO NOT ADD OR REMOVE
   "item.base_percentile",
   "item.armour",
   "item.evasion_rating",
@@ -138,13 +137,12 @@ export const _INTERNAL_TRADE_IDS = [
   "item.aps",
   "item.has_empty_modifier",
   "item.spirit",
-  // #endregion DO NOT ADD OR REMOVE
-  // KEEP AS 12 number, maybe fix this to be better later
+  // FilterModifierItemIsElemental.vue reads these four as entries 12 to 15, so the list above
+  // keeps exactly 12 ids and these four keep their order
   "item.has_elemental_affix",
   "item.has_elemental_fire_affix",
   "item.has_elemental_cold_affix",
   "item.has_elemental_lightning_affix",
-  // KEEP above in order and as 12-15
   "item.reload_time",
   "item.rarity_magic",
   "item.map_revives",

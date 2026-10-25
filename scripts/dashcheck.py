@@ -29,7 +29,6 @@ EXEMPTIONS = {
     "renderer/specs/Parser/sectionUnit.test.ts": "item text copied from the game",
     "renderer/specs/web/FullCampaign.txt": "client log lines copied from the game",
     "renderer/specs/web/client-log.test.ts": "client log lines copied from the game",
-    "renderer/src/web/price-check/filters/create-unique-filters.ts": "a comment quotes copied item text",
 }
 
 
