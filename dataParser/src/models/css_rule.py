@@ -43,6 +43,10 @@ class CssRule:
                 my_hashes.append(row["hash"])  # pyright: ignore[reportUnknownArgumentType]
                 logger.debug(f"Matched {row['ref']}[{row['hash']}]")
 
+        if not my_hashes:
+            logger.warning(f"The css rule {self.name!r} matches no stat")
+            return f"/* {self.name}: matches no stat */"
+
         out: list[str] = [f"/* {self.name} */"]
         # all but last
         for hash in my_hashes[:-1]:

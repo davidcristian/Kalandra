@@ -28,9 +28,10 @@ languages in no fixed order, and each language overwrites `output/<lang>/stats.n
 `client_strings.js`. Each build logs `Building <lang>: <n>/9` between two lines of `=` signs.
 
 `src/create-styles.py` is a second command. It builds three CSS user styles for the trade site (`tagOnly`,
-`tagOnlyCompact` and `kvanRules`). It writes each one to `output/css/` and then copies it to
-`../gist-trade-highlight/`. This repo has no such folder, so the first copy fails and ends the run before the other two
-styles are written. The app does not read these styles.
+`tagOnlyCompact` and `kvanRules`). A rule that matches no stat writes only a comment with its name and logs a
+warning. It writes each style to `output/css/` and then copies it to `../gist-trade-highlight/`. This repo has no
+such folder, so the first copy fails and ends the run before the other two styles are written. The app does not read
+these styles.
 
 ## Inputs
 
