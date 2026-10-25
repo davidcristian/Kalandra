@@ -213,6 +213,8 @@ unique rolls, the fixed stats of a unique, negated stats and the values that the
 filter tag and trade category. `shown-filters.test.ts` there checks that turning each filter button on or off
 changes the body of `createTradeRequest`, so `createFilters` returns no filter that the search does not send.
 `null-trade-ids.test.ts` there makes the stat filters of the stats whose trade ids are `null` in `stats.ndjson`.
+`mageblood.test.ts` there makes the Mageblood preset of `create-unique-filters.ts` for belts with one to four
+Legacy kinds, and checks the Duplicates filter and the count of Legacy rolls that `createTradeRequest` sends.
 `specs/web/price-check/item-editor/` checks which editor `getItemEditorType` opens for real copied items, the
 catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
