@@ -5,6 +5,7 @@ Retrieves all data that is sourced from the trade site
 import json
 import logging
 import os
+from typing import TypeGuard
 
 import cloudscraper
 from cloudscraper.exceptions import CloudflareException
@@ -23,9 +24,7 @@ USER_AGENT_PRODUCT = (
 
 def create_trade_session() -> cloudscraper.CloudScraper:
     """Returns a cloudscraper session whose User-Agent also names this tool."""
-    session: cloudscraper.CloudScraper = cloudscraper.create_scraper(  # pyright:ignore [reportAny]
-        interpreter="nodejs"
-    )
+    session = cloudscraper.create_scraper(interpreter="nodejs")
     # Keeps cloudscraper's browser User-Agent for Cloudflare and adds the tool's name,
     # as the app's Electron User-Agent adds the app's name
     session.headers["User-Agent"] = (
@@ -38,17 +37,28 @@ class TradeDataError(ValueError):
     """Raised when a trade data response is not the JSON the build reads."""
 
 
+def is_json_object(value: object) -> TypeGuard[dict[str, object]]:
+    """Returns whether a parsed JSON value is an object, whose keys are strings."""
+    return isinstance(value, dict)
+
+
+def is_json_array(value: object) -> TypeGuard[list[object]]:
+    """Returns whether a parsed JSON value is an array."""
+    return isinstance(value, list)
+
+
 def sorted_stats_group(group: object) -> dict[str, object]:
     """Returns a group of the stats response with its entries sorted by id."""
-    if not isinstance(group, dict) or "id" not in group or "label" not in group:
+    if not is_json_object(group) or "id" not in group or "label" not in group:
         raise TradeDataError("a stats group has no id or label")
     entries = group.get("entries")
-    if not isinstance(entries, list):
+    if not is_json_array(entries):
         raise TradeDataError(f"the stats group {group['id']!r} has no entries list")
-    if not all(isinstance(entry, dict) and "id" in entry for entry in entries):
+    objects = [entry for entry in entries if is_json_object(entry) and "id" in entry]
+    if len(objects) != len(entries):
         raise TradeDataError(f"an entry of the stats group {group['id']!r} has no id")
     return {
-        "entries": sorted(entries, key=lambda entry: str(entry["id"])),
+        "entries": sorted(objects, key=lambda entry: str(entry["id"])),
         "id": group["id"],
         "label": group["label"],
     }
@@ -56,11 +66,12 @@ def sorted_stats_group(group: object) -> dict[str, object]:
 
 def saved_form(filename: str, data: object) -> object:
     """Checks a trade data response and returns it as it is saved, with the stats sorted."""
-    if not isinstance(data, dict) or not isinstance(data.get("result"), list):
+    result = data.get("result") if is_json_object(data) else None
+    if not is_json_array(result):
         raise TradeDataError("the response has no result list")
     if filename != "stats":
         return data
-    return {"result": [sorted_stats_group(group) for group in data["result"]]}
+    return {"result": [sorted_stats_group(group) for group in result]}
 
 
 def write_atomically(path: str, text: str) -> None:
@@ -77,7 +88,7 @@ class TradeApiProvider:
         lang: LANG,
         pacer: RequestPacer | None = None,
         output_dir: str | None = None,
-    ):
+    ) -> None:
         self.lang: LANG = lang
         self.pacer: RequestPacer = pacer or RequestPacer(create_trade_session())
         self.output_dir: str = output_dir or os.path.join(

@@ -4,7 +4,7 @@ from murmurhash2 import murmurhash2
 
 
 class HashComputer:
-    def __init__(self, salt1: int = 0xC58F1A7B, salt2: int = 0x02312233):
+    def __init__(self, salt1: int = 0xC58F1A7B, salt2: int = 0x02312233) -> None:
         self.salt1: int = salt1
         self.salt2: int = salt2
 

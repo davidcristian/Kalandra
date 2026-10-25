@@ -15,7 +15,7 @@ class GameStore:
     lang: LANG
     data_dir: str
 
-    def __init__(self, lang: LANG):
+    def __init__(self, lang: LANG) -> None:
         self.lang = lang
         self.data_dir = os.path.join(
             os.path.dirname(__file__),
@@ -24,7 +24,7 @@ class GameStore:
         )
 
     def get(self, tableFileName: GAME_API_TABLES_TYPE) -> pd.DataFrame:
-        return pd.read_json(os.path.join(self.data_dir, tableFileName))  # pyright:ignore [reportUnknownMemberType]
+        return pd.read_json(os.path.join(self.data_dir, tableFileName))
 
     def get_description(
         self, tableFileName: STAT_DESCRIPTION_FILES_TYPE

@@ -31,7 +31,7 @@ class Description:
     pattern_no_closing: Pattern[str] = re.compile(r"\[([^\|\]]*?)\|([^\]\[]+)")
     pattern_missing_left: Pattern[str] = re.compile(r"\|\s*([^\]]+)\]")
 
-    def __init__(self, lang: LANG, filename: STAT_DESCRIPTION_FILES_TYPE):
+    def __init__(self, lang: LANG, filename: STAT_DESCRIPTION_FILES_TYPE) -> None:
         self.lang: LANG = lang
 
         self.data_dir: str = os.path.join(
@@ -43,7 +43,7 @@ class Description:
         self.data: list[str] | None = None
         self.hc: HashComputer = HashComputer()
 
-    def load(self):
+    def load(self) -> None:
         with open(
             os.path.join(self.data_dir, self.filename), "r", encoding="utf-16"
         ) as f:

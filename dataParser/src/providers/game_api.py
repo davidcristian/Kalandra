@@ -9,12 +9,12 @@ EXPORT_COMMAND = "pathofexile-dat"
 
 
 class GameDataProvider:
-    def __init__(self):
+    def __init__(self) -> None:
         self.vendor_dir: str = os.path.join(
             os.path.dirname(__file__), "../../data/vendor"
         )
 
-    def run_export(self):
+    def run_export(self) -> None:
         # shutil.which also finds a .cmd file on Windows, so the command runs without a shell
         command = shutil.which(EXPORT_COMMAND)
         if command is None:
