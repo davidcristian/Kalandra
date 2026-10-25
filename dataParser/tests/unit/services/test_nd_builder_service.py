@@ -796,6 +796,41 @@ def test_group_trade_stats_still_rejects_an_unknown_type():
         service.group_trade_stats(df)
 
 
+NOTABLE_SPIRIT = "Notable Passive Skills in Radius also grant # to Spirit"
+SMALL_DAMAGE = "Small Passive Skills in Radius also grant #% increased Damage"
+
+
+def test_set_timeless_matchers_sets_the_radius_stats_to_their_trade_text():
+    service = NdBuilderService("ru", "noLookup")
+    service.local_lookup = {
+        NOTABLE_SPIRIT: "Notable spirit text",
+        SMALL_DAMAGE: "Small damage text",
+    }
+    mana_matchers = [{"string": "# to maximum Mana"}]
+    df = pd.DataFrame(
+        [
+            {"ref": NOTABLE_SPIRIT, "id": None, "matchers": [], "dp": None},
+            {"ref": SMALL_DAMAGE, "id": None, "matchers": [], "dp": None},
+            {
+                "ref": "# to maximum Mana",
+                "id": "base_maximum_mana",
+                "matchers": mana_matchers,
+                "dp": None,
+            },
+        ]
+    )
+
+    result = service.set_timeless_matchers(df)
+
+    assert result["matchers"].tolist() == [
+        [{"string": "Notable spirit text"}],
+        [{"string": "Small damage text"}],
+        mana_matchers,
+    ]
+    pd.testing.assert_series_equal(result["id"], df["id"])
+    assert df["matchers"].tolist()[0] == []
+
+
 def test_value_trade_stats_df_extracts_values_and_hashes():
     service = NdBuilderService("ru", "new")
     service.stats_combined_df = MagicMock(

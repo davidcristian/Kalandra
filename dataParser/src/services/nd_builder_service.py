@@ -69,12 +69,7 @@ class NdBuilderService:
         logger.info("Joining trade site and descriptions")
         joined_df = self.join_trade_and_descriptions(valueless_trade_stats_df, desc_df)
 
-        matcher_deduped = self.dedupe_matchers(joined_df)
-
-        timeless_mask = matcher_deduped["ref"].str.startswith(("Small", "Notable"))
-        matcher_deduped.loc[timeless_mask] = matcher_deduped.loc[timeless_mask].apply(
-            self.timeless_function, axis=1
-        )
+        matcher_deduped = self.set_timeless_matchers(self.dedupe_matchers(joined_df))
 
         logger.info("Joining stats with and without values")
         concated = pd.concat([matcher_deduped, value_trade_stats_df]).sort_values("ref")
@@ -284,14 +279,19 @@ class NdBuilderService:
         value = self.value_trade_stats_df()
         return self.vc.convert_value_stats_to_trade(value)
 
-    def timeless_function(self, row: pd.Series) -> pd.Series:
+    def set_timeless_matchers(self, in_df: pd.DataFrame) -> pd.DataFrame:
         if self.local_lookup is None:
             raise ValueError("Local lookup is not set")
 
-        ref = row["ref"]
-        matchers = {"string": self.local_lookup[ref]}
-        row["matchers"] = [matchers]
-        return row
+        out_df = in_df.copy()
+        is_timeless = out_df["ref"].str.startswith(("Small", "Notable"))
+        out_df["matchers"] = [
+            [{"string": self.local_lookup[ref]}] if timeless else matchers
+            for ref, matchers, timeless in zip(
+                out_df["ref"], out_df["matchers"], is_timeless
+            )
+        ]
+        return out_df
 
     def build_items_ndjson(self) -> pd.DataFrame:
         logger.info("Building items")
