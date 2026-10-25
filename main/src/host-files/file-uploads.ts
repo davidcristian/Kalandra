@@ -20,6 +20,8 @@ const IMAGE_EXTENSIONS = new Set([
   ".webp",
 ]);
 
+const MAX_UPLOAD_BYTES = 16_000_000;
+
 export function addFileUploadRoutes(routes: HttpRoutes, logger: Logger) {
   const uploadsPath = path.join(app.getPath("userData"), "apt-data", "files");
 
@@ -40,14 +42,17 @@ export function addFileUploadRoutes(routes: HttpRoutes, logger: Logger) {
       return;
     }
 
-    let contents = Buffer.alloc(0);
-    req.on("data", (chunk) => {
-      if (contents.length > 16_000_000) {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    req.on("data", (chunk: Buffer) => {
+      size += chunk.length;
+      if (size > MAX_UPLOAD_BYTES) {
         return req.destroy();
       }
-      contents = Buffer.concat([contents, chunk]);
+      chunks.push(chunk);
     });
     req.once("end", () => {
+      const contents = Buffer.concat(chunks);
       const hash = crypto.createHash("md5").update(contents).digest("hex");
       const filename = `${hash}${extension}`;
 

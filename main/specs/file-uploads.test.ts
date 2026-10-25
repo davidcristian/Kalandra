@@ -37,6 +37,8 @@ const events = new FakeServer();
 const logger = new Logger(events);
 let port = 0;
 
+const MAX_UPLOAD_BYTES = 16_000_000;
+
 const md5 = (text: string) =>
   crypto.createHash("md5").update(text).digest("hex");
 
@@ -90,6 +92,22 @@ describe("POST /uploads/<name>", () => {
       );
     },
   );
+
+  it("stores an image of 16,000,000 bytes", async () => {
+    const image = "a".repeat(MAX_UPLOAD_BYTES);
+    const reply = await post(port, "/uploads/large.png", image);
+
+    const name = `${md5(image)}.png`;
+    expect(reply).toEqual({ status: 200, body: JSON.stringify({ name }) });
+    expect(fs.statSync(path.join(uploads, name)).size).toBe(MAX_UPLOAD_BYTES);
+  });
+
+  it("closes the connection of a larger image and stores nothing", async () => {
+    const image = "a".repeat(MAX_UPLOAD_BYTES + 1);
+
+    await expect(post(port, "/uploads/large.png", image)).rejects.toThrow();
+    expect(fs.existsSync(uploads)).toBe(false);
+  });
 
   it("returns 500 and logs the error when the file cannot be written", async () => {
     fs.mkdirSync(path.dirname(uploads), { recursive: true });

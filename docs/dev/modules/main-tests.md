@@ -55,8 +55,8 @@ replaces it with `vi.mock("electron", ...)`.
 
 ## host-files/
 
-- `file-uploads.test.ts` posts images and other files to the `/uploads/` routes, and an image while a file holds the
-  place of the uploads folder.
+- `file-uploads.test.ts` posts images and other files to the `/uploads/` routes, images of 16,000,000 bytes and one
+  byte more, and an image while a file holds the place of the uploads folder.
 - `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
   write or fail the rename as Windows does for a file another program has open.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary

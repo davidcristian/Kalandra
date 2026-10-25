@@ -155,8 +155,9 @@ The entry, the server and the app services, in `main/src/`:
 - `ConfigStore.ts`: `ConfigStore` reads and writes `apt-data/config.json` ([config.md](config.md)).
 - `file-uploads.ts`: `addFileUploadRoutes(routes, logger)` adds the `/uploads/` routes, which store files in
   `apt-data/files/`. `POST` stores only a file whose URL path ends in an image extension that Chromium shows in an
-  `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. A failed
-  write returns 500 and logs `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
+  `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. It closes
+  the connection of a body over 16,000,000 bytes and stores nothing. A failed write returns 500 and logs
+  `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
   `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on
