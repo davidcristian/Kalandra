@@ -124,8 +124,11 @@ hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-pri
 [config.md](config.md)); the `IpcEvent` messages in `ipc/types.ts` ([ipc.md](ipc.md)); the background state in
 `web/background/` and `web/client-log/`.
 
-**Tests.** `npx vitest run` in `renderer/`. No test covers the registry, `OverlayWindow.vue` or `Widget.vue`, and
-coverage counts only the `.ts` files of `src/` (`coverage.include` in `vitest.config.ts`). Widget logic outside components is tested in
+**Tests.** `npx vitest run` in `renderer/`. No test covers `OverlayWindow.vue` or `Widget.vue`, and coverage
+counts only the `.ts` files of `src/` (`coverage.include` in `vitest.config.ts`). `specs/web/widget-registry.test.ts`
+loads every widget component and checks the registered types and the invariants above on the widgets of
+`defaultConfig()`: one entry per single widget, a registered component and valid `Widget` fields for each, the
+menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`), `specs/web/library/libraryChaos.test.ts`
 (`library/widget.ts`), `specs/web/library/session.test.ts` (`library/session.ts`, which keeps a session inactive
 until main opens its file), `specs/web/client-log.test.ts` (the player and area levels the XP tracker reads, with

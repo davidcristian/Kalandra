@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** config
 **Origin:** [renderer/specs/vitest.setup.ts](../../../../renderer/specs/vitest.setup.ts)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-25
 
 `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test file:
 `vi.mock("@/web/Config", ...)` returns only `AppConfig` and `TipsFrequency`, and `AppConfig` reads
@@ -29,3 +29,6 @@ defaults at older commits, found with `git log -p -- renderer/src/web/Config.ts`
 - 2026-10-21: The hotkey list moved from `getConfigForHost()` to `shortcutActions()` in
   `renderer/src/web/shortcut-actions.ts`, which `renderer/specs/web/shortcut-actions.test.ts` checks. The
   other `HostConfig` fields, `defaultConfig()` and `upgradeConfig()` still have no test.
+- 2026-10-25: `renderer/vitest.config.ts` adds the Vue plugin, so a test can load the real `Config.ts`
+  and the widget registry. `renderer/specs/web/widget-registry.test.ts` checks the widgets of
+  `defaultConfig()`. `upgradeConfig()`, `getConfigForHost()` and the other defaults still have no test.

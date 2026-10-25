@@ -163,7 +163,7 @@ runtime. It reads the trade site lists through the proxy with `useTradeData()` f
 ([renderer-price-check.md](renderer-price-check.md), [080](../refinements/tasks/080-data-loader-imports-trade-data.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
-the floor in `renderer/vitest.config.ts` (71.0% of the lines of the `.ts` files in `src/` on 25 Oct 2026). The parser
+the floor in `renderer/vitest.config.ts` (71.9% of the lines of the `.ts` files in `src/` on 25 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
 has the text and the expected fields) and `specs/Parser/mods.ts`. `specs/Parser/whole-item.test.ts` parses whole
 items, such as fractured, unidentified and corrupted ones, and compares their properties, modifier counts and runes
@@ -173,5 +173,6 @@ with their `TestItem`. The suites in `specs/data/` cover the loader and its look
 with a mock config, connects the parser settings to it, and replaces `Host` with a mock whose `proxy` returns the
 trade site's `data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no
 test reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
-and makes `fetch` read files from `renderer/public/`. A parser fix adds the copied item text as a case (AGENTS.md,
-rule 5).
+and makes `fetch` read files from `renderer/public/`. `vitest.config.ts` adds the Vue plugin, so a test can import
+a `.vue` component, and keeps a template URL such as `/images/divine.png` a string. A parser fix adds the copied
+item text as a case (AGENTS.md, rule 5).

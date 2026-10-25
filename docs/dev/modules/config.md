@@ -119,9 +119,11 @@ the `Logger` from `main/src/RemoteLogger.ts`.
 
 **Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()`
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
-the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it. No test runs
-`defaultConfig()`, `upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against
-the steps before it and against the type. `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
+the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it.
+`renderer/specs/web/widget-registry.test.ts` loads the real module with `vi.importActual`, checks the widgets of
+`defaultConfig()` and checks that the mock has each top-level field of `defaultConfig()`. No test runs
+`upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against the steps before it
+and against the type. `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`. `main/specs/ConfigStore.test.ts` checks
