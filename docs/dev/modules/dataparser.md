@@ -142,10 +142,12 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 tests the constants, models, providers, services and stores one module at a time. Its provider tests run a fake
 export command, the trade site tests use the fake session and clock in `tests/fake_http.py`, and its description
 tests read the sample files in `tests/data/cases/`.
-`tests/integration/` reads real files. `tests/test_main.py` runs `main()` end to end with `push`, checks the files
-it writes and copies, and tests the `--pull` step with a fake export and the fake session. Every test writes to a
-temporary folder: `main()` takes the output folder and `ImageProvider` the cache folder, and `NdBuilderService`
-opens the image cache only when it applies the icons. The hooks in
+`tests/integration/` reads real files. `test_game_store_i.py` fails when parsed game text keeps markup such as `[`
+or `|` for an id outside `BROKEN_GAME_TEXT`, the ids whose game text is broken, or when one of those ids is fixed,
+so a game patch that changes either updates that set. `tests/test_main.py` runs `main()` end to end with `push`,
+checks the files it writes and copies, and tests the `--pull` step with a fake export and the fake session. Every
+test writes to a temporary folder: `main()` takes the output folder and `ImageProvider` the cache folder, and
+`NdBuilderService` opens the image cache only when it applies the icons. The hooks in
 `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`, and the
 pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions and no
 `log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root.

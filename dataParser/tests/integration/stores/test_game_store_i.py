@@ -3,114 +3,69 @@ import re
 import pytest
 
 from constants.filenames import GAME_API_TABLES, STAT_DESCRIPTION_FILES
-from constants.lang import LANGUAGES
+from constants.lang import LANG, LANGUAGES
 from stores.game_store import GameStore
 
+MARKUP = re.compile(r"[\[\]\|\{\}]")
 
-@pytest.mark.parametrize("lang", LANGUAGES)
-def test_game_store_get_description(lang):
+# Ids whose game text in that language has markup the parser cannot read, such as
+# "[Rarity||raros]", "[Split|Divisent|" or "{0]%". A game patch can fix or break more.
+BROKEN_GAME_TEXT: dict[LANG, set[str]] = {
+    "cmn-Hant": {
+        "empower_barrage_damage_-%_final_with_repeated_projectiles",
+        "map_expedition_monster_spawn_additional_missing_life_%",
+    },
+    "de": {"temporal_chains_gem_level_+"},
+    "fr": {
+        "allies_in_font_of_blood_radius_leech_%_of_my_physical_damage_as_life",
+        "allies_in_font_of_mana_radius_leech_%_of_my_physical_damage_as_mana",
+        "base_cannot_be_ignited",
+        "cannot_be_poisoned",
+        "expedition_elite_%_to_drop_rare_jewellery",
+        "instilling_all_damage_%_to_gain_as_instilling_type",
+        "modifiers_to_number_of_projectiles_instead_apply_to_splitting",
+        "projectile_number_to_split",
+    },
+    "ja": {
+        "map_ritual_contains_defiance_of_destiny",
+        "remove_all_damaging_ailments_on_warcry",
+        "skill_empowers_next_x_melee_attacks",
+    },
+    "ko": {"from_league_item_quantity_+%_permyriad"},
+    "pt": {
+        "map_dropped_waystones_are_rare_and_corrupted_chance_%",
+        "map_expedition_rare_monsters_+%",
+        "map_strongboxes_have_%_chance_to_be_rare_corrupted_max_mods",
+    },
+    "ru": {
+        "base_skill_seal_gain_interval_ms",
+        "brequel_reward_anaemia_crafted_modifier_chance_%",
+        "buff_effect_on_self_+%",
+        "cast_when_stunned_gain_X_centienergy_when_stunned",
+        "expedition_elite_%_to_drop_rare_jewellery",
+        "local_display_supported_by_level_x_awakened_weapon_elemental_damage",
+        "stun_threshold_+_per_10_maximum_ward",
+    },
+}
+
+
+def keeps_markup(text: str) -> bool:
+    if "<nemesismod>" in text or "<enchanted>" in text or "<附魔>" in text:
+        text = re.sub(r"\{\{.*?\}\}", "", text)
+    return bool(MARKUP.search(text)) and "{0%}" not in text
+
+
+@pytest.mark.parametrize("lang", sorted(LANGUAGES))
+def test_get_description_keeps_markup_only_in_the_known_broken_game_text(lang: LANG):
     store = GameStore(lang)
-    forbidden_re = re.compile(r"[\[\]\|\{\}]")
+    broken: set[str] = set()
 
     for filename in STAT_DESCRIPTION_FILES:
         df = store.get_description(filename)
 
         for _, row in df.iterrows():
-            for matcher in row["matchers"]:
-                text: str = matcher["string"]
-                id_ = row.get("id", None)
-
-                if "<nemesismod>" in text or "<enchanted>" in text or "<附魔>" in text:
-                    clean_text = re.sub(r"\{\{.*?\}\}", "", text)
-                else:
-                    clean_text = text
-
-                if (
-                    (lang == "ko" and (id_ == "from_league_item_quantity_+%_permyriad"))
-                    or (
-                        lang == "ru"
-                        and (
-                            id_ == "expedition_elite_%_to_drop_rare_jewellery"
-                            or id_
-                            == "cast_when_stunned_gain_X_centienergy_when_stunned"
-                            or id_
-                            == "local_display_supported_by_level_x_awakened_weapon_elemental_damage"
-                            or id_ == "buff_effect_on_self_+%"
-                            or id_ == "you_and_allies_in_presence_accuracy_rating_+%"
-                            or id_ == "you_and_allies_in_presence_attack_speed_+%"
-                            or id_ == "you_and_allies_in_presence_cast_speed_+%"
-                            or id_ == "you_and_allies_in_presence_cooldown_speed_+%"
-                        )
-                    )
-                    or (
-                        lang == "es"
-                        and (
-                            id_ == "from_league_item_quantity_+%_permyriad"
-                            or id_ == "block_%_damage_taken_while_active_blocking"
-                            or id_
-                            == "skill_cost_efficiency_+%_if_consumed_power_charge_recently"
-                        )
-                    )
-                    or (
-                        lang == "ja"
-                        and (
-                            id_ == "map_betrayal_intelligence_+%"
-                            or id_
-                            == "map_betrayal_non_interrogate_options_grant_X_intelligence"
-                            or id_
-                            == "remnant_pickup_range_+%_if_you_have_at_least_100_tribute"
-                            or id_
-                            == "recover_%_life_and_mana_per_minute_for_supported_offering_lifetime"
-                        )
-                    )
-                    or (
-                        lang == "cmn-Hant"
-                        and (
-                            id_
-                            == "map_expedition_monster_spawn_additional_missing_life_%"
-                            or id_ == "base_number_of_projectiles"
-                        )
-                    )
-                    or (
-                        lang == "de"
-                        and (
-                            id_ == "temporal_chains_gem_level_+"
-                            or id_ == "tower_add_irradiated_to_X_maps"
-                        )
-                    )
-                    or (
-                        lang == "pt"
-                        and (
-                            id_
-                            == "support_advancing_assault_projectile_damage_+%_final"
-                            or id_ == "map_expedition_rare_monsters_+%"
-                            or id_
-                            == "map_dropped_waystones_are_rare_and_corrupted_chance_%"
-                        )
-                    )
-                    or (
-                        lang == "fr"
-                        and (
-                            id_ == "expedition_elite_%_to_drop_rare_jewellery"
-                            or id_
-                            == "allies_in_font_of_blood_radius_leech_%_of_my_physical_damage_as_life"
-                            or id_
-                            == "allies_in_font_of_mana_radius_leech_%_of_my_physical_damage_as_mana"
-                            or id_
-                            == "instilling_all_damage_%_to_gain_as_instilling_type"
-                            or id_ == "base_cannot_be_ignited"
-                            or id_ == "cannot_be_poisoned"
-                        )
-                    )
-                ):
-                    # assert forbidden_re.search(clean_text) or ("{0%}" in clean_text), (
-                    #     f"{filename} - [{id_}]: Translation has been fixed: {text}"
-                    # )
-                    continue
-
-                assert (not forbidden_re.search(clean_text)) ^ ("{0%}" in clean_text), (
-                    f"{filename} - [{id_}]: forbidden chars found in: {text}"
-                )
+            if any(keeps_markup(matcher["string"]) for matcher in row["matchers"]):
+                broken.add(row["id"])
 
         for val in df["matchers"]:
             for matcher in val:
@@ -118,6 +73,11 @@ def test_game_store_get_description(lang):
                     assert isinstance(matcher["value"], int), (
                         f"{filename} - values: invalid content found: {val}"
                     )
+
+    known = BROKEN_GAME_TEXT.get(lang, set())
+    assert broken == known, (
+        f"markup left in: {sorted(broken - known)}, fixed: {sorted(known - broken)}"
+    )
 
 
 @pytest.mark.parametrize("lang", LANGUAGES)
