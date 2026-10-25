@@ -174,6 +174,9 @@ and lists the skipped ones at the end of the install; `npm install-scripts ls` l
   does not need esbuild. npm skips the scripts of `vue-demi`, `unrs-resolver` and the esbuild of
   `docs/`, and the tests and builds pass without them.
 - An `overrides` entry has its reason in the module doc of its folder.
+- npm lists `postcss-selector-parser` 6.1.5 in `renderer/` as vulnerable to GHSA-rj75-hqrm-r3gf.
+  Tailwind CSS 3 depends on it through `^6`, and 6.1.5 has the fix backported from 7.1.6, but the
+  advisory names only 7.1.6 as fixed. So no override moves Tailwind CSS 3 to version 7.
 - A Vue update in `renderer/` must keep the watchers of a component in the order they are
   defined, which `CheckedItem.vue` needs
   ([renderer-price-check.md](docs/dev/modules/renderer-price-check.md)).

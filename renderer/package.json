@@ -38,7 +38,7 @@
     "@types/node": "24.x.x",
     "@types/object-hash": "^3.0.0",
     "@vitejs/plugin-vue": "^6.0.10",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.12",
     "@vue/eslint-config-standard-with-typescript": "^9.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
     "autoprefixer": "^10.0.2",
@@ -50,7 +50,7 @@
     "typescript": "5.9.x",
     "vite": "^8.3.4",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.1.11",
+    "vitest": "^4.1.12",
     "vue-tsc": "^2.0.0"
   },
   "postcss": {
