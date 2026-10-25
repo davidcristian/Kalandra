@@ -36,7 +36,7 @@ merged pull request into `master` is a push to `master`. A tag push never starts
 - Nothing is signed. `mac.identity` is `null`, and the workflow gives electron-builder no
   certificate for Windows. The download page tells users the app is unsigned.
 
-`-p onTagOrDraft` makes electron-builder (26.8.1, locked in `main/package-lock.json`) look for a
+`-p onTagOrDraft` makes electron-builder (26.18.0, locked in `main/package-lock.json`) look for a
 GitHub release whose tag is `v` plus the `version` in `main/package.json`, and upload only into a
 draft. The `npm run package` step of each `package` job logs one of three outcomes:
 
