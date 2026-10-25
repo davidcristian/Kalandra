@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ArrayClientString:
-    def __init__(self, values: Sequence[BaseClientString]):
+    def __init__(self, values: Sequence[BaseClientString]) -> None:
         if len(values) == 0:
             raise ValueError("ArrayClientString must have at least one value")
         if not all([v.my_key == values[0].my_key for v in values]):

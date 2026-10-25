@@ -28,7 +28,7 @@ class CapturePlaceholderClientString(ClientString, RegexClientString):
         trim: bool = False,
         capture_str: str = "(.*)",
         override: dict[LANG, str] | None = None,
-    ):
+    ) -> None:
         super().__init__(
             my_key,
             poe_keys,

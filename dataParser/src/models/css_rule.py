@@ -27,7 +27,7 @@ class CssRule:
         row_selector: Callable[[str, int, list[str], str], bool],
         name: str = "",
         disableSelector: str | None = None,
-    ):
+    ) -> None:
         self.css = css
         self.css_selector = css_selector
         self.row_selector = row_selector
@@ -38,9 +38,9 @@ class CssRule:
         my_hashes: list[str] = []
         logger.debug(f"Applying {self.css} to {df.shape[0]} rows")
 
-        for _, row in df.iterrows():  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
-            if self.row_selector(row["ref"], row["hash"], row["Tags"], row["id"]):  # pyright: ignore[reportUnknownArgumentType]
-                my_hashes.append(row["hash"])  # pyright: ignore[reportUnknownArgumentType]
+        for _, row in df.iterrows():
+            if self.row_selector(row["ref"], row["hash"], row["Tags"], row["id"]):
+                my_hashes.append(row["hash"])
                 logger.debug(f"Matched {row['ref']}[{row['hash']}]")
 
         if not my_hashes:
@@ -65,9 +65,9 @@ class CssRule:
         return "\n".join(out)
 
     @override
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"CssRule(name={self.name}, css={self.css}, css_selector={self.css_selector}, row_selector={self.row_selector})"
 
     @override
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

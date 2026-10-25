@@ -1,13 +1,18 @@
-# pyright: basic
-
 import copy
 from typing import Literal
 
-UNIQUE_FILTER = {"type_filters": {"filters": {"rarity": {"option": "unique"}}}}
-NONUNIQUE_FILTER = {"type_filters": {"filters": {"rarity": {"option": "nonunique"}}}}
-BASE_PAYLOAD: dict[
-    str, dict[str, dict[str, str] | list[dict[str, str | list[str]]]] | dict[str, str]
-] = {
+from models.json_value import Json
+
+type RarityFilter = dict[str, dict[str, dict[str, dict[str, str]]]]
+type SearchPayload = dict[str, dict[str, Json]]
+
+UNIQUE_FILTER: RarityFilter = {
+    "type_filters": {"filters": {"rarity": {"option": "unique"}}}
+}
+NONUNIQUE_FILTER: RarityFilter = {
+    "type_filters": {"filters": {"rarity": {"option": "nonunique"}}}
+}
+BASE_PAYLOAD: SearchPayload = {
     "query": {
         "status": {"option": "any"},
         "stats": [{"type": "and", "filters": []}],
@@ -22,7 +27,7 @@ class ItemImage:
         name: str,
         namespace: Literal["UNIQUE", "ITEM", "GEM"],
         unique: dict[str, str] | None = None,
-    ):
+    ) -> None:
         self.name = name
         self.namespace = namespace
         if namespace == "UNIQUE":
@@ -33,21 +38,21 @@ class ItemImage:
         else:
             self.base = name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.namespace})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.name} ({self.namespace})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ItemImage):
             return False
         return self.name == other.name and self.namespace == other.namespace
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.name, self.namespace))
 
-    def search_payload(self):
+    def search_payload(self) -> SearchPayload:
         payload = copy.deepcopy(BASE_PAYLOAD)
         if self.namespace == "UNIQUE":
             payload["query"]["filters"] = UNIQUE_FILTER

@@ -28,7 +28,7 @@ class ClientString(BaseClientString):
         keep_format_option: bool = False,
         trim: bool = False,
         override: dict[LANG, str] | None = None,
-    ):
+    ) -> None:
         self._my_key = my_key
         self.poe_keys: list[str] = poe_keys
         self.format: str | list[str] | None = format

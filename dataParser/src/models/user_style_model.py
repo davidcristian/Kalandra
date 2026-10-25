@@ -14,7 +14,7 @@ class UserStyleModel:
         version: str,
         user_style_vars: str,
         user_style_default_css: str,
-    ):
+    ) -> None:
         self.name = name
         self.description = description
         self.filename = filename

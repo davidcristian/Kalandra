@@ -11,7 +11,7 @@ class ConstClientString(BaseClientString):
     need_lookup: bool
     _my_key: str
 
-    def __init__(self, key: str, output: str | dict[LANG, str]):
+    def __init__(self, key: str, output: str | dict[LANG, str]) -> None:
         self._my_key = key
         if isinstance(output, str):
             self.const: str = output
