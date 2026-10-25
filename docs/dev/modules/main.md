@@ -123,9 +123,11 @@ The entry, the server and the app services, in `main/src/`:
   to the default browser. Before a web view starts, its `will-attach-webview` handler removes a `preload`, sets
   `nodeIntegration` false and `contextIsolation` true, and blocks the web view with a `warn [Overlay]` line unless
   `isTradeSiteUrl()` accepts its first address. Later navigation inside it, such as a sign-in through another site,
-  is not checked. `roundedCorners` is false on Linux, where Electron otherwise rounds a frameless window.
-  `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in development, or with
-  `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
+  is not checked. The window's menu has the edit roles, `toggleDevTools` (Ctrl + Shift + I on Windows), which the
+  [in-game check](../runbooks/in-game-check.md#where-the-logs-are) uses in a packaged build, and `reload` only in a dev
+  run, since a reload drops the overlay's state. `roundedCorners` is false on Linux, where Electron otherwise rounds a
+  frameless window. `loadAppPage(port)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
+  development, or with `--no-overlay` opens it in the default browser. `assertOverlayActive()`, `assertGameActive()`
   and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
   overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns whether the game window has the focus,
   and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.

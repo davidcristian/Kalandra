@@ -53,10 +53,10 @@ replaces it with `vi.mock("electron", ...)`.
 - `overlay-keys.test.ts` names a key press with each combination of modifiers and checks which presses move the
   focus.
 - `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process.
-- `overlay-window.test.ts` creates `OverlayWindow` with a fake `BrowserWindow` and a fake `OverlayController`. It
-  checks the window options on each platform, the page it loads, the attach to the game window, the focus
-  changes, the overlay key and Escape in the window and in a web view, and Hide overlay on blur. It sends
-  `will-attach-webview` with a preload and Node.js on, for the trade site and for addresses the check blocks.
+- `overlay-window.test.ts` creates `OverlayWindow` with a fake `BrowserWindow` and a fake `OverlayController`. It checks
+  the window options on each platform, the menu with and without a dev run, the page it loads, the attach to the game
+  window, the focus changes, the overlay key and Escape in the window and in a web view, and Hide overlay on blur. It
+  sends `will-attach-webview` with a preload and Node.js on, for the trade site and for addresses the check blocks.
 - `widget-area.test.ts` sends `OVERLAY->MAIN::track-area` through the fake server and mouse events through the fake
   global hook at the edges of the area and the close threshold, and on Windows and Linux through a fake `screen` at
   150% scale.

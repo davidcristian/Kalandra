@@ -32,12 +32,13 @@
   `main/src/windowing/OverlayWindow.ts`). Unticked, the window stays and draws nothing.
 - In a packaged build, Ctrl + Shift + I with the overlay focused opens the developer tools: the
   overlay window's menu has the `toggleDevTools` role, which Electron binds to that key on Windows.
-  The window is frameless, and the run shows whether the key works there.
+  The window is frameless, and the run shows whether the key works there. Ctrl + R does not reload
+  the page there, because only a dev run adds the `reload` role.
 
 **Do.** [Section 2 of the runbook](../../runbooks/in-game-check.md#2-the-overlay-key-and-focus),
 including its Also check list. Open each widget named above and move focus between the game and
 the overlay. Switch to another program with Alt + Tab, once with the setting ticked and once with
-it unticked. Then press Ctrl + Shift + I in a packaged build.
+it unticked. Then press Ctrl + Shift + I and Ctrl + R in a packaged build.
 
 **Pass.** Each item above happens as written, and the setting does what docs/settings.md says.
 With another window focused, Ctrl + D reaches that window and not Kalandra.

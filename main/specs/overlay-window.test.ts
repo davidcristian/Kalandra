@@ -203,11 +203,22 @@ describe("OverlayWindow", () => {
       });
       expect(shown.menu.map((item) => item.role)).toEqual([
         "editMenu",
-        "reload",
         "toggleDevTools",
       ]);
     },
   );
+
+  it("adds the reload key to the menu only in a dev run", () => {
+    vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
+
+    const { shown } = createOverlay();
+
+    expect(shown.menu.map((item) => item.role)).toEqual([
+      "editMenu",
+      "reload",
+      "toggleDevTools",
+    ]);
+  });
 
   it("loads the app page from the port, or from the dev server with the dev tools", () => {
     const { overlay, shown } = createOverlay();

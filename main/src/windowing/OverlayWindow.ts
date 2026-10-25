@@ -57,10 +57,15 @@ export class OverlayWindow {
       },
     });
 
+    // A reload drops the overlay's state, so only a dev run has its key. The developer tools key stays, because
+    // docs/dev/runbooks/in-game-check.md reads the page's console in a packaged build with it
+    const reload = process.env.VITE_DEV_SERVER_URL
+      ? [{ role: "reload" as const }]
+      : [];
     this.window.setMenu(
       Menu.buildFromTemplate([
         { role: "editMenu" },
-        { role: "reload" },
+        ...reload,
         { role: "toggleDevTools" },
       ]),
     );
