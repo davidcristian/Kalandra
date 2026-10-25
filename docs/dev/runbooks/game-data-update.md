@@ -54,7 +54,8 @@ On 18 Oct 2026 the last two print 445 and 16.
    This runs the game export into `data/vendor/`, requests the trade site data for each language into
    `data/json/<lang>/`, then builds every language into `output/`. The log shows `Exported game data to: <path>`
    once, then `Fetching JSON from: <url> for language: <lang>` and `Saved JSON to: <path>` for each of the 36 trade
-   files, then `Building <lang>: <n>/9` for each language.
+   files, then `Building <lang>: <n>/9` for each language. The trade requests go one at a time, 5 seconds apart,
+   or further apart when the trade site's rate limit headers set a longer wait, so they take at least three minutes.
 
    `Game data export failed: <error>` means the export did not run, and the build used whatever `data/vendor/` held.
    A `Failed to fetch JSON from: <url>, code: <status>` line means that file kept its old copy. Fix either before
@@ -125,6 +126,7 @@ On 18 Oct 2026 the last two print 445 and 16.
 | `FileNotFoundError` for `data/vendor/tables/<Language>/<Table>.json` | the export did not write that table | read the export's own output in step 2, and check the table and `translations` in `config.json` |
 | `FileNotFoundError` for `data/vendor/files/data@StatDescriptions@<name>.csd` | the export did not write that stat description file | check `files` in `config.json` against `STAT_DESCRIPTION_FILES` in `src/constants/filenames.py` |
 | `FileNotFoundError` for `data/json/fr/<name>.json` during `--pull` | the folder does not exist | create `dataParser/data/json/fr/` and run step 2 again |
+| `Rate limited 4 times, gave up on: <url>` during step 2 | the trade site returned 429 for the request and its three retries; that file kept its old copy | run step 2 again only after the seconds in the last `Waiting <seconds> seconds for the rate limit of: <url>` line have passed, and never in a loop |
 | `FileNotFoundError` for `data/json/<lang>/<name>.json` during a build | the trade data was never pulled for that language | run step 2 |
 | `KeyError` from `use_game_store` in `src/services/client_strings_builder.py` | the patch renamed or removed a `ClientStrings` id the tool reads | find the entry with that id in `src/constants/client_string_data.py` and change it to the new id |
 | `ValueError: No data found for <file>` or `No descriptions found for <file>` | a stat description file is empty or has no `description` block | run the export again; if the file stays empty, stop and ask the maintainer |

@@ -52,10 +52,22 @@ installs that command or names its version. A command missing from the PATH or a
 `Game data export failed: <error>`, and the build continues with whatever `data/vendor/` already holds.
 
 **The trade data.** `TradeApiProvider` (`src/providers/trade_api.py`) requests the four endpoints for each language
-from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests in a row with no pause. It uses `cloudscraper`,
-which needs Node.js on the PATH (`interpreter="nodejs"`). It sorts the entries of `stats.json` by id. A response
-other than 200 is logged as `Failed to fetch JSON from: <url>, code: <status>`, and that file keeps its old copy.
-The folder `data/json/fr/` is not in the repo, and the tool does not create it.
+from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests one at a time through one `RequestPacer`
+(`src/services/request_pacer.py`):
+
+- Each request starts at least 5 seconds after the one before, as the app's trade requests do until the trade site
+  sends its limits.
+- After each response it reads `Retry-After` and the `X-Rate-Limit-<rule>` and `X-Rate-Limit-<rule>-State` headers
+  that `X-Rate-Limit-Rules` names. It waits the seconds a restriction has left, or the whole window of a rule that
+  is one request from its limit. A header it cannot read is logged as `Ignored ...` and adds no wait.
+- A request that gets a 429 is sent again up to three times, after the response's wait or 60 seconds when the
+  response has none. Then it logs `Rate limited 4 times, gave up on: <url>`, and that file keeps its old copy.
+
+It uses `cloudscraper`, which needs Node.js on the PATH (`interpreter="nodejs"`) and sends a browser User-Agent.
+`create_trade_session` adds `kalandra-dataparser/1` and the link to the issues to it, as Electron adds the app's name
+to the app's User-Agent. It sorts the entries of `stats.json` by id. A response other than 200 is logged as
+`Failed to fetch JSON from: <url>, code: <status>`, and that file keeps its old copy. The folder `data/json/fr/` is
+not in the repo, and the tool does not create it.
 
 ## Image modes
 
@@ -117,8 +129,9 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 ## Tests
 
 `python -m pytest` in `dataParser/`, where `pyproject.toml` adds `.` and `src` to the import path. `tests/unit/`
-tests the constants, models, providers, services and stores one module at a time. Its provider tests mock the export
-command and the trade site requests, and its description tests read the sample files in `tests/data/cases/`.
+tests the constants, models, providers, services and stores one module at a time. Its provider tests run a fake
+export command, the trade site tests use the fake session and clock in `tests/fake_http.py`, and its description
+tests read the sample files in `tests/data/cases/`.
 `tests/integration/` reads real files, and `tests/test_main.py` runs `main()` end to end. The hooks in
 `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`, and the
 pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions and no

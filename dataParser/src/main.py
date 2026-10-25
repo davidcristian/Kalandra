@@ -12,10 +12,11 @@ from constants.client_string_data import (
 )
 from constants.lang import ENGLISH, LANG, LANGUAGES
 from providers.game_api import GameDataProvider
-from providers.trade_api import TradeApiProvider
+from providers.trade_api import TradeApiProvider, create_trade_session
 from services.client_strings_builder import ClientStringsBuilder
 from services.image_provider import MODE
 from services.nd_builder_service import NdBuilderService
+from services.request_pacer import RequestPacer
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -31,8 +32,10 @@ def main(**kwargs: dict[str, bool | str]):
 
     if pull:
         GameDataProvider().run_export()
+        # One pacer for every language, so the pause also holds from one language to the next
+        pacer = RequestPacer(create_trade_session())
         for lang in tqdm(LANGUAGES):
-            TradeApiProvider(lang).pull()
+            TradeApiProvider(lang, pacer).pull()
 
     run_on: list[LANG] = [ENGLISH, *[lang for lang in LANGUAGES if lang != ENGLISH]]
 

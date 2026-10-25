@@ -10,15 +10,36 @@ import cloudscraper
 
 from constants.lang import LANG
 from constants.urls import LANG_URLS, TRADE_QUERY_URLS
+from services.request_pacer import RequestPacer
+
+USER_AGENT_PRODUCT = (
+    "kalandra-dataparser/1 (+https://github.com/davidcristian/Kalandra/issues)"
+)
+
+
+def create_trade_session() -> cloudscraper.CloudScraper:
+    """Returns a cloudscraper session whose User-Agent also names this tool."""
+    session: cloudscraper.CloudScraper = cloudscraper.create_scraper(  # pyright:ignore [reportAny]
+        interpreter="nodejs"
+    )
+    # Keeps cloudscraper's browser User-Agent for Cloudflare and adds the tool's name,
+    # as the app's Electron User-Agent adds the app's name
+    session.headers["User-Agent"] = (
+        f"{session.headers['User-Agent']} {USER_AGENT_PRODUCT}"
+    )
+    return session
 
 
 class TradeApiProvider:
-    def __init__(self, lang: LANG):
+    def __init__(
+        self,
+        lang: LANG,
+        pacer: RequestPacer | None = None,
+        output_dir: str | None = None,
+    ):
         self.lang: LANG = lang
-        self.session: cloudscraper.CloudScraper = cloudscraper.create_scraper(  # pyright:ignore [reportAny]
-            interpreter="nodejs"
-        )
-        self.output_dir: str = os.path.join(
+        self.pacer: RequestPacer = pacer or RequestPacer(create_trade_session())
+        self.output_dir: str = output_dir or os.path.join(
             os.path.dirname(__file__), "../../data/json", self.lang
         )
 
@@ -35,7 +56,7 @@ class TradeApiProvider:
             logging.info(f"Fetching JSON from: {url} for language: {self.lang}")
 
             # Fetch the JSON data
-            response = self.session.get(url)
+            response = self.pacer.get(url)
 
             if response.status_code == 200:
                 output_path = os.path.join(self.output_dir, f"{filename}.json")
