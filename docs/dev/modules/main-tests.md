@@ -10,6 +10,8 @@ replaces it with `vi.mock("electron", ...)`.
   host address no computer has.
 - `served-file.test.ts` covers the path check, and `request-origin.test.ts` the header check.
 - `startup.test.ts` covers the startup order on each platform, with a fake `app` that emits `ready` once.
+- `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry and sends
+  `CLIENT->MAIN::user-action` messages.
 - `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails.
 - `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` before and after a
   `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of the overlay
