@@ -162,8 +162,8 @@ A fresh clone cannot pass the tests as of 18 Oct 2026:
 - `tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
   needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
   since it reads game tables when it is built.
-- The description tests in `tests/unit/stores/helpers/test_description.py` and `tests/integration/stores/helpers/`
-  read expected results from `tests/data/expected/`, which is not in the repo.
+- The description tests in `tests/integration/stores/helpers/` read expected frames from `tests/data/expected/`,
+  which has only the expected blocks for the unit tests in `tests/unit/stores/helpers/test_description.py`.
 
 **Dependencies.** Python, the packages above, Node.js for `cloudscraper`, the `pathofexile-dat` command, a local
 Path of Exile 2 install, and the official trade sites.
