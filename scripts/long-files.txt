@@ -4,7 +4,7 @@
 380 dataParser/src/constants/client_string_data.py
 365 dataParser/src/constants/css_rules.py
 563 dataParser/src/services/nd_builder_service.py
-317 dataParser/src/stores/helpers/description.py
+312 dataParser/src/stores/helpers/description.py
 337 ipc/types.ts
 308 main/src/shortcuts/Shortcuts.ts
 487 renderer/src/assets/data/index.ts

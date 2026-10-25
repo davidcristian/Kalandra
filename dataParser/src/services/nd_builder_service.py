@@ -217,8 +217,8 @@ class NdBuilderService:
         return value_trade_stats_df
 
     def group_trade_stats(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        # Check we have needed columns
-        assert set(in_df.columns) == {"id", "text", "ref", "type"}  # nosec: B101
+        if set(in_df.columns) != {"id", "text", "ref", "type"}:
+            raise ValueError(f"unexpected trade stat columns {sorted(in_df.columns)}")
         grouped_trade_stats_df = in_df.pivot_table(
             index=["ref"],
             columns="type",
@@ -231,8 +231,8 @@ class NdBuilderService:
                 .fillna("")
                 .apply(lambda d: d if isinstance(d, list) else [])
             )
-
-        assert set(grouped_trade_stats_df.columns) == {"ref"}.union(MOD_TYPES)  # nosec: B101
+        if set(grouped_trade_stats_df.columns) != {"ref"}.union(MOD_TYPES):
+            raise ValueError("trade stats have a type that is not in MOD_TYPES")
         return grouped_trade_stats_df
 
     def add_hash_to_trade_stats(self, in_df: pd.DataFrame) -> pd.DataFrame:

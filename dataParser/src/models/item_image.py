@@ -26,9 +26,10 @@ class ItemImage:
         self.name = name
         self.namespace = namespace
         if namespace == "UNIQUE":
-            assert unique is not None
-            assert unique.get("base") is not None
-            self.base = unique.get("base")
+            base = unique.get("base") if unique else None
+            if base is None:
+                raise ValueError(f"unique item {name} has no base type")
+            self.base = base
         else:
             self.base = name
 
@@ -47,7 +48,6 @@ class ItemImage:
         return hash((self.name, self.namespace))
 
     def search_payload(self):
-        assert self.base is not None
         payload = copy.deepcopy(BASE_PAYLOAD)
         if self.namespace == "UNIQUE":
             payload["query"]["filters"] = UNIQUE_FILTER

@@ -692,6 +692,30 @@ def test_group_trade_stats_pivots_and_fills_correctly():
     )
 
 
+def test_group_trade_stats_rejects_missing_columns():
+    service = NdBuilderService("ru", "new")
+    df = pd.DataFrame(
+        [{"id": "explicit.stat_1", "ref": "Ref Text A", "type": "explicit"}]
+    )
+
+    with pytest.raises(ValueError, match="columns"):
+        service.group_trade_stats(df)
+
+
+@patch("services.nd_builder_service.MOD_TYPES", ["explicit"])
+def test_group_trade_stats_rejects_a_type_outside_mod_types():
+    service = NdBuilderService("ru", "new")
+    df = pd.DataFrame(
+        [
+            {"id": "explicit.stat_1", "text": "a", "ref": "A", "type": "explicit"},
+            {"id": "enchant.stat_2", "text": "b", "ref": "B", "type": "enchant"},
+        ]
+    )
+
+    with pytest.raises(ValueError, match="MOD_TYPES"):
+        service.group_trade_stats(df)
+
+
 def test_value_trade_stats_df_extracts_values_and_hashes():
     service = NdBuilderService("ru", "new")
     service.stats_combined_df = MagicMock(

@@ -5,7 +5,7 @@ from datetime import datetime
 from time import sleep
 
 import cloudscraper
-from requests.models import CaseInsensitiveDict, Response
+from requests.models import Response
 
 # Initial logging configuration
 logging.basicConfig(
@@ -65,8 +65,8 @@ class RateLimiter:
         duration : int | float
             The duration to wait in seconds.
         """
-        assert isinstance(duration, int) or isinstance(duration, float)
-        assert duration > 0
+        if duration <= 0:
+            raise ValueError(f"cannot wait for {duration} seconds")
         sleep(duration)
 
     def parse_window_limit(self, window: str) -> RateLimit:
@@ -82,9 +82,9 @@ class RateLimiter:
         RateLimit
             The parsed RateLimit object.
         """
-        assert isinstance(window, str)
         split_window = window.split(":")
-        assert len(split_window) == 3
+        if len(split_window) != 3:
+            raise ValueError(f"rate limit {window!r} is not limit:interval:penalty")
         return RateLimit(
             int(split_window[0]),
             int(split_window[1]),
@@ -104,7 +104,6 @@ class RateLimiter:
         list[RateLimit]
             The parsed list of RateLimit objects.
         """
-        assert isinstance(limit, str)
         split_limit = limit.split(",")
         windows = []
         for window in split_limit:
@@ -126,21 +125,14 @@ class RateLimiter:
         list[tuple[RateLimit, RateLimit]]
             The paired list of RateLimit objects. The first element in the tuple is the limit and the second element is the state.
         """
-        assert isinstance(limit, str)
-        assert isinstance(state, str)
         # limits follow format: "limit:interval:penalty"
         limits = self.parse_rate_limit(limit)
-        assert isinstance(limits, list)
-        assert len(limits) > 0
-        assert isinstance(limits[0], RateLimit)
         states = self.parse_rate_limit(state)
-        assert isinstance(states, list)
-        assert len(states) > 0
-        assert isinstance(states[0], RateLimit)
 
         limit_groups = []
         for limit_group, state_group in zip(limits, states):
-            assert limit_group.window == state_group.window
+            if limit_group.window != state_group.window:
+                raise ValueError(f"rate limit state {state!r} does not match {limit!r}")
             limit_groups.append((limit_group, state_group))
         return limit_groups
 
@@ -154,10 +146,6 @@ class RateLimiter:
         state : RateLimit
             The current state of the limit
         """
-        assert isinstance(limit, RateLimit)
-        assert isinstance(state, RateLimit)
-        assert isinstance(state.penalty, int)
-        assert isinstance(limit.penalty, int)
         # If the server says we are on penalty
         if state.penalty > 0:
             # Wait for the full penalty
@@ -169,14 +157,9 @@ class RateLimiter:
             )
 
     def wait_if_needed(self, limit: RateLimit, state: RateLimit, policy: str):
-        assert isinstance(limit, RateLimit)
-        assert isinstance(state, RateLimit)
-        assert isinstance(policy, str)
-
         # If we are less than 1.2x the average rate since last update, wait for 1.1x the average rate
         average_request_rate = limit.window / limit.max * 2
-        last_update = self.limits.get(policy, {}).get("last_update")
-        assert isinstance(last_update, datetime)
+        last_update: datetime = self.limits[policy]["last_update"]
         time_since_last_update = (datetime.now() - last_update).total_seconds()
         if time_since_last_update <= average_request_rate * 1.5:
             # Should almost always happen for limit with the longest average request rate
@@ -190,11 +173,15 @@ class RateLimiter:
             )
             self.wait(average_request_rate * 3)
 
-    def wait_limit(self, policy: str, rules: str, limit: str, state: str):
-        assert isinstance(policy, str)
-        assert isinstance(rules, str)
-        assert isinstance(limit, str)
-        assert isinstance(state, str)
+    def wait_limit(
+        self,
+        policy: str | None,
+        rules: str | None,
+        limit: str | None,
+        state: str | None,
+    ):
+        if policy is None or rules is None or limit is None or state is None:
+            raise ValueError("a rate limit header named in the response is missing")
         rate_limits = self.get_limits(limit, state)
         self.limits[policy] = {
             "policy": policy,
@@ -214,8 +201,6 @@ class RateLimiter:
 
     def handle_headers(self, headers: dict[str, str], status_code: int):
         """Handles the headers returned from the server."""
-        assert isinstance(headers, CaseInsensitiveDict)
-        assert isinstance(status_code, int)
         if status_code == 429:
             logger.error("Rate limit exceeded.")
             retry_after = headers.get("Retry-After")

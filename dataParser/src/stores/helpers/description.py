@@ -295,11 +295,6 @@ class Description:
             return True
         return None
 
-    def flip_negate(self, negate: bool | None) -> bool | None:
-        assert negate is not False
-
-        return True if negate is None else None
-
     def parse_canonical(self, flags: str | None) -> bool | None:
         if flags is None:
             return None
