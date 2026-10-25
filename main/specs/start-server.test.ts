@@ -1,8 +1,9 @@
 import { app } from "electron";
 import * as fs from "fs";
+import * as path from "path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type WebSocket from "ws";
-import type { IpcEvent, UpdateInfo } from "../../ipc/types";
+import type { HostState, IpcEvent, UpdateInfo } from "../../ipc/types";
 import { Logger } from "../src/RemoteLogger";
 import { onEventAnyClient, server, startServer } from "../src/server";
 import { FakeServer } from "./fake-server";
@@ -120,6 +121,20 @@ describe("startServer", () => {
       updater: { state: "checking-for-update" },
       contents: null,
     });
+  });
+
+  it("returns at GET /config the config that a save-config message stored", async () => {
+    const contents = JSON.stringify({ configVersion: 1, fontSize: 16 });
+    const save: IpcEvent = {
+      name: "CLIENT->MAIN::save-config",
+      payload: { contents, isTemporary: false },
+    };
+    await sendMessages([JSON.stringify(save)]);
+
+    const reply = await get(port, "/config");
+    expect((JSON.parse(reply.body) as HostState).contents).toBe(contents);
+    const file = path.join(app.getPath("userData"), "apt-data", "config.json");
+    expect(fs.readFileSync(file, "utf8")).toBe(contents);
   });
 
   it("sends a new page the updater state current when it connects", async () => {

@@ -34,10 +34,10 @@ class FakeServer implements ServerEvents {
     this.sent.push(event);
   };
 
-  saveConfig(contents: string) {
+  saveConfig(contents: string, isTemporary = false) {
     const payload: IpcEventPayload<"CLIENT->MAIN::save-config"> = {
       contents,
-      isTemporary: false,
+      isTemporary,
     };
     this.bus.emit("CLIENT->MAIN::save-config", payload);
   }
@@ -89,6 +89,10 @@ async function saveOnDisk(contents: string) {
   await fs.writeFile(path.join(configFolder(), "config.json"), contents);
 }
 
+async function readOnDisk(name: string): Promise<string> {
+  return await fs.readFile(path.join(configFolder(), name), "utf8");
+}
+
 let server: FakeServer;
 let logger: Logger;
 
@@ -104,6 +108,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  vi.unstubAllEnvs();
   await fs.rm(electron.userData, { recursive: true, force: true });
 });
 
@@ -208,5 +213,39 @@ describe("ConfigStore", () => {
 
     expect(await store.load()).toBe(STEP_1);
     expect(logger.history).toContain("EPERM: operation not permitted, rename");
+  });
+
+  it("writes a temporary save and every later save to config.json.tmp, and leaves config.json as it was", async () => {
+    await saveOnDisk("a config that is not JSON");
+    const store = createStore();
+
+    server.saveConfig(STEP_1, true);
+    expect(await store.load()).toBe(STEP_1);
+    server.saveConfig(STEP_2);
+    expect(await store.load()).toBe(STEP_2);
+
+    expect(await readOnDisk("config.json")).toBe("a config that is not JSON");
+    expect(await readOnDisk("config.json.tmp")).toBe(STEP_2);
+  });
+
+  it("writes nothing in development, where Vite serves the page", async () => {
+    vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
+    await saveOnDisk(STEP_1);
+    const store = createStore();
+
+    server.saveConfig(STEP_2);
+
+    expect(await store.load()).toBe(STEP_1);
+    expect(server.sent).toEqual([
+      { name: "MAIN->CLIENT::config-changed", payload: { contents: STEP_2 } },
+    ]);
+  });
+
+  it("returns null when config.json cannot be read", async () => {
+    await fs.mkdir(path.join(configFolder(), "config.json"), {
+      recursive: true,
+    });
+
+    expect(await createStore().load()).toBeNull();
   });
 });

@@ -125,5 +125,7 @@ the steps before it and against the type. `renderer/specs/web/shortcut-actions.t
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`. `main/specs/ConfigStore.test.ts` checks
-`ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, and a rename
-that fails while another program has the file open, with the log line of each failed save.
+`ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
+that fails while another program has the file open, with the log line of each failed save, the temporary save, a
+run in development and a `config.json` it cannot read. `main/specs/start-server.test.ts` reads `GET /config` after a
+`save-config` message.

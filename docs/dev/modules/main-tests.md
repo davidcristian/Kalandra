@@ -11,9 +11,10 @@ replaces it with `vi.mock("electron", ...)`.
 - `served-file.test.ts` covers the path check, and `request-origin.test.ts` the header check.
 - `startup.test.ts` covers the startup order on each platform, with a fake `app` that emits `ready` once.
 - `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails.
-- `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` and the first `/events`
-  messages, sends overlay events with the User-Agent of the overlay window, of a browser and with none, sends
-  messages main cannot use, and sends client log entries from the overlay window and a browser tab.
+- `start-server.test.ts` calls `startServer()` with a fake updater, reads `GET /config` before and after a
+  `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of the overlay
+  window, of a browser and with none, sends messages main cannot use, and sends client log entries from the overlay
+  window and a browser tab.
 - `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first, and
   which client receives a `last-active` event after a connect, a `CLIENT->MAIN::used-recently` message and a close.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
@@ -58,7 +59,8 @@ replaces it with `vi.mock("electron", ...)`.
 - `file-uploads.test.ts` posts images and other files to the `/uploads/` routes, images of 16,000,000 bytes and one
   byte more, and an image while a file holds the place of the uploads folder.
 - `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
-  write or fail the rename as Windows does for a file another program has open.
+  write or fail the rename as Windows does for a file another program has open. It also makes a temporary save,
+  saves in development and reads a `config.json` that is a folder.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary
   folder, and the first two pass their own default paths.
 - `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its
