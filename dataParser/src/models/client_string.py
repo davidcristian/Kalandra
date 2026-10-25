@@ -64,14 +64,7 @@ class ClientString(BaseClientString):
         if self.override is not None and lang in self.override:
             return f"  // [Override]\n  {self.my_key}: '{self.override[lang]}',"
 
-        out_out = self.value(poe_key_lookup, lang)
-        out_string = "\n".join(
-            [
-                # f"  // [{self.apply(self.poe_keys)}]",
-                f"  {self.my_key}: '{out_out}',",
-            ]
-        )
-        return out_string
+        return f"  {self.my_key}: '{self.value(poe_key_lookup, lang)}',"
 
     @override
     def value(self, poe_key_lookup: Callable[[str], str], lang: LANG) -> str:

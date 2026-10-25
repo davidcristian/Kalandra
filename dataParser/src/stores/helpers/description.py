@@ -218,10 +218,6 @@ class Description:
                     out["negate"] = False
                 else:
                     out["negate"] = True
-            canonical = self.parse_canonical(flags)
-            if canonical:
-                pass
-                # out["canonical"] = True
             decimal = self.parse_dp(flags, line_string)
             if decimal and dp is None:
                 dp = decimal
@@ -292,13 +288,6 @@ class Description:
         if flags is None:
             return None
         if "negate" in flags:
-            return True
-        return None
-
-    def parse_canonical(self, flags: str | None) -> bool | None:
-        if flags is None:
-            return None
-        if "canonical" in flags:
             return True
         return None
 

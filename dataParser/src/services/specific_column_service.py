@@ -10,47 +10,11 @@ from services.agg import make_list_agg
 from services.augment_builder import AugmentBuilder
 from stores.game_store import GameStore
 
-GENERAL_CLASS_TO_ITEM_CLASS = {
-    "armour": [
-        "Body Armour",
-        "Boots",
-        "Buckler",
-        "Focus",
-        "Gloves",
-        "Helmet",
-        "Shield",
-    ],
-    "weapon": [
-        "Bow",
-        "Claw",
-        "Crossbow",
-        "Dagger",
-        "Flail",
-        "One Hand Axe",
-        "One Hand Mace",
-        "One Hand Sword",
-        "Spear",
-        "Two Hand Axe",
-        "Two Hand Mace",
-        "Two Hand Sword",
-        "Warstaff",
-        "Talisman",
-    ],
-    "caster": [
-        "Staff",
-        "Wand",
-    ],
-}
-
 
 class SpecificColumnService:
     def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
-
-        # self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
-        # self.trade_store: TradeStore = TradeStore(lang)
         self.ref_game_store: GameStore = GameStore(ENGLISH)
-        # self.game_store: GameStore = GameStore(lang)
 
     def apply_item_specific_columns(
         self, items: pd.DataFrame, stats: pd.DataFrame

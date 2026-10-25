@@ -9,5 +9,4 @@ class Matcher(TypedDict):
     string: str
     value: NotRequired[int]
     negate: NotRequired[bool]
-    advanced: NotRequired[str]
     oils: NotRequired[str]

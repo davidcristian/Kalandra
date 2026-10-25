@@ -4,16 +4,8 @@ from typing import Literal
 
 # Trade API files
 ITEMS_JSON = "items.json"
-FILTERS_JSON = "filters.json"
 STATS_JSON = "stats.json"
 STATIC_JSON = "static.json"
-
-TRADE_API_FILES = (
-    ITEMS_JSON,
-    FILTERS_JSON,
-    STATS_JSON,
-    STATIC_JSON,
-)
 
 # Game API tables
 GAME_API_TABLES_TYPE = Literal[
@@ -36,7 +28,6 @@ GAME_API_TABLES_TYPE = Literal[
     "SoulCoreStats.json",
     "SoulCoreTypes.json",
     "SoulCores.json",
-    "SoulCoresPerClass.json",
     "Stats.json",
     "Tags.json",
     "UniqueStashLayout.json",
@@ -63,7 +54,6 @@ SOUL_CORE_STAT_CATEGORIES = "SoulCoreStatCategories.json"
 SOUL_CORE_STATS = "SoulCoreStats.json"
 SOUL_CORE_TYPES = "SoulCoreTypes.json"
 SOUL_CORES = "SoulCores.json"
-SOUL_CORES_PER_CLASS = "SoulCoresPerClass.json"
 STATS = "Stats.json"
 TAGS = "Tags.json"
 UNIQUE_STASH_LAYOUT = "UniqueStashLayout.json"

@@ -17,10 +17,6 @@ class LogbookFactions:
     def create_matcher(self, name: str) -> list[dict[str, str]]:
         return [{"string": name}]
 
-    def create_trade_entry(self, id: str) -> dict[str, None | dict[str, list[str]]]:
-        # return {"ids": {"pseudo": ["pseudo.pseudo_" + id]}}
-        return {"ids": None}
-
     def create_id(self, name: str) -> str:
         return name.lower().replace(" ", "_")
 
@@ -40,8 +36,10 @@ class LogbookFactions:
         expedition_factions["id"] = ref_expedition_factions["Name"].apply(
             self.create_id
         )
-        expedition_factions["trade"] = expedition_factions["id"].apply(
-            self.create_trade_entry
+        expedition_factions["trade"] = pd.Series(
+            [{"ids": None} for _ in expedition_factions.index],
+            index=expedition_factions.index,
+            dtype=object,
         )
         expedition_factions.drop(columns=["Name"], inplace=True)
         return expedition_factions

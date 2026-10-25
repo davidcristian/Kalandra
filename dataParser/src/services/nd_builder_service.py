@@ -107,18 +107,12 @@ class NdBuilderService:
         ndjson["better"] = ndjson["better"].fillna(1).astype(int)
 
         def custom_sort_key(matcher: Matcher) -> tuple[int, int]:
-            # Determine the group number: 0 for no 'negated' and no 'value', 1 for 'negated', 2 for 'value'
-            if "negate" not in matcher and "value" not in matcher:
-                group = 0
-            elif "negate" in matcher:
+            if "negate" in matcher:
                 group = 1
             elif "value" in matcher:
                 group = 2
             else:
-                # Handles unexpected cases, if any
-                group = 3
-
-            # Return a tuple: group number and string length
+                group = 0
             return (group, len(matcher["string"]))
 
         def sort_matchers(matchers: list[Matcher]) -> list[Matcher]:

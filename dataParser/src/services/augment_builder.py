@@ -2,7 +2,6 @@ import logging
 from typing import cast
 
 import pandas as pd
-from pandas.core.frame import DataFrame
 
 from constants.filenames import (
     BASE_ITEM_TYPES,
@@ -79,7 +78,6 @@ class AugmentBuilder:
         self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
         self.ref_game_store: GameStore = GameStore(ENGLISH)
         self.nd_stats: pd.DataFrame = nd_stats
-        self.db: DataFrame = self.build()
 
     def build(self) -> pd.DataFrame:
         cores = self.get_soul_cores()
@@ -163,7 +161,6 @@ class AugmentBuilder:
             key=lambda x: len(x["string"]) if isinstance(x["string"], str) else 9999999,
         )
         for matcher in sorted_matchers:
-            # Check for absence of 'negated' key or its value being False
             if not matcher.get("negate", False) and not matcher.get("value"):
                 return matcher["string"]
         for matcher in sorted_matchers:

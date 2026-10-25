@@ -38,5 +38,3 @@ MOD_TYPES: list[MOD_TYPE] = [
     PSEUDO,
     CRAFTED,
 ]
-
-MOD_TYPES_SET: set[MOD_TYPE] = set(MOD_TYPES)

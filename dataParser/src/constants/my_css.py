@@ -2,19 +2,7 @@ import constants.other as t
 
 CSS_SELECTOR = '#trade .results {{c(":is(.explicitMod,.runeMod,.implicitMod,.enchantMod,.desecratedMod)")}} > .lc.s[data-field$="stat_{0}"]'
 
-EXPLICIT_CSS_SELECTOR = (
-    '#trade .results .explicitMod > .lc.s[data-field="stat.explicit.stat_{0}"]'
-)
 RUNE_CSS_SELECTOR = '#trade .results .runeMod > .lc.s[data-field="stat.rune.stat_{0}"]'
-IMPLICIT_CSS_SELECTOR = (
-    '#trade .results .implicitMod > .lc.s[data-field="stat.implicit.stat_{0}"]'
-)
-ENCHANT_CSS_SELECTOR = (
-    '#trade .results .enchantMod > .lc.s[data-field="stat.enchant.stat_{0}"]'
-)
-DESECRATED_CSS_SELECTOR = (
-    '#trade .results .desecratedMod > .lc.s[data-field="stat.desecrated.stat_{0}"]'
-)
 
 MY_CSS_DEFAULT = """
 

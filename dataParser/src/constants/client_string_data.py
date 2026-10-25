@@ -73,7 +73,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("ARMOUR", ["ItemDisplayArmourArmour"], "{0}: "),
     ClientString("EVASION", ["ItemDisplayArmourEvasionRating"], "{0}: "),
     ClientString("ENERGY_SHIELD", ["ItemDisplayArmourEnergyShield"], "{0}: "),
-    # ClientString("RUNIC_WARD", ["ItemDisplayArmourRunicWard"], "{0}: "),
     ConstClientString("RUNIC_WARD", "Runic Ward: "),
     ClientString("BLOCK_CHANCE", ["ItemDisplayShieldBlockChance"], "{0}: "),
     ClientString("CORRUPTED", ["ItemPopupCorrupted"]),
@@ -274,7 +273,6 @@ CLIENT_STRING_ARRAYS: list[ArrayClientString] = [
 CLIENT_STRING_REGEX: list[RegexClientString] = [
     CapturePlaceholderClientString("ITEM_SUPERIOR", ["QualityItem"]),
     CapturePlaceholderClientString("ITEM_EXCEPTIONAL", ["ExceptionalItem"]),
-    # CapturePlaceholderClientString("ITEM_RUNEFORGED", ["RuneforgedItem"]),
     ConstRegexClientString("ITEM_RUNEFORGED", output="Runeforged (.*)"),
     CapturePlaceholderClientString("MAP_BLIGHTED", ["InfectedMap"]),
     CapturePlaceholderClientString("MAP_BLIGHT_RAVAGED", ["UberInfectedMap"]),
