@@ -6,7 +6,7 @@ import { HeistGemFinder } from "./HeistGemFinder";
 import { ImageData } from "./utils";
 
 let _heistGems: HeistGemFinder;
-let _changeLangPromise = Promise.resolve();
+let _lastLangChange = Promise.resolve();
 
 const WorkerBody = {
   async init(binDir: string) {
@@ -14,12 +14,15 @@ const WorkerBody = {
     _heistGems = await HeistGemFinder.create(binDir);
   },
   async changeLanguage(lang: string, binDir: string) {
-    await _changeLangPromise;
-    _changeLangPromise = Bindings.changeLanguage(lang, binDir);
-    await _changeLangPromise;
+    const previous = _lastLangChange;
+    // The previous caller gets the error of a failed change, so the next change only waits for it to end
+    _lastLangChange = Promise.allSettled([previous]).then(async () => {
+      await Bindings.changeLanguage(lang, binDir);
+    });
+    await _lastLangChange;
   },
   async findHeistGems(screenshot: ImageData) {
-    await _changeLangPromise;
+    await _lastLangChange;
     return _heistGems.ocrScreenshot(screenshot);
   },
 };

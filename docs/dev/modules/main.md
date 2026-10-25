@@ -198,6 +198,8 @@ user installs ([the OCR guide](../../ocr-guide.md)), and `HeistGemFinder` reads 
 of the game window. `init()` in `wasm-bindings.ts` throws on every platform but Windows. When the worker thread
 fails or exits, `WorkerCalls` in `worker-calls.ts` logs `error [OCR] Worker failed: <message>` or `Worker exited
 with code <code>`, and rejects each call that waits for a reply or comes later, so the start does not wait for it.
+The worker runs one language change at a time, in the order main sends them, and runs the next one after one
+fails. A gem search waits for the last change and fails when that change failed.
 
 ## Invariants
 

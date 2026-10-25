@@ -125,4 +125,56 @@ describe("the OCR worker thread", () => {
       "end ru",
     ]);
   });
+
+  it("starts each of three quick language changes after the one before it ends", async () => {
+    const changes = [
+      api.changeLanguage("en", BIN),
+      api.changeLanguage("ru", BIN),
+      api.changeLanguage("ko", BIN),
+    ];
+    await api.init(BIN);
+
+    await endChange("en");
+    await endChange("ru");
+    await endChange("ko");
+    await Promise.all(changes);
+
+    expect(
+      vision.calls.filter(
+        (call) => !call.startsWith("init") && !call.startsWith("finder"),
+      ),
+    ).toEqual([
+      "start en",
+      "end en",
+      "start ru",
+      "end ru",
+      "start ko",
+      "end ko",
+    ]);
+  });
+
+  it("changes the language and finds gems after a language change fails", async () => {
+    const unsupported = api.changeLanguage("de", BIN);
+    await endChange("de", new Error("Unsupported language"));
+    await expect(unsupported).rejects.toThrow("Unsupported language");
+
+    const english = api.changeLanguage("en", BIN);
+    await endChange("en");
+    await english;
+
+    expect(await api.findHeistGems(SCREENSHOT)).toEqual({
+      recognized: [{ text: "Fireball", confidence: 90 }],
+    });
+  });
+
+  it("fails a gem search while the last language change has failed", async () => {
+    const unsupported = api.changeLanguage("de", BIN);
+    await endChange("de", new Error("Unsupported language"));
+    await expect(unsupported).rejects.toThrow("Unsupported language");
+
+    await expect(api.findHeistGems(SCREENSHOT)).rejects.toThrow(
+      "Unsupported language",
+    );
+    expect(vision.calls).not.toContain("ocr 2x1");
+  });
 });
