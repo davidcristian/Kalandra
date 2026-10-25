@@ -7,6 +7,8 @@ import logging
 import os
 
 import cloudscraper
+from cloudscraper.exceptions import CloudflareException
+from requests import RequestException
 
 from constants.lang import LANG
 from constants.urls import LANG_URLS, TRADE_QUERY_URLS
@@ -30,6 +32,43 @@ def create_trade_session() -> cloudscraper.CloudScraper:
     return session
 
 
+class TradeDataError(ValueError):
+    """Raised when a trade data response is not the JSON the build reads."""
+
+
+def sorted_stats_group(group: object) -> dict[str, object]:
+    """Returns a group of the stats response with its entries sorted by id."""
+    if not isinstance(group, dict) or "id" not in group or "label" not in group:
+        raise TradeDataError("a stats group has no id or label")
+    entries = group.get("entries")
+    if not isinstance(entries, list):
+        raise TradeDataError(f"the stats group {group['id']!r} has no entries list")
+    if not all(isinstance(entry, dict) and "id" in entry for entry in entries):
+        raise TradeDataError(f"an entry of the stats group {group['id']!r} has no id")
+    return {
+        "entries": sorted(entries, key=lambda entry: str(entry["id"])),
+        "id": group["id"],
+        "label": group["label"],
+    }
+
+
+def saved_form(filename: str, data: object) -> object:
+    """Checks a trade data response and returns it as it is saved, with the stats sorted."""
+    if not isinstance(data, dict) or not isinstance(data.get("result"), list):
+        raise TradeDataError("the response has no result list")
+    if filename != "stats":
+        return data
+    return {"result": [sorted_stats_group(group) for group in data["result"]]}
+
+
+def write_atomically(path: str, text: str) -> None:
+    """Writes text to a temporary file and moves it over path, so a failed write keeps the old file."""
+    temporary_path = f"{path}.tmp"
+    with open(temporary_path, "w", encoding="utf-8") as file:
+        _ = file.write(text)
+    os.replace(temporary_path, path)
+
+
 class TradeApiProvider:
     def __init__(
         self,
@@ -43,52 +82,38 @@ class TradeApiProvider:
             os.path.dirname(__file__), "../../data/json", self.lang
         )
 
-    def pull(self):
+    def pull(self) -> None:
         base_url = LANG_URLS[self.lang]
 
         for relative_url in TRADE_QUERY_URLS:
-            # Construct the full URL
             url = f"{base_url}{relative_url}"
-
-            # Extract the filename from the relative URL
             filename = os.path.basename(relative_url)
-
             logging.info(f"Fetching JSON from: {url} for language: {self.lang}")
 
-            # Fetch the JSON data
+            data = self.fetch(url, filename)
+            if data is None:
+                continue
+            output_path = os.path.join(self.output_dir, f"{filename}.json")
+            text = json.dumps(
+                data, ensure_ascii=False, indent=4, sort_keys=filename == "stats"
+            )
+            write_atomically(output_path, text)
+            logging.info(f"Saved JSON to: {output_path}")
+
+    def fetch(self, url: str, filename: str) -> object | None:
+        """Returns the response in the form it is saved, or None after logging why it is unusable."""
+        try:
             response = self.pacer.get(url)
-
-            if response.status_code == 200:
-                output_path = os.path.join(self.output_dir, f"{filename}.json")
-                with open(output_path, "w", encoding="utf-8") as file:
-                    res = response.json()  # pyright: ignore[reportAny]
-                    if filename == "stats":
-                        if not isinstance(res, dict):
-                            raise ValueError(f"Expected dict, got {type(res)}")  # pyright: ignore[reportAny]
-                        sorted_res: dict[
-                            str, list[dict[str, str | list[dict[str, str]]]]
-                        ] = {"result": []}
-                        for mods_of_type in res["result"]:  # pyright: ignore[reportUnknownVariableType]
-                            out_block: dict[str, str | list[dict[str, str]]] = {
-                                "entries": sorted(
-                                    mods_of_type["entries"],  # pyright: ignore[reportUnknownArgumentType]
-                                    key=lambda x: x["id"],
-                                ),
-                                "id": mods_of_type["id"],
-                                "label": mods_of_type["label"],
-                            }
-                            sorted_res["result"].append(out_block)
-                        res = sorted_res
-
-                    json.dump(
-                        res,
-                        file,
-                        ensure_ascii=False,
-                        indent=4,
-                        sort_keys=filename == "stats",
-                    )
-                logging.info(f"Saved JSON to: {output_path}")
-            else:
-                logging.error(
-                    f"Failed to fetch JSON from: {url}, code: {response.status_code}"
-                )
+        except (RequestException, CloudflareException) as error:
+            logging.error(f"Failed to fetch JSON from: {url}, error: {error}")
+            return None
+        if response.status_code != 200:
+            logging.error(
+                f"Failed to fetch JSON from: {url}, code: {response.status_code}"
+            )
+            return None
+        try:
+            return saved_form(filename, response.json())
+        except ValueError as error:
+            logging.error(f"Failed to read JSON from: {url}, error: {error}")
+            return None

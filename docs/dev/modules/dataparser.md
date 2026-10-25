@@ -65,9 +65,16 @@ from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests one at a tim
 
 It uses `cloudscraper`, which needs Node.js on the PATH (`interpreter="nodejs"`) and sends a browser User-Agent.
 `create_trade_session` adds `kalandra-dataparser/1` and the link to the issues to it, as Electron adds the app's name
-to the app's User-Agent. It sorts the entries of `stats.json` by id. A response other than 200 is logged as
-`Failed to fetch JSON from: <url>, code: <status>`, and that file keeps its old copy. The folder `data/json/fr/` is
-not in the repo, and the tool does not create it.
+to the app's User-Agent. It sorts the entries of `stats.json` by id. It writes a file only after the response passes
+these checks, and otherwise logs the failure and keeps the old copy:
+
+- A request that raises, such as on a lost connection, is logged as `Failed to fetch JSON from: <url>, error: <error>`.
+- A status other than 200 is logged as `Failed to fetch JSON from: <url>, code: <status>`.
+- A body that is not JSON or has no `result` list is logged as `Failed to read JSON from: <url>, error: <reason>`, as
+  is a `stats` group without `id`, `label` or an `entries` list, or with an entry without `id`.
+
+It writes the new copy to `<name>.json.tmp` and then moves it over the old one, so a failed write also keeps the old
+copy, and its error ends the pull. The folder `data/json/fr/` is not in the repo, and the tool does not create it.
 
 ## Image modes
 
