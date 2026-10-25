@@ -9,7 +9,7 @@
       <hotkey-input v-model="poedbKey" class="w-48" />
     </div>
     <div v-if="isEnglish" class="flex">
-      <label class="flex-1">Open base item on Craft of Exile</label>
+      <label class="flex-1">{{ t("item.open_on_craftofexile") }}</label>
       <hotkey-input v-model="craftOfExileKey" class="w-48" />
     </div>
     <div class="flex">

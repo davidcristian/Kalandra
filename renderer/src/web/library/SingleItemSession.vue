@@ -127,7 +127,7 @@ export default defineComponent({
       item,
       rollCount,
       modsDiff: computed(() => {
-        if (itemModsDiff.value.added.length === 0) return ["None added"];
+        if (itemModsDiff.value.added.length === 0) return [t(":none_added")];
         return itemModsDiff.value.added.map((mod) => mod.info.name);
       }),
       errMessage,

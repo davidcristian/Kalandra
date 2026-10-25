@@ -3,41 +3,17 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/public/data/en/app_i18n.json](../../../../renderer/public/data/en/app_i18n.json)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-25
 
 [AGENTS.md](../../../../AGENTS.md#architecture-rules) says a new UI string goes into
-`renderer/public/data/en/app_i18n.json`, and translators work from that file. 20 files in
-`renderer/src/web/` pass 37 English texts to `t()` as keys that the English file does not define.
-`renderer/src/web/i18n.ts` sets `fallbackFormat: true`, so vue-i18n shows the key itself, which
-reads as English. The Russian file defines 18 of the 37 as top-level keys, and no other language
-defines any of them. The keys, by folder:
+`renderer/public/data/en/app_i18n.json`, and translators work from that file.
+`renderer/src/web/settings/general.vue` passes `Hotcool` to `t()` as the label of the `pc-garena`
+realm option, which shows only when the language is `cmn-Hant`, and no language file defines it.
+`renderer/src/web/i18n.ts` sets `fallbackFormat: true`, so vue-i18n shows the key itself.
 
-- `settings/`: `Save` and `Cancel` (`SettingsWindow.vue`), `Disabled` (`hotkeys.vue`),
-  `Restart required` and `Hotcool` (`general.vue`), `Remove` (`chat.vue`).
-- `price-check/`: `Refresh`, `Retry`, `No`, `None`, `Currency / Hour`, `Items / Hour`, `Both` and
-  `milliseconds` (`settings-price-check.vue`); `Retry` and `Browser` (`BackgroundInfo.vue`,
-  `trade/TradeListing.vue`, `trade/TradeBulk.vue`); `Search` (`CheckedItem.vue`); `You`
-  (`trade/TradeBulk.vue`, `trade/TradeItem.vue`); `in demand` and `Gone` (`trade/TradeItem.vue`);
-  `Instant or Online`, `Instant`, `Online` and `Offline` (`trade/OnlineFilter.vue`); `Retry Item`,
-  `Reload fallback data` and `Loading...` (`fallback/ReloadTradeData.vue`); `min` and `max`
-  (`filters/FilterModifier.vue`); `Unable to determine fractured stat` (`filters/FiltersBlock.vue`);
-  `Not recognized modifier` (`filters/UnknownModifier.vue`).
-- `library/ProfileSettings.vue`: `Recording settings`, `keep explicit mods`, `keep implicit mods`,
-  `keep enchant mods` and `keep augment mods`.
-- Other folders: `Not recognized modifier` (`map-check/MapCheck.vue`), `Search`
-  (`map-check/settings-maps.vue`), `Select` (`item-search/WidgetItemSearch.vue`), `Add`
-  (`stash-search/stash-search-editor.vue`).
-
-`Hotcool` labels the `pc-garena` realm option, which shows only when the language is `cmn-Hant`.
-Two strings do not go through `t()` at all: the label `Open base item on Craft of Exile` in
-`item-check/settings-item-check.vue`, although `item.open_on_craftofexile` holds the same text, and
-`None added` in the `modsDiff` computed of `library/SingleItemSession.vue`.
-
-Done looks like: each string has an entry in the English file, and the two literals use a key. The
-English file already maps some texts to themselves, such as `seconds`, so adding each text as a
-top-level key keeps the code and the Russian entries working. The `Hotcool` label needs the realm's
-name from the maintainer, in English and in `cmn-Hant`. `renderer/specs/web/i18n-keys.test.ts` lists
-the 37 keys and fails when one of them gets an English entry, so remove each one there as it does.
+Done looks like: the maintainer gives the realm's name in English and in `cmn-Hant`, both files
+define it, and `Hotcool` leaves `LISTED_MISSING` in `renderer/specs/web/i18n-keys.test.ts`, which
+fails when the English file defines a key that the list still names.
 
 ## History
 
@@ -54,3 +30,7 @@ the 37 keys and fails when one of them gets an English entry, so remove each one
 - 2026-10-22: `PLANNED` in `renderer/specs/web/i18n-keys.test.ts` keeps `item.open_on_craftofexile`
   for the label in `settings-item-check.vue`. The test fails when code reads the key, so the commit
   that adds it to the label removes it from that list.
+- 2026-10-25: The English file now defines 36 of the 37 texts as top-level keys that map to
+  themselves, which keeps the Russian entries working. The Craft of Exile label reads
+  `item.open_on_craftofexile`, and `None added` reads `library.none_added`. Only `Hotcool` remains,
+  since it needs the realm's name from the maintainer.

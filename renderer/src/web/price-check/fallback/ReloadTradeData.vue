@@ -70,7 +70,7 @@ export default defineComponent({
         },
         () => {
           // shouldn't happen, load is internally try caught
-          err.value = "unhandled internal error, please report on github";
+          err.value = "poe2_new.internal_error";
         },
       );
     };

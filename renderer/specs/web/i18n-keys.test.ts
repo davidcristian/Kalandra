@@ -5,49 +5,19 @@ import { readMessages, TRANSLATIONS } from "./app-i18n";
 
 const SRC_DIR = path.resolve(__dirname, "../../src");
 
-// The UI texts that docs/dev/refinements/tasks/019-ui-text-not-in-app-i18n.md lists: t() gets them
-// as keys, and the English file does not define them yet. Remove a text here when it gets a key.
-const LISTED_MISSING = [
-  "Add",
-  "Both",
-  "Browser",
-  "Cancel",
-  "Currency / Hour",
-  "Disabled",
-  "Gone",
-  "Hotcool",
-  "Instant",
-  "Instant or Online",
-  "Items / Hour",
-  "Loading...",
-  "No",
-  "None",
-  "Not recognized modifier",
-  "Online",
-  "Recording settings",
-  "Refresh",
-  "Reload fallback data",
-  "Remove",
-  "Restart required",
-  "Retry",
-  "Retry Item",
-  "Save",
-  "Search",
-  "Select",
-  "Unable to determine fractured stat",
-  "You",
-  "in demand",
-  "keep augment mods",
-  "keep enchant mods",
-  "keep explicit mods",
-  "keep implicit mods",
-  "max",
-  "milliseconds",
-  "min",
-];
+// The UI text that docs/dev/refinements/tasks/019-ui-text-not-in-app-i18n.md lists: t() gets it as
+// a key, and the English file does not define it yet. Remove a text here when it gets a key.
+const LISTED_MISSING = ["Hotcool"];
 
-// Texts of task 019 that t() gets through an expression, which literalKeys() does not read
-const COMPUTED_MISSING = ["Offline"];
+// Keys that t() gets through a condition or a prop default, which literalKeys() does not read
+const EXPRESSION_KEYS = [
+  "Instant",
+  "Offline",
+  "Online",
+  "Trade",
+  "poe2_new.failed_to_load",
+  "poe2_new.internal_error",
+];
 
 // Key prefixes that src/ completes at run time, as in t(`tips.tip_${n}`)
 const COMPUTED_PREFIXES = [
@@ -67,8 +37,8 @@ const COMPUTED_KEYS = [
   "item.wrong_language_help",
 ];
 
-// Keys that no code reads yet, kept until tasks 019 and 016 put them to use or remove them
-const PLANNED = ["item.open_on_craftofexile", "item_editor.sceptre"];
+// Keys that no code reads yet, kept until task 016 puts them to use or removes them
+const PLANNED = ["item_editor.sceptre"];
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -130,14 +100,25 @@ describe("the literal keys passed to t()", () => {
     const outdated = LISTED_MISSING.filter(
       (key) => !used.has(key) || english.has(key),
     );
-    const defined = COMPUTED_MISSING.filter((key) => english.has(key));
-    expect([...outdated, ...defined]).toEqual([]);
+    expect(outdated).toEqual([]);
+  });
+});
+
+describe("the keys that t() gets through an expression", () => {
+  const english = readMessages("en");
+  const quoted = quotedStrings();
+
+  it("are quoted in the source and are UI texts of the English file", () => {
+    const missing = EXPRESSION_KEYS.filter(
+      (key) => !quoted.has(key) || !english.has(key),
+    );
+    expect(missing).toEqual([]);
   });
 });
 
 describe("the keys of a translation", () => {
   const english = readMessages("en");
-  const listed = new Set([...LISTED_MISSING, ...COMPUTED_MISSING]);
+  const listed = new Set(LISTED_MISSING);
 
   it.each(TRANSLATIONS)(
     "are keys of the English file, or listed as missing, in %s",
