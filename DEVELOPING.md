@@ -104,11 +104,15 @@ part alone:
   as uncovered. The renderer's `.vue` components are not counted.
 - `npm run lint` in `renderer/` or `main/` runs ESLint on `src/` and `specs/`, and in `main/`
   on `build/script.mjs` too. The pre-commit hooks run the same files with `--fix`.
+- Both processes run ESLint 9 with the flat config in their `eslint.config.mjs`, from
+  `devDependencies` in `main/` and `optionalDependencies` in `renderer/`. Each config adds the
+  `strict` rules of typescript-eslint to a Standard style base: `neostandard` in `main/` and
+  `@vue/eslint-config-standard-with-typescript` in `renderer/`.
 - An ESLint rule turned on after code broke it skips only that code. In `renderer/`,
   `eslint-suppressions.json` holds how many violations of each such rule each file had, and the
   lint fails when a file has more or fewer; `npm run lint -- --prune-suppressions` lowers a count
-  after a fix. main's ESLint 8 has no such file, so `existingOffenders` in `main/.eslintrc.cjs`
-  turns a rule off for the files listed; remove a file once it passes. Both lists only shrink.
+  after a fix. In `main/`, `existingOffenders` in `main/eslint.config.mjs` turns a rule off for
+  the files listed; remove a file once it passes. Both lists only shrink.
 - ESLint checks rule 7 of AGENTS.md in both processes: `no-explicit-any`, `ban-ts-comment` for
   `@ts-ignore` and an `@ts-expect-error` without a reason, `no-empty` for an empty `catch`, and
   `no-restricted-syntax` for a cast through `unknown` and an empty `.catch()` handler. No installed

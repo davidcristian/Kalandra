@@ -2,10 +2,9 @@ import type { BrowserWindow } from "electron";
 import { EventEmitter } from "events";
 import { OverlayController, AttachEvent } from "electron-overlay-window";
 
-export interface GameWindow {
-  on: (event: "active-change", listener: (isActive: boolean) => void) => this;
-}
-export class GameWindow extends EventEmitter {
+export class GameWindow extends EventEmitter<{
+  "active-change": [isActive: boolean];
+}> {
   private _isActive = false;
   private _isTracking = false;
 

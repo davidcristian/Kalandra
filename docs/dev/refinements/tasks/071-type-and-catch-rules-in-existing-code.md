@@ -2,8 +2,8 @@
 
 **Status:** open
 **Area:** rules
-**Origin:** [main/.eslintrc.cjs](../../../../main/.eslintrc.cjs)
-**Verified:** 2026-10-22
+**Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
+**Verified:** 2026-10-25
 
 Rule 7 of [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass) bans `any`, a cast through
 `unknown` and an error dropped by an empty `catch`. ESLint checks these in both processes with
@@ -11,7 +11,7 @@ Rule 7 of [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass) bans `a
 cast through `unknown` and one for an empty `.catch()` handler. The code that broke them when they
 were turned on is exempt:
 
-- main, in `existingOffenders` and the `no-restricted-syntax` override of `main/.eslintrc.cjs`:
+- main, in `existingOffenders` and the `no-restricted-syntax` override of `main/eslint.config.mjs`:
   4 empty `catch` blocks in `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)),
   `guessFileLocation()` and `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
   `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
@@ -39,3 +39,5 @@ the line. Then its file leaves the main lists.
   replaced by typed test items, parser states and stat fixtures.
 - 2026-10-22: The 11 casts through `unknown` in `specs/web/client-log.test.ts` were replaced by a
   helper that returns the sent client log events of one type, so the renderer exempts none.
+- 2026-10-25: main moved to ESLint 9, and the main lists moved to `main/eslint.config.mjs` with the
+  same files.

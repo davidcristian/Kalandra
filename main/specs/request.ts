@@ -106,6 +106,13 @@ export async function openClient(
   });
 }
 
+/** Returns the text of a message, which the default nodebuffer binary type passes as one Buffer. */
+function messageText(data: WebSocket.RawData): string {
+  if (!Buffer.isBuffer(data))
+    throw new TypeError("The message is not one Buffer");
+  return data.toString("utf-8");
+}
+
 // Resolves the first `count` messages a new /events client receives, or those that came within 2 seconds
 export async function firstMessages(
   port: number,
@@ -123,7 +130,7 @@ export async function firstMessages(
     };
     const timer = setTimeout(done, 2000);
     socket.on("message", (data) => {
-      messages.push(JSON.parse(String(data)));
+      messages.push(JSON.parse(messageText(data)));
       if (messages.length === count) done();
     });
     socket.on("error", reject);
@@ -137,7 +144,7 @@ export class EventClient {
 
   private constructor(private readonly socket: WebSocket) {
     socket.on("message", (data) => {
-      const event = JSON.parse(String(data)) as IpcEvent;
+      const event = JSON.parse(messageText(data)) as IpcEvent;
       const resolve = this.waiting.shift();
       if (resolve) resolve(event);
       else this.kept.push(event);
