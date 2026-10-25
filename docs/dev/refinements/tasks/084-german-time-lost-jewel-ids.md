@@ -1,6 +1,6 @@
 # The German data searches each Time-Lost jewel conqueror one option too low
 
-**Status:** open
+**Status:** done 2026-10-25
 **Area:** data
 **Origin:** [renderer/public/data/de/stats.ndjson](../../../../renderer/public/data/de/stats.ndjson)
 **Verified:** 2026-10-25
@@ -23,3 +23,6 @@ records ending in `|21` to `|28` and no other change to them.
 ## History
 
 - 2026-10-25: Found while comparing the German trade data with the generated German stats.
+- 2026-10-25: Done by fix(data): search German Time-Lost jewels by the trade site's option. The
+  eight records are the data tool's output, and they differ from the old ones only in the trade id.
+  The rest of the German data is unchanged.

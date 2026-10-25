@@ -1,6 +1,6 @@
 # The committed data has five unique items without a name and 18 client strings nothing reads
 
-**Status:** open
+**Status:** done 2026-10-25
 **Area:** data
 **Origin:** [renderer/public/data/en/items.ndjson](../../../../renderer/public/data/en/items.ndjson)
 **Verified:** 2026-10-25
@@ -38,3 +38,8 @@ item without `refName`, with a test, which the committed data would fail today.
 
 - 2026-10-25: Found while comparing a build of the data tool with the committed data, after the
   tool started naming uniques by the name the game shows and stopped writing unread client strings.
+- 2026-10-25: Done by fix(data): name five uniques and use the trade site's unique names,
+  fix(data): remove 18 client strings that the app never reads, and build(renderer): fail
+  make-index-files on an item without a refName. The nine records per language take `name` and
+  `refName` from the data tool's output and keep their icons, and they moved to where the tool's
+  sort by namespace and `refName` puts them.

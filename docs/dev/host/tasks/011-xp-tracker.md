@@ -26,6 +26,9 @@ from April 2026, game version `4.4.0j`. [docs/xp-tracker.md](../../../xp-tracker
 - `G1_1`, The Riverbank, is the first campaign area. `client-log.ts` sets the level to 1 when a
   character enters it, because only a new character goes there. If a character above level 1 can
   enter it again, the widget shows level 1 there.
+- With the game in Korean, a level up line has `이(가)` as the game's text writes it, which the
+  Korean `LOG_LEVEL_UP` in `renderer/public/data/ko/client_strings.js` matches literally. No test
+  log is Korean.
 
 **Do.** [Section 8 of the runbook](../../runbooks/in-game-check.md#8-clienttxt-for-the-xp-tracker),
 with a character that can gain a level. Enter a town, the hideout and another area, gain a level,
@@ -48,3 +51,5 @@ in the page needs a Mac, which this list does not cover
 - 2026-10-18: Checked against the code. Removed two claims that need no game: the experience
   formula, which is code and which the game shows no number to compare with, and the widget's first
   position, which `initInstance()` in `WidgetXpTracker.vue` sets. Added the return to `G1_1`.
+- 2026-10-25: Added the Korean level up line, after the data stopped reading `(가)` as a regex group
+  ([refinement 085](../../refinements/tasks/085-unescaped-client-string-regexes.md)).

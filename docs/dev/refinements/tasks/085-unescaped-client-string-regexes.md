@@ -1,6 +1,6 @@
 # Four committed client string regexes read game text characters as regex syntax
 
-**Status:** open
+**Status:** done 2026-10-25
 **Area:** data
 **Origin:** [renderer/public/data/ko/client_strings.js](../../../../renderer/public/data/ko/client_strings.js)
 **Verified:** 2026-10-25
@@ -27,3 +27,6 @@ regenerated with the escapes, and a Korean level up checked in game with
 ## History
 
 - 2026-10-25: Found while checking the generated regexes for regex syntax characters.
+- 2026-10-25: Done by fix(data): match regex characters of game text literally, which replaces the
+  four lines with the data tool's output. The Korean level up in game is a claim of
+  [host task 011](../../host/tasks/011-xp-tracker.md), not yet checked.
