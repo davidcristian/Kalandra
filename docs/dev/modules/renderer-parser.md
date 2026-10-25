@@ -164,7 +164,7 @@ runtime. It reads the trade site lists through the proxy with `useTradeData()` f
 ([renderer-price-check.md](renderer-price-check.md), [080](../refinements/tasks/080-data-loader-imports-trade-data.md)).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
-the floor in `renderer/vitest.config.ts` (78.4% of the lines of the `.ts` files in `src/` on 25 Oct 2026). The parser
+the floor in `renderer/vitest.config.ts` (78.7% of the lines of the `.ts` files in `src/` on 25 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
 has the text and the expected fields) and `specs/Parser/mods.ts`. `specs/Parser/whole-item.test.ts` parses whole
 items, such as fractured, unidentified and corrupted ones, and compares their properties, modifier counts and runes
