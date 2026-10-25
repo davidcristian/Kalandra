@@ -12,7 +12,8 @@ replaces it with `vi.mock("electron", ...)`.
 - `startup.test.ts` covers the startup order on each platform, with a fake `app` that emits `ready` once.
 - `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry, Open in Browser
   also before the server listens, and sends `CLIENT->MAIN::user-action` messages.
-- `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails.
+- `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails,
+  with or without an `error` event.
 - `start-server.test.ts` calls `startServer()` with a fake updater, checks the address it resolves, reads `GET /config`
   before and after a `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of
   the overlay window, of a browser and with none, sends messages main cannot use, and sends client log entries from the
@@ -72,7 +73,7 @@ replaces it with `vi.mock("electron", ...)`.
   write or fail the rename as Windows does for a file another program has open. It also makes a temporary save,
   saves in development and reads a `config.json` that is a folder.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary
-  folder, and the first two pass their own default paths.
+  folder, and the first two pass their own default paths, of which `unreadable-files.ts` makes some fail with EACCES.
 - `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key
   codes it cannot read, and reads a file again only at a new path.
 - `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its

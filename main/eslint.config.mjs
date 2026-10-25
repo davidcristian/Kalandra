@@ -19,11 +19,7 @@ const existingOffenders = {
     "src/main.ts",
     "src/server.ts",
   ],
-  "no-empty": [
-    "src/host-files/ConfigStore.ts",
-    "src/host-files/utils.ts",
-    "src/vision/link-main.ts",
-  ],
+  "no-empty": ["src/host-files/ConfigStore.ts", "src/vision/link-main.ts"],
 };
 
 const castThroughUnknown = {

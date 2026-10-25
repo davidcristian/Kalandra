@@ -31,7 +31,9 @@ When `PoE log file` is empty, Kalandra looks for `Client.txt` in the default gam
 
 If the widget does not update, open the Settings window and go to `Debug`:
 
-- `No log file found` means that `Client.txt` is in none of these folders.
+- `No log file found` means that Kalandra can read `Client.txt` in none of these folders. A line before it,
+  `Cannot read a default log file: <reason>`, names a file that exists but that Kalandra cannot read, such as one
+  with the code `EACCES` when Kalandra has no permission to read it.
 - `Found 2 log files, please enter one into settings:` means that both the standalone and the Steam file exist.
 - `Failed to watch file: <reason>` means that Kalandra could not open the log file. The reason starts with an error
   code, such as `ENOENT` when the file does not exist or `EACCES` when Kalandra has no permission to read it.

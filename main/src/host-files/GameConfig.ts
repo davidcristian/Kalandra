@@ -55,7 +55,14 @@ export class GameConfig {
     this._actualPath = null;
 
     if (!filePath.length) {
-      const guessedPath = await guessFileLocation(this.possiblePaths);
+      const guessedPath = await guessFileLocation(
+        this.possiblePaths,
+        (message) => {
+          this.logger.write(
+            `warn [GameConfig] Cannot read a default game configuration file: ${message}`,
+          );
+        },
+      );
       if (guessedPath != null) {
         filePath = guessedPath;
       } else if (guessedPath === null) {

@@ -9,6 +9,7 @@ import {
 import { MAX_LINE_BYTES } from "../src/host-files/LineSplitter";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
+import { unreadableFiles } from "./unreadable-files";
 
 vi.mock("electron", async () => {
   const os = await import("node:os");
@@ -35,6 +36,11 @@ vi.mock("fs", async (importOriginal) => {
       polls.delete(file);
     },
   };
+});
+
+vi.mock("fs/promises", async (importOriginal) => {
+  const { withUnreadableFiles } = await import("./unreadable-files");
+  return withUnreadableFiles(await importOriginal());
 });
 
 /** Stands in for fs.watchFile: a test calls change() where the 450 ms poll would see a change. */
@@ -91,6 +97,7 @@ beforeEach(async () => {
 afterEach(async () => {
   await watcher.restart("", false);
   vi.restoreAllMocks();
+  unreadableFiles.clear();
   await fs.rm(folder, { recursive: true, force: true });
 });
 
@@ -133,6 +140,22 @@ describe("GameLogWatcher.restart", () => {
     await fs.writeFile(steam, "");
     await watcher.restart("", true);
     expect(files.watched).toEqual([steam]);
+  });
+
+  it("logs why a default log file cannot be read, and then that none was found", async () => {
+    const standalone = path.join(folder, "standalone", "Client.txt");
+    const steam = path.join(folder, "steam", "Client.txt");
+    unreadableFiles.add(steam);
+    createWatcher([standalone, steam]);
+
+    await watcher.restart("", true);
+
+    expect(files.watched).toEqual([]);
+    expect(logger.history).toContain(
+      `warn [GameLogWatcher] Cannot read a default log file: EACCES: permission denied, access '${steam}'`,
+    );
+    expect(logger.history).not.toContain(standalone);
+    expect(logger.history).toContain("No log file found");
   });
 
   it("keeps the open file and its read position on a restart with the same path", async () => {

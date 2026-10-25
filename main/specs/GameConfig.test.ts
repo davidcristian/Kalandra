@@ -5,10 +5,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GameConfig } from "../src/host-files/GameConfig";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
+import { unreadableFiles } from "./unreadable-files";
 
 vi.mock("electron", async () => {
   const os = await import("node:os");
   return { app: { getPath: () => os.tmpdir() } };
+});
+
+vi.mock("fs/promises", async (importOriginal) => {
+  const { withUnreadableFiles } = await import("./unreadable-files");
+  return withUnreadableFiles(await importOriginal());
 });
 
 // 90 is the key code of Z
@@ -50,6 +56,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  unreadableFiles.clear();
   await fs.rm(folder, { recursive: true, force: true });
 });
 
@@ -78,6 +85,22 @@ describe("GameConfig.readConfig", () => {
       `error [GameConfig] Found more than one game configuration file, enter one in settings: ${documents}, ${proton}`,
     );
     expect(logger.history).not.toContain("Failed to find");
+  });
+
+  it("logs why a default file cannot be read, and reads the one it can", async () => {
+    const documents = configPath("documents");
+    const proton = configPath("proton");
+    await writeConfig(documents);
+    await writeConfig(proton);
+    unreadableFiles.add(documents);
+    const reader = createReader([documents, proton]);
+
+    await reader.readConfig("");
+
+    expect(reader.showModsKey).toBe("Z");
+    expect(logger.history).toContain(
+      `warn [GameConfig] Cannot read a default game configuration file: EACCES: permission denied, access '${documents}'`,
+    );
   });
 
   it("logs why the file at the path in settings cannot be read", async () => {

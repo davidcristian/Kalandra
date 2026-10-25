@@ -67,12 +67,12 @@ The entry, the server and the app services, in `main/src/`:
   (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
   `GameLogWatcher` writes after its `Found 2 log files` error have no level. The Debug settings page shows the log.
 - `AppUpdater.ts`: `AppUpdater` wraps electron-updater. Setting `info` broadcasts `MAIN->CLIENT::updater-state`. It
-  checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not
-  wait for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is
-  off for the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with
-  `--no-updates`. `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and
-  `disabled-by-flag` for the flag. An `error` event logs `error [AppUpdater] Update failed:` and the first line of
-  the error's message, because electron-updater writes the response headers, which can hold cookies, after it.
+  checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not wait
+  for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is off for
+  the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with `--no-updates`.
+  `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and `disabled-by-flag` for the flag. An
+  `error` event logs `error [AppUpdater] Update failed:` and the first line of the error's message, since the next lines
+  are response headers, which can contain cookies. A check that fails without an `error` event logs the same line.
 - `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a message
   box that says to press the overlay key; Open in Browser, which opens `pageUrl` once `main.ts` sets it after the server
   listens; Open config folder (`apt-data`); and Quit.
@@ -198,8 +198,8 @@ The entry, the server and the app services, in `main/src/`:
   Each event and `restart` starts after the one before it ends, so an entry that comes while its file opens is written
   once the file is open, and lines keep the order of their events. A failed open or write is logged, and the next
   event still runs.
-- `utils.ts`: `guessFileLocation(entries)` returns the one readable path, `null` when more than one is readable,
-  or `undefined` when none is.
+- `utils.ts`: `guessFileLocation(entries, onUnreadable)` returns the one readable path, `null` when more than one is
+  readable, or `undefined` when none is, and passes each error but `ENOENT` to `onUnreadable`, which logs a `warn`.
 
 `vision/`: `OcrWorker` in `link-main.ts` runs `link-worker.ts`, bundled as `dist/vision.js`, in a worker thread
 through Comlink. The worker loads the Tesseract and OpenCV WebAssembly builds from `apt-data/cv-ocr/`, which the
@@ -223,9 +223,9 @@ fails. A gem search waits for the last change and fails when that change failed.
 - Item text and OCR text go to the last active client only; the log, the updater state, the config and the focus
   state go to every client.
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
-- Some existing code drops errors in empty `catch` blocks: `ConfigStore.load()`, `guessFileLocation()`,
-  `OcrWorker` and the `copy-item` and `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of
-  [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on a new empty `catch` block or `.catch()` handler.
+- Some existing code drops errors in empty `catch` blocks: `ConfigStore.load()`, `OcrWorker` and the `copy-item` and
+  `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and
+  ESLint fails on a new empty `catch` block or `.catch()` handler.
 
 **Dependencies.** `ipc/types.ts` and `ipc/KeyToCode.ts`, by relative path. At run time Electron 44, and the native
 modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle leaves out with `electron`. Both

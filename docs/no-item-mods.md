@@ -26,10 +26,11 @@ names the log line that shows it.
 - **The key is not `Alt`, and Kalandra cannot read the game's config file**, so it presses `Alt`. The log shows
   `error [GameConfig] Failed to find game configuration file in the default location.`,
   `error [GameConfig] Found more than one game configuration file, enter one in settings: <paths>` or
-  `error [GameConfig] Failed to read game configuration file: <reason>`. Set the path of
-  `poe2_production_Config.ini` in **PoE config file** on the **General** settings page. On Windows, Kalandra looks
-  for the file in `Documents\My Games\Path of Exile 2`. Each click on **Save** reads the file again until a read
-  succeeds, for example after the game has created the file at its first start.
+  `error [GameConfig] Failed to read game configuration file: <reason>`.
+  `warn [GameConfig] Cannot read a default game configuration file: <reason>` names a default file that Kalandra
+  cannot read. Set the path of `poe2_production_Config.ini` in **PoE config file** on the **General** settings page.
+  On Windows, Kalandra looks for the file in `Documents\My Games\Path of Exile 2`. Each click on **Save** reads the
+  file again until a read succeeds, for example after the game has created the file at its first start.
 - **Another program uses the same keys**, so the game does not receive them. The log shows
   `Failed to register a shortcut "<keys>". It is already registered by another application.`, or nothing.
   [Another program takes the copy keys](/nothing-happens#another-program-takes-the-copy-keys) describes how to find

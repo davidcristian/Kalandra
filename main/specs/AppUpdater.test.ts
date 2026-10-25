@@ -5,10 +5,14 @@ import { AppUpdater } from "../src/AppUpdater";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 
-const check = vi.hoisted(() => ({ failure: undefined as Error | undefined }));
+const check = vi.hoisted(() => ({
+  failure: undefined as Error | undefined,
+  emitsError: true,
+}));
 
 // A check finds version 9.9.9 and, with autoDownload on, downloads it, as electron-updater does.
-// With check.failure set, it emits the error and then rejects with it, as electron-updater does.
+// With check.failure set, it emits the error and then rejects with it, as electron-updater does,
+// or with check.emitsError false only rejects.
 vi.mock("electron-updater", async () => {
   const { EventEmitter } = await import("node:events");
   class FakeAutoUpdater extends EventEmitter {
@@ -17,7 +21,9 @@ vi.mock("electron-updater", async () => {
     async checkForUpdates() {
       this.emit("checking-for-update");
       if (check.failure) {
-        this.emit("error", check.failure, String(check.failure.stack));
+        if (check.emitsError) {
+          this.emit("error", check.failure, String(check.failure.stack));
+        }
         throw check.failure;
       }
       this.emit("update-available", { version: "9.9.9" });
@@ -43,9 +49,15 @@ const loggedLines = (logger: Logger) =>
     .filter((line) => line !== "")
     .map((line) => line.replace(/^\[[^\]]*\] /, ""));
 
+// The fake check rejects at once, so the updater has handled the rejection after the pending promise callbacks
+async function checkSettled() {
+  await new Promise((resolve) => setImmediate(resolve));
+}
+
 beforeEach(() => {
   autoUpdater.removeAllListeners();
   check.failure = undefined;
+  check.emitsError = true;
 });
 
 describe("AppUpdater", () => {
@@ -84,18 +96,33 @@ describe("AppUpdater", () => {
     },
   );
 
-  it("logs the first line of a failed check's message, without the response headers", () => {
+  it("logs the first line of a failed check's message once, without the response headers", async () => {
     check.failure = new Error(
       '404 Not Found\nHeaders: {\n  "set-cookie": "_gh_sess=fake-session; path=/"\n}',
     );
     const server = new FakeServer();
     const logger = new Logger(server);
     const updater = new AppUpdater(server, logger);
+    await checkSettled();
 
     expect(loggedLines(logger)).toEqual([
       "error [AppUpdater] Update failed: 404 Not Found",
     ]);
     expect(updater.info.state).toBe("error");
     expect(states(server.sent)).toEqual(["checking-for-update", "error"]);
+  });
+
+  it("logs a failed check that sends no error event", async () => {
+    check.failure = new Error("net::ERR_INTERNET_DISCONNECTED");
+    check.emitsError = false;
+    const server = new FakeServer();
+    const logger = new Logger(server);
+    const updater = new AppUpdater(server, logger);
+    await checkSettled();
+
+    expect(loggedLines(logger)).toEqual([
+      "error [AppUpdater] Update failed: net::ERR_INTERNET_DISCONNECTED",
+    ]);
+    expect(updater.info.state).toBe("error");
   });
 });

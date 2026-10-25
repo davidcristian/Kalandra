@@ -12,8 +12,8 @@ cast through `unknown` and one for an empty `.catch()` handler. The code that br
 were turned on is exempt:
 
 - main, in `existingOffenders` and the `no-restricted-syntax` override of `main/eslint.config.mjs`:
-  4 empty `catch` blocks in `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)),
-  `guessFileLocation()` and `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
+  3 empty `catch` blocks in `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)) and
+  `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
   `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
   second also in [010](010-ocr-errors-dropped.md).
 
@@ -41,3 +41,5 @@ the line. Then its file leaves the main lists.
   helper that returns the sent client log events of one type, so the renderer exempts none.
 - 2026-10-25: main moved to ESLint 9, and the main lists moved to `main/eslint.config.mjs` with the
   same files.
+- 2026-10-25: `guessFileLocation()` passes each error but a missing file to its caller, which logs it,
+  and `utils.ts` left the `no-empty` list.

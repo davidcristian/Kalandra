@@ -5,6 +5,7 @@ import type { UpdateInfo } from "../../ipc/types";
 
 export class AppUpdater {
   private _info: UpdateInfo = { state: "initial" };
+  private reportedError: unknown;
 
   public readonly noAutoUpdatesReason: Extract<
     UpdateInfo,
@@ -60,13 +61,7 @@ export class AppUpdater {
     autoUpdater.on("update-not-available", () => {
       this.info = { state: "update-not-available", checkedAt: Date.now() };
     });
-    autoUpdater.on("error", (error: unknown) => {
-      // electron-updater writes the response headers, which can hold cookies, after the first line
-      const message = error instanceof Error ? error.message : String(error);
-      const reason = message.split("\n")[0];
-      this.logger.write(`error [AppUpdater] Update failed: ${reason}`);
-      this.info = { state: "error", checkedAt: Date.now() };
-    });
+    autoUpdater.on("error", this.reportFailure);
     autoUpdater.on("update-downloaded", (info: { version: string }) => {
       this.info = { state: "update-downloaded", version: info.version };
     });
@@ -79,8 +74,18 @@ export class AppUpdater {
   private check = async () => {
     try {
       await autoUpdater.checkForUpdates();
-    } catch {
-      // handled by event
+    } catch (error) {
+      // electron-updater emits a failed check as an error event, then rejects with the same error
+      if (error !== this.reportedError) this.reportFailure(error);
     }
+  };
+
+  private reportFailure = (error: unknown) => {
+    this.reportedError = error;
+    // electron-updater writes the response headers, which can hold cookies, after the first line
+    const message = error instanceof Error ? error.message : String(error);
+    const reason = message.split("\n")[0];
+    this.logger.write(`error [AppUpdater] Update failed: ${reason}`);
+    this.info = { state: "error", checkedAt: Date.now() };
   };
 }

@@ -99,7 +99,14 @@ export class GameLogWatcher {
     }
 
     if (!logFile.length) {
-      const guessedPath = await guessFileLocation(this.possiblePaths);
+      const guessedPath = await guessFileLocation(
+        this.possiblePaths,
+        (message) => {
+          this.logger.write(
+            `warn [GameLogWatcher] Cannot read a default log file: ${message}`,
+          );
+        },
+      );
       if (guessedPath) {
         logFile = guessedPath;
       } else {
