@@ -227,6 +227,8 @@ file fixture. Saved listings name their sellers `Seller01#0001` and up, and thei
 returns the saved listings, and checks the grouped rows and how many listings it reads.
 `specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` that answers when
 the test says.
+`bulk-search.test.ts` in `specs/web/price-check/trade/` runs `execBulkSearch` on hand-written exchange responses
+and checks the order and the totals per currency, the seller states and the cache.
 `specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
 schema version and an overview type that the map does not list, and `specs/web/prices-load.test.ts` loads the price
 file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
