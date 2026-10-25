@@ -145,3 +145,4 @@ layout and its reasons.
 - 081: [The anointment filter decodes oil indexes with its own copy of a game table's order](tasks/081-oil-names-follow-game-table-order.md)
 - 082: [Code still checks item names and fields that the Path of Exile 2 data does not have](tasks/082-checks-for-item-names-the-data-lacks.md)
 - 083: [The Library widget saves mod options that nothing reads](tasks/083-library-mod-options-unread.md)
+- 084: [The German data searches each Time-Lost jewel conqueror one option too low](tasks/084-german-time-lost-jewel-ids.md)

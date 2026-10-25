@@ -154,19 +154,16 @@ class ValueConverterService:
         )
         historic_matchers = advanced_df["local_unique_jewel_alternate_tree_version"]
         advanced_desc_array = [matcher["string"] for matcher in historic_matchers]
-        max_value = (
-            int(in_df["value"].max())
-            if self.lang != GERMAN
-            else int(in_df["value"].max()) - 1
-        )
-        if len(advanced_desc_array) != max_value:
+        # The German game text names High Templar Dominus on two lines and Description
+        # keeps one, so the German list is one shorter before the trade site's values
+        missing = 1 if self.lang == GERMAN else 0
+        if len(advanced_desc_array) != int(in_df["value"].max()) - missing:
             # Without one advanced text per value, the matchers keep the trade site's texts
             return self.simple_agg(in_df)
         out: list[dict[str, object]] = []
         for row in value_stat_rows(in_df):
-            value = int(row.value) - 1
-            if self.lang == GERMAN:
-                value -= 1
+            trade_value = int(row.value)
+            index = trade_value - 1 - missing
 
             out_row: dict[str, object] = {
                 "ref": row.ref.split("\n")[0],
@@ -175,14 +172,14 @@ class ValueConverterService:
                 "better": BETTER_LOOKUP[TIME_LOST_HISTORIC_JEWEL],
                 "matchers": [
                     {
-                        "string": re.sub(r"\([^)]*\)", "", advanced_desc_array[value]),
-                        "advanced": advanced_desc_array[value],
+                        "string": re.sub(r"\([^)]*\)", "", advanced_desc_array[index]),
+                        "advanced": advanced_desc_array[index],
                     }
                 ],
                 "trade": {
                     "ids": {
                         "explicit": [
-                            f"explicit.stat_{TIME_LOST_HISTORIC_JEWEL}|{value + 1}"
+                            f"explicit.stat_{TIME_LOST_HISTORIC_JEWEL}|{trade_value}"
                         ]
                     }
                 },

@@ -20,7 +20,7 @@ from constants.known_stats import (
     VALUE_TO_DESCRIPTION_ID,
     VALUE_TO_REF,
 )
-from constants.lang import ENGLISH
+from constants.lang import ENGLISH, GERMAN
 from services.value_converter_service import ValueConverterService
 
 
@@ -483,3 +483,70 @@ def test_historic_agg_integration():
         out = svc.historic_agg(df)
 
         pd.testing.assert_frame_equal(out, expected_df)
+
+
+GERMAN_HISTORIC_JEWELS = [
+    (
+        "Remembrancing # songworthy deeds by the line of Vorana",
+        "In Erinnerung an # lobenswerte Taten der Ahnenlinie von Vorana",
+    ),
+    (
+        "Remembrancing # songworthy deeds by the line of Medved",
+        "In Erinnerung an # lobenswerte Taten der Ahnenlinie von Medved",
+    ),
+    (
+        "Remembrancing # songworthy deeds by the line of Olroth",
+        "In Erinnerung an # lobenswerte Taten der Ahnenlinie von Olroth",
+    ),
+    (
+        "Glorifying the defilement of # souls in tribute to Amanamu",
+        "In Verehrung der Schändung von # Seelen als Tribut an Amanamu",
+    ),
+    (
+        "Glorifying the defilement of # souls in tribute to Kulemak",
+        "In Verehrung der Schändung von # Seelen als Tribut an Kulemak",
+    ),
+    (
+        "Glorifying the defilement of # souls in tribute to Kurgal",
+        "In Verehrung der Schändung von # Seelen als Tribut an Kurgal",
+    ),
+    (
+        "Glorifying the defilement of # souls in tribute to Tecrod",
+        "In Verehrung der Schändung von # Seelen als Tribut an Tecrod",
+    ),
+    (
+        "Glorifying the defilement of # souls in tribute to Ulaman",
+        "In Verehrung der Schändung von # Seelen als Tribut an Ulaman",
+    ),
+]
+
+
+def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_conqueror():
+    rows = pd.DataFrame(
+        [
+            {
+                "hash": TIME_LOST_HISTORIC_JEWEL,
+                "ref": f"{ref}\nPassives in radius are Conquered",
+                "text": f"{text}\nPassive im Radius wurden erobert",
+                "value": str(value),
+                "type": "explicit",
+                "id": "explicit.stat_3418580811",
+            }
+            for value, (ref, text) in enumerate(GERMAN_HISTORIC_JEWELS, start=21)
+        ]
+    )
+
+    with patch.object(ValueConverterService, "get_blight", return_value={}):
+        out = ValueConverterService(lang=GERMAN).historic_agg(rows)
+
+    assert [
+        (
+            r["ref"],
+            r["trade"]["ids"]["explicit"],
+            r["matchers"][0]["advanced"].split("(")[0],
+        )
+        for r in out.to_dict("records")
+    ] == [
+        (ref, [f"explicit.stat_3418580811|{value}"], text)
+        for value, (ref, text) in enumerate(GERMAN_HISTORIC_JEWELS, start=21)
+    ]
