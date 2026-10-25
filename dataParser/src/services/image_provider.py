@@ -28,8 +28,9 @@ def get_script_dir() -> str:
 
 
 class ImageProvider:
-    def __init__(self, mode: MODE):
+    def __init__(self, mode: MODE, cache_dir: str | None = None):
         self.mode: MODE = mode
+        self.cache_dir: str = cache_dir or get_script_dir()
         self.net: RateLimiter = RateLimiter(debug=False)
 
         self.cache: dict[str, str] = self.get_cache()
@@ -38,7 +39,7 @@ class ImageProvider:
         self.save_cache(self.cache, output_file=OLD_ITEM_IMAGE_CACHE)
 
     def get_cache(self) -> dict[str, str]:
-        cache_path = f"{get_script_dir()}/{ITEM_IMAGE_CACHE}"
+        cache_path = os.path.join(self.cache_dir, ITEM_IMAGE_CACHE)
 
         # Check if the file exists and create it if it doesn't
         if not os.path.exists(cache_path):
@@ -50,7 +51,7 @@ class ImageProvider:
             return json.loads(f.read())
 
     def save_cache(self, cache: dict[str, str], output_file: str = ITEM_IMAGE_CACHE):
-        cache_path = f"{get_script_dir()}/{output_file}"
+        cache_path = os.path.join(self.cache_dir, output_file)
         logger.info(f"Saving cache to {cache_path}")
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(cache, f, indent=4)

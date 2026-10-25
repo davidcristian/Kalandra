@@ -142,7 +142,10 @@ the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data))
 tests the constants, models, providers, services and stores one module at a time. Its provider tests run a fake
 export command, the trade site tests use the fake session and clock in `tests/fake_http.py`, and its description
 tests read the sample files in `tests/data/cases/`.
-`tests/integration/` reads real files, and `tests/test_main.py` runs `main()` end to end. The hooks in
+`tests/integration/` reads real files. `tests/test_main.py` runs `main()` end to end with `push`, checks the files
+it writes and copies, and tests the `--pull` step with a fake export and the fake session. Every test writes to a
+temporary folder: `main()` takes the output folder and `ImageProvider` the cache folder, and `NdBuilderService`
+opens the image cache only when it applies the icons. The hooks in
 `dataParser/.pre-commit-config.yaml` run Ruff (lint with `--fix`, and format), Bandit outside `tests/`, and the
 pygrep checks: annotations instead of type comments, no `eval`, no blanket `noqa`, no misused mock assertions and no
 `log.warn`. Run them with `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root.
@@ -155,7 +158,8 @@ A fresh clone cannot pass the tests as of 18 Oct 2026:
 - No file lists the packages `src/` and `tests/` import: `pandas`, `numpy` 2 or newer (for `numpy.strings`), `tqdm`,
   `cloudscraper`, `requests`, `murmurhash2` and `pytest`.
 - `tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
-  needs it and the trade data in `data/json/`.
+  needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
+  since it reads game tables when it is built.
 - The description tests in `tests/unit/stores/helpers/test_description.py` and `tests/integration/stores/helpers/`
   read expected results from `tests/data/expected/`, which is not in the repo.
 

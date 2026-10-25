@@ -41,7 +41,9 @@ class NdBuilderService:
     stats: pd.DataFrame
     items: pd.DataFrame
 
-    def __init__(self, lang: LANG, image_mode: MODE):
+    def __init__(
+        self, lang: LANG, image_mode: MODE, image_cache_dir: str | None = None
+    ):
         self.lang: LANG = lang
 
         self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
@@ -51,7 +53,7 @@ class NdBuilderService:
 
         self.vc = ValueConverterService(lang)
         self.image_mode: MODE = image_mode
-        self.image_provider = ImageProvider(mode=image_mode)
+        self.image_cache_dir: str | None = image_cache_dir
         self.specific_column_service = SpecificColumnService(lang)
         self.logbook_factions = LogbookFactions(lang)
 
@@ -460,7 +462,7 @@ class NdBuilderService:
         return filtered
 
     def apply_images(self, items: pd.DataFrame) -> pd.DataFrame:
-        return self.image_provider.apply_images(items)
+        return ImageProvider(self.image_mode, self.image_cache_dir).apply_images(items)
 
     def fill_in_missing_matchers(self, joined_df_i: pd.DataFrame) -> pd.DataFrame:
         trade_stats_df = self.stats_combined_df()

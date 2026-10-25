@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import os
 import shutil
 
 import pandas as pd
@@ -36,18 +37,28 @@ def write_ndjson(df: pd.DataFrame, path: str) -> None:
             f.write(f"{json.dumps(obj, ensure_ascii=False, allow_nan=False)}\n")
 
 
-def main(**kwargs: dict[str, bool | str]):
-    pull: bool = kwargs.get("pull", False)  # pyright: ignore[reportAssignmentType]
-    image_mode: MODE = kwargs.get("image_mode", "noLookup")  # pyright: ignore[reportAssignmentType]
-    push: bool = kwargs.get("push", False)  # pyright: ignore[reportAssignmentType]
-    main_repo_path: str = kwargs.get("main_repo_path", "..")  # pyright: ignore[reportAssignmentType]
+def pull_inputs(
+    game_data: GameDataProvider, pacer: RequestPacer, json_dir: str | None = None
+) -> None:
+    """Runs the game export, then pulls the trade data of every language into json_dir/<lang>."""
+    game_data.run_export()
+    for lang in tqdm(LANGUAGES):
+        lang_dir = None if json_dir is None else os.path.join(json_dir, lang)
+        TradeApiProvider(lang, pacer, lang_dir).pull()
 
+
+def main(
+    pull: bool = False,
+    image_mode: MODE = "noLookup",
+    push: bool = False,
+    main_repo_path: str = "..",
+    output_dir: str = "output",
+    image_cache_dir: str | None = None,
+) -> None:
+    """Builds the three files of every language into output_dir/<lang>."""
     if pull:
-        GameDataProvider().run_export()
         # One pacer for every language, so the pause also holds from one language to the next
-        pacer = RequestPacer(create_trade_session())
-        for lang in tqdm(LANGUAGES):
-            TradeApiProvider(lang, pacer).pull()
+        pull_inputs(GameDataProvider(), RequestPacer(create_trade_session()))
 
     run_on: list[LANG] = [ENGLISH, *[lang for lang in LANGUAGES if lang != ENGLISH]]
 
@@ -62,10 +73,13 @@ def main(**kwargs: dict[str, bool | str]):
         nd = NdBuilderService(
             lang,
             image_mode if lang is ENGLISH else "noLookup",
+            image_cache_dir,
         )
+        lang_dir = os.path.join(output_dir, lang)
+        os.makedirs(lang_dir, exist_ok=True)
 
-        write_ndjson(nd.build_stats_ndjson(), f"output/{lang}/stats.ndjson")
-        write_ndjson(nd.build_items_ndjson(), f"output/{lang}/items.ndjson")
+        write_ndjson(nd.build_stats_ndjson(), os.path.join(lang_dir, "stats.ndjson"))
+        write_ndjson(nd.build_items_ndjson(), os.path.join(lang_dir, "items.ndjson"))
 
         client_strings_builder = ClientStringsBuilder(lang)
         client_strings_js = client_strings_builder.build(
@@ -73,7 +87,9 @@ def main(**kwargs: dict[str, bool | str]):
             array_strings=CLIENT_STRING_ARRAYS,
             regex_strings=CLIENT_STRING_REGEX,
         )
-        with open(f"output/{lang}/client_strings.js", "w", encoding="utf-8") as f:
+        with open(
+            os.path.join(lang_dir, "client_strings.js"), "w", encoding="utf-8"
+        ) as f:
             try:
                 f.write(client_strings_js)
             except Exception as e:
@@ -84,18 +100,11 @@ def main(**kwargs: dict[str, bool | str]):
         # Copy files into the app's data folder
         if push:
             logger.info("Copying files to renderer/public/data")
-            _ = shutil.copy(
-                f"output/{lang}/stats.ndjson",
-                f"{main_repo_path}/renderer/public/data/{lang}/stats.ndjson",
-            )
-            _ = shutil.copy(
-                f"output/{lang}/items.ndjson",
-                f"{main_repo_path}/renderer/public/data/{lang}/items.ndjson",
-            )
-            _ = shutil.copy(
-                f"output/{lang}/client_strings.js",
-                f"{main_repo_path}/renderer/public/data/{lang}/client_strings.js",
-            )
+            for name in ("stats.ndjson", "items.ndjson", "client_strings.js"):
+                _ = shutil.copy(
+                    os.path.join(lang_dir, name),
+                    f"{main_repo_path}/renderer/public/data/{lang}/{name}",
+                )
 
 
 if __name__ == "__main__":
@@ -121,7 +130,7 @@ if __name__ == "__main__":
         help="Path to the repo root",
     )
 
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
 
-    logging.getLogger().setLevel(args.log.upper())  # pyright:ignore [reportAny]
-    main(**vars(args))  # pyright:ignore [reportAny]
+    logging.getLogger().setLevel(args.pop("log").upper())  # pyright:ignore [reportAny]
+    main(**args)  # pyright:ignore [reportAny]
