@@ -234,7 +234,8 @@ and checks the order and the totals per currency, the seller states and the cach
 filters that `createTradeRequest` sends for them, and the elements an elemental damage filter leaves out.
 `specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
 schema version and an overview type that the map does not list, and `specs/web/prices-load.test.ts` loads the price
-file from a fake host. `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
+file from a fake host. `specs/web/display-rounding.test.ts` writes prices as `displayRounding` shows them.
+`specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site
 with fake timers. `specs/web/host-proxy.test.ts` checks the URL and the header that `Host.proxy` sends.
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with
 `adjustRateLimits`, and `RateLimiter.test.ts` beside it checks the limiter's timing and restrictions with fake
