@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from price_service.ninja import Reply
@@ -41,6 +42,24 @@ class FakeGet:
                     raise reply
                 return reply
         return Reply(404, b"", None)
+
+
+class FakeDisk:
+    def __init__(self, directory: Path) -> None:
+        self.directory = directory
+        self.opened: list[tuple[Path, int]] = []
+        self.synced: list[tuple[str, dict[str, str]]] = []
+
+    # Windows cannot open a directory, so the fake returns a descriptor of the null device in its place
+    def open_directory(self, directory: Path) -> int:
+        descriptor = os.open(os.devnull, os.O_RDONLY)
+        self.opened.append((directory, descriptor))
+        return descriptor
+
+    def fsync(self, descriptor: int) -> None:
+        kind = "directory" if descriptor in (opened for _, opened in self.opened) else "file"
+        files = {path.name: path.read_text("utf-8") for path in sorted(self.directory.iterdir())}
+        self.synced.append((kind, files))
 
 
 def ok(body: bytes | object, etag: str | None = None) -> Reply:

@@ -2,9 +2,11 @@
 
 import json
 import logging
+import os
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path
 
 from .ninja import NinjaClient, NinjaError, StopCycleError
@@ -21,6 +23,8 @@ from .transform import (
 )
 
 CORE_CATEGORY = "Currency"
+# Windows cannot open a directory, so it cannot sync one
+OPEN_DIRECTORY: Callable[[Path], int] | None = None if os.name == "nt" else partial(os.open, flags=os.O_RDONLY)
 
 log = logging.getLogger(__name__)
 
@@ -59,11 +63,30 @@ def build_league(client: NinjaClient, categories: list[Category], league: str) -
     return price_file(core, overviews)
 
 
-def write_atomic(directory: Path, name: str, text: str) -> None:
-    """Writes a file next to its target and renames it, so readers never see half a file."""
+def write_atomic(
+    directory: Path,
+    name: str,
+    text: str,
+    *,
+    fsync: Callable[[int], None] = os.fsync,
+    open_directory: Callable[[Path], int] | None = OPEN_DIRECTORY,
+) -> None:
+    """Writes a file next to its target, syncs it to disk and renames it, so readers never see half a file.
+
+    Then it syncs the directory where the platform can open one, so a power loss cannot undo the rename.
+    """
     temporary = directory / f".{name}.tmp"
-    temporary.write_text(text, encoding="utf-8")
+    with temporary.open("w", encoding="utf-8") as file:
+        file.write(text)
+        file.flush()
+        fsync(file.fileno())
     temporary.replace(directory / name)
+    if open_directory is not None:
+        descriptor = open_directory(directory)
+        try:
+            fsync(descriptor)
+        finally:
+            os.close(descriptor)
 
 
 def run_cycle(

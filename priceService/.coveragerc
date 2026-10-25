@@ -5,4 +5,4 @@ source = price_service
 
 [report]
 precision = 1
-fail_under = 99.5
+fail_under = 99.6

@@ -36,7 +36,9 @@ Each cycle writes into `PRICE_OUTPUT_DIR`:
   check in `compose.yaml` and the deploy runbook do.
 
 `write_atomic` in `service.py` writes each file as `.<name>.tmp` next to its target and then renames it, so a reader
-never gets half a file, and `nginx.conf` returns 404 for any name that starts with a dot. A league that fails in a
+never gets half a file, and `nginx.conf` returns 404 for any name that starts with a dot. It syncs the temporary
+file to disk with `os.fsync` before the rename and the directory after it, so a power loss cannot leave the file
+empty or cut short. Windows cannot open a directory, so there the directory is not synced. A league that fails in a
 cycle keeps the file of its last good cycle.
 
 ### The price file format
@@ -196,9 +198,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
 
 ## Tests
 
-`python -m unittest discover -s tests -v` in `priceService/`, 65 tests on 26 Oct 2026. The `price-service` job in
+`python -m unittest discover -s tests -v` in `priceService/`, 67 tests on 26 Oct 2026. The `price-service` job in
 `.github/workflows/test.yml` runs it under coverage.py ([architecture.md](../architecture.md#ci)) and fails below the
-floor in `priceService/.coveragerc`, 99.5% of lines and branches on 21 Oct 2026. The pre-commit hooks run Ruff with
+floor in `priceService/.coveragerc`, 99.6% of lines and branches on 26 Oct 2026. The pre-commit hooks run Ruff with
 every rule but those `priceService/ruff.toml` turns off, each with its reason, and Pyright in strict mode, set in
 `pyrightconfig.json` at the repo root. The app side is `renderer/specs/web/prices.test.ts`,
 `renderer/specs/data/namespace-map.test.ts` and `renderer/specs/web/price-check/trends/getDetailsId.test.ts`, run by

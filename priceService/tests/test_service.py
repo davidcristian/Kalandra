@@ -1,11 +1,12 @@
 import json
+import os
 import tempfile
 import unittest
 from datetime import UTC, datetime
 from functools import partial
 from pathlib import Path
 
-from support import FIXTURES, FakeGet, FakeSleep, StopScheduleError, fixture, league_routes, ok
+from support import FIXTURES, FakeDisk, FakeGet, FakeSleep, StopScheduleError, fixture, league_routes, ok
 
 from price_service.ninja import NinjaClient, Reply, StopCycleError
 from price_service.service import build_league, run_cycle, run_schedule, write_atomic
@@ -202,13 +203,33 @@ class RunScheduleTest(unittest.TestCase):
 
 
 class WriteAtomicTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.directory = Path(self.temporary.name)
+        (self.directory / "a.json").write_text("old", encoding="utf-8")
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
     def test_replaces_the_target_and_leaves_no_temporary_file(self) -> None:
-        with tempfile.TemporaryDirectory() as name:
-            directory = Path(name)
-            (directory / "a.json").write_text("old", encoding="utf-8")
-            write_atomic(directory, "a.json", "new")
-            self.assertEqual([path.name for path in directory.iterdir()], ["a.json"])
-            self.assertEqual((directory / "a.json").read_text("utf-8"), "new")
+        write_atomic(self.directory, "a.json", "new")
+        self.assertEqual([path.name for path in self.directory.iterdir()], ["a.json"])
+        self.assertEqual((self.directory / "a.json").read_text("utf-8"), "new")
+
+    def test_syncs_the_whole_text_before_the_rename_and_the_directory_after_it(self) -> None:
+        disk = FakeDisk(self.directory)
+        write_atomic(self.directory, "a.json", "new", fsync=disk.fsync, open_directory=disk.open_directory)
+        synced = [("file", {".a.json.tmp": "new", "a.json": "old"}), ("directory", {"a.json": "new"})]
+        self.assertEqual(disk.synced, synced)
+        self.assertEqual([directory for directory, _ in disk.opened], [self.directory])
+        with self.assertRaises(OSError):
+            os.fstat(disk.opened[0][1])
+
+    def test_syncs_only_the_file_where_the_platform_cannot_open_a_directory(self) -> None:
+        disk = FakeDisk(self.directory)
+        write_atomic(self.directory, "a.json", "new", fsync=disk.fsync, open_directory=None)
+        self.assertEqual(disk.synced, [("file", {".a.json.tmp": "new", "a.json": "old"})])
+        self.assertEqual((self.directory / "a.json").read_text("utf-8"), "new")
 
 
 if __name__ == "__main__":
