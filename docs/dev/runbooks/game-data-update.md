@@ -14,15 +14,15 @@ maintainer before each of them.
 
 ## What the machine needs
 
-Nothing below is installed or listed by this repo; each item names the file that expects it.
+This repo installs nothing below; each item names the file that expects it.
 
 - Path of Exile 2, installed in the folder that `steam` names in `dataParser/data/vendor/config.json`. The committed
   value is a Steam install folder on Windows.
 - The `pathofexile-dat` command on the PATH, which `src/providers/game_api.py` runs. This repo does not say where the
   command comes from or which version the data was built with, so ask the maintainer.
 - Node.js on the PATH, for `cloudscraper` in `src/providers/trade_api.py`.
-- Python and the packages in [dataparser.md](../modules/dataparser.md#tests), which `dataParser/src/` and
-  `dataParser/tests/` import.
+- Python 3.12 and the packages in `dataParser/requirements.txt`, installed into `dataParser/.venv` as
+  [dataparser.md](../modules/dataparser.md#setup) says. The steps below write `python` for that Python.
 - The item image cache `dataParser/src/services/itemImageCache.json` from the last run. Without it, every icon that
   the trade site's `static.json` does not give becomes `%NOT_FOUND%`.
 - The folder `dataParser/data/json/fr/`, which git does not create. Create it before step 2.

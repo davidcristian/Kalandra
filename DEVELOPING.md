@@ -10,7 +10,7 @@ describes the parts of the app and how they talk to each other.
 - **Node 24 and npm.** Every CI job that runs Node sets up version 24.
 - **Python 3.12 or newer.** `priceService/` uses only the standard library, and CI tests it on
   3.12. `dataParser/` imports `typing.override`, which Python added in 3.12, and the packages in
-  [dataparser.md](docs/dev/modules/dataparser.md#tests), which no requirements file lists.
+  `dataParser/requirements.txt` ([dataparser.md](docs/dev/modules/dataparser.md#setup)).
 - **pre-commit and coverage**, for example `pip install pre-commit coverage`. Run
   `pre-commit install` once in the repo, and again after `default_install_hook_types` in
   `.pre-commit-config.yaml` changes. It installs the pre-commit hooks and the commit-msg hooks,

@@ -1,9 +1,9 @@
 # dataParser declares none of its Python dependencies
 
-**Status:** open
+**Status:** done 2026-10-25
 **Area:** dataparser
 **Origin:** [dataParser/pyproject.toml](../../../../dataParser/pyproject.toml)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-25
 
 `dataParser/pyproject.toml` holds only `[tool.pytest.ini_options]`: no `requires-python` and no
 dependencies, and the folder has no requirements file. The code in `src/` imports `pandas`,
@@ -21,3 +21,8 @@ it in a new virtual environment: install, then `python -m pytest`.
 
 - 2026-10-18: Found while the dataParser module doc and the game data update runbook were written,
   by listing the third-party imports of `src/` and `tests/`.
+- 2026-10-25: Closed. `dataParser/requirements.txt` lists each package and `pandas-stubs` at the
+  exact version installed in the `.venv` where `python -m pytest` passes, instead of a `[project]`
+  table with ranges. `pip install --dry-run -r requirements.txt` there finds nothing to install.
+  The data tool's README and module doc give the install commands, and the game data runbook links
+  them. The install was not tried in a new virtual environment.

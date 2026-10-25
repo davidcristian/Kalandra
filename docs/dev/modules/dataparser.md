@@ -10,6 +10,17 @@ newer than what this copy of the tool produces (see [Outputs](#outputs)). Updati
 [dataParser/README.md](../../../dataParser/README.md). The parser that reads the data:
 [renderer-parser.md](renderer-parser.md).
 
+## Setup
+
+`requirements.txt` lists the packages that `src/` and `tests/` import, and `pandas-stubs`, which the Pyright hook
+needs, at the exact versions the tests pass with on Python 3.12. `numpy` must stay at 2 or newer, for
+`numpy.strings`. From `dataParser/`:
+
+```sh
+py -3.12 -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
+```
+
 ## Command line
 
 `python ./src/main.py`, run from `dataParser/`, since the output paths are relative to the working directory. The
@@ -179,13 +190,10 @@ the repo root, so the config's top-level `files: ^dataParser/` keeps them to thi
 `.github/workflows/test.yml` has no job for `dataParser/`, and the root `.pre-commit-config.yaml` does not include
 these hooks.
 
-A fresh clone cannot pass the tests as of 18 Oct 2026:
+A fresh clone with the packages installed still cannot pass the tests as of 18 Oct 2026:
+`tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
+needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
+since it reads game tables when it is built.
 
-- No file lists the packages `src/` and `tests/` import: `pandas`, `numpy` 2 or newer (for `numpy.strings`), `tqdm`,
-  `cloudscraper`, `requests`, `murmurhash2` and `pytest`, nor `pandas-stubs`, which the Pyright hook needs.
-- `tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
-  needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
-  since it reads game tables when it is built.
-
-**Dependencies.** Python, the packages above, Node.js for `cloudscraper`, the `pathofexile-dat` command, a local
-Path of Exile 2 install, and the official trade sites.
+**Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper`, the
+`pathofexile-dat` command, a local Path of Exile 2 install, and the official trade sites.

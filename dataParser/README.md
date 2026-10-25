@@ -8,6 +8,20 @@ each language, from an export of the game's files and the trade site's data endp
 - Updating the app's data for a game patch, step by step:
   [docs/dev/runbooks/game-data-update.md](../docs/dev/runbooks/game-data-update.md).
 
+## Setup
+
+The tool runs on Python 3.12 with the packages in [requirements.txt](./requirements.txt). From this folder:
+
+```bash
+py -3.12 -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
+```
+
+On Linux and macOS, create it with `python3.12 -m venv .venv` and use `.venv/bin/python`. The commands below write
+`python` for the Python in `.venv`.
+
+## Running it
+
 [main.py](./src/main.py) is the entry point. Run it from this folder:
 
 ```bash
