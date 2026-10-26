@@ -80,6 +80,15 @@ describe("the hotkeys the renderer sends to main", () => {
     ]);
   });
 
+  it("leaves out the Craft of Exile key for a language other than English", () => {
+    const config = hotkeyConfig();
+    config.language = "de";
+    findWidget<ItemCheckWidget>("item-check", config)!.craftOfExileKey =
+      "Alt + E";
+
+    expect(shortcutActions(config).slice(3)).toEqual([]);
+  });
+
   it("adds the chat commands that have a hotkey", () => {
     const config = hotkeyConfig();
     config.commands = [

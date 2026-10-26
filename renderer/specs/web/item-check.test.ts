@@ -1,10 +1,11 @@
 import type { IpcEvent } from "@ipc/types";
 import { init } from "@/assets/data";
-import { parseClipboard } from "@/parser";
+import { itemIsModifiable, parseClipboard } from "@/parser";
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
 import {
   __testExports,
+  canOpenCoE,
   findSamePricedItems,
   openPoedb,
 } from "@/web/item-check/hotkeyable-actions";
@@ -12,6 +13,7 @@ import type { ItemCheckWidget } from "@/web/item-check/widget";
 import type { Widget } from "@/web/overlay/widgets";
 import {
   ArmourHighValueRareItem,
+  DePlatedVestments,
   JaArrayBuckler,
   JaArrayedFocus,
   NormalItem,
@@ -121,6 +123,27 @@ describe("the poe2db page of an item", () => {
     openPoedb(parseClipboard(RareJewel.rawText)._unsafeUnwrap());
 
     expect(opened).toEqual(["https://poe2db.tw/us/Ruby#ModifiersCalc"]);
+  });
+});
+
+describe("the Craft of Exile button", () => {
+  it("shows for a modifiable item copied in English", async () => {
+    setupTests();
+    await init("en");
+
+    expect(canOpenCoE(parseClipboard(NormalItem.rawText)._unsafeUnwrap())).toBe(
+      true,
+    );
+  });
+
+  it("is hidden for a modifiable item copied in German, as its hotkey row is", async () => {
+    setupTests({ language: "de" });
+    await init("de");
+    const item = parseClipboard(DePlatedVestments.rawText)._unsafeUnwrap();
+    expect(item.info.craftable).toBeDefined();
+    expect(itemIsModifiable(item)).toBe(true);
+
+    expect(canOpenCoE(item)).toBe(false);
   });
 });
 

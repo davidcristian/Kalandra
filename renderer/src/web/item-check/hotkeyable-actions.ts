@@ -1,8 +1,14 @@
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
-import { ItemRarity, ParsedItem, parseClipboard } from "@/parser";
+import {
+  ItemRarity,
+  ParsedItem,
+  itemIsModifiable,
+  parseClipboard,
+} from "@/parser";
 import { ItemCheckWidget } from "./widget";
 import { ARMOUR, ItemCategory } from "@/parser/meta";
+import { offersCraftOfExile } from "./craft-of-exile";
 
 const POEDB_LANGS = {
   "en": "us",
@@ -118,6 +124,13 @@ export function openCoE(item: ParsedItem) {
   const encodedClipboard = encodeURIComponent(item.rawText);
   window.open(
     `https://craftofexile.com/?game=poe2&eimport=${encodedClipboard}`,
+  );
+}
+
+/** Returns whether Item info offers Craft of Exile for the item: a modifiable item, in English. */
+export function canOpenCoE(item: ParsedItem): boolean {
+  return (
+    offersCraftOfExile(AppConfig().language) && Boolean(itemIsModifiable(item))
   );
 }
 

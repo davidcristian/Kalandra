@@ -5,6 +5,7 @@ import type { StashSearchWidget } from "./stash-search/widget";
 import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import type { LibraryWidget } from "./library/widget";
+import { offersCraftOfExile } from "./item-check/craft-of-exile";
 
 function widgetOfType<T extends widget.Widget>(config: Config, type: string) {
   return config.widgets.find((w) => w.wmType === type) as T;
@@ -42,7 +43,7 @@ export function shortcutActions(config: Config): ShortcutAction[] {
       action: { type: "copy-item", target: "open-wiki" },
     });
   }
-  if (itemCheck.craftOfExileKey) {
+  if (itemCheck.craftOfExileKey && offersCraftOfExile(config.language)) {
     actions.push({
       shortcut: itemCheck.craftOfExileKey,
       action: { type: "copy-item", target: "open-craft-of-exile" },

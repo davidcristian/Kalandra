@@ -23,7 +23,7 @@ The top line shows the item's base type, or the unique's name for a unique. The 
 | --- | --- |
 | **wiki** | Opens the poe2wiki.net page of the item's base type, or of the unique, by its English name, in your default browser. |
 | **poedb** | Opens poe2db.tw in the app's language. A unique opens its own page. Another item opens the modifier calculator for its kind, for example `Helmets_str_int` for a helmet with armour and energy shield. An item kind with no calculator page opens the item's own page, and so does an item whose kind the game data does not know yet. |
-| **CoE** | Opens Craft of Exile with the full item text imported. It shows only for an item you can still modify: not corrupted, mirrored or sanctified. |
+| **CoE** | Opens Craft of Exile with the full item text imported. It shows only when the app language is English, and only for an item you can still modify: not corrupted, mirrored or sanctified. Kalandra has not checked an import of item text in another language. |
 | **Find in Stash** | Switches to the game and types the item's name, in quotes, into the stash search, as [Stash search](/stash-search#how-a-search-runs) describes. The name is the base type for a normal, magic or rare item, and the unique's name for a unique. |
 | dollar sign | Shows only when the item has a price note, the `Note:` line in its text. It searches the stash for the same note in quotes. |
 
@@ -48,7 +48,7 @@ you click **Save**.
 | --- | --- | --- |
 | **Open item on wiki** | **Not Set** | Runs **wiki**. |
 | **Open item on PoEDB** | **Not Set** | Runs **poedb**. |
-| **Open base item on Craft of Exile** | **Not Set** | Runs **CoE**. This row shows only when the app language is English. |
+| **Open base item on Craft of Exile** | **Not Set** | Runs **CoE**. This row shows, and the key works, only when the app language is English. |
 | **Find in Stash** | **Not Set** | Runs **Find in Stash**. |
 | **Filter by** | **Price and Item**, **Not Set** | The list sets what the dollar sign button searches for: **Price Only** or **Price and Item**. The key runs that search. |
 

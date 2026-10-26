@@ -132,7 +132,9 @@ loads every widget component and checks the registered types and the invariants 
 `defaultConfig()`: one entry per single widget, a registered component and valid `Widget` fields for each, the
 menu's numeric `wmZorder`, the `menu::skip` flags and new objects at each call. Widget logic outside components is tested in
 `specs/web/item-check.test.ts` (`hotkeyable-actions.ts`: the poe2db page of each item kind, in English and
-Japanese, and the stash search for the same price note, which adds the name up to 50 characters),
+Japanese, the Craft of Exile button, which `offersCraftOfExile()` in `item-check/craft-of-exile.ts` shows only in
+English, as it does the button's hotkey, and the stash search for the same price note, which adds the name up to 50
+characters),
 `specs/web/item-check-hotkeys.test.ts` (the pages and the stash search that the item check hotkeys open for item
 text from a fake host, and nothing for text that is not an item),
 `specs/web/library/libraryChaos.test.ts` (`library/widget.ts`: the kept modifier kinds and the columns of a

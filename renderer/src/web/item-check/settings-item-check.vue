@@ -8,7 +8,7 @@
       <label class="flex-1">{{ t("item.open_on_poedb") }}</label>
       <hotkey-input v-model="poedbKey" class="w-48" />
     </div>
-    <div v-if="isEnglish" class="flex">
+    <div v-if="showCraftOfExile" class="flex">
       <label class="flex-1">{{ t("item.open_on_craftofexile") }}</label>
       <hotkey-input v-model="craftOfExileKey" class="w-48" />
     </div>
@@ -38,12 +38,15 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { configProp, configModelValue, findWidget } from "../settings/utils.js";
 import type { ItemCheckWidget } from "./widget.js";
+import { offersCraftOfExile } from "./craft-of-exile";
 
 import HotkeyInput from "../settings/HotkeyInput.vue";
 
 const props = defineProps(configProp());
 
-const isEnglish = computed(() => props.config.language === "en");
+const showCraftOfExile = computed(() =>
+  offersCraftOfExile(props.config.language),
+);
 const wikiKey = configModelValue(
   () => findWidget<ItemCheckWidget>("item-check", props.config)!,
   "wikiKey",
