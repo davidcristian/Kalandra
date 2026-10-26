@@ -1,6 +1,6 @@
 # The anointment filter decodes oil indexes with its own copy of a game table's order
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** data
 **Origin:** [renderer/src/web/price-check/filters/pseudo/anointments.ts](../../../../renderer/src/web/price-check/filters/pseudo/anointments.ts)
 **Verified:** 2026-10-26
@@ -41,3 +41,7 @@ What remains needs the maintainer's go-ahead for a data update
   order. It has the names but not the order, so `EMOTIONS` stays until the data tool writes it.
 - 2026-10-26: dataParser writes the oil names, and `decodeOils()` reads them and names no unknown
   oil. The data update waits for the maintainer.
+- 2026-10-26: Done by fix(data): name the anointment oils in the game data. Each language's
+  `Allocates #` line is the tool's output: its oils are the names of the oils that the indexes
+  named, and the French line has the 13 French notable names of the game's `PassiveSkills` table.
+  `EMOTIONS`, the string branch and its test are gone, and `oils` is `string[]` in both types.

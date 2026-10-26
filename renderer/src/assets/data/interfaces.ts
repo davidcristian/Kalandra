@@ -5,7 +5,7 @@ export interface StatMatcher {
   advanced?: string;
   negate?: true;
   value?: number;
-  oils?: string | string[]; // Amulet anointment: oil ref names, or BlightCraftingItems row indexes
+  oils?: string[]; // Amulet anointment: the oils' ref names
 }
 
 export enum StatBetter {
@@ -22,7 +22,7 @@ export interface Stat {
   fromAreaMods?: true;
   fromUberAreaMods?: true;
   fromHeistAreaMods?: true;
-  anointments?: Array<{ roll: number; oils: string }>; // Ring anointments
+  anointments?: Array<{ roll: number; oils: string[] }>; // Ring anointments
   trade: {
     inverted?: true;
     option?: true;

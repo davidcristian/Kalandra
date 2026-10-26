@@ -9,7 +9,7 @@ import type { ParsedItem } from "@/parser";
 import { createPresets } from "@/web/price-check/filters/create-presets";
 import { decodeOils } from "@/web/price-check/filters/pseudo/anointments";
 
-/** The amulet with "Allocates Cooked (enchant)", whose emotions in stats.ndjson are 8, 0 and 4. */
+/** The amulet with "Allocates Cooked (enchant)", whose stats.ndjson matcher names three oils. */
 function amulet(enchant = "Allocates Cooked"): ParsedItem {
   const text = NewExplicitTypeDefinitions.rawText.replace(
     "Allocates Cooked",
@@ -22,10 +22,7 @@ function enchantOf(item: ParsedItem): StatCalculated {
   return item.statsByType.find((calc) => calc.type === ModifierType.Enchant)!;
 }
 
-function withOils(
-  enchant: StatCalculated,
-  oils: string | string[],
-): StatCalculated {
+function withOils(enchant: StatCalculated, oils: string[]): StatCalculated {
   const [source] = enchant.sources;
   const translation = { ...source.stat.translation, oils };
   return {
@@ -100,10 +97,6 @@ describe("the anointment filter of an amulet", () => {
     ];
 
     expect(decodeOils(withOils(enchantOf(amulet()), oils))).toEqual(oils);
-  });
-
-  it("names no oils when an index is past the end of the oil table", () => {
-    expect(decodeOils(withOils(enchantOf(amulet()), "13,0,4"))).toBeUndefined();
   });
 
   it("names no oils when the item data lacks one of them", () => {
