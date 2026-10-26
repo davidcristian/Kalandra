@@ -1533,6 +1533,46 @@ export const TempleTablet = itemWithLine(
 TempleTablet.info.refName = "Temple Tablet";
 // #endregion TempleTablet
 
+// #region KeystoneUniqueLine
+// Copied by a user of Exiled Exchange 2 for a bug report. Blood Magic is the
+// text of its keystone stat and of a matcher of the random keystone stat.
+export const KeystoneUniqueLine = new TestItem(`Item Class: Helmets
+Rarity: Unique
+Mask of the Sanguimancer
+Face Mask
+--------
+Evasion Rating: 63 (augmented)
+Energy Shield: 32 (augmented)
+--------
+Requires: Level 30, 10 Dex, 10 Int
+--------
+Sockets: S
+--------
+Item Level: 82
+--------
+18% increased Armour, Evasion and Energy Shield (rune)
+--------
+{ Unique Modifier — Attribute }
++13(10-20) to Strength
+{ Unique Modifier — Attribute }
++17(10-20) to Intelligence
+{ Unique Modifier — Caster, Critical }
+21(20-40)% increased Critical Hit Chance for Spells
+{ Unique Modifier — Life, Mana }
+Blood Magic — Unscalable Value
+{ Unique Modifier — Evasion, Energy Shield }
++21(20-25) to Evasion Rating
++11(10-15) to maximum Energy Shield
+--------
+A terror of ancient times, his identity
+remains lost... but his power does not.
+--------
+`);
+KeystoneUniqueLine.category = ItemCategory.Helmet;
+KeystoneUniqueLine.rarity = ItemRarity.Unique;
+KeystoneUniqueLine.info.refName = "Mask of the Sanguimancer";
+// #endregion KeystoneUniqueLine
+
 // #region SharedStatTexts
 // No copied text with these lines exists here. Each item is a real copied item
 // above with one modifier changed to a line whose text several stats share.
@@ -1542,13 +1582,6 @@ export const KeystoneRuneLine = itemWithLine(
   ArmourHighValueRareItem,
   "54% increased Armour, Evasion and Energy Shield (rune)",
   "Iron Reflexes (rune)",
-);
-
-// From UniqueItem, its last modifier changed
-export const KeystoneUniqueLine = itemWithLine(
-  UniqueItem,
-  "{ Unique Modifier — Mana }\n40% increased Mana Regeneration Rate\n--------",
-  "{ Unique Modifier }\nEldritch Battery\n--------",
 );
 
 // From UniqueItem, its last modifier changed to the advanced text of the stat

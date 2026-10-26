@@ -61,11 +61,24 @@ describe("parsing a line whose text several stats share", () => {
   });
 
   it("picks the stat without an advanced text for a line that has none", () => {
-    const { stats } = statsOfType(KeystoneUniqueLine, ModifierType.Explicit);
+    const { stats, unknown } = statsOfType(
+      KeystoneUniqueLine,
+      ModifierType.Explicit,
+    );
 
-    const last = stats[stats.length - 1];
-    expect(last.stat.ref).toBe("Eldritch Battery");
-    expect(last.stat.trade.ids?.explicit).toEqual(["explicit.stat_2262736444"]);
+    expect(stats.map(({ stat }) => stat.ref)).toEqual([
+      "# to Strength",
+      "# to Intelligence",
+      "#% increased Critical Hit Chance for Spells",
+      "Blood Magic",
+      "# to Evasion Rating",
+      "# to maximum Energy Shield",
+    ]);
+    expect(stats[3].stat.trade.ids?.explicit).toEqual([
+      "explicit.stat_2801937280",
+    ]);
+    expect(stats[3].roll).toBeUndefined();
+    expect(unknown).toEqual([]);
   });
 
   it("picks the random keystone stat for its advanced text", () => {

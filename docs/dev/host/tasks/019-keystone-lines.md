@@ -3,7 +3,7 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [docs/dev/modules/renderer-parser.md](../../modules/renderer-parser.md)
-**Verified:** 2026-10-20
+**Verified:** 2026-10-26
 
 **Claims.** In `renderer/public/data/en/stats.ndjson`, nine keystone names, such as
 `Iron Reflexes` and `Pain Attunement`, are each a stat of their own and a matcher of the random
@@ -20,8 +20,10 @@ keystone stat `#(Ancestral Bond-Zealot's Oath)`. The data gives that stat the ad
   the line matches the random keystone stat. A line with only the keystone name, outside a rune
   line, matches the keystone's own stat.
 
-The parser cases `KeystoneRuneLine`, `KeystoneUniqueLine` and `RandomKeystoneLine` in
-`renderer/specs/Parser/items.ts` are built from other items, not copied.
+The parser cases `KeystoneRuneLine` and `RandomKeystoneLine` in `renderer/specs/Parser/items.ts`
+are built from other items, not copied. `KeystoneUniqueLine` is a Mask of the Sanguimancer with
+`Blood Magic`, copied by a user for
+[a bug report to Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2/issues/966).
 
 **Do.** [Section 4 of the runbook](../../runbooks/in-game-check.md#4-the-price-check-keys) on boots
 with Legacy of The Knight-errant, a helmet with Legacy of Crown of Thorns, and a Flesh Crucible.
@@ -36,3 +38,5 @@ matches another stat goes into a refinement.
 
 - 2026-10-20: Filed when the parser began to pick among the stats that share a keystone name,
   since no copied item text in the repo has such a line.
+- 2026-10-26: `KeystoneUniqueLine` became the copied Mask of the Sanguimancer in place of a built
+  Eldritch Battery line. The parser matches its `Blood Magic` line to the keystone's own stat.

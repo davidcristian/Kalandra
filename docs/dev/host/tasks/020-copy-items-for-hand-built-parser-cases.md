@@ -21,7 +21,7 @@ copies, and one copy serves both tasks.
 | A rare jewel and a magic jewel | `RareJewel`, `MagicJewel` |
 | A crossbow with an increased Reload Speed modifier | `ReloadSpeedCrossbow` |
 | A Temple Tablet | `TempleTablet` |
-| The boots, helmet and Flesh Crucible of [019](019-keystone-lines.md) | `KeystoneRuneLine`, `KeystoneUniqueLine`, `RandomKeystoneLine` |
+| The boots or helmet with a keystone rune, and the Flesh Crucible, of [019](019-keystone-lines.md) | `KeystoneRuneLine`, `RandomKeystoneLine` |
 | In Japanese: Arrayed Focus, Array Buckler, Vagabond Armour, Atziri's Disdain and Atziri's Contempt. In German: Plated Vestments, Plated Raiment, Couture of Crimson and Coat of Red | the case for the same item in the `SharedNameItems` region, such as `JaArrayedFocus` |
 
 Some copied cases have lines that a later commit changed, and the commit does not say whether the
@@ -53,3 +53,5 @@ by hand. Each runs through `parseClipboard` in the suite that read the case it r
 - 2026-10-26: Filed when the parser cases were checked for text not copied from the game. The
   explicit modifier test in `modifiersParsers.test.ts` then took its sections from copied items in
   place of a section written by hand, and the copied waystone `RareMap` became a whole item case.
+- 2026-10-26: `KeystoneUniqueLine` became a Mask of the Sanguimancer that a user copied for a bug
+  report to Exiled Exchange 2, so the table no longer lists it.
