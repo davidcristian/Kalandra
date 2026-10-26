@@ -50,19 +50,20 @@ repos:
         pass_filenames: false
         files: ^renderer/.*\.(ts|js|jsx|tsx|vue|json|md)$
 
+    # Both processes import ipc/, so a change there type checks both.
     -   id: type-check-main
         name: Type Check Main Project
         entry: npm run check-types --prefix ./main
         language: system
         pass_filenames: false
-        files: ^main/.*\.(ts|js|jsx|tsx|vue|json|md)$
+        files: ^(main|ipc)/.*\.(ts|js|jsx|tsx|vue|json|md)$
 
     -   id: type-check-renderer
         name: Type Check Renderer Project
         entry: npm run check-types --prefix ./renderer
         language: system
         pass_filenames: false
-        files: ^renderer/.*\.(ts|js|jsx|tsx|vue|json|md)$
+        files: ^(renderer|ipc)/.*\.(ts|js|jsx|tsx|vue|json|md)$
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.1
     hooks:

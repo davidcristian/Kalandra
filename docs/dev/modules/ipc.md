@@ -153,6 +153,5 @@ the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `H
 
 **Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
 `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes. The type checks are `npm
-run build` in `main/` and `npm run check-types` in `renderer/`. The pre-commit type check hooks run only for a change
-under `main/` or `renderer/`, so a change to `ipc/` alone runs both by hand or `pre-commit run --all-files`; CI's
-Lint & Format job runs every hook over all files.
+run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs both pre-commit type
+check hooks. No hook runs ESLint or Prettier on `ipc/`, locally or in CI.
