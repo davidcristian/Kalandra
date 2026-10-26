@@ -5,9 +5,9 @@
 360 dataParser/src/constants/css_rules.py
 510 dataParser/src/services/nd_builder_service.py
 337 ipc/types.ts
-308 main/src/shortcuts/Shortcuts.ts
+307 main/src/shortcuts/Shortcuts.ts
 486 renderer/src/assets/data/index.ts
-2004 renderer/src/parser/Parser.ts
+2002 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
 702 renderer/src/web/Config.ts
 563 renderer/src/web/background/Prices.ts
@@ -24,5 +24,5 @@
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 377 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
-1947 renderer/src/web/price-check/trade/pathofexile-trade.ts
+1944 renderer/src/web/price-check/trade/pathofexile-trade.ts
 537 renderer/src/web/settings/SettingsWindow.vue

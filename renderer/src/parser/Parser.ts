@@ -892,7 +892,7 @@ function parseArmour(section: string[], item: ParsedItem) {
     item.armourAR = undefined;
     item.armourEV = undefined;
     item.armourES = undefined;
-    item.armourRW = undefined; // ? maybe not ?
+    item.armourRW = undefined;
     item.armourBLOCK = undefined;
   }
 
@@ -1212,8 +1212,6 @@ function applyAugmentSockets(item: ParsedItem) {
       }
     }
 
-    // set all the stuff
-
     item.augmentSockets.empty = augments.filter(
       (augment) => augment === null,
     ).length;
@@ -1227,7 +1225,7 @@ function applyAugmentSockets(item: ParsedItem) {
         item.augmentSockets.current > item.augmentSockets.normal)) &&
     item.rarity !== ItemRarity.Unique
   ) {
-    // fill sockets, if all are empty && if chosen (also maybe check setting to enable it)
+    // When every socket is empty, fill them with the augments saved for the item's category
     const augmentBases = getSavedAugments(item);
     const editorItems = augmentBases.map((base) => {
       if (!base) return null;

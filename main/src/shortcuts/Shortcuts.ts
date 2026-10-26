@@ -288,8 +288,7 @@ function pressKeysToCopyItemText(
 
   uIOhook.keyTap(UiohookKey.C);
 
-  // Timeout to enforce release of keys
-  // Game was dropping the release inputs for some reason
+  // The game dropped key releases sent right after the copy key, so they are sent 10 ms later
   setTimeout(() => {
     keys.reverse();
     for (const key of keys) {

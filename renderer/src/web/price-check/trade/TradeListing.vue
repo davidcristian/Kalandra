@@ -217,7 +217,6 @@ export default defineComponent({
         () => props.item.category && GRANTS_REAL_SKILL.has(props.item.category),
       ),
       isLikelyPriceFixed: computed(() => {
-        // if it isn't filling listings it probably is fine
         if (groupedResults.value.length <= 15) {
           return false;
         }

@@ -131,7 +131,6 @@ function querystring(q: Record<string, string | number>) {
 
 /** Removes the roll ranges and modifier headers of advanced item text, which poeprices.info does not read. */
 function transformItemText(rawText: string) {
-  // this may not account for all cases
   return rawText
     .replace(/(?<=\d)(\([^)]+\))/gm, "")
     .replace(/^\{.+\}$\n/gm, "");

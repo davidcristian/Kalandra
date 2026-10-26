@@ -595,7 +595,7 @@ export function createTradeRequest(
     );
   }
 
-  // Search by category not base type?
+  // An enabled relaxed search searches by category instead of base type
   const activeSearch =
     filters.searchRelaxed && !filters.searchRelaxed.disabled
       ? filters.searchRelaxed
@@ -1839,8 +1839,6 @@ function buildMageBloodNotFilter(
   }
 
   if (duplicateStat.disabled) {
-    // dont do anything and return after adding to main filters,
-    // no duplicate calcs since disabled
     qAnd.filters.push(
       ...legacyOfStats.map((s) => buildFilterWithValue(s, undefined)),
     );
@@ -1849,7 +1847,6 @@ function buildMageBloodNotFilter(
 
   // KNOWN 1-4, DUP 0
   if (dupCount === 0) {
-    // dont do any min stuff
     qAnd.filters.push(
       ...legacyOfStats.map((s) => buildFilterWithValue(s, undefined)),
     );
