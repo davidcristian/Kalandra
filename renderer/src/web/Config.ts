@@ -12,6 +12,7 @@ import { repairSavedConfig } from "./config-repair";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
+import { tradeHost } from "./trade-host";
 
 const _config = shallowRef<Config | null>(null);
 let _lastSavedConfig: Config | null = null;
@@ -90,26 +91,7 @@ export function poeWebApi() {
   if (preferredTradeSite === "www") {
     return "www.pathofexile.com";
   }
-  switch (language) {
-    case "en":
-      return "www.pathofexile.com";
-    case "ru":
-      return "ru.pathofexile.com";
-    case "cmn-Hant":
-      return realm === "pc-garena" ? "pathofexile.tw" : "www.pathofexile.com";
-    case "ko":
-      return "poe.kakaogames.com";
-    case "ja":
-      return "jp.pathofexile.com";
-    case "de":
-      return "de.pathofexile.com";
-    case "es":
-      return "es.pathofexile.com";
-    case "pt":
-      return "br.pathofexile.com";
-    case "fr":
-      return "fr.pathofexile.com";
-  }
+  return tradeHost(language, realm);
 }
 
 export enum TipsFrequency {

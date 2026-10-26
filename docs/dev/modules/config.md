@@ -64,7 +64,8 @@ old one and keep that file, so a saved config must survive every update: this is
   in `shortcut-actions.ts` builds the hotkey list from any config, so the Settings window can check its edited copy.
   [ipc.md](ipc.md) lists each field and each action with the setting it comes from.
 - `poeWebApi()` returns the trade site host: `www.pathofexile.com` when `preferredTradeSite` is `www`, and
-  otherwise the site for `language`, with `pathofexile.tw` for `cmn-Hant` on the `pc-garena` realm.
+  otherwise `tradeHost(language, realm)` from `trade-host.ts`, the site for `language`, with `pathofexile.tw` for
+  `cmn-Hant` on the `pc-garena` realm. The General settings page names the `tradeHost` of its edited copy.
 
 `renderer/src/web/overlay/widgets.ts` and the widget folders:
 
@@ -136,7 +137,8 @@ the price check widget, so `tsc` fails on it when a new required `Config` field 
 and against the type. `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
-`renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`. `main/specs/ConfigStore.test.ts` checks
+`renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and `trade-host.test.ts` beside it
+the host `tradeHost()` returns for each language and realm. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
 that fails while another program has the file open, with the log line of each failed save, the temporary save, a
 run in development and a `config.json` it cannot read. `main/specs/start-server.test.ts` reads `GET /config` after a

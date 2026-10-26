@@ -9,7 +9,7 @@
 487 renderer/src/assets/data/index.ts
 2015 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
-721 renderer/src/web/Config.ts
+703 renderer/src/web/Config.ts
 566 renderer/src/web/background/Prices.ts
 442 renderer/src/web/item-search/WidgetItemSearch.vue
 391 renderer/src/web/overlay/OverlayWindow.vue

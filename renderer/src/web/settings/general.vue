@@ -133,6 +133,7 @@ import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import { alphaModelValue, configModelValue, configProp } from "./utils";
 import { fontSizeFromInput, MAX_FONT_SIZE, MIN_FONT_SIZE } from "./font-size";
 import { settingsDraft } from "./draft";
+import { tradeHost } from "@/web/trade-host";
 
 export default defineComponent({
   name: "settings.general",
@@ -175,30 +176,9 @@ export default defineComponent({
           }
         },
       }),
-      tradeUrl: computed(() => {
-        switch (props.config.language) {
-          case "en":
-            return "www.pathofexile.com";
-          case "ru":
-            return "ru.pathofexile.com";
-          case "cmn-Hant":
-            return props.config.realm === "pc-garena"
-              ? "pathofexile.tw"
-              : "www.pathofexile.com";
-          case "ko":
-            return "poe.kakaogames.com";
-          case "ja":
-            return "jp.pathofexile.com";
-          case "de":
-            return "de.pathofexile.com";
-          case "es":
-            return "es.pathofexile.com";
-          case "pt":
-            return "br.pathofexile.com";
-          case "fr":
-            return "fr.pathofexile.com";
-        }
-      }),
+      tradeUrl: computed(() =>
+        tradeHost(props.config.language, props.config.realm),
+      ),
       preferredTradeSite: computed<typeof props.config.preferredTradeSite>({
         get() {
           return props.config.preferredTradeSite;
