@@ -1,9 +1,9 @@
 # A ConfigStore test waits for real timers
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** main
 **Origin:** [main/specs/ConfigStore.test.ts](../../../../main/specs/ConfigStore.test.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 In `ConfigStore.test.ts`, the test of a `config.json` that stays open in another program waits
 through the 750 ms of `RENAME_RETRY_DELAYS_MS`. With two renderer suites running in parallel, it
@@ -19,3 +19,5 @@ test then waits for no timer.
 - 2026-10-22: Filed when the waits after a log re-parse and two config saves stopped polling.
 - 2026-10-22: The `GameLogWatcher.test.ts` half is done by refactor(main): pass the file watch
   functions to GameLogWatcher.
+- 2026-10-27: refactor(main): pass the rename retry wait to ConfigStore. Both tests of a
+  config.json that stays open now run in under 10 ms.

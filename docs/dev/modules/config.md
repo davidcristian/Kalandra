@@ -168,7 +168,8 @@ old one and keep that file, so a saved config must survive every update: this is
 **Dependencies.** `HostConfig` and `ShortcutAction` from `ipc/types.ts`, `Host` from
 `renderer/src/web/background/IPC.ts`, the widget registry for the default widgets, `vue` and `fast-deep-equal`.
 `ConfigStore` uses Electron's `app` and Node's `fs/promises`, and takes `ServerEvents` from `main/src/server.ts` and
-the `Logger` from `main/src/RemoteLogger.ts`.
+the `Logger` from `main/src/RemoteLogger.ts`. Its tests also pass the file functions (`ConfigFiles`) and the wait
+between rename retries.
 
 **Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()`
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
@@ -199,7 +200,8 @@ on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and `trade-host.test.ts` beside it
 the host `tradeHost()` returns for each language and realm. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
-that fails while another program has the file open, with the log line of each failed save, a
+that fails while another program has the file open, with the 750 ms of retries on a fake clock and the log line of
+each failed save, a
 run in development, a `config.json` that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
 replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET /config` after a
 `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()` keeps the

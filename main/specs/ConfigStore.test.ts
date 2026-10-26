@@ -68,6 +68,15 @@ class SlowFiles implements ConfigFiles {
   };
 }
 
+// Returns at once in place of the delay between rename retries, and adds up the time it would wait
+class FakeClock {
+  waitedMs = 0;
+
+  wait = async (ms: number) => {
+    this.waitedMs += ms;
+  };
+}
+
 function lockedFiles(failures: number): ConfigFiles {
   let left = failures;
   return {
@@ -129,9 +138,10 @@ async function readOnDisk(name: string): Promise<string> {
 
 let server: FakeServer;
 let logger: Logger;
+let clock: FakeClock;
 
 function createStore(files?: ConfigFiles) {
-  return new ConfigStore(server, logger, files);
+  return new ConfigStore(server, logger, files, clock.wait);
 }
 
 beforeEach(async () => {
@@ -139,6 +149,7 @@ beforeEach(async () => {
   electron.exitCodes = [];
   server = new FakeServer();
   logger = new Logger(server);
+  clock = new FakeClock();
 });
 
 afterEach(async () => {
@@ -238,6 +249,7 @@ describe("ConfigStore", () => {
     server.saveConfig(STEP_2);
 
     expect((await store.load()).contents).toBe(STEP_2);
+    expect(clock.waitedMs).toBe(150);
     expect(electron.exitCodes).toEqual([]);
   });
 
@@ -248,6 +260,7 @@ describe("ConfigStore", () => {
     server.saveConfig(STEP_2);
 
     expect((await store.load()).contents).toBe(STEP_1);
+    expect(clock.waitedMs).toBe(750);
     expect(logger.history).toContain("EPERM: operation not permitted, rename");
   });
 

@@ -4,6 +4,7 @@ import type { ConfigProblem } from "../../../ipc/config-problem";
 import { app } from "electron";
 import fs from "fs/promises";
 import path from "path";
+import { setTimeout as sleep } from "timers/promises";
 
 export interface ConfigFiles {
   readFile: (file: string) => Promise<string>;
@@ -36,13 +37,21 @@ const diskFiles: ConfigFiles = {
 // config.json, with EPERM (measured on Node 24); the retries give it 750 ms to close the file
 const RENAME_RETRY_DELAYS_MS = [50, 100, 200, 400];
 
-async function renameWithRetry(files: ConfigFiles, from: string, to: string) {
+/** Waits the given number of milliseconds. */
+type Wait = (ms: number) => Promise<void>;
+
+async function renameWithRetry(
+  files: ConfigFiles,
+  wait: Wait,
+  from: string,
+  to: string,
+) {
   for (const delay of RENAME_RETRY_DELAYS_MS) {
     try {
       await files.rename(from, to);
       return;
     } catch {
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await wait(delay);
     }
   }
   await files.rename(from, to);
@@ -88,6 +97,7 @@ export class ConfigStore {
     server: ServerEvents,
     private readonly logger: Logger,
     private readonly files: ConfigFiles = diskFiles,
+    private readonly wait: Wait = sleep,
   ) {
     server.onEventAnyClient("CLIENT->MAIN::save-config", (cfg) => {
       this.enqueue(async () => {
@@ -136,7 +146,7 @@ export class ConfigStore {
   private async moveAside(): Promise<LoadedConfig> {
     const backup = backupPath(this.cfgPath);
     try {
-      await renameWithRetry(this.files, this.cfgPath, backup);
+      await renameWithRetry(this.files, this.wait, this.cfgPath, backup);
     } catch (err) {
       return this.readFailure(
         new Error(`it is not JSON, and moving it failed: ${errorMessage(err)}`),
@@ -176,7 +186,7 @@ export class ConfigStore {
     try {
       await fs.mkdir(path.dirname(this.cfgPath), { recursive: true });
       await this.files.writeFile(newFile, contents);
-      await renameWithRetry(this.files, newFile, this.cfgPath);
+      await renameWithRetry(this.files, this.wait, newFile, this.cfgPath);
     } catch (err) {
       this.logger.write(
         `error [ConfigStore] Failed to save the config: ${errorMessage(err)}`,
