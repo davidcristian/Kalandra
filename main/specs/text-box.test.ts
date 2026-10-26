@@ -58,18 +58,42 @@ describe("typeInChat", () => {
     expect(chat.sent).toEqual([]);
   });
 
-  it("writes the text copied before back after the command with Restore clipboard on", async () => {
-    chat.clipboardText = "copied text";
+  it("sends the command from a game that pastes after a stall with Restore clipboard on", async () => {
+    chat.clipboardText = "password";
     const clipboard = new HostClipboard(new Logger(new FakeServer()));
     clipboard.updateOptions(true);
+    chat.stall();
 
     await typeInChat("hi", true, clipboard);
+    chat.resume();
 
     expect(chat.sent).toEqual(["hi"]);
-    expect(chat.clipboardText).toBe("copied text");
+    expect(chat.clipboardText).toBe("hi");
   });
 
-  it("logs a failed clipboard read and types the next command", async () => {
+  it("pastes the command into the box of a game that stalls with Restore clipboard on", async () => {
+    chat.clipboardText = "password";
+    const clipboard = new HostClipboard(new Logger(new FakeServer()));
+    clipboard.updateOptions(true);
+    chat.stall();
+
+    await typeInChat("#trade WTB", false, clipboard);
+    chat.resume();
+
+    expect(chat.input).toBe("#trade WTB");
+  });
+
+  it("drops a command that comes before the last one ends", async () => {
+    const clipboard = new HostClipboard(new Logger(new FakeServer()));
+
+    const first = typeInChat("first", true, clipboard);
+    await typeInChat("second", true, clipboard);
+    await first;
+
+    expect(chat.sent).toEqual(["first"]);
+  });
+
+  it("logs a failed clipboard write and types the next command", async () => {
     const logger = new Logger(new FakeServer());
     const clipboard = new HostClipboard(logger);
     chat.clipboardError = new Error("The clipboard is locked");

@@ -18,7 +18,9 @@ export async function typeInChat(
   send: boolean,
   clipboard: HostClipboard,
 ) {
-  await clipboard.restoreShortly(async (clipboard) => {
+  // No restore: main cannot see when the game pastes, and a game that pastes after a restore
+  // pastes the previous text, which an Enter then sends to chat
+  await clipboard.throttle(async (clipboard) => {
     const modifiers = process.platform === "darwin" ? [Key.Meta] : [Key.Ctrl];
 
     if (text === PLACEHOLDER_LAST || text.startsWith(`${PLACEHOLDER_LAST} `)) {

@@ -4,8 +4,8 @@ import type { Logger } from "../RemoteLogger";
 const POLL_DELAY = 48;
 const POLL_LIMIT = 500;
 
-// The game must read the clipboard within this time, after which it is restored. A game that lags
-// reads the restored text instead, which can be a password.
+// The game must read the clipboard within this time, after which a stash search restores it. A game
+// that lags reads the restored text instead, which can be a password.
 const RESTORE_AFTER = 120;
 
 export class HostClipboard {
@@ -14,7 +14,7 @@ export class HostClipboard {
   private shouldRestore = false;
   private initialDelay = POLL_DELAY;
 
-  private isRestored = true;
+  private idle = true;
 
   constructor(private logger: Logger) {}
 
@@ -78,28 +78,38 @@ export class HostClipboard {
     return textAfter;
   }
 
-  // when `shouldRestore` is false, this function continues
-  // to work as a throttler for callback
+  /** Runs `cb` as `throttle()` does, then with Restore clipboard on writes the previous text back. */
   async restoreShortly(cb: (clipboard: Clipboard) => Promise<void>) {
-    // Not only do we not overwrite the clipboard, but we don't exec callback.
-    // This throttling helps against disconnects from "Too many actions".
-    if (!this.isRestored) {
+    await this.runAlone(cb, true);
+  }
+
+  /** Runs `cb` unless the last call has not ended, ends 120 ms after `cb`, and leaves the text of `cb` on the clipboard. */
+  async throttle(cb: (clipboard: Clipboard) => Promise<void>) {
+    await this.runAlone(cb, false);
+  }
+
+  private async runAlone(
+    cb: (clipboard: Clipboard) => Promise<void>,
+    restore: boolean,
+  ) {
+    // Dropping the call, rather than queueing it, helps against disconnects from "Too many actions"
+    if (!this.idle) {
       return;
     }
 
-    this.isRestored = false;
+    this.idle = false;
     try {
-      const saved = await clipboard.readText();
+      const saved = restore ? await clipboard.readText() : null;
       await cb(clipboard);
       await wait(RESTORE_AFTER);
-      if (this.shouldRestore) {
+      if (saved !== null && this.shouldRestore) {
         await clipboard.writeText(saved);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.write(`error [Clipboard] ${message}`);
     } finally {
-      this.isRestored = true;
+      this.idle = true;
     }
   }
 

@@ -1,9 +1,9 @@
 # The clipboard restore after a chat command can come before the game pastes
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** main
 **Origin:** [main/src/shortcuts/HostClipboard.ts](../../../../main/src/shortcuts/HostClipboard.ts)
-**Verified:** 2026-10-19
+**Verified:** 2026-10-26
 
 `typeInChat()` and `stashSearch()` in `main/src/shortcuts/text-box.ts` put their text on the
 clipboard and press the keys inside `restoreShortly()` in `HostClipboard.ts`. With Restore clipboard
@@ -33,3 +33,9 @@ Done looks like: a decision for the maintainer, then the change with a test thro
 
 - 2026-10-19: Filed when the Restore clipboard row got its warning, since main cannot tell when the
   game has read the clipboard.
+- 2026-10-26: Done for chat commands in
+  `fix(main): keep the command text on the clipboard after a chat command`. `typeInChat()` runs in
+  `throttle()`, which restores nothing, so a game that stalls pastes and sends the command. No
+  restore time is safe, and a restore at focus loss still fails when the user leaves a stalled
+  game, such as during a loading screen. The stash search keeps the timed restore:
+  [101](101-clipboard-restore-before-stash-search.md).

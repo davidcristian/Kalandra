@@ -159,6 +159,9 @@ General, sets another path), and uses Alt when the file does not set it
 - **Keys main presses:** the keys for a command with and without `@last` are listed under
   `text-box.ts` in [main.md](../modules/main.md#public-contract). Main drops a second command
   pressed within 120 ms of the first.
+- **Restore clipboard:** with it ticked, copy a word in another program and press F5, once in an
+  area and once during a loading screen. The chat never shows the word, and a paste in another
+  program afterwards gives `/hideout`.
 - **Logs:** `debug [Shortcuts] Action type: paste-in-chat` with key recording on.
 
 ## 6. Stash tab scrolling

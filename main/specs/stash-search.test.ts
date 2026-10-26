@@ -91,6 +91,19 @@ describe("stashSearch", () => {
     expect(desktop.pasted).toEqual(["Currency"]);
   });
 
+  it("writes the text copied before back after the search with Restore clipboard on", async () => {
+    desktop.focused = "game";
+    game.isActive = true;
+    desktop.clipboard = "copied text";
+    const clipboard = new HostClipboard(logger);
+    clipboard.updateOptions(true);
+
+    await stashSearch("Currency", clipboard, overlay);
+
+    expect(desktop.pasted).toEqual(["Currency"]);
+    expect(desktop.clipboard).toBe("copied text");
+  });
+
   it("focuses the game first while the overlay has the focus", async () => {
     desktop.focused = "overlay";
     overlay.isInteractable = true;

@@ -3,7 +3,7 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows, and a second player who whispers the character
 **Origin:** [docs/chat-commands.md](../../../chat-commands.md)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 **Claims.** `typeInChat` in `main/src/shortcuts/text-box.ts` only presses keys and pastes text. What
 happens next is the game's behavior. [docs/chat-commands.md](../../../chat-commands.md),
@@ -25,14 +25,19 @@ happens next is the game's behavior. [docs/chat-commands.md](../../../chat-comma
   names as restoring the last chat. To see the text Kalandra sent, open the chat with Enter and
   press ArrowUp twice.
 - `/kick <your character name>` leaves the party.
+- With Restore clipboard on, the clipboard holds the command text after a command, so a game that
+  stalls before it pastes still pastes the command, never the text copied before it.
 
 **Do.** [Section 5 of the runbook](../../runbooks/in-game-check.md#5-chat-commands). Type some text
 in the chat box without sending it, close the box with Escape, and press F5. Give `@last ty`,
 `/invite @last` and a `/kick` command keys, have the second player whisper the character, and
-press each. Do not press keys fast on purpose to provoke a disconnect.
+press each. Do not press keys fast on purpose to provoke a disconnect. Tick Restore clipboard,
+copy a word in another program, and press F5 once in an area and once during a loading screen.
 
 **Pass.** Each command does what its row in docs/chat-commands.md says. F5 sends `/hideout` alone,
-without the text left in the box. Enter then ArrowUp twice shows the sent text.
+without the text left in the box. Enter then ArrowUp twice shows the sent text. With Restore
+clipboard on, a paste in another program after F5 gives `/hideout`, and the chat never shows the
+copied word.
 
 **Record.** Any difference goes into docs/chat-commands.md, in the same commit as this file's
 History line.
@@ -41,3 +46,5 @@ History line.
 
 - 2026-10-18: Filed from the chat claims the writer of docs/chat-commands.md could not settle from
   the code, which only types the text.
+- 2026-10-26: Added the claim that a chat command leaves its text on the clipboard with Restore
+  clipboard on, so a game that stalls pastes the command.

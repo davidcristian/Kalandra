@@ -15,7 +15,7 @@ type KeyName = (typeof Key)[keyof typeof Key];
 export class FakeChat {
   lastWhisperer = "UltraSkillPlayer";
   clipboardText = "";
-  // The error the next clipboard read fails with, or null for a read that works
+  // The error the next clipboard read or write fails with, or null for one that works
   clipboardError: Error | null = null;
   // The text left in the box when it closes, which the next Enter shows again
   draft = "";
@@ -24,17 +24,18 @@ export class FakeChat {
   sent: string[] = [];
   private cursor = 0;
   private selected = false;
+  // The key presses that wait while the game stalls, or null while it handles each one at once
+  private stalled: Array<[KeyName, KeyName[]]> | null = null;
 
   // A write ends on a later tick, as the operating system's does
   readonly clipboard = {
     readText: async () => {
-      const error = this.clipboardError;
-      this.clipboardError = null;
-      if (error) throw error;
+      this.throwClipboardError();
       return this.clipboardText;
     },
     writeText: async (text: string) => {
       await Promise.resolve();
+      this.throwClipboardError();
       this.clipboardText = text;
     },
   };
@@ -45,9 +46,26 @@ export class FakeChat {
     this.draft = "";
     this.input = null;
     this.sent = [];
+    this.stalled = null;
+  }
+
+  /** Makes the game keep each key press until `resume()`, as a game does while it stalls. */
+  stall() {
+    this.stalled = [];
+  }
+
+  /** Handles the key presses kept since `stall()` in order, each with the clipboard text of now. */
+  resume() {
+    const presses = this.stalled ?? [];
+    this.stalled = null;
+    for (const [key, modifiers] of presses) this.keyTap(key, modifiers);
   }
 
   keyTap = (key: KeyName, modifiers: KeyName[] = []) => {
+    if (this.stalled) {
+      this.stalled.push([key, modifiers]);
+      return;
+    }
     const withCtrl =
       modifiers.includes(Key.Ctrl) || modifiers.includes(Key.Meta);
     if (key === Key.Enter) {
@@ -72,6 +90,12 @@ export class FakeChat {
       this.input = null;
     }
   };
+
+  private throwClipboardError() {
+    const error = this.clipboardError;
+    this.clipboardError = null;
+    if (error) throw error;
+  }
 
   private open(text: string) {
     this.input = text;

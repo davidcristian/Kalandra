@@ -103,13 +103,14 @@ The entry, the server and the app services, in `main/src/`:
   rejects. On Linux it always writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard"
   feature and a Proton 10 bug (linked in the code). With Restore clipboard on it writes the previous text back, or
   empty text when that was item text. On Linux it also writes that text back after a failed read that leaves the
-  marker, unless it is empty. `restoreShortly(cb)` awaits `cb`, restores the clipboard after 120 ms (`RESTORE_AFTER`)
-  with Restore clipboard on, and drops a call until then to avoid the game's "Too many actions" disconnects. A failed
-  clipboard read or write there logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item
-  text, and an uncut gem's rarity line, per game language as literals: main reads no game data.
-- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `restoreShortly()`. After its clipboard write ends,
-  it presses `Enter`, then `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`),
-  and pastes the text.
+  marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`RESTORE_AFTER`), and until then drops a
+  call to it or `restoreShortly()` to avoid the game's "Too many actions" disconnects. `restoreShortly(cb)` does the
+  same, then writes the text from before `cb` back with Restore clipboard on. A failed clipboard read or write logs
+  `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text, and an uncut gem's rarity
+  line, per game language as literals: main reads no game data.
+- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `throttle()` and leaves the text on the clipboard,
+  since main cannot see when the game pastes. After its clipboard write ends, it presses `Enter`, then `Ctrl + A`
+  unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
   When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
   `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text
   ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With
@@ -241,7 +242,7 @@ releases. The `electron` package has no install script. `require("electron")` do
 time it runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.6% of the lines of `src/` on 25 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.7% of the lines of `src/` on 26 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and the
 production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
 `eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard capture

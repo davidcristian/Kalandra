@@ -33,7 +33,8 @@ after a click in Kalandra's page in a web browser, Kalandra skips the search and
 `Skipped a stash search because the game window does not have the focus` to its log, on the **Debug** settings page.
 
 The text goes through the clipboard, so after a search the clipboard holds the search text. To get your previous
-clipboard text back after each search, check `Restore clipboard` in Settings, `General`. Kalandra skips a search
+clipboard text back after each search, check `Restore clipboard` in Settings, `General`; its row on the
+[Settings](/settings#general) page says what a game that stalls pastes then. Kalandra skips a search
 that comes less than 120 ms after the previous search or [chat command](/chat-commands).
 
 ## Map rolling
