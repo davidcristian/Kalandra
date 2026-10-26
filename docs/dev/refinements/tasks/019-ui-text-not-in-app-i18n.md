@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/public/data/en/app_i18n.json](../../../../renderer/public/data/en/app_i18n.json)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-26
 
 [AGENTS.md](../../../../AGENTS.md#architecture-rules) says a new UI string goes into
 `renderer/public/data/en/app_i18n.json`, and translators work from that file.
@@ -12,8 +12,8 @@ realm option, which shows only when the language is `cmn-Hant`, and no language 
 `renderer/src/web/i18n.ts` sets `fallbackFormat: true`, so vue-i18n shows the key itself.
 
 The default widget titles that `defaultConfig()` saves are English literals, and the widget menu
-shows them: `XP` in `leveling/WidgetXpTracker.vue`, `Cheat sheets` in `overlay/WidgetImageStrip.vue`,
-and `Map rolling` and `Dump sorting` in `stash-search/WidgetStashSearch.vue`. `defaultConfig()` runs
+shows them: `XP` in `leveling/WidgetXpTracker.vue`, and `Map rolling` and `Dump sorting` in
+`stash-search/WidgetStashSearch.vue`. `defaultConfig()` runs
 at the first start with `language: "en"`, before a language is loaded, so a title in the user's
 language needs the step that [task 072](072-stash-search-presets-in-english.md) describes for the
 presets.
@@ -46,3 +46,5 @@ language, or the maintainer decides to keep them in English.
   state, the trade error prefix, the volume unit and others. They now read keys, and
   `renderer/specs/web/template-text.test.ts` fails on a template text with a letter outside `t()`.
   The default widget titles were added above.
+- 2026-10-26: Removed `Cheat sheets`, since `defaultConfig()` no longer has the image strip that
+  had it ([031](031-path-of-exile-1-features.md)).

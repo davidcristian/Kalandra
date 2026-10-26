@@ -214,7 +214,7 @@
   },
   "src/web/Config.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 30
+      "count": 29
     }
   },
   "src/web/background/Prices.ts": {

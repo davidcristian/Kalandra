@@ -86,9 +86,8 @@ describe("the widgets of defaultConfig()", () => {
       [6, "stash-search"],
       [7, "price-check"],
       [8, "item-check"],
-      [9, "image-strip"],
-      [10, "delve-grid"],
-      [11, "library"],
+      [9, "delve-grid"],
+      [10, "library"],
     ]);
   });
 

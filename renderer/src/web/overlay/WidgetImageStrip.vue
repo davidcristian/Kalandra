@@ -85,24 +85,6 @@ export default {
     type: "image-strip",
     instances: "multi",
     trNameKey: "image_strip.name",
-    defaultInstances: (): ImageStripWidget[] => {
-      return [
-        {
-          wmId: 0,
-          wmType: "image-strip",
-          wmTitle: "Cheat sheets",
-          wmWants: "hide",
-          wmZorder: null,
-          wmFlags: ["invisible-on-blur"],
-          anchor: {
-            pos: "tc",
-            x: 50,
-            y: 10,
-          },
-          images: [{ id: 1, url: "syndicate.jpg" }],
-        },
-      ];
-    },
   } satisfies WidgetSpec,
 };
 </script>
@@ -133,12 +115,7 @@ if (props.config.wmFlags[0] === "uninitialized") {
     x: Math.random() * (60 - 40) + 40,
     y: Math.random() * (15 - 5) + 5,
   };
-  props.config.images = [
-    {
-      id: 1,
-      url: "syndicate.jpg",
-    },
-  ];
+  props.config.images = [];
   nextTick(() => {
     wm.show(props.config.wmId);
   });

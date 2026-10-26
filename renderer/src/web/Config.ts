@@ -10,6 +10,7 @@ import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
 import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
 import { addMissingWidgets } from "./missing-widgets";
+import * as removed from "./removed-widgets";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { ENGLISH_DEFAULTS_40, namePresetEntries } from "./stash-search/presets";
@@ -211,7 +212,7 @@ export function upgradeConfig(_config: Config): Config {
 
   if (config.configVersion < 3) {
     config.widgets.push({
-      ...defaultConfig().widgets.find((w) => w.wmType === "image-strip")!,
+      ...removed.cheatSheetsDefault(),
       wmId: Math.max(0, ...config.widgets.map((_) => _.wmId)) + 1,
       wmZorder: null,
     });

@@ -11,15 +11,10 @@ The Image strip widget shows a row of images over the game, such as cheat sheets
 full size in the center of the screen, up to the screen height. A large, high resolution image is the easiest to
 read.
 
-Kalandra includes one image strip, named `Cheat sheets`. It starts with a cheat sheet for the Betrayal syndicate of
-Path of Exile 1. Click `Cheat sheets` in the main button bar to show it.
-
-To add another strip, open the overlay (`Shift + Space` by default), hover over the three dots and click
-`Image strip`. A new strip has no title, shows `Untitled`, and starts with the same cheat sheet.
+To add a strip, open the overlay (`Shift + Space` by default), hover over the three dots and click `Image strip`.
+You can add more than one. A new strip has no title, shows `Untitled`, and has no images until you add them.
 
 ![The add widget menu with Image strip circled](/reference-images/AddImageStrip.png)
-
-![A new image strip named Untitled with one image](/reference-images/ImageStripNew.png)
 
 ![An image shown at full size over the game while the mouse is over it](/reference-images/HoverImageStrip.jpg)
 

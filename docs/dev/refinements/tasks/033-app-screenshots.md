@@ -20,6 +20,7 @@ need new ones:
 | [item-data.md](../../../item-data.md) | The Library settings page, with the Recording settings checkboxes and the `kalandra` output folder |
 | [extra-widgets.md](../../../extra-widgets.md), [stash-search.md](../../../stash-search.md) | The add widget menu, which now lists Notepad (`WidgetNotepad.vue` has `instances: "multi"`), to replace `AddImageStrip.png`, `StopWatchAdd.png` and `StashSearchAdd.png` |
 | [stash-search.md](../../../stash-search.md), [features.md](../../../features.md) | The `Dump sorting` widget, to replace `DumpSortWidget.png`, which shows the search `Trials:` where the widget now shows `"Number of Trials:"` |
+| [widgets.md](../../../widgets.md) | The main button bar of a new install, which has no `Cheat sheets` button, to replace `mainWidget.png` |
 | [chat-commands.md](../../../chat-commands.md) | The Chat page with the default commands of `defaultConfig()`, to replace `ChatCommandsList.png`, which shows `@last ty gl` and the keys End, PageUp, PageDown and Insert |
 
 None of these needs the game. Kalandra started with `--no-overlay` opens its page in the default
@@ -39,4 +40,6 @@ and the docs build passes. Screenshots of the game itself are [host task 017](..
   but could not run the app to take new ones.
 - 2026-10-26: Added the `Dump sorting` widget, whose last search now comes from the game data.
 - 2026-10-26: Removed the row for `ocr-guide.md`, which was deleted with the Heist gem OCR
+  ([031](031-path-of-exile-1-features.md)).
+- 2026-10-26: Added the main button bar, since a new install has no `Cheat sheets` image strip
   ([031](031-path-of-exile-1-features.md)).

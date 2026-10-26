@@ -29,6 +29,8 @@ old one and keep that file, so a saved config must survive every update: this is
   A step sets what version N added and ends with `config.configVersion = N`. A step that adds a widget adds that
   widget's default instance from `defaultConfig()` with the next free `wmId`, and takes the index to insert at from
   `findIndex()`. The `< 29` and `< 30` steps pass the item search `wmId` to `splice()` as an index instead.
+  `defaultConfig()` has no image strip, so the `< 3` step takes its `Cheat sheets` strip, with the Path of Exile 1
+  syndicate sheet, from `cheatSheetsDefault()` in `renderer/src/web/removed-widgets.ts`.
 - `repairSavedConfig(config)` in `renderer/src/web/config-repair.ts` is what the `< 36` step runs. It sets
   `overlayAlwaysClose` to false when it is missing, since no step adds it to a config from Awakened PoE Trade. It
   keeps the first library widget, which the settings window and the hotkeys read, and removes the others: a v0.14.0

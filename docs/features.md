@@ -90,12 +90,12 @@ Details: [Extra widgets](/extra-widgets).
 
 ## Image strip
 
-Shows your own images on the overlay, such as cheat sheets. Kalandra starts with one image strip named Cheat sheets:
-click **Cheat sheets** in the main button bar to show it. Use its **edit** button to add, order and remove images.
+Shows your own images on the overlay, such as cheat sheets. To add a strip, hover over the three dots in the main
+button bar, then click **Image strip**. Use its **edit** button to add, order and remove images.
 
 Details: [Extra widgets](/extra-widgets).
 
-![The Cheat sheets image strip with five images](/reference-images/minCheatSheet.png)
+![An image strip named Cheat sheets with five images](/reference-images/minCheatSheet.png)
 
 ## Stopwatch
 

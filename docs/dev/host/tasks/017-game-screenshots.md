@@ -16,7 +16,7 @@ screenshot of the game needs the game, so these are listed here. Screenshots of 
 | [failed-load-leagues.md](../../../failed-load-leagues.md) | The league list the built-in browser shows after the bot check |
 | [no-item-mods.md](../../../no-item-mods.md) | A weapon's price check with no modifier filters, to replace `no-stats.png`, which shows the Path of Exile 1 wording `Critical Strike Chance` where the app shows `Critical Hit Chance` |
 | [faq.md](../../../faq.md) | The Mousewheel Zoom option and the camera zoom bindings, if host task [008](008-stash-tab-scrolling.md) finds that `mousewheel-zoom.png` and `zoom-keybinds.png` show Path of Exile 1 |
-| [extra-widgets.md](../../../extra-widgets.md) | The Image strip over the game with a Path of Exile 2 cheat sheet, to replace `HoverImageStrip.jpg`, if the maintainer replaces the default Path of Exile 1 sheet ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)) |
+| [extra-widgets.md](../../../extra-widgets.md) | The Image strip over the game with a Path of Exile 2 cheat sheet, to replace `HoverImageStrip.jpg`, which shows the Path of Exile 1 syndicate sheet that Kalandra no longer includes ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)) |
 
 **Do.** Take each screenshot in the game with the current build. Crop it to the part the page
 describes, and keep no account name, character name or chat line from other players in it.
@@ -34,3 +34,5 @@ match. The docs build passes ([runbooks/docs-site.md](../../runbooks/docs-site.m
   Named the image strip file to replace.
 - 2026-10-26: Removed the row for `ocr-guide.md`, which was deleted with the Heist gem OCR
   ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)).
+- 2026-10-26: The image strip row no longer waits for a decision: Kalandra removed its Path of
+  Exile 1 syndicate sheet ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)).
