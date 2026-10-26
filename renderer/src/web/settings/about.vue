@@ -36,7 +36,7 @@
             class="border-b"
             href="https://old.reddit.com/r/pathofexile2"
             target="_blank"
-            >r/pathofexile</a
+            >r/pathofexile2</a
           >
         </li>
         <li>

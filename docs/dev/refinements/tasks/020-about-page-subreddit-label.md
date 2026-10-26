@@ -1,9 +1,9 @@
 # The About page subreddit label does not match its link
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/settings/about.vue](../../../../renderer/src/web/settings/about.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Settings, About has a link with the text `r/pathofexile` whose `href` is
 `https://old.reddit.com/r/pathofexile2`. The text names the Path of Exile 1 subreddit and the link
@@ -16,3 +16,4 @@ no change.
 ## History
 
 - 2026-10-18: Found while docs/settings.md was written, by reading `about.vue`.
+- 2026-10-27: fix(renderer): label the About page subreddit link r/pathofexile2

@@ -18,7 +18,7 @@ const ALLOWED = new Set([
   "Kalandra",
   "poe.ninja",
   "www.pathofexile.com",
-  "r/pathofexile",
+  "r/pathofexile2",
   "pathofexile",
   "PoE-Leveling-Guide",
   "wiki",
