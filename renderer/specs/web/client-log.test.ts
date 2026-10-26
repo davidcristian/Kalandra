@@ -999,9 +999,13 @@ describe("clientLog", () => {
   });
 
   it.each([
-    [log1, 1],
-    [logStartThroughRedVale, 1],
-  ])("Should have deaths", (log, count) => {
+    ["log1", log1, ["Kvan_seven_abyss"]],
+    [
+      "logStartThroughRedVale",
+      logStartThroughRedVale,
+      ["kvanClientLogTestOne"],
+    ],
+  ])("sends the name of each character slain in %s", (_name, log, names) => {
     const { handleLine } = createClientLog();
 
     for (const line of log.split("\n")) {
@@ -1009,10 +1013,7 @@ describe("clientLog", () => {
     }
 
     const events = sentLogEvents("player-death");
-    expect(events.length).toBe(count);
-    events.forEach((event) => {
-      expect(event.charName.toLowerCase()).toContain("kvan");
-    });
+    expect(events.map((event) => event.charName)).toEqual(names);
   });
 
   it.each([

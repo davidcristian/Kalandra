@@ -1,9 +1,9 @@
 # The player-death charName starts with a colon and a space
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/client-log/client-log-parser.ts](../../../../renderer/src/web/client-log/client-log-parser.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The client log parser reads chat lines from `Client.txt`, which start with `: `. It removes those
 characters into `colonLess` and matches every chat type against `colonLess`, except one:
@@ -22,3 +22,4 @@ fails before the fix; the table row and the sample line in docs/client-log-parse
 
 - 2026-10-18: Found while docs/client-log-parser.md was rewritten, by comparing the `player-death`
   branch with the other chat branches.
+- 2026-10-27: fix(renderer): remove the leading colon from the player-death charName

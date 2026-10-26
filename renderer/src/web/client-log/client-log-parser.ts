@@ -189,7 +189,7 @@ export function parseClientLogText(
           points: count,
           pointType,
         };
-      } else if ((groups = text.match(SLAIN_REGEX)?.groups)) {
+      } else if ((groups = colonLess.match(SLAIN_REGEX)?.groups)) {
         data = {
           ...data,
           type: ClientLogInfoType.PlayerDeath,

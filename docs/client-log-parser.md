@@ -48,7 +48,7 @@ computer set to UTC. The sample shows one entry for most types, not a whole file
 {"ts":1765544513000,"ms":1004507968,"type":"npc","npcName":"Wounded Man","message":"By the First Ones! You're alive!"}
 {"ts":1765544616000,"ms":1004610062,"type":"level-up","level":2,"charName":"HolyMolyThisIsCharName","charClass":"Mercenary"}
 {"ts":1765544687000,"ms":1004681234,"type":"passive-tree","allocate":true,"nodeId":"projectiles18","nodeName":"Projectile Damage"}
-{"ts":1765544769000,"ms":1004763718,"type":"player-death","charName":": HolyMolyThisIsCharName"}
+{"ts":1765544769000,"ms":1004763718,"type":"player-death","charName":"HolyMolyThisIsCharName"}
 {"ts":1765544820000,"ms":1004814156,"type":"permanent-bonus","permanentBonus":"+10% to [Resistances|Cold Resistance].","charName":"HolyMolyThisIsCharName"}
 {"ts":1765548394000,"ms":1008388109,"type":"afk","isAfk":true}
 {"ts":1765550526000,"ms":1010520875,"type":"skill-point","points":2,"pointType":"passive"}
@@ -128,7 +128,7 @@ A character died, from the `: <name> has been slain.` line.
 
 | Field | Type | Content |
 | --- | --- | --- |
-| `charName` | string | Character name. The value starts with `: `, the two characters before the name in the log line. |
+| `charName` | string | Character name |
 
 ### `passive-tree`
 
