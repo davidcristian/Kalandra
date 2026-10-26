@@ -1,9 +1,9 @@
 # The map property filters send only their minimum to the trade site
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/trade/pathofexile-trade.ts](../../../../renderer/src/web/price-check/trade/pathofexile-trade.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 `createTradeRequest` in `pathofexile-trade.ts` sends a `.min` and a `.max` for most property
 filters, such as `item.physical_dps`, but only the `.min` for the map filters: `item.map_revives`,
@@ -18,3 +18,5 @@ equipment filters do, and a test checks that a maximum is in the query.
 
 - 2026-10-22: Filed when the comment that asked for these maximums was removed from
   `pathofexile-trade.ts`.
+- 2026-10-27: fix(trade): send the maximum of the map property filters. The seven cases became
+  one, which looks up each filter's key under `map_filters` and sets its `.min` and `.max`.

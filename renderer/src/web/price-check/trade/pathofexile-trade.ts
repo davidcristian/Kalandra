@@ -556,6 +556,17 @@ export interface PricingResult {
   gone?: boolean;
 }
 
+/** The key under `map_filters` of each map property filter. */
+const MAP_PROPERTY_FILTERS = {
+  "item.map_revives": "map_revives",
+  "item.map_pack_size": "map_packsize",
+  "item.map_magic_monsters": "map_magic_monsters",
+  "item.map_rare_monsters": "map_rare_monsters",
+  "item.map_drop_chance": "map_bonus",
+  "item.map_item_rarity": "map_iir",
+  "item.map_gold": "map_gold",
+} as const;
+
 export function createTradeRequest(
   filters: ItemFilters,
   stats: StatFilter[],
@@ -899,7 +910,8 @@ export function createTradeRequest(
     }
 
     const input = stat.roll!;
-    switch (stat.tradeId[0] as InternalTradeId) {
+    const tradeId = stat.tradeId[0] as InternalTradeId;
+    switch (tradeId) {
       case "item.armour":
         propSet(
           query.filters,
@@ -1050,54 +1062,25 @@ export function createTradeRequest(
         break;
 
       case "item.map_revives":
-        propSet(
-          query.filters,
-          "map_filters.filters.map_revives.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        break;
       case "item.map_pack_size":
-        propSet(
-          query.filters,
-          "map_filters.filters.map_packsize.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        break;
       case "item.map_magic_monsters":
-        propSet(
-          query.filters,
-          "map_filters.filters.map_magic_monsters.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        break;
       case "item.map_rare_monsters":
-        propSet(
-          query.filters,
-          "map_filters.filters.map_rare_monsters.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        break;
       case "item.map_drop_chance":
-        propSet(
-          query.filters,
-          "map_filters.filters.map_bonus.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        break;
       case "item.map_item_rarity":
+      case "item.map_gold": {
+        const key = MAP_PROPERTY_FILTERS[tradeId];
         propSet(
           query.filters,
-          "map_filters.filters.map_iir.min",
+          `map_filters.filters.${key}.min`,
           typeof input.min === "number" ? input.min : undefined,
         );
-        break;
-      case "item.map_gold":
         propSet(
           query.filters,
-          "map_filters.filters.map_gold.min",
-          typeof input.min === "number" ? input.min : undefined,
+          `map_filters.filters.${key}.max`,
+          typeof input.max === "number" ? input.max : undefined,
         );
         break;
+      }
       case "item.duplicates":
         {
           if (item.info.refName !== "Mageblood") {

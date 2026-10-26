@@ -10,7 +10,7 @@ import {
   TestItem,
 } from "@specs/Parser/items";
 import { init } from "@/assets/data";
-import { parseClipboard } from "@/parser";
+import { parseClipboard, type ParsedItem } from "@/parser";
 import {
   INTERNAL_TRADE_IDS,
   ItemIsElementalModifier,
@@ -23,9 +23,15 @@ const FIRE = "stat_709508406";
 const COLD = "stat_1037193709";
 const LIGHTNING = "stat_3336890334";
 
-/** The search of a real item with each of its item property filters turned on, after `change` edits them. */
-function search(item: TestItem, change?: (props: StatFilter[]) => void) {
-  const parsed = parseClipboard(item.rawText)._unsafeUnwrap();
+/** The search of an item, parsed first when it is a `TestItem`, with its property filters on after `change` edits them. */
+function search(
+  item: TestItem | ParsedItem,
+  change?: (props: StatFilter[]) => void,
+) {
+  const parsed =
+    item instanceof TestItem
+      ? parseClipboard(item.rawText)._unsafeUnwrap()
+      : item;
   const [preset] = createPresets(parsed, createTestCreateOptions()).presets;
   const props = preset.stats.filter(
     (stat) =>
@@ -111,6 +117,35 @@ describe("the item property filters of a trade search", () => {
     expect(query.filters.equipment_filters?.filters.ar).toEqual({
       min: 2927,
       max: 3000,
+    });
+  });
+
+  it("sends the maximum the user sets on each property of a Waystone", () => {
+    const setMaximum = (props: StatFilter[]) => {
+      for (const filter of props) {
+        if (filter.roll) filter.roll.max = 500;
+      }
+    };
+    const withGold = parseClipboard(
+      RareMapFakeAllProps.rawText,
+    )._unsafeUnwrap();
+    // The parser reads no gold line, since client_strings.js has no string for it
+    withGold.mapGold = 40;
+
+    expect(
+      search(RareMap, setMaximum).filters.map_filters?.filters,
+    ).toMatchObject({
+      map_revives: { min: 2, max: 500 },
+      map_packsize: { min: 34, max: 500 },
+      map_rare_monsters: { min: 28, max: 500 },
+      map_bonus: { min: 75, max: 500 },
+    });
+    expect(
+      search(withGold, setMaximum).filters.map_filters?.filters,
+    ).toMatchObject({
+      map_magic_monsters: { max: 500 },
+      map_iir: { min: 17, max: 500 },
+      map_gold: { min: 40, max: 500 },
     });
   });
 

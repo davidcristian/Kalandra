@@ -190,7 +190,7 @@ otherwise the first. A failed load is logged with `console.warn` and its message
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 1948 lines** (2026-10-26,
+- **`pathofexile-trade.ts` is 1923 lines** (2026-10-27,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 
@@ -228,7 +228,8 @@ the test says.
 `bulk-search.test.ts` in `specs/web/price-check/trade/` runs `execBulkSearch` on hand-written exchange responses
 and checks the order and the totals per currency, the seller states and the cache.
 `property-filters.test.ts` there turns on the item property filters of real items and checks the trade site
-filters that `createTradeRequest` sends for them, and the elements an elemental damage filter leaves out.
+filters that `createTradeRequest` sends for them, with a maximum the user sets, and the elements an elemental damage
+filter leaves out.
 `specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
 schema version and an overview type that the map does not list, and `specs/web/prices-load.test.ts` loads the price
 file from a fake host. `specs/web/display-rounding.test.ts` writes prices as `displayRounding` shows them.
