@@ -1,6 +1,6 @@
 # ConfigStore sends config-changed before the save is written
 
-**Status:** open
+**Status:** declined 2026-10-26
 **Area:** config
 **Origin:** [main/src/host-files/ConfigStore.ts](../../../../main/src/host-files/ConfigStore.ts)
 **Verified:** 2026-10-26
@@ -42,3 +42,6 @@ and none after a failed write, and the price check is checked in the game
 - 2026-10-20: Found while a failed save was changed to log its error and keep the app running.
 - 2026-10-26: Checked again. Moving the event after the write would let a save on blur close a price
   check opened after it, so the change waits for the maintainer to choose one of the ways above.
+- 2026-10-26: Declined. The maintainer kept the current order: a failed write is rare and logged,
+  the next save writes the whole config again, and each other way changes the `IpcEvent` contract or
+  can close a price check opened after a save.

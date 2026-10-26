@@ -1,6 +1,6 @@
 # No check follows a link to another site
 
-**Status:** open
+**Status:** declined 2026-10-26
 **Area:** docs
 **Origin:** [scripts/linkcheck.py](../../../../scripts/linkcheck.py)
 **Verified:** 2026-10-26
@@ -26,3 +26,6 @@ in `docs/dev/modules/scripts.md`. If it is not, this task is declined with the r
 - 2026-10-26: Filed when AGENTS.md was corrected to say that the docs build fails on a dead
   internal link only. No script was added, since one needs the network and a rule for the hosts it
   may contact.
+- 2026-10-26: Declined. The docs build checks the internal links. The 70 distinct links to other
+  sites in the tracked markdown files, most of them to GitHub, do not justify a script and tests that
+  need the network and could not run in CI.

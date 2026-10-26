@@ -1,9 +1,9 @@
 # Record why Kalandra is under the AGPL v3
 
-**Status:** open
+**Status:** declined 2026-10-26
 **Area:** rules
 **Origin:** [docs/dev/adr/ADR-0002-agpl-with-mit-notice.md](../../adr/ADR-0002-agpl-with-mit-notice.md)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 [ADR-0002](../../adr/ADR-0002-agpl-with-mit-notice.md) records that Kalandra is under the GNU
 Affero General Public License v3 and what that license requires. Decisions 2 to 4 each give a
@@ -20,3 +20,5 @@ Alternatives rejected lists the licenses not chosen.
 
 - 2026-10-18: Found while ADR-0002 was written. A review of the repo against the maintainer's
   documentation practices listed it as an open question.
+- 2026-10-26: Declined. The maintainer chose not to record a reason. The license applies without
+  one, and [ADR-0002](../../adr/ADR-0002-agpl-with-mit-notice.md) states the decision.
