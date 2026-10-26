@@ -43,11 +43,12 @@ export function parseModInfoLine(
   let tier: ModifierInfo["tier"];
   let rank: ModifierInfo["rank"];
 
-  if (_$.EATER_IMPLICIT.test(modText) || _$.EXARCH_IMPLICIT.test(modText)) {
-    const match =
-      modText.match(_$.EATER_IMPLICIT) ?? modText.match(_$.EXARCH_IMPLICIT)!;
+  const eldritch =
+    _$.EATER_IMPLICIT.exec(modText) ?? _$.EXARCH_IMPLICIT.exec(modText);
+  const groups = eldritch ? undefined : _$.MODIFIER_LINE.exec(modText)?.groups;
+  if (eldritch) {
     generation = "eldritch";
-    switch (match.groups!.rank) {
+    switch (eldritch.groups?.rank) {
       case _$.ELDRITCH_MOD_R1:
         rank = 1;
         break;
@@ -67,57 +68,44 @@ export function parseModInfoLine(
         rank = 6;
         break;
     }
-  } else if (!_$.MODIFIER_LINE.test(modText)) {
+  } else if (!groups) {
     console.warn("Cannot parse the modifier line:", line);
   } else {
-    const match = modText.match(_$.MODIFIER_LINE)!;
-    if (match.groups!.type.startsWith(_$.FRACTURED_MODIFIER)) {
-      match.groups!.type = match
-        .groups!.type.slice(_$.FRACTURED_MODIFIER.length)
-        .trim();
+    if (groups.type.startsWith(_$.FRACTURED_MODIFIER)) {
+      groups.type = groups.type.slice(_$.FRACTURED_MODIFIER.length).trim();
       type = ModifierType.Fractured;
     }
     // mostly for spanish
-    else if (match.groups!.type2?.startsWith(_$.FRACTURED_MODIFIER)) {
-      match.groups!.type2 = match
-        .groups!.type2.slice(_$.FRACTURED_MODIFIER.length)
-        .trim();
+    else if (groups.type2?.startsWith(_$.FRACTURED_MODIFIER)) {
+      groups.type2 = groups.type2.slice(_$.FRACTURED_MODIFIER.length).trim();
       type = ModifierType.Fractured;
     }
 
-    if (match.groups!.type.startsWith(_$.DESECRATED_MODIFIER)) {
-      match.groups!.type = match
-        .groups!.type.slice(_$.DESECRATED_MODIFIER.length)
-        .trim();
+    if (groups.type.startsWith(_$.DESECRATED_MODIFIER)) {
+      groups.type = groups.type.slice(_$.DESECRATED_MODIFIER.length).trim();
       if (type !== ModifierType.Fractured) {
         type = ModifierType.Desecrated;
       }
-    } else if (match.groups!.type.startsWith(_$.CRAFTED_MODIFIER)) {
-      match.groups!.type = match
-        .groups!.type.slice(_$.CRAFTED_MODIFIER.length)
-        .trim();
+    } else if (groups.type.startsWith(_$.CRAFTED_MODIFIER)) {
+      groups.type = groups.type.slice(_$.CRAFTED_MODIFIER.length).trim();
       if (type !== ModifierType.Fractured) {
         type = ModifierType.Crafted;
       }
     }
     // mostly for spanish
-    else if (match.groups!.type2?.startsWith(_$.DESECRATED_MODIFIER)) {
-      match.groups!.type2 = match
-        .groups!.type2.slice(_$.DESECRATED_MODIFIER.length)
-        .trim();
+    else if (groups.type2?.startsWith(_$.DESECRATED_MODIFIER)) {
+      groups.type2 = groups.type2.slice(_$.DESECRATED_MODIFIER.length).trim();
       if (type !== ModifierType.Fractured) {
         type = ModifierType.Desecrated;
       }
-    } else if (match.groups!.type2?.startsWith(_$.CRAFTED_MODIFIER)) {
-      match.groups!.type2 = match
-        .groups!.type2.slice(_$.CRAFTED_MODIFIER.length)
-        .trim();
+    } else if (groups.type2?.startsWith(_$.CRAFTED_MODIFIER)) {
+      groups.type2 = groups.type2.slice(_$.CRAFTED_MODIFIER.length).trim();
       if (type !== ModifierType.Fractured) {
         type = ModifierType.Crafted;
       }
     }
 
-    switch (match.groups!.type) {
+    switch (groups.type) {
       case _$.PREFIX_MODIFIER:
         generation = "prefix";
         break;
@@ -139,9 +127,9 @@ export function parseModInfoLine(
         generation = "mutated";
     }
 
-    name = match.groups!.name || undefined;
-    tier = Number(match.groups!.tier) || undefined;
-    rank = Number(match.groups!.rank) || undefined;
+    name = groups.name || undefined;
+    tier = Number(groups.tier) || undefined;
+    rank = Number(groups.rank) || undefined;
   }
 
   let tags: ModifierInfo["tags"];
@@ -187,7 +175,7 @@ export function* groupLinesByMod(
   let last: GroupedModLines | undefined;
   for (const line of lines) {
     if (!isModInfoLine(line)) {
-      last!.statLines.push(line);
+      last?.statLines.push(line);
     } else {
       if (last) {
         yield last;
@@ -195,7 +183,7 @@ export function* groupLinesByMod(
       last = { modLine: line, statLines: [] };
     }
   }
-  yield last!;
+  if (last) yield last;
 }
 
 export function parseModType(lines: string[]): {

@@ -255,26 +255,16 @@ function normalizeName(item: ParserState) {
   }
 
   if (item.rarity === ItemRarity.Normal || item.rarity === ItemRarity.Rare) {
+    const blight = [
+      _$REF.MAP_BLIGHTED,
+      _$REF.MAP_BLIGHT_RAVAGED,
+      _$.MAP_BLIGHTED,
+      _$.MAP_BLIGHT_RAVAGED,
+    ];
     if (item.baseType) {
-      if (_$REF.MAP_BLIGHTED.test(item.baseType)) {
-        item.baseType = _$REF.MAP_BLIGHTED.exec(item.baseType)![1];
-      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.baseType)) {
-        item.baseType = _$REF.MAP_BLIGHT_RAVAGED.exec(item.baseType)![1];
-      } else if (_$.MAP_BLIGHTED.test(item.baseType)) {
-        item.baseType = _$.MAP_BLIGHTED.exec(item.baseType)![1];
-      } else if (_$.MAP_BLIGHT_RAVAGED.test(item.baseType)) {
-        item.baseType = _$.MAP_BLIGHT_RAVAGED.exec(item.baseType)![1];
-      }
+      item.baseType = firstCapture(item.baseType, blight);
     } else {
-      if (_$REF.MAP_BLIGHTED.test(item.name)) {
-        item.name = _$REF.MAP_BLIGHTED.exec(item.name)![1];
-      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.name)) {
-        item.name = _$REF.MAP_BLIGHT_RAVAGED.exec(item.name)![1];
-      } else if (_$.MAP_BLIGHTED.test(item.name)) {
-        item.name = _$.MAP_BLIGHTED.exec(item.name)![1];
-      } else if (_$.MAP_BLIGHT_RAVAGED.test(item.name)) {
-        item.name = _$.MAP_BLIGHT_RAVAGED.exec(item.name)![1];
-      }
+      item.name = firstCapture(item.name, blight);
     }
   }
 
@@ -452,12 +442,14 @@ function parseBlightedMap(item: ParsedItem) {
       calc.stat.ref.startsWith("Area is infested with Fungal Growths"),
   );
   if (calc !== undefined) {
-    if (calc.sources[0].contributes!.value === 9) {
+    if (calc.sources[0].contributes?.value === 9) {
       item.mapBlighted = "Blight-ravaged";
-      item.info.icon = ITEM_BY_REF("ITEM", "Blight-ravaged Map")![0].icon;
+      item.info.icon =
+        ITEM_BY_REF("ITEM", "Blight-ravaged Map")?.[0].icon ?? item.info.icon;
     } else {
       item.mapBlighted = "Blighted";
-      item.info.icon = ITEM_BY_REF("ITEM", "Blighted Map")![0].icon;
+      item.info.icon =
+        ITEM_BY_REF("ITEM", "Blighted Map")?.[0].icon ?? item.info.icon;
     }
   }
 }
@@ -472,33 +464,38 @@ function pickCorrectVariant(item: ParserState) {
   if (!item.info.disc) return;
 
   for (const variant of item.infoVariants) {
-    const cond = variant.disc!;
+    const cond = variant.disc;
+    if (!cond) continue;
 
     if (cond.propAR && !item.armourAR) continue;
     if (cond.propEV && !item.armourEV) continue;
     if (cond.propES && !item.armourES) continue;
 
-    if (cond.mapTier === "W" && !(item.mapTier! <= 5)) continue;
-    if (cond.mapTier === "Y" && !(item.mapTier! >= 6 && item.mapTier! <= 10))
-      continue;
-    if (cond.mapTier === "R" && !(item.mapTier! >= 11)) continue;
+    if (cond.mapTier) {
+      const tier = item.mapTier;
+      if (tier === undefined) continue;
+      if (cond.mapTier === "W" && !(tier <= 5)) continue;
+      if (cond.mapTier === "Y" && !(tier >= 6 && tier <= 10)) continue;
+      if (cond.mapTier === "R" && !(tier >= 11)) continue;
+    }
 
+    const { hasImplicit, hasExplicit } = cond;
     if (
-      cond.hasImplicit &&
+      hasImplicit &&
       !item.statsByType.some(
         (calc) =>
           calc.type === ModifierType.Implicit &&
-          calc.stat.ref === cond.hasImplicit!.ref,
+          calc.stat.ref === hasImplicit.ref,
       )
     )
       continue;
 
     if (
-      cond.hasExplicit &&
+      hasExplicit &&
       !item.statsByType.some(
         (calc) =>
           calc.type === ModifierType.Explicit &&
-          calc.stat.ref === cond.hasExplicit!.ref,
+          calc.stat.ref === hasExplicit.ref,
       )
     )
       continue;
@@ -667,9 +664,8 @@ function parseUnidentified(section: string[], item: ParsedItem) {
   const match = section[0].match(_$.UNIDENTIFIED);
   if (match) {
     item.isUnidentified = true;
-    if (match.groups!.tier) {
-      item.unidentifiedTier = Number(match.groups!.tier);
-    }
+    const tier = match.groups?.tier;
+    if (tier) item.unidentifiedTier = Number(tier);
     return "SECTION_PARSED";
   }
   return "SECTION_SKIPPED";
@@ -706,10 +702,10 @@ function parseRequirements(section: string[], item: ParsedItem) {
   }
 
   item.requires = {
-    level: parseInt(match.groups!.level ?? "0"),
-    str: parseInt(match.groups!.str ?? "0"),
-    dex: parseInt(match.groups!.dex ?? "0"),
-    int: parseInt(match.groups!.int ?? "0"),
+    level: parseInt(match.groups?.level ?? "0"),
+    str: parseInt(match.groups?.str ?? "0"),
+    dex: parseInt(match.groups?.dex ?? "0"),
+    int: parseInt(match.groups?.int ?? "0"),
   };
 
   return "SECTION_PARSED";
@@ -1248,16 +1244,9 @@ function applyAugmentSockets(item: ParsedItem) {
         ? item.augmentSockets.normal
         : item.augmentSockets.current;
 
-    if (allSameAugment) {
-      const augmentToApply = editorItems[0];
-      for (let i = 0; i < augmentCountToApply; i++) {
-        useAugment(item, augmentToApply!, i);
-      }
-    } else {
-      for (let i = 0; i < augmentCountToApply; i++) {
-        if (!editorItems[i]) continue;
-        useAugment(item, editorItems[i]!, i);
-      }
+    for (let i = 0; i < augmentCountToApply; i++) {
+      const augment = allSameAugment ? editorItems[0] : editorItems[i];
+      if (augment) useAugment(item, augment, i);
     }
   }
 }
@@ -1417,11 +1406,10 @@ function parseSuperior(item: ParserState) {
     (item.rarity === ItemRarity.Rare && item.isUnidentified) ||
     (item.rarity === ItemRarity.Unique && item.isUnidentified)
   ) {
-    if (_$REF.ITEM_SUPERIOR.test(item.name)) {
-      item.name = _$REF.ITEM_SUPERIOR.exec(item.name)![1];
-    } else if (_$.ITEM_SUPERIOR.test(item.name)) {
-      item.name = _$.ITEM_SUPERIOR.exec(item.name)![1];
-    }
+    item.name = firstCapture(item.name, [
+      _$REF.ITEM_SUPERIOR,
+      _$.ITEM_SUPERIOR,
+    ]);
   }
 }
 
@@ -1432,12 +1420,20 @@ function parseExceptional(item: ParserState) {
     (item.rarity === ItemRarity.Rare && item.isUnidentified) ||
     (item.rarity === ItemRarity.Unique && item.isUnidentified)
   ) {
-    if (_$REF.ITEM_EXCEPTIONAL.test(item.name)) {
-      item.name = _$REF.ITEM_EXCEPTIONAL.exec(item.name)![1];
-    } else if (_$.ITEM_EXCEPTIONAL.test(item.name)) {
-      item.name = _$.ITEM_EXCEPTIONAL.exec(item.name)![1];
-    }
+    item.name = firstCapture(item.name, [
+      _$REF.ITEM_EXCEPTIONAL,
+      _$.ITEM_EXCEPTIONAL,
+    ]);
   }
+}
+
+/** Returns the first group of the first pattern that matches the text, or the text unchanged. */
+function firstCapture(text: string, patterns: RegExp[]): string {
+  for (const pattern of patterns) {
+    const match = pattern.exec(text);
+    if (match) return match[1];
+  }
+  return text;
 }
 
 function parseCategoryByHelpText(section: string[], item: ParsedItem) {
@@ -1723,25 +1719,14 @@ function applyElementalAdded(item: ParsedItem) {
     item.statsByType.forEach((calc) => {
       if (knownRefs.has(calc.stat.ref)) {
         for (const source of calc.sources) {
+          const value = source.contributes?.value;
+          if (value === undefined) continue;
           if (calc.stat.ref === "Adds # to # Lightning Damage") {
-            if (item.weaponLIGHTNING) {
-              item.weaponLIGHTNING =
-                source.contributes!.value + item.weaponLIGHTNING;
-            } else {
-              item.weaponLIGHTNING = source.contributes!.value;
-            }
+            item.weaponLIGHTNING = value + (item.weaponLIGHTNING || 0);
           } else if (calc.stat.ref === "Adds # to # Cold Damage") {
-            if (item.weaponCOLD) {
-              item.weaponCOLD = source.contributes!.value + item.weaponCOLD;
-            } else {
-              item.weaponCOLD = source.contributes!.value;
-            }
+            item.weaponCOLD = value + (item.weaponCOLD || 0);
           } else if (calc.stat.ref === "Adds # to # Fire Damage") {
-            if (item.weaponFIRE) {
-              item.weaponFIRE = source.contributes!.value + item.weaponFIRE;
-            } else {
-              item.weaponFIRE = source.contributes!.value;
-            }
+            item.weaponFIRE = value + (item.weaponFIRE || 0);
           }
         }
       }
@@ -1881,12 +1866,8 @@ function modifiedBfs(
       if (!best || result.length < best.length) {
         best = result;
       } else if (result.length === best.length) {
-        const resultMax = Math.max(
-          ...result.map((v) => result.filter((x) => x === v).length),
-        );
-        const bestMax = Math.max(
-          ...best.map((v) => best!.filter((x) => x === v).length),
-        );
+        const resultMax = mostRepeats(result);
+        const bestMax = mostRepeats(best);
         if (resultMax > bestMax) {
           best = result;
         } else if (resultMax === bestMax) {
@@ -1901,6 +1882,14 @@ function modifiedBfs(
     }
   }
   return best?.toSorted((a, b) => b - a) ?? null;
+}
+
+function mostRepeats(values: number[]) {
+  return Math.max(...values.map((v) => values.filter((x) => x === v).length));
+}
+
+function firstItemByRef(refName: string): BaseType[] {
+  return ITEM_BY_REF("ITEM", refName)?.slice(0, 1) ?? [];
 }
 
 function determineAugments(
@@ -1939,7 +1928,7 @@ function determineAugments(
   // something like "Raven-Touched"
   if (!augmentAppliedValue || !augmentAppliedValue.length) {
     const singleAugment = possibleAugments[0];
-    return [ITEM_BY_REF("ITEM", singleAugment.refName)![0]];
+    return firstItemByRef(singleAugment.refName);
   }
 
   if (augmentAppliedValue.length > 1) {
@@ -1949,7 +1938,7 @@ function determineAugments(
         augmentAppliedValue.length,
     );
     if (!likelyAugment) return [];
-    return [ITEM_BY_REF("ITEM", likelyAugment.refName)![0]];
+    return firstItemByRef(likelyAugment.refName);
   }
 
   // // Calculate how many of this augment are in the item
@@ -1972,12 +1961,12 @@ function determineAugments(
   const likelyValues =
     modifiedBfs(augmentAppliedValue[0], [], availableAugmentValues) ?? [];
 
-  return likelyValues.map((v) => {
+  return likelyValues.flatMap((v) => {
     const augment = possibleAugments.find(
       (aug) =>
         aug.values.some((augVal) => augVal === v) || avg(aug.values) === v,
-    )!;
-    return ITEM_BY_REF("ITEM", augment.refName)![0];
+    );
+    return augment ? firstItemByRef(augment.refName) : [];
   });
 }
 

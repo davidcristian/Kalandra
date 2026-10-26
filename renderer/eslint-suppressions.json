@@ -189,12 +189,7 @@
   },
   "src/parser/Parser.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 47
-    }
-  },
-  "src/parser/advanced-mod-desc.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 27
+      "count": 6
     }
   },
   "src/parser/augment-builder.ts": {
