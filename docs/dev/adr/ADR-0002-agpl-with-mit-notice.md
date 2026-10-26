@@ -18,10 +18,11 @@ Kalandra that someone distributes, changed or not, comes with its source or an o
 A changed copy that users reach over a network offers those users its source.
 
 **2. The inherited code keeps its MIT notice in `LICENSES/MIT.txt`.** The file holds the notice unchanged and is
-never removed or edited. Reason: the MIT License requires that notice to stay with every copy of the code, and nearly
-all of the app's source is that code. On 18 Oct 2026, 76 of the 32,787 lines of `.ts` and `.vue` files in
-`main/src/` and `renderer/src/` were last changed by a Kalandra commit. `git blame --line-porcelain HEAD` on each
-file, counting the `author-mail` lines of Kalandra's commits, measures it again.
+never removed or edited. Reason: the MIT License requires that notice to stay with every copy of the code, and most
+of the app's source is that code. At commit `4882431b` of 18 Oct 2026, 76 of the 32,787 lines of `.ts` and `.vue`
+files in `main/src/` and `renderer/src/` were last changed by a Kalandra commit.
+`git blame --line-porcelain 4882431b` on each file, counting the `author-mail` lines of Kalandra's commits, measures
+it again, and `HEAD` in place of the commit measures the current tree.
 
 **3. A fix cherry-picked from Exiled Exchange 2 is under the same MIT notice.** It is code that project publishes
 under the MIT License, so it comes in on the same terms as the rest of the inherited code. Reason: the same condition
