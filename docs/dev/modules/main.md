@@ -80,21 +80,21 @@ The entry, the server and the app services, in `main/src/`:
 
 `shortcuts/`:
 
-- `Shortcuts.ts`: `Shortcuts.create(logger, overlay, poeWindow, gameConfig, server)` starts the OCR worker and returns
-  the shortcuts. `updateActions(actions, stashScroll, logKeys, restoreClipboard, language)` replaces the hotkeys, and
-  `updateDelay(delay)` sets the clipboard's first poll delay. Each hotkey is registered with Electron's
-  `globalShortcut` only while the game window is active. `registrableActions()` in `registrable-actions.ts` drops,
+- `Shortcuts.ts`: `new Shortcuts(logger, overlay, poeWindow, gameConfig, server)` holds the hotkeys.
+  `updateActions(actions, stashScroll, logKeys, restoreClipboard)` replaces them, and `updateDelay(delay)` sets the
+  clipboard's first poll delay. Each hotkey is registered with Electron's `globalShortcut` only while the game window
+  is active. `registrableActions()` in `registrable-actions.ts` drops,
   with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a
   hotkey the game uses ([settings.md](../../settings.md#hotkeys) lists them) and a hotkey given to two actions, except
   that a `toggle-overlay` action keeps it. It broadcasts `MAIN->CLIENT::unregistered-hotkeys` with the first two kinds
   and the hotkeys `globalShortcut` refused, after each `updateActions()` and when `register()` finds other keys taken.
   On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when `keepModKeys` is set)
   and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`),
-  `stash-search`, `copy-item` (presses the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to the
-  last active client and, with `focusOverlay`, makes the overlay active when it was the last active client) or
-  `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is
-  active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for
-  `Ctrl` and the mouse wheel while the game is active, except over the area `isStashArea()` computes.
+  `stash-search` or `copy-item` (presses the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to
+  the last active client and, with `focusOverlay`, makes the overlay active when it was the last active client). With
+  `logKeys` it logs each key while the game window is active (`key-log.ts`). With `stashScroll` (the Stash tab
+  scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active,
+  except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: Electron's clipboard reads and writes return promises, and each one ends before main presses a
   key. `readItemText(pressCopyKeys)` clears the clipboard when it holds item text and then calls `pressCopyKeys`, so a
   write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for
@@ -150,7 +150,7 @@ The entry, the server and the app services, in `main/src/`:
   `toggle-overlay` or `undefined` for a key press.
 - `GameWindow.ts`: `GameWindow`, an `EventEmitter`, attaches through `OverlayController.attachByTitle()` to the
   window whose title is `windowTitle`, and emits `active-change` on the game window's focus and blur. It also has
-  `bounds`, `isActive`, `uiSidebarWidth`, `onAttach(cb)` and `screenshot()`.
+  `bounds`, `isActive`, `uiSidebarWidth` and `onAttach(cb)`.
 - `OverlayVisibility.ts`: `OverlayVisibility` hides the overlay's UI when `Alt` is held alone, after 275 ms or
   85 ms while the overlay is interactable, and shows it again on any other key, a key release or a mouse move
   without `Alt`. It sends `MAIN->OVERLAY::visibility`.
@@ -203,15 +203,6 @@ The entry, the server and the app services, in `main/src/`:
 - `utils.ts`: `guessFileLocation(entries, onUnreadable)` returns the one readable path, `null` when more than one is
   readable, or `undefined` when none is, and passes each error but `ENOENT` to `onUnreadable`, which logs a `warn`.
 
-`vision/`: `OcrWorker` in `link-main.ts` runs `link-worker.ts`, bundled as `dist/vision.js`, in a worker thread
-through Comlink. The worker loads the Tesseract and OpenCV WebAssembly builds from `apt-data/cv-ocr/`, which the
-user installs ([the OCR guide](../../ocr-guide.md)), and `HeistGemFinder` reads Heist gem names from a screenshot
-of the game window. `init()` in `wasm-bindings.ts` throws on every platform but Windows. When the worker thread
-fails or exits, `WorkerCalls` in `worker-calls.ts` logs `error [OCR] Worker failed: <message>` or `Worker exited
-with code <code>`, and rejects each call that waits for a reply or comes later, so the start does not wait for it.
-The worker runs one language change at a time, in the order main sends them, and runs the next one after one
-fails. A gem search waits for the last change and fails when that change failed.
-
 ## Invariants
 
 - The renderer reaches main only through the routes in `server.ts` and the `IpcEvent` messages
@@ -219,32 +210,30 @@ fails. A gem search waits for the last change and fails when that change failed.
 - `HttpProxy` destroys a request to a host outside `PROXY_HOSTS`. Adding a host is a deliberate change to that list
   ([ADR-0005](../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
 - A platform-specific path or API checks `process.platform`, as the default file paths, the Linux clipboard marker,
-  the Windows-only OCR, the macOS accessibility check and the `Meta` key do. CI packages the app on Windows, Linux
-  and macOS.
+  the macOS accessibility check and the `Meta` key do. CI packages the app on Windows, Linux and macOS.
 - Hotkeys are registered only while the game window is active, so they do not take keys from other programs.
-- Item text and OCR text go to the last active client only; the log, the updater state, the config and the focus
-  state go to every client.
+- Item text goes to the last active client only; the log, the updater state, the config and the focus state go to
+  every client.
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
-- Some existing code drops errors in empty `catch` blocks: `OcrWorker` and the `copy-item` and
-  `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and
-  ESLint fails on a new empty `catch` block or `.catch()` handler.
+- Some existing code drops errors in an empty `.catch()` handler: the `copy-item` handler in `Shortcuts`. New code
+  handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on a new empty `catch` block or
+  `.catch()` handler.
 
 **Dependencies.** `ipc/types.ts`, `ipc/KeyToCode.ts` and `renderer/content-security-policy.ts`, by relative path. At run
 time Electron 44, and the native modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle
 leaves out with `electron`. Both modules load prebuilt Node-API binaries, which load in a new Electron version without a
-rebuild. The bundle includes `electron-updater`, `ws`, `ini`, `comlink` and `@wokwi/bmp-ts`. `main.ts` imports
-`electron-devtools-installer` inside its `VITE_DEV_SERVER_URL` check, which the production build defines as `null`, so
-only a development bundle has it. `build/script.mjs` bundles `dist/main.js` and `dist/vision.js` with esbuild; in
-development it sets `VITE_DEV_SERVER_URL` to `http://localhost:5173` and restarts Electron after each rebuild.
-`electron-builder.yml` packages `dist/main.js`, `dist/vision.js` and `../renderer/dist` as an NSIS installer and a
-portable build on Windows, an AppImage on Linux and an unsigned universal dmg on macOS, and publishes to GitHub
+rebuild. The bundle includes `electron-updater`, `ws` and `ini`. `main.ts` imports `electron-devtools-installer`
+inside its `VITE_DEV_SERVER_URL` check, which the production build defines as `null`, so only a development bundle has
+it. `build/script.mjs` bundles `dist/main.js` with esbuild; in development it sets `VITE_DEV_SERVER_URL` to
+`http://localhost:5173` and restarts Electron after each rebuild. `electron-builder.yml` packages `dist/main.js` and
+`../renderer/dist` as an NSIS installer and a portable build on Windows, an AppImage on Linux and an unsigned universal dmg on macOS, and publishes to GitHub
 releases. The `electron` package has no install script. `require("electron")` downloads the Electron binary the first
 time it runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.9% of the lines of `src/` on 26 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (91.8% of the lines of `src/` on 26 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and the
 production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
-`eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard capture
-and OCR need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,
+`eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus and clipboard
+capture need the game: [runbooks/in-game-check.md](../runbooks/in-game-check.md) says how to check them,
 [host/index.md](../host/index.md) lists every host check, and each task's Status line says whether it still has to run.

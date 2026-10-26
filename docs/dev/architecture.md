@@ -14,8 +14,7 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 |  main/  the main process (Node.js)                           |
 |    shortcuts/   hotkeys, key presses, the clipboard          |
 |    windowing/   the overlay window over the game window      |
-|    host-files/  apt-data files, Client.txt, game config      |
-|    vision/      OCR worker, Windows only                     |    +-- outside hosts, over HTTPS ----+
+|    host-files/  apt-data files, Client.txt, game config      |    +-- outside hosts, over HTTPS ----+
 |    AppUpdater   updates from GitHub releases                 |    | official trade sites:           |
 |    AppTray      the tray icon and its menu                   |    |   www.pathofexile.com and       |
 |    server.ts    HTTP and WebSocket server on 127.0.0.1       |    |   eight regional hosts          |
@@ -226,7 +225,6 @@ main/              the Electron main process: TypeScript bundled by esbuild, pac
     shortcuts/     hotkeys, key presses, reading item text, typing chat commands and stash searches
     windowing/     the overlay window, the game window, overlay visibility, the widget area tracker
     host-files/    config.json, uploads, the Client.txt watcher, the game config, the data file writer
-    vision/        the OCR worker thread, Windows only
   build/           script.mjs (the esbuild build and dev runner) and the app icons
   electron-builder.yml  NSIS installer and portable on Windows, AppImage on Linux, universal dmg on macOS
 renderer/          the Vue 3 page: Vite, Tailwind, Vitest

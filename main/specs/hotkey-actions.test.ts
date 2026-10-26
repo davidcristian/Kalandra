@@ -42,26 +42,11 @@ vi.mock("electron-overlay-window", async () => {
     OverlayController: {
       events: new EventEmitter(),
       targetBounds: { x: 0, y: 0, width: 1920, height: 1080 },
-      screenshot: () => Buffer.alloc(8),
       activateOverlay: () => {},
       focusTarget: () => {},
     },
   };
 });
-
-// The OCR worker thread runs dist/vision.js, which the tests do not build
-vi.mock("../src/vision/link-main", () => ({
-  OcrWorker: {
-    create: async () => ({
-      updateOptions: async () => {},
-      findHeistGems: async (image: { width: number; height: number }) => ({
-        recognized: [
-          { text: `Fireball ${image.width}x${image.height}`, confidence: 90 },
-        ],
-      }),
-    }),
-  },
-}));
 
 const ITEM_TEXT = "Item Class: Rings\nRarity: Rare\nGale Loop\nAmethyst Ring";
 const PLATFORM = process.platform;
@@ -91,7 +76,7 @@ beforeEach(async () => {
   process.argv.push("--no-overlay");
   overlay = new OverlayWindow(server, logger, game);
   process.argv.pop();
-  shortcuts = await Shortcuts.create(
+  shortcuts = new Shortcuts(
     logger,
     overlay,
     game,
@@ -111,7 +96,7 @@ afterEach(() => {
 
 // Shortcuts registers the hotkeys on the tick after the game window becomes active
 async function registerOnFocus(actions: ShortcutAction[]) {
-  shortcuts.updateActions(actions, false, false, false, "en");
+  shortcuts.updateActions(actions, false, false, false);
   game.isActive = true;
   await new Promise((resolve) => setImmediate(resolve));
 }
@@ -142,12 +127,6 @@ function copyItem(
 function itemTexts() {
   return server.sent.flatMap((event) =>
     event.name === "MAIN->CLIENT::item-text" ? [event.payload] : [],
-  );
-}
-
-function ocrTexts() {
-  return server.sent.flatMap((event) =>
-    event.name === "MAIN->CLIENT::ocr-text" ? [event.payload] : [],
   );
 }
 
@@ -218,23 +197,6 @@ describe("the copy item hotkey", () => {
 });
 
 describe("other hotkey actions", () => {
-  it("sends the gem names the OCR worker reads from the game window, on Windows only", async () => {
-    const ocr: ShortcutAction = {
-      shortcut: "Ctrl + D",
-      action: { type: "ocr-text", target: "heist-gems" },
-    };
-    onPlatform("linux");
-    await registerOnFocus([ocr]);
-    await pressHotkey("Ctrl+D");
-    expect(ocrTexts()).toEqual([]);
-
-    onPlatform("win32");
-    await pressHotkey("Ctrl+D");
-    expect(ocrTexts()).toEqual([
-      { target: "heist-gems", paragraphs: ["Fireball 1920x1080"] },
-    ]);
-  });
-
   it("logs a hotkey that another application has registered", async () => {
     globalShortcut.taken.add("F5");
 

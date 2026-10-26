@@ -126,7 +126,7 @@ except the renderer and main builds, which run only on a push to `master`.
    file in [docs/dev/refinements/](docs/dev/refinements/index.md). A change that makes a rule here false updates
    this file in the same commit.
 9. **The game is out of reach; everything else is not.** An agent cannot run Path of Exile 2, so hotkeys, overlay
-   focus, clipboard capture and OCR inside the game need the maintainer on Windows. Check everything else yourself:
+   focus and clipboard capture inside the game need the maintainer on Windows. Check everything else yourself:
    parser cases with real item text, unit tests and both builds. In the summary, name each in-game behavior left to
    check and mark it unverified. [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md) says how
    to check each one, and [docs/dev/host/](docs/dev/host/index.md) lists every host check.

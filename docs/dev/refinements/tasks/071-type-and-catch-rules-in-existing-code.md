@@ -12,9 +12,7 @@ cast through `unknown` and one for an empty `.catch()` handler. The code that br
 were turned on is exempt:
 
 - main, in `existingOffenders` and the `no-restricted-syntax` override of `main/eslint.config.mjs`:
-  2 empty `catch` blocks in `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
-  `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
-  second also in [010](010-ocr-errors-dropped.md).
+  the empty `.catch()` handler of the `copy-item` key in `shortcuts/Shortcuts.ts`.
 
 No installed ESLint plugin checks the reason on an `eslint-disable` line, so that ban is checked
 only by reading the diff.
@@ -44,3 +42,6 @@ the line. Then its file leaves the main lists.
   and `utils.ts` left the `no-empty` list.
 - 2026-10-26: `ConfigStore.load()` passes each read error but a missing file on with a type
   ([001](001-failed-config-read-saves-defaults.md)), and `ConfigStore.ts` left the `no-empty` list.
+- 2026-10-26: The Heist gem OCR was removed ([031](031-path-of-exile-1-features.md)) with the 2
+  empty `catch` blocks in `OcrWorker` and the empty `.catch()` handler of the `ocr-text` key, and
+  `link-main.ts` left the `no-empty` list.

@@ -1,9 +1,9 @@
 # OCR errors are dropped by empty catch blocks
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** main
-**Origin:** [main/src/vision/link-main.ts](../../../../main/src/vision/link-main.ts)
-**Verified:** 2026-10-18
+**Origin:** [main/src/shortcuts/Shortcuts.ts](../../../../main/src/shortcuts/Shortcuts.ts)
+**Verified:** 2026-10-26
 
 OCR (optical character recognition) reads text from a screenshot of the game window. In
 `main/src/vision/link-main.ts`, `OcrWorker.create()` has an empty `catch {}` around `api.init()`,
@@ -31,3 +31,7 @@ maintainer removes OCR ([031](031-path-of-exile-1-features.md)), this task close
 
 - 2026-10-18: Found while docs/ocr-guide.md was rewritten, by reading `OcrWorker` and the `ocr-text`
   branch.
+- 2026-10-26: Done. The maintainer chose to remove the Heist gem OCR
+  ([031](031-path-of-exile-1-features.md)), and `OcrWorker`, its worker thread and the `ocr-text`
+  branch of `Shortcuts.ts` were removed with it. The Origin links `Shortcuts.ts`, since
+  `link-main.ts` is gone.

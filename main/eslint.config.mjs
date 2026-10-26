@@ -10,7 +10,6 @@ const existingOffenders = {
     "src/AppUpdater.ts",
     "src/host-files/ConfigStore.ts",
     "src/main.ts",
-    "src/shortcuts/Shortcuts.ts",
     "src/windowing/OverlayWindow.ts",
   ],
   "@typescript-eslint/no-misused-promises": [
@@ -19,10 +18,8 @@ const existingOffenders = {
     "src/main.ts",
     "src/server.ts",
   ],
-  "no-empty": ["src/vision/link-main.ts"],
   "@typescript-eslint/no-non-null-assertion": [
     "specs/AppTray.test.ts",
-    "specs/ocr-worker-body.test.ts",
     "specs/overlay-window.test.ts",
   ],
 };

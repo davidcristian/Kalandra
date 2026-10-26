@@ -7,7 +7,6 @@ export interface HostConfig {
   overlayKey: string;
   logKeys: boolean;
   windowTitle: string;
-  language: string;
   readClientLog: boolean;
   libraryAlpha: boolean;
   libraryOutputPath: string | null;
@@ -23,10 +22,6 @@ export interface ShortcutAction {
         type: "copy-item";
         focusOverlay?: boolean;
         target: string;
-      }
-    | {
-        type: "ocr-text";
-        target: "heist-gems";
       }
     | {
         type: "trigger-event";
@@ -92,7 +87,6 @@ export type IpcEvent =
   | IpcHostConfig
   | IpcWidgetAction
   | IpcItemText
-  | IpcOcrText
   | IpcConfigChanged
   | IpcUserAction
   | IpcWriteToFile
@@ -188,14 +182,6 @@ type IpcItemText = Event<
     item?: unknown;
     position: { x: number; y: number };
     focusOverlay: boolean;
-  }
->;
-
-type IpcOcrText = Event<
-  "MAIN->CLIENT::ocr-text",
-  {
-    target: string;
-    paragraphs: string[];
   }
 >;
 

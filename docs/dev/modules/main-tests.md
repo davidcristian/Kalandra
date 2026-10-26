@@ -55,8 +55,8 @@ replaces it with `vi.mock("electron", ...)`.
   hotkey and reads the keys it releases from `fake-hook.ts`, which keeps each key main presses, and turns the mouse
   wheel with `Ctrl` at the edges of the stash area.
 - `hotkey-actions.test.ts` presses the copy item hotkey on Windows and macOS with a fake clipboard that the game
-  fills when main taps `C`, and reads the keys and the item text main sends. It also presses the OCR and
-  test-only hotkeys and registers one that another application holds in `fake-global-shortcut.ts`.
+  fills when main taps `C`, and reads the keys and the item text main sends. It also presses the test-only hotkey
+  and registers one that another application holds in `fake-global-shortcut.ts`.
 - `key-names.test.ts` writes hotkeys with `hotkeyToString()`, `mergeTwoHotkeys()` and `shortcutToElectron()`, and
   checks that `KeyToCode` gives each key a code of its own and that `KeyToElectron` has an accelerator for each key.
 
@@ -95,11 +95,3 @@ replaces it with `vi.mock("electron", ...)`.
 - `GameLogWatcher.test.ts` calls the change listener of a fake `FileWatch` or `fs.watchFile`, deletes a new log as
   the watcher opens it, and on Windows fails that open with EPERM as Windows does during a delete. It also fails that
   open with EACCES, turns reading off while it runs, restarts with the same path and finds both default logs.
-
-## vision/
-
-- `ocr-worker.test.ts` runs `OcrWorker` with a fake worker thread that answers through Comlink, fails or exits.
-- `ocr-worker-body.test.ts` loads `link-worker.ts` through Comlink with a fake parent port, fake bindings and a fake
-  gem finder, and checks the order of its calls while language changes run and after one fails.
-- `heist-points.test.ts` groups weighted points, pairs them into lines and converts colors to the 0 to 255 range with
-  the functions of `vision/utils.ts` that `HeistGemFinder` calls, none of which needs the OpenCV build.

@@ -32,11 +32,6 @@ vi.mock("electron-overlay-window", async () => {
   };
 });
 
-// The OCR worker thread runs dist/vision.js, which the tests do not build
-vi.mock("../src/vision/link-main", () => ({
-  OcrWorker: { create: async () => ({ updateOptions: async () => {} }) },
-}));
-
 let server: FakeServer;
 let logger: Logger;
 let game: GameWindow;
@@ -51,7 +46,7 @@ beforeEach(async () => {
   const overlay = new OverlayWindow(server, logger, game);
   process.argv.pop();
   const gameConfig = new GameConfig(logger);
-  shortcuts = await Shortcuts.create(logger, overlay, game, gameConfig, server);
+  shortcuts = new Shortcuts(logger, overlay, game, gameConfig, server);
 });
 
 afterEach(() => {
@@ -67,7 +62,7 @@ function trigger(shortcut: string): ShortcutAction {
 
 // Shortcuts registers the hotkeys on the tick after the game window becomes active
 async function registerOnFocus(actions: ShortcutAction[]) {
-  shortcuts.updateActions(actions, false, false, false, "en");
+  shortcuts.updateActions(actions, false, false, false);
   game.isActive = true;
   await new Promise((resolve) => setImmediate(resolve));
 }
@@ -117,7 +112,7 @@ describe("Shortcuts", () => {
   );
 
   it("registers no hotkey until the game window is active, and none after it loses the focus", async () => {
-    shortcuts.updateActions([trigger("F5")], false, false, false, "en");
+    shortcuts.updateActions([trigger("F5")], false, false, false);
     expect(registered()).toEqual([]);
 
     await registerOnFocus([trigger("F5")]);
@@ -245,7 +240,7 @@ describe("the hotkeys main sends as not registered", () => {
     globalShortcut.taken.add("F6");
     await registerOnFocus([trigger("F6")]);
     await setGameActive(false);
-    shortcuts.updateActions([trigger("F6")], false, false, false, "en");
+    shortcuts.updateActions([trigger("F6")], false, false, false);
 
     expect(unregisteredLists().at(-1)).toEqual([
       { shortcut: "F6", reason: "taken" },
@@ -256,7 +251,7 @@ describe("the hotkeys main sends as not registered", () => {
     globalShortcut.taken.add("F6");
     await registerOnFocus([trigger("F6")]);
     await setGameActive(false);
-    shortcuts.updateActions([trigger("F7")], false, false, false, "en");
+    shortcuts.updateActions([trigger("F7")], false, false, false);
 
     expect(unregisteredLists().at(-1)).toEqual([]);
   });
@@ -284,7 +279,7 @@ describe("a hotkey press", () => {
 
 describe("Ctrl and the mouse wheel with stash scrolling on", () => {
   beforeEach(async () => {
-    shortcuts.updateActions([], true, false, false, "en");
+    shortcuts.updateActions([], true, false, false);
     game.isActive = true;
     await new Promise((resolve) => setImmediate(resolve));
   });
@@ -310,9 +305,9 @@ describe("Ctrl and the mouse wheel with stash scrolling on", () => {
 
   it("taps nothing without Ctrl, with stash scrolling off or while the game is not active", async () => {
     hook.wheel(1500, 700, 1);
-    shortcuts.updateActions([], false, false, false, "en");
+    shortcuts.updateActions([], false, false, false);
     hook.wheel(1500, 700, 1, { ctrlKey: true });
-    shortcuts.updateActions([], true, false, false, "en");
+    shortcuts.updateActions([], true, false, false);
     game.isActive = false;
     hook.wheel(1500, 700, 1, { ctrlKey: true });
 

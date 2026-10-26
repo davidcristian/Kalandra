@@ -30,8 +30,6 @@
     "@types/node": "24.x.x",
     "@types/ws": "^8.5.3",
     "@vitest/coverage-v8": "^4.1.12",
-    "@wokwi/bmp-ts": "^3.0.0",
-    "comlink": "^4.3.1",
     "electron": "^44.9.3",
     "electron-builder": "^26.18.0",
     "electron-devtools-installer": "^4.0.0",

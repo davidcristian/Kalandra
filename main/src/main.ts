@@ -89,7 +89,7 @@ startWhenReady(
         const overlay = new OverlayWindow(eventPipe, logger, poeWindow);
         // eslint-disable-next-line no-new -- the instance listens to key events from its constructor
         new OverlayVisibility(eventPipe, overlay);
-        const shortcuts = await Shortcuts.create(
+        const shortcuts = new Shortcuts(
           logger,
           overlay,
           poeWindow,
@@ -109,7 +109,6 @@ startWhenReady(
               cfg.stashScroll,
               cfg.logKeys,
               cfg.restoreClipboard,
-              cfg.language,
             );
             shortcuts.updateDelay(cfg.initialDelay);
             gameLogWatcher.restart(cfg.clientLog ?? "", cfg.readClientLog);

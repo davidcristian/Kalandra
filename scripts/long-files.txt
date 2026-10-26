@@ -4,11 +4,11 @@
 305 dataParser/src/constants/client_string_data.py
 360 dataParser/src/constants/css_rules.py
 510 dataParser/src/services/nd_builder_service.py
-338 ipc/types.ts
+324 ipc/types.ts
 486 renderer/src/assets/data/index.ts
 2002 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
-710 renderer/src/web/Config.ts
+709 renderer/src/web/Config.ts
 563 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue
 391 renderer/src/web/overlay/OverlayWindow.vue
