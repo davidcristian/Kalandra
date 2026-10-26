@@ -28,3 +28,13 @@ DEVELOPING.md, `docs/dev/architecture.md`, ADR-0008, `docs/dev/modules/price-ser
 
 - 2026-10-18: Found while the cherry-pick runbook was written, by comparing `origin/dev` with
   `upstream/dev` and `origin/master`.
+- 2026-10-26: The maintainer deleted eight inherited branches from `origin`, and `dev` stays there
+  until the maintainer decides. Each deleted tip is still in Kvan7/Exiled-Exchange-2:
+  - `app_i18n` at `fdede1bc408344fd3395bc9a512974b21468971f`
+  - `awakened-upstream` at `ce551eb7a9b704fbdcc2478eebb26be8f91786c7`
+  - `features/CvRemnants` at `165c9fc531cddf381a4a235afb24e46cc28de116`
+  - `features/itemEditorV2` at `5f1e48baa39632f7339c3eb3eba314d979755067`
+  - `features/linkingTradeStats` at `245ccec32b77d6fc281597a0b59327ceae1f0b77`
+  - `features/removePseudo` at `993840d2fc7530d6dfabcaf8be5cd7d7eb411cbc`
+  - `fix-autohide-pinning` at `41f5647694355523311acebfef0c0616fb6809c9`
+  - `fix/dumpTabPrice` at `b5e935f8f7be9ffeb2df6af7db5d70b4bf06796b`

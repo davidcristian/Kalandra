@@ -1,9 +1,9 @@
 # Choose the first Kalandra version above the inherited tags
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** release
 **Origin:** [docs/dev/runbooks/release.md](../../runbooks/release.md)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 The five version places that `scripts/versioncheck.py` compares read `0.16.3`: `main/package.json`,
 `main/package-lock.json`, `README.md`, `.github/ISSUE_TEMPLATE/bug-report.yml` and `appVersion` in
@@ -27,3 +27,5 @@ outward facing, so only the maintainer does it.
 
 - 2026-10-18: Found while docs/download.md and the release runbook were written, by checking the tag
   `v0.16.3` with `git log -1 v0.16.3`.
+- 2026-10-26: Done. The maintainer set the version to `0.17.0`, above the inherited `v0.16.3`
+  tag, in `chore: set the version to 0.17.0`, and released it.

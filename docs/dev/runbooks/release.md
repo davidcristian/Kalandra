@@ -7,13 +7,12 @@ maintainer's job. Every push, tag and release below needs the maintainer's go-ah
 ([AGENTS.md](../../../AGENTS.md#safety)). Setting up a machine:
 [DEVELOPING.md](../../../DEVELOPING.md).
 
-On 2026-10-18 Kalandra has no published release, and the five version places read `0.16.3`, the
-Exiled Exchange 2 version Kalandra started from. `origin` also holds 90 tags inherited from Exiled
-Exchange 2, the newest `v0.16.3`, and each one points at an Exiled Exchange 2 commit:
-`git ls-remote --tags --refs origin` lists them. A version whose tag already exists on `origin`
-cannot be released with these steps, because GitHub attaches a new release to the existing tag and
-its commit. So the first release sets a version whose tag does not exist, such as one above
-`0.16.3`.
+Kalandra started from Exiled Exchange 2 version `0.16.3`, and its first release is `0.17.0`.
+`origin` holds 90 tags inherited from Exiled Exchange 2, the newest `v0.16.3`, and each one points
+at an Exiled Exchange 2 commit: `git ls-remote --tags --refs origin` lists them. A version whose tag
+already exists on `origin` cannot be released with these steps, because GitHub attaches a new
+release to the existing tag and its commit. So each release sets a version above `0.16.3`, whose
+tag does not exist.
 
 ## How the Build workflow publishes
 
