@@ -104,8 +104,8 @@ except the renderer and main builds, which run only on a push to `master`.
 3. **The main process**: Vitest and the build. CI packages it on Windows, Linux and macOS, so platform-specific code
    needs a `process.platform` check.
 4. **The price service, the scripts and the docs site**: both unit test suites, and the site build, which fails on a
-   dead link or a missing image. **The data tool** is outside `check.py`: when `dataParser/` changes, run
-   `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml` there.
+   dead internal link or a missing image. **The data tool** is outside `check.py`: when `dataParser/` changes,
+   run `python -m pytest` and the hooks in `dataParser/.pre-commit-config.yaml` there.
 5. **Tests.** New behavior has tests, and a bug fix adds a test that fails without the fix. A parser fix adds the
    real copied item text as a case under `renderer/specs/Parser/`. Tests use saved responses, such as those in
    `renderer/specs/docs/`, and never call a live site. A test checks behavior, including the error and edge paths,
