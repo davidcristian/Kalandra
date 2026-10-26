@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'Gewährt Fertigkeit: ',
   RELOAD_SPEED: 'Nachladezeit: ',
   SANCTIFIED: 'Geheiligt',
+  ITEM_UNIDENTIFIED: 'Nicht identifiziert',
+  TIER: 'Level',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Wiederbelebungen verfügbar: ',
   WAYSTONE_PACK_SIZE: 'Monstergruppengröße: ',

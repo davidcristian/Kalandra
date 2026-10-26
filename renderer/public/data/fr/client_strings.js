@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'Octroie l\'Aptitude: ',
   RELOAD_SPEED: 'Temps de rechargement: ',
   SANCTIFIED: 'Sanctifié',
+  ITEM_UNIDENTIFIED: 'Non identifié',
+  TIER: 'Palier',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Résurrections disponibles: ',
   WAYSTONE_PACK_SIZE: 'Taille des Groupes: ',

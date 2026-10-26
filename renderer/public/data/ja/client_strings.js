@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'スキルを付与: ',
   RELOAD_SPEED: '再装填時間: ',
   SANCTIFIED: '聖別化',
+  ITEM_UNIDENTIFIED: '未鑑定',
+  TIER: 'ティア',
   HYPHEN: '-',
   WAYSTONE_REVIVES: '復活が利用可能: ',
   WAYSTONE_PACK_SIZE: 'パックサイズ: ',

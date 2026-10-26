@@ -172,6 +172,8 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("GRANTS_SKILL", ["ItemDisplayGrantsSkill"], "{0}: "),
     ClientString("RELOAD_SPEED", ["SkillPopupReloadTime"], "{0}: "),
     ClientString("SANCTIFIED", ["ItemPopupSanctified"]),
+    ClientString("ITEM_UNIDENTIFIED", ["ItemPopupUnidentified"]),
+    ClientString("TIER", ["Tier"]),
     ClientString("HYPHEN", ["ItemDisplayWeaponDamageRange"], trim=True),
     ClientString("WAYSTONE_REVIVES", ["NumberOfPortalsPerWaystone"], "{0}: "),
     ClientString("WAYSTONE_PACK_SIZE", ["ItemDisplayMapPack"], "{0}: "),

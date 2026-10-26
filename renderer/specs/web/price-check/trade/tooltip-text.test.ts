@@ -55,6 +55,14 @@ function savedUnrevealed(veiledMods: string[]): FetchResult {
   return listing;
 }
 
+/** The saved Swiftstalker Coat listing as an unidentified item of the tier. */
+function savedUnidentified(tier?: number): FetchResult {
+  const listing = savedUnrevealed([]);
+  listing.item.identified = false;
+  listing.item.unidentifiedTier = tier;
+  return listing;
+}
+
 describe("tooltipLineText", () => {
   let logged: unknown[];
 
@@ -136,6 +144,27 @@ describe("tooltipLineText", () => {
       expect(lineTexts("de")).toEqual([
         "Entweihtes Präfix",
         "Entweihtes Suffix",
+      ]);
+    });
+
+    it("tags an unidentified item with the game's text, with or without its tier", async () => {
+      const tagTexts = (lang: string) =>
+        [savedUnidentified(4), savedUnidentified()].map((listing) =>
+          __testExports
+            .parseFetchResult(listing)
+            ?.itemTags?.map((tag) =>
+              tooltipLineText(tag.text, createAppI18n(lang)),
+            ),
+        );
+
+      expect(tagTexts("en")).toEqual([
+        ["Unidentified (Tier 4)"],
+        ["Unidentified"],
+      ]);
+      await init("de");
+      expect(tagTexts("de")).toEqual([
+        ["Nicht identifiziert (Level 4)"],
+        ["Nicht identifiziert"],
       ]);
     });
   });

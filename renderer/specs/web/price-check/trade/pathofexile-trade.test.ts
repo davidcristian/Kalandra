@@ -155,7 +155,7 @@ describe("parseFetchResult", () => {
       "unidentified and corrupted",
       { identified: false, corrupted: true },
       [
-        ["item.unidentified", UNMET],
+        ["ITEM_UNIDENTIFIED", UNMET],
         ["CORRUPTED", UNMET],
       ],
     ],

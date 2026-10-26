@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'Concede Habilidade: ',
   RELOAD_SPEED: 'Tempo de Recarregamento: ',
   SANCTIFIED: 'Santificado',
+  ITEM_UNIDENTIFIED: 'Sem Identificação',
+  TIER: 'Nível',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Renascimentos Disponíveis: ',
   WAYSTONE_PACK_SIZE: 'Tamanho de Grupos de Monstros: ',

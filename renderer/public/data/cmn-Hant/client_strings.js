@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: '賦予技能: ',
   RELOAD_SPEED: '重新裝填時間: ',
   SANCTIFIED: '聖化的',
+  ITEM_UNIDENTIFIED: '未鑑定',
+  TIER: '階級',
   HYPHEN: '到',
   WAYSTONE_REVIVES: '可用的復活數: ',
   WAYSTONE_PACK_SIZE: '怪群大小: ',

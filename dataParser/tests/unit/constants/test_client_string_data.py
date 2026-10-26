@@ -92,6 +92,33 @@ def test_runic_ward_reads_the_armour_label_of_each_language(
 
 
 @pytest.mark.parametrize(
+    ("lang", "game_text", "expected"),
+    [
+        (
+            ENGLISH,
+            {"ItemPopupUnidentified": "Unidentified", "Tier": "Tier"},
+            {"ITEM_UNIDENTIFIED": "Unidentified", "TIER": "Tier"},
+        ),
+        (
+            GERMAN,
+            {"ItemPopupUnidentified": "Nicht identifiziert", "Tier": "Level"},
+            {"ITEM_UNIDENTIFIED": "Nicht identifiziert", "TIER": "Level"},
+        ),
+    ],
+)
+def test_unidentified_tag_strings_are_the_game_text_of_each_language(
+    lang: LANG, game_text: dict[str, str], expected: dict[str, str]
+):
+    values = {
+        s.my_key: s.value(game_text.__getitem__, lang)
+        for s in CLIENT_STRING_KEY_VALUES
+        if s.my_key in expected
+    }
+
+    assert values == expected
+
+
+@pytest.mark.parametrize(
     ("key", "lang", "game_text", "expected"),
     [
         (

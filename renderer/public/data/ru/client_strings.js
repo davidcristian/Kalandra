@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'Дарует умение: ',
   RELOAD_SPEED: 'Время перезарядки: ',
   SANCTIFIED: 'Освящено',
+  ITEM_UNIDENTIFIED: 'Неопознано',
+  TIER: 'Ранг',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Доступно возрождений: ',
   WAYSTONE_PACK_SIZE: 'Размер групп монстров: ',

@@ -1,7 +1,7 @@
 # Source files that were over 300 lines when linecap.py was added, with their line counts.
 # Each file must have exactly the count written here. Lower a count when a file shrinks, and remove the
 # file once it is within the limit. Raising a count needs its reason in the commit body.
-301 dataParser/src/constants/client_string_data.py
+303 dataParser/src/constants/client_string_data.py
 360 dataParser/src/constants/css_rules.py
 510 dataParser/src/services/nd_builder_service.py
 338 ipc/types.ts
@@ -23,5 +23,5 @@
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 377 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
-1944 renderer/src/web/price-check/trade/pathofexile-trade.ts
+1940 renderer/src/web/price-check/trade/pathofexile-trade.ts
 537 renderer/src/web/settings/SettingsWindow.vue

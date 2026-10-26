@@ -188,9 +188,9 @@ otherwise the first. A failed load is logged with `console.warn` and its message
   `TradeResponseError` with the HTTP status in `status`. Its message names the status, or is the site's own message
   for an `error`, and the result lists show it. A listing that `parseFetchResult` cannot read is logged and kept
   without its item tooltip. The item tooltip passes only a key of the English `app_i18n.json` to `t()`
-  (`tooltipLineText` in `trade/tooltip-text.ts`), so the message formatter never reads trade site text. Its
-  `Corrupted`, `Mirrored` and `Sanctified` tags and its unrevealed modifiers (`VEILED_PREFIX`, `VEILED_SUFFIX`) show
-  the game's client strings.
+  (`tooltipLineText` in `trade/tooltip-text.ts`), so the message formatter never reads trade site text. Its tags,
+  `Unidentified (Tier 2)` from `ITEM_UNIDENTIFIED` and `TIER`, `Corrupted`, `Mirrored` and `Sanctified`, and its
+  unrevealed modifiers (`VEILED_PREFIX`, `VEILED_SUFFIX`) show the game's client strings.
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.

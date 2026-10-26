@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: '스킬 부여: ',
   RELOAD_SPEED: '재장전 시간: ',
   SANCTIFIED: '축성',
+  ITEM_UNIDENTIFIED: '미확인',
+  TIER: '등급',
   HYPHEN: '-',
   WAYSTONE_REVIVES: '부활 횟수: ',
   WAYSTONE_PACK_SIZE: '무리 규모: ',

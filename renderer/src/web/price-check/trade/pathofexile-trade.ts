@@ -1387,17 +1387,13 @@ function parseFetchResult(result: FetchResult): PricingResult["displayItem"] {
 
   // Should be exclusive to all other tags(except corrupted)
   if (result.item.identified === false) {
-    if (result.item.unidentifiedTier) {
-      itemTags.push({
-        text: `Unidentified (Tier ${result.item.unidentifiedTier})`,
-        color: TradeNumberColors.Unmet,
-      });
-    } else {
-      itemTags.push({
-        text: "item.unidentified",
-        color: TradeNumberColors.Unmet,
-      });
-    }
+    const tier = result.item.unidentifiedTier;
+    itemTags.push({
+      text: tier
+        ? `${_$.ITEM_UNIDENTIFIED} (${_$.TIER} ${tier})`
+        : _$.ITEM_UNIDENTIFIED,
+      color: TradeNumberColors.Unmet,
+    });
   }
 
   // remaining _should_ be exclusive

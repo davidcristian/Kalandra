@@ -1,6 +1,6 @@
 # The listing tooltip names an unidentified item's tier in English
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** data
 **Origin:** [renderer/src/web/price-check/trade/pathofexile-trade.ts](../../../../renderer/src/web/price-check/trade/pathofexile-trade.ts)
 **Verified:** 2026-10-26
@@ -31,3 +31,7 @@ lines go into each committed `client_strings.js` alone, which needs the maintain
   `Unidentified` and `Tier` in English and `Nicht identifiziert` and `Level` in German, and match
   the committed `UNIDENTIFIED` expressions. The `item.unidentified` UI text differs from the game
   text in Spanish, Portuguese and Russian. Left open for the go-ahead above.
+- 2026-10-26: Done by fix(data): tag unidentified listings with the game's text. The tool writes
+  `ITEM_UNIDENTIFIED` and `TIER`, each committed `client_strings.js` has the two lines it wrote, and
+  both tags read them, such as `Nicht identifiziert (Level 4)` in German. The tag of each language
+  matches its `UNIDENTIFIED` expression.

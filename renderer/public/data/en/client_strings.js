@@ -85,6 +85,8 @@ export default {
   GRANTS_SKILL: 'Grants Skill: ',
   RELOAD_SPEED: 'Reload Time: ',
   SANCTIFIED: 'Sanctified',
+  ITEM_UNIDENTIFIED: 'Unidentified',
+  TIER: 'Tier',
   HYPHEN: '-',
   WAYSTONE_REVIVES: 'Revives Available: ',
   WAYSTONE_PACK_SIZE: 'Pack Size: ',

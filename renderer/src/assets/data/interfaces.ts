@@ -218,6 +218,8 @@ export interface TranslationDict {
   GRANTS_SKILL: string;
   RELOAD_SPEED: string;
   SANCTIFIED: string;
+  ITEM_UNIDENTIFIED: string;
+  TIER: string;
   HYPHEN: string;
   LOG_LEVEL_UP: RegExp;
   LOG_ZONE_GEN: RegExp;
