@@ -55,13 +55,12 @@ interface NinjaXchgRates {
 }
 
 type PriceDatabase = Array<{
-  // My namespace for searching
   ns: string;
-  // If db is from the currency exchange (cx)
+  // true for a category from poe.ninja's exchange overview, false for its stash item overview
   cx: boolean;
-  // base url on ninja
+  // the category's path in poe.ninja page links
   url: string;
-  // json blob data
+  // the category's part of the price file, searched as text
   lines: string;
 }>;
 const RETRY_INTERVAL_MS = 4 * 60 * 1000;

@@ -3,10 +3,9 @@ import { createGlobalState } from "@vueuse/core";
 import { Host } from "@/web/background/IPC";
 import { readTradeData } from "@/web/price-check/trade/trade-response";
 
-// from Prices.ts, but longer periods since maybe would slowdown ui more
-const RETRY_INTERVAL_MS = 30 * 60 * 1000; // 30 min, try to get new stuff
-const UPDATE_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 hours, only allow every this period
-const INTEREST_SPAN_MS = 60 * 60 * 1000; // 20 min, refuse to get if haven't used for this period
+const RETRY_INTERVAL_MS = 30 * 60 * 1000;
+const UPDATE_INTERVAL_MS = 2 * 60 * 60 * 1000;
+const INTEREST_SPAN_MS = 60 * 60 * 1000;
 
 interface TradeItem {
   type: string;
@@ -131,7 +130,7 @@ export const useTradeData = createGlobalState(() => {
   async function load(force: boolean = false) {
     if (
       !force &&
-      // don't update more that this frequently
+      // don't update more often than this
       (Date.now() - lastUpdateTime < UPDATE_INTERVAL_MS ||
         // don't update if user hasn't needed them recently
         Date.now() - lastInterestTime > INTEREST_SPAN_MS)

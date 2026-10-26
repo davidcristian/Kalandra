@@ -10,7 +10,7 @@
 2004 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
 705 renderer/src/web/Config.ts
-564 renderer/src/web/background/Prices.ts
+563 renderer/src/web/background/Prices.ts
 442 renderer/src/web/item-search/WidgetItemSearch.vue
 391 renderer/src/web/overlay/OverlayWindow.vue
 422 renderer/src/web/overlay/Widget.vue
