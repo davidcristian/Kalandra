@@ -1,9 +1,9 @@
 # origin holds Exiled Exchange 2's branches, including dev
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** repo
 **Origin:** [.github/workflows/test.yml](../../../../.github/workflows/test.yml)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 `git ls-remote --heads origin` lists nine branches besides `master`: `dev`, `app_i18n`,
 `awakened-upstream`, `features/CvRemnants`, `features/itemEditorV2`,
@@ -38,3 +38,9 @@ DEVELOPING.md, `docs/dev/architecture.md`, ADR-0008, `docs/dev/modules/price-ser
   - `features/removePseudo` at `993840d2fc7530d6dfabcaf8be5cd7d7eb411cbc`
   - `fix-autohide-pinning` at `41f5647694355523311acebfef0c0616fb6809c9`
   - `fix/dumpTabPrice` at `b5e935f8f7be9ffeb2df6af7db5d70b4bf06796b`
+- 2026-10-26: Done. The maintainer deleted `dev` from `origin`, at
+  `d95f53e11b40f0071491389834b9b54ca11b6288`, after its three commits were checked. That tip is
+  still on Exiled Exchange 2's `dev`. The bug that its Mask of the Sanguimancer commit fixes is not
+  in Kalandra, and the parser case `KeystoneUniqueLine` tests that item. Its match v2 commit is
+  task [104](104-stat-group-lines.md). `ci: run the test workflow only for master` removed `dev`
+  from `test.yml` and from the CI table in `docs/dev/architecture.md`.

@@ -5,11 +5,9 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev'
   pull_request:
     branches:
     - master
-    - dev
   # Build calls this workflow with all_jobs before it packages the app.
   workflow_call:
     inputs:
