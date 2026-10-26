@@ -16,7 +16,7 @@ export default defineComponent({
     modelValue: {},
     values: {
       type: Array,
-      default: [true, false],
+      default: () => [true, false],
     },
   },
   setup(props, ctx) {
