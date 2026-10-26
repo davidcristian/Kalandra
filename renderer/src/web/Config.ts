@@ -28,13 +28,15 @@ export function AppConfig(type?: string) {
 }
 
 export function updateConfig(updates: Config) {
-  _config.value = deepReactive(JSON.parse(JSON.stringify(updates)));
-  _config.value!.fontSize = validFontSize(_config.value!.fontSize);
-  document.documentElement.style.fontSize = `${_config.value!.fontSize}px`;
+  const config: Config = deepReactive(JSON.parse(JSON.stringify(updates)));
+  _config.value = config;
+  config.fontSize = validFontSize(config.fontSize);
+  document.documentElement.style.fontSize = `${config.fontSize}px`;
 }
 
 export function saveConfig(opts?: { isTemporary: boolean }) {
-  const rawConfig = toRaw(_config.value!);
+  if (!_config.value) return;
+  const rawConfig = toRaw(_config.value);
   if (
     rawConfig.widgets.some(
       (w) => w.wmZorder === "exclusive" && w.wmWants === "show",

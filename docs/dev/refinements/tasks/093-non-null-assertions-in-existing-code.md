@@ -29,3 +29,5 @@ count.
   `parser/Parser.ts` and none in `parser/advanced-mod-desc.ts`.
 - 2026-10-26: 41 in the price check filters were replaced by checks and optional chaining. Most
   of the rest there assert a filter's `roll`.
+- 2026-10-26: `updateConfig()` and `saveConfig()` in `web/Config.ts` dropped theirs. The rest of
+  that file is in `upgradeConfig()` steps, which never change, and in `AppConfig()`.
