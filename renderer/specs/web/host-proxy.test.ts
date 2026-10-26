@@ -49,7 +49,9 @@ describe("Host.proxy", () => {
 
   it("sends the header when the caller gives no options", async () => {
     vi.stubGlobal("window", { fetch: echoFetch });
-    const response = await Host.proxy("www.poeprices.info/api?l=Standard");
+    const response = await Host.proxy(
+      "www.pathofexile.com/api/trade2/data/leagues",
+    );
     const echo = (await response.json()) as Echo;
 
     expect(echo.headers).toEqual({ "x-kalandra-proxy": "1" });

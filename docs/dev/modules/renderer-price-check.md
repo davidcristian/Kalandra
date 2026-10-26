@@ -90,10 +90,6 @@ that the route needs ([main.md](main.md)).
 
 ### Other parts
 
-- `price-prediction/poeprices.ts`: `requestPoeprices(item)` sends the item text to `www.poeprices.info/api`, and
-  `sendFeedback` posts to `/send_feedback`. The setting "Show price prediction" (`requestPricePrediction`,
-  default `false`) exists, but the `<price-prediction>` element in `CheckedItem.vue` is commented out, so the
-  window shows no prediction and sends no request to `www.poeprices.info`.
 - `trends/` (`PriceTrend.vue`, `getDetailsId.ts`, `trade-volume.ts`), `related-items/`, `stack-value/`: the
   estimate, related items and stack value read from the price file. `getDetailsId` returns the item's query for the
   price file, with a unique's base item as `variant` ([price-service.md](price-service.md#the-price-file-format)).
@@ -247,4 +243,4 @@ reads hand-written responses with `readTradeData` and answers each trade site re
 `artificial-slowdown.test.ts` there checks with fake timers when a result list stops waiting after a reset.
 `specs/web/watch-order.test.ts` mounts a component with a fake renderer and checks that Vue runs its watchers in
 the order they are defined. No test calls a live site. `specs/web/leagues.test.ts` loads leagues from a fake trade
-site and checks the league `load()` selects and `isPopular`. `poeprices.ts` has no test file of its own.
+site and checks the league `load()` selects and `isPopular`.

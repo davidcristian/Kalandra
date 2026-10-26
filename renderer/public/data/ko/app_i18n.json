@@ -306,7 +306,6 @@
     "fill_roll_exact": "동일한 수치",
     "extra_delay": "검색 제한을 방지하기 위한 딜레이 시간",
     "auto_search": "눌렀을 때 자동으로 검색하기",
-    "show_prediction": "가격 예측 표시",
     "use_tooltip_hover": "가격에 커서를 가져다 대면 아이템 상세 정보 표시",
     "use_tooltip_keybind": "SHIFT + 가격에 커서를 이동",
     "use_tooltip_always": "가격에 커서를 이동",

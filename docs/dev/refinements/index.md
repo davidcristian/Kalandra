@@ -152,7 +152,7 @@ layout and its reasons.
 - 088: [Two tips name controls by labels the app does not show](tasks/088-tips-name-labels-the-app-does-not-show.md)
 - 089: [The poedb button opens a flask's or a tablet's own page instead of its calculator](tasks/089-poe2db-flask-and-tablet-pages.md)
 - 090: [The XP tracker page describes Over in words that differ from its formula at a safe zone step](tasks/090-xp-tracker-over-wording.md)
-- 091: [Ten modules in main and the renderer have no spec that imports them](tasks/091-modules-without-a-spec.md)
+- 091: [Nine modules in main and the renderer have no spec that imports them](tasks/091-modules-without-a-spec.md)
 - 092: [The default macOS Client.txt path is the folder of the Path of Exile 1 Mac client](tasks/092-macos-client-log-path.md)
 - 093: [Existing code in main and the renderer uses non-null assertions](tasks/093-non-null-assertions-in-existing-code.md)
 - 094: [No check follows a link to another site](tasks/094-no-check-for-links-to-other-sites.md)

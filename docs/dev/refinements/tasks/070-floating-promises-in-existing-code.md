@@ -11,7 +11,7 @@ in both processes, except for the code that broke them when they were turned on.
 floating promises in 6 files, such as `shell.openExternal()` in `windowing/OverlayWindow.ts` and
 `gameLogWatcher.restart()` in `main.ts`, and 4 async callbacks passed where a callback returns
 nothing, such as `setInterval(this.check)` in `AppUpdater.ts`. In the renderer,
-`renderer/eslint-suppressions.json` holds 22 floating promises in 14 files.
+`renderer/eslint-suppressions.json` holds 21 floating promises in 13 files.
 
 A rejection of one of these promises is not handled where it starts. Main writes it to the log
 with the generic `error [unhandledRejection]` line of `uncaught-errors.ts`. The renderer writes it only to
@@ -31,3 +31,5 @@ with `void` and its reason on the line. Then its file leaves `existingOffenders`
   removed.
 - 2026-10-25: main moved to ESLint 9, and the main lists moved to `main/eslint.config.mjs` with the
   same files.
+- 2026-10-26: `price-prediction/FeedbackOption.vue` left the renderer list when the price
+  prediction was removed.

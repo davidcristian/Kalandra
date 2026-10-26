@@ -5,7 +5,7 @@
 ## Context
 
 The renderer is a page served by the main process ([ADR-0004](ADR-0004-process-boundary.md)), and it needs data from
-other hosts: the official trade sites, `www.poeprices.info` and the price files at `kalandra.ashoal.com`
+other hosts: the official trade sites and the price files at `kalandra.ashoal.com`
 ([ADR-0006](ADR-0006-own-price-service.md)). The official trade site limits how many requests a client sends in a
 time window and announces those limits in response headers. [AGENTS.md](../../../AGENTS.md) records that it bans
 clients that exceed them.
@@ -16,8 +16,7 @@ clients that exceed them.
 `renderer/src/web/background/IPC.ts` requests `/proxy/<host>/<path>` from the main process, and `HttpProxy` in
 `main/src/proxy.ts` sends it on to `https://<host>/<path>`. Every `fetch` the renderer code sends to another host
 goes this way: the league list (`Leagues.ts`), the trade stat and item data (`TradeData.ts`), trade searches,
-exchanges and fetches (`pathofexile-trade.ts`, `pathofexile-bulk.ts`), price predictions (`poeprices.ts`,
-although `CheckedItem.vue` has the prediction component commented out) and the price file (`Prices.ts`). The item
+exchanges and fetches (`pathofexile-trade.ts`, `pathofexile-bulk.ts`) and the price file (`Prices.ts`). The item
 icons are the exception, described under Consequences. Reason: network access to other hosts belongs to the main
 process ([ADR-0004](ADR-0004-process-boundary.md)).
 

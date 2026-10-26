@@ -1,4 +1,4 @@
-# Ten modules in main and the renderer have no spec that imports them
+# Nine modules in main and the renderer have no spec that imports them
 
 **Status:** open
 **Area:** repo
@@ -18,7 +18,6 @@ No file in `main/specs/` or `renderer/specs/` imports these `.ts` files of `main
 | `main/src/host-files/utils.ts` | 100% | `GameConfig.test.ts` and `GameLogWatcher.test.ts` cover `guessFileLocation()` through their default paths. No spec of its own is needed. |
 | `main/src/vision/wasm-types.ts` | no code | Types only. |
 | `renderer/src/web/client-log/client-log-parser.ts` | 85.6% | `client-log.test.ts` covers it with `FullCampaign.txt`. The lines left name the skill point types other than Passive, Weapon Set and Abyss Atlas. Nothing reads `pointType` yet, so a test with copied log lines can wait until something does. |
-| `renderer/src/web/price-check/price-prediction/poeprices.ts` | 2.5% | No user reaches it: `CheckedItem.vue` has the price prediction commented out. [018](018-price-prediction-setting.md) is the decision about the setting, and [030](030-rate-limiter-and-league-tests.md) lists its tests. |
 | `renderer/src/web/item-search/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 | `renderer/src/web/leveling/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 
@@ -41,3 +40,5 @@ History line that says why the code stays.
   had no importing spec.
 - 2026-10-26: `createTradeRequest` sends each Legacy filter of a Mageblood once in the `and` group,
   and `mageblood.test.ts` checks it.
+- 2026-10-26: `poeprices.ts` left the table when the price prediction was removed, so the title
+  names nine modules.

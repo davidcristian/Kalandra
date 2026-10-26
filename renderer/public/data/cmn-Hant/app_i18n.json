@@ -361,7 +361,6 @@
     "accurate_collapsed": "在折疊的列表中顯示指示",
     "auto_search": "按下時自動搜尋",
     "select_stock": "始終選擇“庫存”過濾器",
-    "show_prediction": "顯示價格預測",
     "remember_currency": "記住買方貨幣過濾器",
     "use_tooltip_hover": "將滑鼠懸停在價格上時顯示物品",
     "use_tooltip_keybind": "SHIFT + 懸停",

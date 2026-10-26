@@ -1,6 +1,6 @@
 # The price prediction code has no tests
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/trade/RateLimiter.ts](../../../../renderer/src/web/price-check/trade/RateLimiter.ts)
 **Verified:** 2026-10-26
@@ -27,3 +27,6 @@ Done looks like: a spec for `poeprices.ts`, which depends on [018](018-price-pre
   status of a trade site response that is not data.
 - 2026-10-26: `Leagues.ts` got its spec, `renderer/specs/web/leagues.test.ts`, with the change that
   removes its check for Path of Exile 1 Ruthless leagues, so the title no longer names the leagues.
+- 2026-10-26: Done. The maintainer chose to remove the price prediction
+  ([018](018-price-prediction-setting.md)), and `poeprices.ts` went with it, so no code this task
+  names is left without a spec.

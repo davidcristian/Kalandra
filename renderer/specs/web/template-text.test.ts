@@ -12,15 +12,11 @@ const ATTRIBUTE = 6;
 
 const TEXT_ATTRIBUTES = ["title", "placeholder", "label", "alt", "aria-label"];
 
-// CheckedItem.vue does not render price-prediction/, and task 018 decides whether it returns
-const SKIPPED_DIRS = [path.join("web", "price-check", "price-prediction")];
-
 // Text that is the same in every language
 const ALLOWED = new Set([
   // Product and site names
   "Kalandra",
   "poe.ninja",
-  "www.poeprices.info",
   "www.pathofexile.com",
   "r/pathofexile",
   "pathofexile",
@@ -89,10 +85,7 @@ function templateTexts(source: string): string[] {
 function vueFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      const skipped = SKIPPED_DIRS.includes(path.relative(SRC_DIR, file));
-      return skipped ? [] : vueFiles(file);
-    }
+    if (entry.isDirectory()) return vueFiles(file);
     return entry.name.endsWith(".vue") ? [file] : [];
   });
 }

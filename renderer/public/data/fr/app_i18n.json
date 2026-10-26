@@ -370,7 +370,6 @@
     "accurate_collapsed": "Afficher une indication sur les listes réduites",
     "auto_search": "Effectuer une recherche automatique lors de l'appui",
     "select_stock": "Toujours sélectionner le filtre « Stock »",
-    "show_prediction": "Afficher la prédiction du prix",
     "remember_currency": "Mémoriser le filtre de devise d'achat",
     "default_all_selected": "Par défaut, tous les filtres sont activés",
     "use_tooltip_hover": "Afficher l'objet lors du survol du prix",

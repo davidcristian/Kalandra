@@ -136,12 +136,6 @@
         }}</ui-radio>
       </div>
     </div>
-    <ui-checkbox class="mb-4" v-model="requestPricePrediction"
-      >{{ t(":show_prediction") }}
-      <span class="bg-gray-700 px-1 rounded"
-        >www.poeprices.info</span
-      ></ui-checkbox
-    >
     <ui-checkbox class="mb-4" v-model="showCursor">{{
       t(":cursor_pos")
     }}</ui-checkbox>
@@ -286,10 +280,6 @@ export default defineComponent({
       builtinBrowser: configModelValue(
         () => configWidget.value,
         "builtinBrowser",
-      ),
-      requestPricePrediction: configModelValue(
-        () => configWidget.value,
-        "requestPricePrediction",
       ),
       collapseListings: configModelValue(
         () => configWidget.value,
