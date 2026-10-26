@@ -167,9 +167,10 @@ runtime. It reads the trade site lists through the proxy with `useTradeData()` f
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
 the floor in `renderer/vitest.config.ts` (79.3% of the lines of the `.ts` files in `src/` on 26 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
-has the text and the expected fields) and `specs/Parser/mods.ts`. `specs/Parser/whole-item.test.ts` parses whole
-items, such as fractured, unidentified and corrupted ones, and compares their properties, modifier counts and runes
-with their `TestItem`. The suites in `specs/data/` cover the loader and its lookups, and
+has the text and the expected fields) and `specs/Parser/mods.ts`. A case built by hand from other items says so in a
+comment, and [host task 020](../host/tasks/020-copy-items-for-hand-built-parser-cases.md) lists the copies that
+would replace them. `specs/Parser/whole-item.test.ts` parses whole items, such as fractured, unidentified and
+corrupted ones and a waystone, and compares their properties, modifier counts and runes with their `TestItem`. The suites in `specs/data/` cover the loader and its lookups, and
 `specs/data/fetchData.test.ts` a data file that the server does not return.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces `@/web/Config`
 with a mock config, connects the parser settings to it, and replaces `Host` with a mock whose `proxy` returns the

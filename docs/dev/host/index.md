@@ -94,3 +94,4 @@ A check is not a design, so it has more outcomes than a refinement:
 - 017: [Take Path of Exile 2 screenshots for the pages that lost theirs](tasks/017-game-screenshots.md)
 - 018: [The price check reads the catalyst quality of rings, amulets and jewels](tasks/018-catalyst-quality-lines.md)
 - 019: [The price check matches keystone lines to the stat the item has](tasks/019-keystone-lines.md)
+- 020: [Copy the items whose parser cases are built by hand](tasks/020-copy-items-for-hand-built-parser-cases.md)
