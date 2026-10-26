@@ -24,12 +24,6 @@ const existingOffenders = {
     "specs/AppTray.test.ts",
     "specs/ocr-worker-body.test.ts",
     "specs/overlay-window.test.ts",
-    "src/AppTray.ts",
-    "src/proxy.ts",
-    "src/server.ts",
-    "src/vision/link-worker.ts",
-    "src/vision/wasm-bindings.ts",
-    "src/windowing/OverlayWindow.ts",
   ],
 };
 

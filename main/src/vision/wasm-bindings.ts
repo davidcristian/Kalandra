@@ -36,10 +36,11 @@ export async function init(binDir: string) {
 }
 
 export async function changeLanguage(lang: string, binDir: string) {
-  if (!langMap.has(lang)) {
+  const tessLang = langMap.get(lang);
+  if (tessLang === undefined) {
     throw new Error("Unsupported language");
   }
-  lang = langMap.get(lang)!;
+  lang = tessLang;
   const langData = await fs.readFile(binDir + `/${lang}.traineddata`);
   tessModule.FS.writeFile(`${lang}.traineddata`, langData);
   if (tessApi.Init(null, lang, tessModule.OEM_DEFAULT)) {

@@ -210,9 +210,10 @@ export async function startServer(
     });
     socket.on("close", () => {
       const clients = websocketServer.clients;
+      const remaining = clients.values().next().value;
       // OverlayWindow keeps isOverlay from the last used-recently, which the closed client may have sent
-      if (clients.size === 1) {
-        lastActiveClient = clients.values().next().value!;
+      if (clients.size === 1 && remaining) {
+        lastActiveClient = remaining;
         evBus.emit("CLIENT->MAIN::used-recently", {
           isOverlay: overlayClients.has(lastActiveClient),
         });

@@ -26,6 +26,9 @@ const WorkerBody = {
     return _heistGems.ocrScreenshot(screenshot);
   },
 };
-Comlink.expose(WorkerBody, nodeEndpoint(parentPort!));
+if (!parentPort) {
+  throw new Error("link-worker.ts runs only as a worker thread");
+}
+Comlink.expose(WorkerBody, nodeEndpoint(parentPort));
 
 export type WorkerAPI = Comlink.Remote<typeof WorkerBody>;

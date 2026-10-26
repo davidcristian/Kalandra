@@ -11,7 +11,7 @@ export class AppTray {
     let trayImage = nativeImage.createFromPath(
       path.join(
         __dirname,
-        process.env.STATIC!,
+        process.env.STATIC,
         process.platform === "win32" ? "icon.ico" : "icon.png",
       ),
     );

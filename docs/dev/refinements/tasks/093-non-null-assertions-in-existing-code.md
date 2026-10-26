@@ -23,3 +23,5 @@ count.
 
 - 2026-10-26: Filed when the rule was turned on in both ESLint configs: 11 assertions in 9 files
   in main and 485 in 104 files in the renderer, specs included.
+- 2026-10-26: The 6 in `main/src/` were replaced by checks and by a `STATIC` type in
+  `main/src/env.d.ts`, so only 3 spec files stay in the main list.
