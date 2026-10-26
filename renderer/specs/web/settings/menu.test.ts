@@ -17,7 +17,6 @@ describe("the pages the Settings window menu lists", () => {
     expect(menuPages("timer")).toEqual([["stopwatch"]]);
     expect(menuPages("item-check")).toEqual([["item-check", "maps"]]);
     expect(menuPages("price-check")).toEqual([["price-check"]]);
-    expect(menuPages("item-search")).toEqual([["item-search"]]);
     expect(menuPages("library")).toEqual([["library"]]);
   });
 
@@ -27,5 +26,6 @@ describe("the pages the Settings window menu lists", () => {
 
   it("lists every page for a widget without its own settings", () => {
     expect(menuPages("delve-grid")).toEqual(menuPages());
+    expect(menuPages("item-search")).toEqual(menuPages());
   });
 });

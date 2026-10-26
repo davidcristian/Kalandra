@@ -327,7 +327,6 @@
     "import_failed": "Could not add the file. Kalandra adds PNG, JPEG, GIF, WebP, AVIF, BMP and ICO images up to about 16 MB."
   },
   "item_search": {
-    "name": "Item search",
     "input": "Search by name…",
     "reset": "Reset items",
     "heist_target": "Type of Item:",
@@ -335,8 +334,7 @@
     "target_unique": "Uniques",
     "target_base_item": "Base Items",
     "too_many_": "Too many items found, enter the name more precisely.",
-    "not_found": "No items found.",
-    "ocr_gems_key": "Perform an OCR for a Skill Gem"
+    "not_found": "No items found."
   },
   "map_check": {
     "name": "Map check",

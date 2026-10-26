@@ -262,14 +262,12 @@
     "name": "Bildleiste"
   },
   "item_search": {
-    "name": "Gegenstandssuche",
     "input": "Nach Namen suchen…",
     "reset": "Gegenstände zurücksetzen",
     "heist_target": "Heist-Ziel:",
     "target_gem": "Skill-Gem",
     "too_many_": "Zu viele Gegenstände gefunden, geben Sie den Namen präziser ein.",
-    "not_found": "Keine Gegenstände gefunden.",
-    "ocr_gems_key": "Optische Texterkennung für eine Skill-Gem durchführen"
+    "not_found": "Keine Gegenstände gefunden."
   },
   "map_check": {
     "name": "Kartenprüfung",

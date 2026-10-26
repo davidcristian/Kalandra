@@ -137,7 +137,6 @@ import SettingsDebug from "./debug.vue";
 import SettingsMaps from "../map-check/settings-maps.vue";
 import SettingsStashSearch from "../stash-search/stash-search-editor.vue";
 import SettingsStopwatch from "../stopwatch/settings-stopwatch.vue";
-import SettingsItemSearch from "../item-search/settings-item-search.vue";
 import SettingsLeveling from "../leveling/settings-leveling.vue";
 import SettingsLibrary from "../library/settings-library.vue";
 import { disableWidget, enableWidget, findWidget } from "./utils";
@@ -157,7 +156,6 @@ const PAGES: Record<SettingsPage, Component> = {
   "about": SettingsAbout,
   "stash-search": SettingsStashSearch,
   "stopwatch": SettingsStopwatch,
-  "item-search": SettingsItemSearch,
   "library": SettingsLibrary,
 };
 

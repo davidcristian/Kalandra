@@ -4,7 +4,6 @@ import type * as widget from "./overlay/widgets";
 import type { StashSearchWidget } from "./stash-search/widget";
 import { entrySearchText } from "./stash-search/presets";
 import type { ItemCheckWidget } from "./item-check/widget";
-import type { ItemSearchWidget } from "./item-search/widget";
 import type { LibraryWidget } from "./library/widget";
 import { offersCraftOfExile } from "./item-check/craft-of-exile";
 
@@ -136,15 +135,6 @@ export function shortcutActions(config: Config): ShortcutAction[] {
             type: "trigger-event",
             target: `stopwatch-reset:${widget.wmId}`,
           },
-        });
-      }
-    } else if (widget.wmType === "item-search") {
-      const itemSearch = widget as ItemSearchWidget;
-      if (itemSearch.ocrGemsKey) {
-        actions.push({
-          shortcut: itemSearch.ocrGemsKey,
-          keepModKeys: true,
-          action: { type: "ocr-text", target: "heist-gems" },
         });
       }
     }

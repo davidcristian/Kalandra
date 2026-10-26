@@ -128,7 +128,7 @@ describe("the hotkeys the renderer sends to main", () => {
     ]);
   });
 
-  it("targets each stopwatch by its widget id and adds the item search OCR key", () => {
+  it("targets each stopwatch by its widget id and adds no key for the saved item search OCR key", () => {
     const config = hotkeyConfig();
     config.widgets.push(
       widgetEntry(7, "timer", { toggleKey: "Alt + T", resetKey: null }),
@@ -146,11 +146,6 @@ describe("the hotkeys the renderer sends to main", () => {
         shortcut: "Alt + R",
         keepModKeys: true,
         action: { type: "trigger-event", target: "stopwatch-reset:8" },
-      },
-      {
-        shortcut: "Alt + O",
-        keepModKeys: true,
-        action: { type: "ocr-text", target: "heist-gems" },
       },
     ]);
   });

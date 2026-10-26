@@ -255,12 +255,7 @@
       "count": 1
     },
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/web/item-search/settings-item-search.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
+      "count": 2
     }
   },
   "src/web/leveling/settings-leveling.vue": {

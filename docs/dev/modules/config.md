@@ -132,7 +132,9 @@ old one and keep that file, so a saved config must survive every update: this is
   `autoFillEmptyRuneSockets` and the `< 25` step `openItemEditorAbove`. The top-level keys that the `< 10`, `< 14`
   and `< 16` steps copy into widgets, such as `priceCheckKey` and `itemCheckKey`, also stay. These keys change
   nothing, so no step deletes them: such a step would raise `configVersion` and rewrite every saved config with no
-  change in behavior.
+  change in behavior. The item search `ocrGemsKey`, the key of the removed Heist gem OCR, is read by no code either,
+  but it stays in `ItemSearchWidget` and in the widget's default as `null`: the `< 15` and `< 38` steps set it, and
+  the config upgrade spec checks the value the `< 38` step gives it.
 - The steps read the single instance widgets without a check, so `initConfig()` adds the missing ones first. A
   config older than version 7 without a map check widget still throws a `TypeError` in the `< 4` or `< 7` step:
   `defaultConfig()` has no widget of that type, and only an Awakened PoE Trade config edited by hand lacks one.

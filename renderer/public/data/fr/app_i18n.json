@@ -267,14 +267,12 @@
     "name": "Bande d'images"
   },
   "item_search": {
-    "name": "Recherche d'objet",
     "input": "Recherche par nom…",
     "reset": "Réinitialiser les objets",
     "heist_target": "Cible du casse :",
     "target_gem": "Gemme de compétence",
     "too_many_": "Trop d'objets trouvés, saisissez le nom plus précisément.",
-    "not_found": "Aucun objet trouvé.",
-    "ocr_gems_key": "Effectuer un OCR pour une gemme de compétence"
+    "not_found": "Aucun objet trouvé."
   },
   "map_check": {
     "name": "Vérification de carte",

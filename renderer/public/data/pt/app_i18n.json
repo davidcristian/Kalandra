@@ -253,14 +253,12 @@
     "name": "Faixa de imagem"
   },
   "item_search": {
-    "name": "Busca de itens",
     "input": "Buscar por nome…",
     "reset": "Reiniciar itens",
     "heist_target": "Alvo de assalto:",
     "target_gem": "Gema de habilidade",
     "too_many_": "Muitos itens encontrados, insira o nome de forma mais precisa.",
-    "not_found": "Nenhum item encontrado.",
-    "ocr_gems_key": "Realizar um OCR para uma gema de habilidade"
+    "not_found": "Nenhum item encontrado."
   },
   "map_check": {
     "name": "Verificação de mapa",

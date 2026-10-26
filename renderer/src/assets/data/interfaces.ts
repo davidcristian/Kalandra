@@ -146,9 +146,6 @@ export interface TranslationDict {
   METAMORPH_HEART: RegExp;
   METAMORPH_LIVER: RegExp;
   CANNOT_USE_ITEM: string;
-  QUALITY_ANOMALOUS: RegExp;
-  QUALITY_DIVERGENT: RegExp;
-  QUALITY_PHANTASMAL: RegExp;
   AREA_LEVEL: string;
   HEIST_WINGS_REVEALED: string;
   HEIST_TARGET: string;

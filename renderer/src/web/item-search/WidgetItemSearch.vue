@@ -3,7 +3,7 @@
     :config="config"
     :move-handles="['tl', 'bl']"
     :removable="false"
-    :inline-edit="false"
+    readonly
   >
     <div
       class="widget-default-style flex flex-col p-1 gap-1"
@@ -35,14 +35,7 @@
           </div>
         </button>
       </transition-group>
-      <UiTimeout
-        v-if="!showSearch"
-        ref="showTimeout"
-        @timeout="makeInvisible"
-        class="self-center"
-        :ms="4000"
-      />
-      <div v-else class="bg-gray-800 rounded">
+      <div v-if="showSearch" class="bg-gray-800 rounded">
         <div class="flex gap-x-1 p-1">
           <input
             type="text"
@@ -50,7 +43,7 @@
             class="rounded bg-gray-900 px-1 flex-1"
             v-model="searchValue"
           />
-          <button @click="clearSelectedItems" class="btn">
+          <button @click="clearItems" class="btn">
             <i class="fas fa-times" /> {{ t(":reset") }}
           </button>
         </div>
@@ -124,11 +117,9 @@
 
 <script lang="ts">
 import { ref } from "vue";
-import { distance } from "fastest-levenshtein";
 import {
   BaseType,
   ITEM_BY_TRANSLATED,
-  CLIENT_STRINGS as _$,
   GEM_NS_NAMES,
   UNIQUE_NS_NAMES,
   ITEM_NS_NAMES,
@@ -172,7 +163,7 @@ function useSelectedItems() {
 
   function addItem(newItem: SelectedItem) {
     if (items.value.some((item) => item.info.name === newItem.info.name))
-      return false;
+      return;
 
     if (items.value.length < 5) {
       items.value.push(newItem);
@@ -182,7 +173,6 @@ function useSelectedItems() {
     } else {
       items.value = [newItem];
     }
-    return true;
   }
 
   function clearItems() {
@@ -221,35 +211,6 @@ function findItems(opts: {
   }
   return out;
 }
-
-function fuzzyFindHeistGem(badStr: string) {
-  badStr = badStr.toLowerCase();
-
-  const qualities = [
-    ["Anomalous", _$.QUALITY_ANOMALOUS.toString().slice(2, -2)],
-    ["Divergent", _$.QUALITY_DIVERGENT.toString().slice(2, -2)],
-    ["Phantasmal", _$.QUALITY_PHANTASMAL.toString().slice(2, -2)],
-  ];
-
-  let bestMatch: { name: string; altQuality: string };
-  let minDist = Infinity;
-  for (const name of GEM_NS_NAMES()) {
-    for (const [altQuality, reStr] of qualities) {
-      const exactStr = reStr.replace("(.*)", name).toLowerCase();
-      if (Math.abs(exactStr.length - badStr.length) > 5) {
-        continue;
-      }
-
-      const dist = distance(badStr, exactStr);
-      if (dist < minDist) {
-        bestMatch = { name, altQuality };
-        if (dist === 0) return bestMatch;
-        minDist = dist;
-      }
-    }
-  }
-  return bestMatch!;
-}
 </script>
 
 <script setup lang="ts">
@@ -263,7 +224,6 @@ import { ItemCategory } from "@/parser";
 
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import Widget from "../overlay/Widget.vue";
-import UiTimeout from "@/web/ui/UiTimeout.vue";
 
 const props = defineProps<{
   config: ItemSearchWidget;
@@ -272,8 +232,6 @@ const props = defineProps<{
 const wm = inject<WidgetManager>("wm")!;
 const { t } = useI18nNs("item_search");
 const { findPriceByQuery, autoCurrency, queuePricesFetch } = usePoeninja();
-
-const showTimeout = shallowRef<{ reset: () => void } | null>(null);
 
 nextTick(() => {
   props.config.wmFlags = ["invisible-on-blur"];
@@ -284,21 +242,7 @@ const { items: starred, addItem, clearItems } = useSelectedItems();
 
 const typeFilter = shallowRef<"gem" | "unique" | "base_item">("base_item");
 
-Host.onEvent("MAIN->CLIENT::ocr-text", (e) => {
-  if (e.target !== "heist-gems") return;
-
-  for (const para of e.paragraphs) {
-    const res = fuzzyFindHeistGem(para);
-    selectItem(ITEM_BY_TRANSLATED("GEM", res.name)![0], {
-      withTimeout: true,
-    });
-  }
-});
-
-function selectItem(
-  item: BaseType,
-  opts?: { unique?: true; withTimeout?: true },
-) {
+function selectItem(item: BaseType, opts?: { unique?: true }) {
   queuePricesFetch();
 
   let price: ReturnType<typeof findPriceByQuery>;
@@ -314,15 +258,11 @@ function selectItem(
       name: item.refName,
     });
   }
-  const isAdded = addItem({
+  addItem({
     info: item,
     chaos: price?.primaryValue,
     price: price != null ? autoCurrency(price.primaryValue) : undefined,
   });
-  if (isAdded && opts?.withTimeout) {
-    showTimeout.value?.reset();
-    props.config.wmFlags = [];
-  }
   searchValue.value = "";
 }
 
@@ -348,16 +288,7 @@ const results = computed(() => {
   }
 });
 
-function clearSelectedItems() {
-  clearItems();
-  props.config.wmFlags = ["invisible-on-blur"];
-}
-
 const showSearch = wm.active;
-
-function makeInvisible() {
-  props.config.wmFlags = ["invisible-on-blur"];
-}
 
 function starredItemClick(e: MouseEvent, item: SelectedItem) {
   const parsed =

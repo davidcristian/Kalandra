@@ -10,7 +10,7 @@
 374 renderer/src/parser/stat-translations.ts
 710 renderer/src/web/Config.ts
 563 renderer/src/web/background/Prices.ts
-442 renderer/src/web/item-search/WidgetItemSearch.vue
+373 renderer/src/web/item-search/WidgetItemSearch.vue
 391 renderer/src/web/overlay/OverlayWindow.vue
 422 renderer/src/web/overlay/Widget.vue
 336 renderer/src/web/price-check/CheckedItem.vue
@@ -24,4 +24,4 @@
 367 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
 1940 renderer/src/web/price-check/trade/pathofexile-trade.ts
-537 renderer/src/web/settings/SettingsWindow.vue
+535 renderer/src/web/settings/SettingsWindow.vue

@@ -234,14 +234,12 @@
     "name": "이미지"
   },
   "item_search": {
-    "name": "아이템 검색",
     "input": "이름으로 검색 …",
     "reset": "아이템 초기화",
     "heist_target": "강탈 대상:",
     "target_gem": "스킬 젬",
     "too_many_": "너무 많은 아이템이 검색되었습니다. 조금 더 자세히 검색해주세요.",
-    "not_found": "찾은 아이템이 없습니다.",
-    "ocr_gems_key": "스킬 젬 검색"
+    "not_found": "찾은 아이템이 없습니다."
   },
   "map_check": {
     "name": "지도 체크",

@@ -58,7 +58,7 @@ https://davidcristian.github.io/Kalandra/ (each link opens the page's source).
 | --- | --- | --- | --- | --- |
 | `menu` | `overlay/WidgetMenu.vue` | `WidgetMenu` (`overlay/widgets.ts`) | single | [`/widgets`](../../widgets.md) |
 | `settings` | `settings/SettingsWindow.vue` | `Widget` | single | [`/settings`](../../settings.md) |
-| `item-search` | `item-search/WidgetItemSearch.vue` | `ItemSearchWidget` (`item-search/widget.ts`) | single | [`/extra-widgets`](../../extra-widgets.md), [`/ocr-guide`](../../ocr-guide.md) |
+| `item-search` | `item-search/WidgetItemSearch.vue` | `ItemSearchWidget` (`item-search/widget.ts`) | single | [`/extra-widgets`](../../extra-widgets.md) |
 | `experience-tracker` | `leveling/WidgetXpTracker.vue` | `XpWidget` (`leveling/widget.ts`) | single | [`/xp-tracker`](../../xp-tracker.md) |
 | `timer` | `stopwatch/WidgetTimer.vue` | `StopwatchWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `stash-search` | `stash-search/WidgetStashSearch.vue` | `StashSearchWidget` (`stash-search/widget.ts`) | multi | [`/stash-search`](../../stash-search.md) |
