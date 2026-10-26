@@ -8,7 +8,7 @@ import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
-import { repairSavedConfig } from "./config-repair";
+import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
@@ -135,7 +135,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 37,
+  configVersion: 38,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -674,6 +674,11 @@ export function upgradeConfig(_config: Config): Config {
     config.configVersion = 37;
   }
   /* eslint-enable */
+
+  if (config.configVersion < 38) {
+    addKeysWithoutStep(config, defaultConfig());
+    config.configVersion = 38;
+  }
 
   return config as Config;
 }

@@ -15,7 +15,8 @@ const CURRENT = actual.defaultConfig().configVersion;
 // Each file is a new install's config of that version with the choices in USER_CHOICES:
 // 2 is Awakened PoE Trade in June 2020, the oldest version the steps accept; 16 is its last
 // release, which Exiled Exchange 2 saved until v0.2.0; 25 has the filter generator; 28 is
-// before the XP tracker and the library; 32 is before the library profile; 36 is the last.
+// before the XP tracker and the library; 32 is before the library profile; 36 is before the
+// map check marks by ref.
 const VERSIONS = [2, 16, 25, 28, 32, 36];
 
 const USER_CHOICES = {
@@ -24,21 +25,6 @@ const USER_CHOICES = {
   exitHotkey: "F10",
   priceCheckHotkey: "E",
   mapRollingAnchor: { pos: "tl", x: 61.5, y: 30.25 },
-};
-
-// No step adds these keys. Awakened PoE Trade added the first four and the two hotkeys to its
-// defaults without a new version, and the version 15 step adds ocrGemsKey, which a new install
-// of version 16 lacks (docs/dev/refinements/tasks/098-old-configs-lack-default-keys.md)
-const KEYS_NO_STEP_ADDS: Record<number, string[]> = {
-  2: [
-    "restoreClipboard",
-    "clientLog",
-    "gameConfig",
-    "language",
-    "widgets[item-check].craftOfExileKey",
-    "widgets[delve-grid].toggleKey",
-  ],
-  16: ["widgets[item-search].ocrGemsKey"],
 };
 
 function readSaved(version: number): Config {
@@ -140,6 +126,21 @@ function configShapeDifferences(saved: Config, defaults: Config): string[] {
   ];
 }
 
+/** Returns the keys that entered defaultConfig() without a step of their own, which the version 38 step adds. */
+function keysWithoutStep(config: Config) {
+  const widget = (wmType: string) =>
+    config.widgets.find((w) => w.wmType === wmType);
+  return {
+    language: config.language,
+    restoreClipboard: config.restoreClipboard,
+    clientLog: config.clientLog,
+    gameConfig: config.gameConfig,
+    craftOfExileKey: field(widget("item-check"), "craftOfExileKey"),
+    toggleKey: field(widget("delve-grid"), "toggleKey"),
+    ocrGemsKey: field(widget("item-search"), "ocrGemsKey"),
+  };
+}
+
 function userChoices(config: Config) {
   const priceCheck = config.widgets.find((w) => w.wmType === "price-check");
   const mapRolling = config.widgets.find((w) => w.wmTitle === "Map rolling");
@@ -177,10 +178,33 @@ describe("upgradeConfig", () => {
 
       expect(upgraded.configVersion).toBe(CURRENT);
       expect(configShapeDifferences(upgraded, actual.defaultConfig())).toEqual(
-        KEYS_NO_STEP_ADDS[version] ?? [],
+        [],
       );
     },
   );
+
+  // Awakened PoE Trade added the first four keys and two hotkeys without a new version, and
+  // a new install of versions 15 to 21 has no ocrGemsKey
+  it.each([2, 16])(
+    "sets each key that entered the defaults without a step to its default in a version %i config",
+    (version) => {
+      const upgraded = upgrade(readSaved(version));
+
+      expect(keysWithoutStep(upgraded)).toStrictEqual(
+        keysWithoutStep(actual.defaultConfig()),
+      );
+    },
+  );
+
+  it("keeps the saved value of each key the version 38 step sets", () => {
+    const changed = asSaved(
+      changeEverySetting(asSaved(actual.defaultConfig())) as Config,
+    );
+    const config = asSaved(changed);
+    config.configVersion = 37;
+
+    expect(upgrade(config)).toEqual(changed);
+  });
 
   it.each(VERSIONS)(
     "keeps the league, hotkeys and widget position the user chose in a version %i config",

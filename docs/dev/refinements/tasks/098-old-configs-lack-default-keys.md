@@ -1,6 +1,6 @@
 # Saved configs of versions 2 to 21 upgrade without some keys of defaultConfig()
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** config
 **Origin:** [renderer/specs/web/config-upgrade.test.ts](../../../../renderer/specs/web/config-upgrade.test.ts)
 **Verified:** 2026-10-26
@@ -34,3 +34,6 @@ later, and [docs/download.md](../../../download.md) tells Awakened PoE Trade use
 - 2026-10-26: Found by the config upgrade spec, which compares each upgraded fixture with
   `defaultConfig()`. The fixtures are new installs built from the defaults at the commits of
   each version.
+- 2026-10-26: Done in `fix(renderer): set the default keys that old saved configs lack`. The
+  `< 38` step sets each of these keys to its value in `defaultConfig()` where the saved config has
+  none, and the spec checks every key of every fixture, so `KEYS_NO_STEP_ADDS` is gone.

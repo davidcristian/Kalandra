@@ -1,3 +1,8 @@
+import type { Config } from "./Config";
+import type { DelveGridWidget, Widget } from "./overlay/widgets";
+import type { ItemCheckWidget } from "./item-check/widget";
+import type { ItemSearchWidget } from "./item-search/widget";
+
 type SavedWidget = Record<string, unknown>;
 
 /** The parts of a saved config that `repairSavedConfig` reads and changes. */
@@ -41,4 +46,61 @@ function moveAfterItemSearch(widgets: SavedWidget[], wmTypes: string[]): void {
   const after = rest.findIndex((w) => w.wmType === "item-search") + 1;
   rest.splice(after, 0, ...moved);
   widgets.splice(0, widgets.length, ...rest);
+}
+
+/** The parts of a saved config that `addKeysWithoutStep` reads and changes. */
+export interface ConfigKeysWithoutStep {
+  language?: Config["language"];
+  restoreClipboard?: boolean;
+  clientLog?: string | null;
+  gameConfig?: string | null;
+  widgets: SavedWidget[];
+}
+
+/** Sets each key that entered `defaultConfig()` without a step to its value in `defaults`, where the saved config has none. */
+export function addKeysWithoutStep(
+  config: ConfigKeysWithoutStep,
+  defaults: Config,
+): void {
+  if (config.language === undefined) config.language = defaults.language;
+  if (config.restoreClipboard === undefined) {
+    config.restoreClipboard = defaults.restoreClipboard;
+  }
+  if (config.clientLog === undefined) config.clientLog = defaults.clientLog;
+  if (config.gameConfig === undefined) config.gameConfig = defaults.gameConfig;
+
+  const itemCheck = defaultWidget<ItemCheckWidget>(defaults, "item-check");
+  const delveGrid = defaultWidget<DelveGridWidget>(defaults, "delve-grid");
+  const itemSearch = defaultWidget<ItemSearchWidget>(defaults, "item-search");
+  addWidgetKey(
+    config.widgets,
+    "item-check",
+    "craftOfExileKey",
+    itemCheck?.craftOfExileKey,
+  );
+  addWidgetKey(config.widgets, "delve-grid", "toggleKey", delveGrid?.toggleKey);
+  addWidgetKey(
+    config.widgets,
+    "item-search",
+    "ocrGemsKey",
+    itemSearch?.ocrGemsKey,
+  );
+}
+
+function defaultWidget<T extends Widget>(
+  defaults: Config,
+  wmType: string,
+): T | undefined {
+  return defaults.widgets.find((w) => w.wmType === wmType) as T | undefined;
+}
+
+// AppConfig(type) reads the first widget of a type, so the key goes on that one
+function addWidgetKey(
+  widgets: SavedWidget[],
+  wmType: string,
+  key: string,
+  value: unknown,
+): void {
+  const widget = widgets.find((w) => w.wmType === wmType);
+  if (widget !== undefined && widget[key] === undefined) widget[key] = value;
 }
