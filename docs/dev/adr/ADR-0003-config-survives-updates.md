@@ -28,10 +28,13 @@ a file has had, so each step runs once for each file.
 
 **3. An existing step is never edited, reordered or deleted.** Reason: every step from the user's version runs in
 order on the next start. A changed step reaches only the users who have not run it yet, so two users on the same
-version would end up with different configs.
+version would end up with different configs. One change keeps a step's result and is allowed: when a default leaves
+`defaultConfig()`, a step that copied it from there takes a frozen copy of that exact default instead, as
+`renderer/src/web/removed-widgets.ts` holds for the Delve grid and the Cheat sheets strip. Reason: the step would
+otherwise copy `undefined`, and the steps after it would throw on every config older than that step.
 
-**4. A new widget type adds its instance in its step.** The `< 3` step shows the form: it pushes the default
-`image-strip` and `delve-grid` widgets into `config.widgets`, each with a new `wmId`. Reason: an existing config has
+**4. A new widget type adds its instance in its step.** The `< 3` step shows the form: it pushes the Cheat sheets
+`image-strip` and the `delve-grid` widget into `config.widgets`, each with a new `wmId`. Reason: an existing config has
 only the widgets it was saved with, because `initConfig()` does not merge a saved file with `defaultConfig()`. It
 adds a missing single instance widget only to a config at or above the version whose step adds that widget.
 
@@ -65,6 +68,8 @@ only through that message ([ADR-0004](ADR-0004-process-boundary.md)).
 - **Renumbering the steps to close the gaps at 20 and 34.** A saved file stores the number it reached, and
   renumbering changes which steps that file runs.
 - **Fixing a mistake inside an old step.** The users who already ran it never run it again. A fix is a new step.
+- **Keeping a removed widget in `defaultConfig()` so old steps can still copy it.** New installs would get the
+  widget, and a later step would have to remove it again.
 
 ## Related
 

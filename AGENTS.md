@@ -43,9 +43,9 @@ app in three parts, plus a data tool and a docs site:
    only when a test reads its config.
 
 Never edit, reorder or delete an existing upgrade step: a user can skip any number of versions, and every step runs
-in order from theirs. A setting that `main` needs also goes through `getConfigForHost()` into `HostConfig`. The
-reasons are [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md) and the code is
-[docs/dev/modules/config.md](docs/dev/modules/config.md).
+in order from theirs. When a default leaves `defaultConfig()`, a step that copied it takes a frozen copy of that exact
+default instead, so its result stays the same. A setting that `main` needs also goes through `getConfigForHost()` into
+`HostConfig`. Reasons: [ADR-0003](docs/dev/adr/ADR-0003-config-survives-updates.md); code: [config.md](docs/dev/modules/config.md).
 
 ## Architecture rules
 
