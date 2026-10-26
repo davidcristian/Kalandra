@@ -9,16 +9,10 @@ interface TradeLeague {
   text: string;
 }
 
-interface League {
-  id: string;
-  isPopular: boolean;
-  text: string;
-}
-
 export const useLeagues = createGlobalState(() => {
   const isLoading = shallowRef(false);
   const error = shallowRef<string | null>(null);
-  const tradeLeagues = shallowRef<League[]>([]);
+  const tradeLeagues = shallowRef<TradeLeague[]>([]);
 
   const selectedId = computed<string | undefined>({
     get() {
@@ -31,12 +25,12 @@ export const useLeagues = createGlobalState(() => {
 
   const selected = computed(() => {
     const { leagueId } = AppConfig();
-    if (!tradeLeagues.value || !leagueId) return undefined;
-    const listed = tradeLeagues.value.find((league) => league.id === leagueId);
+    if (!leagueId) return undefined;
+    const listed = tradeLeagues.value.some((league) => league.id === leagueId);
     return {
       id: leagueId,
       realm: AppConfig().realm,
-      isPopular: !isPrivateLeague(leagueId) && Boolean(listed?.isPopular),
+      isPopular: listed && !isPrivateLeague(leagueId),
     };
   });
 
@@ -50,9 +44,7 @@ export const useLeagues = createGlobalState(() => {
         `${poeWebApi()}/api/trade2/data/leagues`,
       );
       const leagues = await readTradeData<{ result: TradeLeague[] }>(response);
-      tradeLeagues.value = leagues.result.map((league) => {
-        return { id: league.id, isPopular: true, text: league.text };
-      });
+      tradeLeagues.value = leagues.result.map(({ id, text }) => ({ id, text }));
 
       const leagueIsAlive = tradeLeagues.value.some(
         (league) => league.id === selectedId.value,
@@ -85,8 +77,5 @@ export const useLeagues = createGlobalState(() => {
 });
 
 function isPrivateLeague(id: string) {
-  if (id.includes("Ruthless")) {
-    return true;
-  }
   return /\(PL\d+\)$/.test(id);
 }

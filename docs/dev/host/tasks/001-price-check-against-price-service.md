@@ -14,8 +14,7 @@ file yet.
 `load()` requests the file only for a league on the International realm (`realm === "pc-ggg"`)
 whose `isPopular` is true. The realm is International by default, and Settings, General shows
 Realm only for the language `cmn-Hant`. `useLeagues` in `Leagues.ts` sets `isPopular` for each
-league the trade site lists, except a private league: an id that ends with `(PL<number>)` or
-contains `Ruthless`.
+league the trade site lists, except a private league: an id that ends with `(PL<number>)`.
 
 **Do.** Set up as [Before you start](../../runbooks/in-game-check.md#before-you-start) says, then:
 

@@ -167,9 +167,9 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
   ([ADR-0005](../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
 - `renderer/src/web/background/Prices.ts` (`usePoeninja`): `load` requests
   `/proxy/kalandra.ashoal.com/prices/<file>` through `Host.proxy` for the selected league. It loads a league only
-  when the trade site lists it, `isPrivateLeague` in `Leagues.ts` does not match it (a private league or a Ruthless
-  league), and the realm setting is `pc-ggg`, labelled International. The realm setting shows only with the
-  Traditional Chinese language, where `pc-garena` is the other choice.
+  when the trade site lists it, `isPrivateLeague` in `Leagues.ts` does not match it (a private league), and the
+  realm setting is `pc-ggg`, labelled International. The realm setting shows only with the Traditional Chinese
+  language, where `pc-garena` is the other choice.
 - The core currency is the currency the app shows prices in, exalted or chaos. It is the **Primary base currency**
   setting in the price check settings (`coreCurrency` in `renderer/src/web/price-check/settings-price-check.vue`).
   `core.rates` converts the file's divine values to it. While one divine costs fewer than 5 chaos, the app shows

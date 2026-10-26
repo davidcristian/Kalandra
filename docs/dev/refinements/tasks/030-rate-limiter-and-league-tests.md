@@ -1,20 +1,16 @@
-# The league and price prediction code have no tests
+# The price prediction code has no tests
 
 **Status:** open
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/trade/RateLimiter.ts](../../../../renderer/src/web/price-check/trade/RateLimiter.ts)
-**Verified:** 2026-10-20
+**Verified:** 2026-10-26
 
-`renderer/src/web/background/Leagues.ts` has only a test of a load that fails, in
-`renderer/specs/web/price-check/trade/trade-response.test.ts`, and
 `renderer/src/web/price-check/price-prediction/poeprices.ts` has no test. No file in
 `renderer/src/` has an in-source test. The rate limiter that keeps Kalandra under the trade site's
 limits ([ADR-0005](../../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)) has its specs in
 `renderer/specs/web/price-check/trade/RateLimiter.test.ts` and `rate-limits.test.ts`.
 
-Done looks like: specs for `load()` in `Leagues.ts` with a saved league list, including the league
-it selects when the saved one is gone. The `poeprices.ts` part depends on
-[018](018-price-prediction-setting.md).
+Done looks like: a spec for `poeprices.ts`, which depends on [018](018-price-prediction-setting.md).
 
 ## History
 
@@ -29,3 +25,5 @@ it selects when the saved one is gone. The `poeprices.ts` part depends on
   data.
 - 2026-10-20: A test of a league list load that gets a web page came with the fix that names the
   status of a trade site response that is not data.
+- 2026-10-26: `Leagues.ts` got its spec, `renderer/specs/web/leagues.test.ts`, with the change that
+  removes its check for Path of Exile 1 Ruthless leagues, so the title no longer names the leagues.

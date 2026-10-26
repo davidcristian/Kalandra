@@ -60,8 +60,7 @@ lists the other items of the set and the items the encounter drops, each with it
 
 No estimate shows when:
 
-- the league is a private league (its name ends with the PL number in brackets, such as `(PL12345)`) or has
-  `Ruthless` in its name,
+- the league is a private league (its name ends with the PL number in brackets, such as `(PL12345)`),
 - the realm is **Hotcool**, which the General settings offer for Traditional Chinese,
 - the trade site does not list the league, or the price service has no file for it,
 - the price file has no entry for the item, such as a normal, magic or rare weapon, armour piece or accessory.
