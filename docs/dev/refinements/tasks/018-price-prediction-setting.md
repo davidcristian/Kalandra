@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/CheckedItem.vue](../../../../renderer/src/web/price-check/CheckedItem.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 Settings, Price check shows the checkbox `Show price prediction` with `www.poeprices.info`, bound to
 `requestPricePrediction` in the price check widget config and off by default. The
@@ -18,8 +18,9 @@ This is a decision for the maintainer, with two outcomes:
 - Restore the component, after checking that poeprices returns prices for Path of Exile 2 items. The
   request goes to a live site, so it needs the maintainer's go-ahead
   ([AGENTS.md](../../../../AGENTS.md#safety)), and the user page then documents the setting. Its
-  English text moves into `app_i18n.json`, and `price-prediction/` leaves `SKIPPED_DIRS` in
-  `renderer/specs/web/template-text.test.ts`.
+  English text moves into `app_i18n.json`, `price-prediction/` leaves `SKIPPED_DIRS` in
+  `renderer/specs/web/template-text.test.ts`, and the Acknowledgments in the README credit
+  poeprices.info again.
 - Remove the checkbox, the `price-prediction/` folder, the import in `CheckedItem.vue` and the
   proxy host. Removing `requestPricePrediction` from the widget config type follows the hard rule
   in [AGENTS.md](../../../../AGENTS.md#the-one-hard-rule), and
@@ -32,3 +33,5 @@ and ADR-0005 match it.
 
 - 2026-10-18: Found while docs/price-check.md was rewritten, and again in the renderer and ADR
   reviews, by reading `CheckedItem.vue` and searching for callers of `requestPoeprices`.
+- 2026-10-26: Checked again. The README no longer credits poeprices.info, since the app sends it
+  no request.

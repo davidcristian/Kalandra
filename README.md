@@ -38,8 +38,6 @@ architecture, the decisions and the module docs. The rules every change follows 
 - [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2)
 - [awakened-poe-trade](https://github.com/SnosMe/awakened-poe-trade)
 - [libuiohook](https://github.com/kwhat/libuiohook)
-- [RePoE](https://github.com/brather1ng/RePoE)
-- [poeprices.info](https://www.poeprices.info/)
 - [poe.ninja](https://poe.ninja/)
 
 ![graph](https://i.imgur.com/MATqhv7.png)
