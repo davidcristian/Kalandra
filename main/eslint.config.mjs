@@ -19,7 +19,7 @@ const existingOffenders = {
     "src/main.ts",
     "src/server.ts",
   ],
-  "no-empty": ["src/host-files/ConfigStore.ts", "src/vision/link-main.ts"],
+  "no-empty": ["src/vision/link-main.ts"],
   "@typescript-eslint/no-non-null-assertion": [
     "specs/AppTray.test.ts",
     "specs/ocr-worker-body.test.ts",

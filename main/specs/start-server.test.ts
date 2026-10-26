@@ -131,6 +131,7 @@ describe("startServer", () => {
       version: "1.2.3",
       updater: { state: "checking-for-update" },
       contents: null,
+      configProblem: null,
     });
   });
 

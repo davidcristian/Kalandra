@@ -48,8 +48,11 @@ old one and keep that file, so a saved config must survive every update: this is
   each stash search entry whose text is an English default of earlier versions, `Currency`, `"Rarity: Normal"` or
   `Trials:`, the `preset` that makes it search that game text in the game language
   ([renderer-widgets.md](renderer-widgets.md#stash-search-presets)). It keeps the entry's text.
-- `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no file it uses
-  `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. Before the steps, `addMissingWidgets()` in
+- `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
+  main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
+  the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
+  when the overlay first attaches to the game, for 20 seconds and even when that banner is turned off in
+  Settings. Before the steps, `addMissingWidgets()` in
   `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
   version has, with the next free `wmId`, and logs `[config] Added the default widgets that the saved config
   lacks:` and their types to the console. A widget that a later step adds, such as the library to a config before
@@ -92,8 +95,12 @@ old one and keep that file, so a saved config must survive every update: this is
 
 `main/src/host-files/ConfigStore.ts`:
 
-- `ConfigStore` keeps the file at `apt-data/config.json` under Electron's `userData` folder. `load()` returns its
-  text, or `null` when it cannot be read; `server.ts` returns that text from `GET /config`. On
+- `ConfigStore` keeps the file at `apt-data/config.json` under Electron's `userData` folder. `load()` returns a
+  `LoadedConfig`: the file's text, or `null` when there is no file, and `problem` null. Any other read error, such
+  as `EBUSY` while another program holds the file, gives `null` and a `ConfigProblem` with reason `unreadable`, the
+  path and the error message, and logs `error [ConfigStore] Failed to read <path>: <message>`. Until a later read
+  succeeds, each save is skipped with `warn [ConfigStore] Did not save the config`, so the page, which runs on the
+  defaults, never replaces the file. `server.ts` returns both in `HostState` from `GET /config`. On
   `CLIENT->MAIN::save-config` it sends the text to every client as `MAIN->CLIENT::config-changed` at once and
   queues the write. Reads and writes of the file run one at a time in the order they arrive, so the last save is
   the one on disk, and `load()` returns the text of a save that is still being written. The first temporary save
@@ -171,5 +178,7 @@ on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 the host `tradeHost()` returns for each language and realm. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
 that fails while another program has the file open, with the log line of each failed save, the temporary save, a
-run in development and a `config.json` it cannot read. `main/specs/start-server.test.ts` reads `GET /config` after a
-`save-config` message.
+run in development, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
+replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET /config` after a
+`save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()` keeps the
+`ConfigProblem`.

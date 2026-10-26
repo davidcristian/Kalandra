@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** rules
 **Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-26
 
 Rule 7 of [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass) bans `any`, a cast through
 `unknown` and an error dropped by an empty `catch`. ESLint checks these in both processes with
@@ -12,8 +12,7 @@ cast through `unknown` and one for an empty `.catch()` handler. The code that br
 were turned on is exempt:
 
 - main, in `existingOffenders` and the `no-restricted-syntax` override of `main/eslint.config.mjs`:
-  3 empty `catch` blocks in `ConfigStore.load()` ([001](001-failed-config-read-saves-defaults.md)) and
-  `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
+  2 empty `catch` blocks in `OcrWorker` ([010](010-ocr-errors-dropped.md)); and the empty
   `.catch()` handlers of the `copy-item` and `ocr-text` keys in `shortcuts/Shortcuts.ts`, the
   second also in [010](010-ocr-errors-dropped.md).
 
@@ -43,3 +42,5 @@ the line. Then its file leaves the main lists.
   same files.
 - 2026-10-25: `guessFileLocation()` passes each error but a missing file to its caller, which logs it,
   and `utils.ts` left the `no-empty` list.
+- 2026-10-26: `ConfigStore.load()` passes each read error but a missing file on with a type
+  ([001](001-failed-config-read-saves-defaults.md)), and `ConfigStore.ts` left the `no-empty` list.

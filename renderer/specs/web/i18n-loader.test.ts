@@ -63,8 +63,9 @@ describe("loadLang", () => {
 
   it("shows the English text for a key that the language does not have", async () => {
     const german = readMessages("de");
+    // t() fills a placeholder with nothing when it gets no values
     const [key, english] = [...readMessages("en")].find(
-      ([key]) => !german.has(key),
+      ([key, text]) => !german.has(key) && !text.includes("{"),
     )!;
 
     await loadLang("de");

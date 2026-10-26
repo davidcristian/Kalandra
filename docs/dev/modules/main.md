@@ -225,7 +225,7 @@ fails. A gem search waits for the last change and fails when that change failed.
 - Item text and OCR text go to the last active client only; the log, the updater state, the config and the focus
   state go to every client.
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
-- Some existing code drops errors in empty `catch` blocks: `ConfigStore.load()`, `OcrWorker` and the `copy-item` and
+- Some existing code drops errors in empty `catch` blocks: `OcrWorker` and the `copy-item` and
   `ocr-text` handlers in `Shortcuts`. New code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and
   ESLint fails on a new empty `catch` block or `.catch()` handler.
 

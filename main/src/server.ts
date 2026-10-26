@@ -233,10 +233,12 @@ export async function startServer(
   httpRoutes.addListener("request", async (req, res) => {
     if (req.url === "/config") {
       res.setHeader("content-type", "application/json");
+      const { contents, problem } = await configStore.load();
       const resBody: HostState = {
         version: app.getVersion(),
         updater: appUpdater.info,
-        contents: await configStore.load(),
+        contents,
+        configProblem: problem,
       };
       res.end(JSON.stringify(resBody));
     }

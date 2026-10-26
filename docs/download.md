@@ -88,6 +88,10 @@ a power loss during a save keeps your previous settings. When a save fails, for 
 keeps `config.json` open, Kalandra keeps running and writes the reason to the
 [log](/faq#where-can-i-find-the-logs). The next save writes all your settings again.
 
+When Kalandra cannot read `config.json` at start, for example because another program holds it open, it starts with
+the default settings and names the file and the reason in the log and in the banner it shows when it finds the game
+window. It then saves no settings, so your file stays as it was. Restart Kalandra to load your settings again.
+
 ## Moving from Exiled Exchange 2
 
 Kalandra installs beside Exiled Exchange 2 and keeps its settings in its own folder. To copy your Exiled Exchange 2

@@ -4,6 +4,7 @@ import type {
   UpdateInfo,
   HostState,
 } from "@ipc/types";
+import type { ConfigProblem } from "@ipc/config-problem";
 import type { UnregisteredHotkey } from "@ipc/hotkeys";
 import { shallowRef } from "vue";
 import Sockette from "sockette";
@@ -28,6 +29,8 @@ class HostTransport {
   updateInfo = shallowRef<UpdateInfo>({ state: "initial" });
   /** The hotkeys of the saved config that main did not register, which the Settings window marks. */
   unregisteredHotkeys = shallowRef<UnregisteredHotkey[]>([]);
+  /** Why main sent no saved config at start although config.json exists, which the start message names. */
+  configProblem = shallowRef<ConfigProblem | null>(null);
 
   async init() {
     this.onEvent("MAIN->CLIENT::log-entry", (entry) => {
@@ -95,6 +98,7 @@ class HostTransport {
     const config = (await response.json()) as HostState;
     this.version.value = config.version;
     this.updateInfo.value = config.updater;
+    this.configProblem.value = config.configProblem;
     return config.contents;
   }
 

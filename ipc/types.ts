@@ -69,6 +69,7 @@ export type UpdateInfo =
 
 export interface HostState {
   contents: string | null;
+  configProblem: import("./config-problem").ConfigProblem | null;
   version: string;
   updater: UpdateInfo;
 }

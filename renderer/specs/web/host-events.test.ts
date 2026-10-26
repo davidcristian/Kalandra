@@ -1,4 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import type { ConfigProblem } from "@ipc/config-problem";
 import type { HostState, IpcEvent } from "@ipc/types";
 import type * as IPC from "@/web/background/IPC";
 
@@ -241,6 +242,7 @@ describe("Host.getConfig", () => {
       version: "1.2.3",
       updater: { state: "checking-for-update" },
       contents: '{"configVersion":1}',
+      configProblem: null,
     };
     vi.stubGlobal("fetch", async (input: RequestInfo | URL) =>
       String(input) === "/config"
@@ -251,5 +253,24 @@ describe("Host.getConfig", () => {
     expect(await Host.getConfig()).toBe('{"configVersion":1}');
     expect(Host.version.value).toBe("1.2.3");
     expect(Host.updateInfo.value).toEqual({ state: "checking-for-update" });
+    expect(Host.configProblem.value).toBeNull();
+  });
+
+  it("keeps why main sent no saved config", async () => {
+    const problem: ConfigProblem = {
+      reason: "unreadable",
+      file: "/home/a/.config/kalandra/apt-data/config.json",
+      message: "EBUSY: resource busy or locked, open",
+    };
+    const state: HostState = {
+      version: "1.2.3",
+      updater: { state: "initial" },
+      contents: null,
+      configProblem: problem,
+    };
+    vi.stubGlobal("fetch", async () => new Response(JSON.stringify(state)));
+
+    expect(await Host.getConfig()).toBeNull();
+    expect(Host.configProblem.value).toEqual(problem);
   });
 });

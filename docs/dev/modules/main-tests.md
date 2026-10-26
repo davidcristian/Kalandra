@@ -80,7 +80,7 @@ replaces it with `vi.mock("electron", ...)`.
   byte more, and an image while a file holds the place of the uploads folder.
 - `ConfigStore.test.ts` saves configs in a temporary folder through fakes that write slowly, stop partway through a
   write or fail the rename as Windows does for a file another program has open. It also makes a temporary save,
-  saves in development and reads a `config.json` that is a folder.
+  saves in development, reads a `config.json` that is a folder and fails a read with `EBUSY`.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary
   folder, and the first two pass their own default paths, of which `unreadable-files.ts` makes some fail with EACCES.
 - `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key

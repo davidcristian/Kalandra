@@ -53,7 +53,9 @@ Four lines from `main/src/shortcuts/` apply to every key below:
 - **Press:** nothing. Start the game while Kalandra runs.
 - **See:** a banner with `Kalandra` and `Is ready and running in background` for 2.5 seconds
   (`renderer/src/web/overlay/LoadingAnimation.vue`). It shows when "Show a notification when the
-  Overlay detects a PoE window" in Settings, General is ticked, as it is by default.
+  Overlay detects a PoE window" in Settings, General is ticked, as it is by default. When main
+  could not read `config.json` at start, the banner also names the file and the reason for 20
+  seconds, even with that setting off.
 - **Logs:** when the game runs as administrator and Kalandra does not, main logs
   `error [Overlay] PoE2 is running with administrator rights` and shows a dialog titled
   `PoE2 window: no access`. Main attaches to the window titled `Path of Exile 2` ("PoE window

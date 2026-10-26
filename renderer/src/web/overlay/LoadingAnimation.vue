@@ -8,6 +8,7 @@
         <div class="py-2 px-4">
           <div class="text-base">Kalandra</div>
           <p>{{ t("app_is_ready") }}</p>
+          <p v-if="notice" class="max-w-xl text-yellow-400">{{ notice }}</p>
         </div>
       </div>
     </div>
@@ -17,20 +18,34 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
+import type { ConfigProblem } from "@ipc/config-problem";
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
 
 const { t } = useI18n();
 
 const show = shallowRef(false);
+const notice = shallowRef<string | null>(null);
+let noticeShown = false;
+
+function configNotice(problem: ConfigProblem): string {
+  return t("config_unreadable", [problem.file, problem.message]);
+}
 
 Host.onEvent("MAIN->OVERLAY::overlay-attached", () => {
-  if (!show.value && AppConfig().showAttachNotification) {
-    show.value = true;
-    setTimeout(() => {
+  if (show.value) return;
+  const problem = noticeShown ? null : Host.configProblem.value;
+  if (!problem && !AppConfig().showAttachNotification) return;
+  notice.value = problem ? configNotice(problem) : null;
+  noticeShown = true;
+  show.value = true;
+  // A path takes longer to read than the usual two words
+  setTimeout(
+    () => {
       show.value = false;
-    }, 2500);
-  }
+    },
+    problem ? 20000 : 2500,
+  );
 });
 </script>
 

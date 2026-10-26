@@ -1,15 +1,24 @@
 import type { ServerEvents } from "../server";
 import type { Logger } from "../RemoteLogger";
+import type { ConfigProblem } from "../../../ipc/config-problem";
 import { app } from "electron";
 import fs from "fs/promises";
 import path from "path";
 
 export interface ConfigFiles {
+  readFile: (file: string) => Promise<string>;
   writeFile: (file: string, contents: string) => Promise<void>;
   rename: (from: string, to: string) => Promise<void>;
 }
 
+/** What `load()` returns: the text of config.json, or null and the reason when the file exists but is not used. */
+export interface LoadedConfig {
+  contents: string | null;
+  problem: ConfigProblem | null;
+}
+
 const diskFiles: ConfigFiles = {
+  readFile: async (file) => await fs.readFile(file, "utf8"),
   writeFile: async (file, contents) => {
     const handle = await fs.open(file, "w");
     try {
@@ -39,6 +48,14 @@ async function renameWithRetry(files: ConfigFiles, from: string, to: string) {
   await files.rename(from, to);
 }
 
+function isMissingFile(err: unknown): boolean {
+  return err instanceof Error && "code" in err && err.code === "ENOENT";
+}
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 export class ConfigStore {
   private isTmpFile = false;
   private cfgPath = path.join(
@@ -46,6 +63,9 @@ export class ConfigStore {
     "apt-data",
     "config.json",
   );
+
+  // Set while the last read of the file failed, so the page has the defaults and a save would replace the file
+  private readFailed = false;
 
   // Each read and write of the file starts after the previous one ends
   private queue: Promise<void> = Promise.resolve();
@@ -66,13 +86,27 @@ export class ConfigStore {
     });
   }
 
-  async load(): Promise<string | null> {
+  async load(): Promise<LoadedConfig> {
     return await this.enqueue(async () => {
-      let contents: string | null = null;
       try {
-        contents = await fs.readFile(this.cfgPath, "utf8");
-      } catch {}
-      return contents;
+        const contents = await this.files.readFile(this.cfgPath);
+        this.readFailed = false;
+        return { contents, problem: null };
+      } catch (err) {
+        if (isMissingFile(err)) {
+          this.readFailed = false;
+          return { contents: null, problem: null };
+        }
+        this.readFailed = true;
+        const message = errorMessage(err);
+        this.logger.write(
+          `error [ConfigStore] Failed to read ${this.cfgPath}: ${message}. The page uses the default settings, and no save replaces the file until a read of it succeeds`,
+        );
+        return {
+          contents: null,
+          problem: { reason: "unreadable", file: this.cfgPath, message },
+        };
+      }
     });
   }
 
@@ -88,6 +122,12 @@ export class ConfigStore {
 
   private async save(contents: string, tmp: boolean) {
     if (process.env.VITE_DEV_SERVER_URL) return;
+    if (this.readFailed) {
+      this.logger.write(
+        `warn [ConfigStore] Did not save the config, because the last read of ${this.cfgPath} failed`,
+      );
+      return;
+    }
 
     if (tmp && !this.isTmpFile) {
       this.cfgPath += ".tmp";
@@ -101,7 +141,7 @@ export class ConfigStore {
       await renameWithRetry(this.files, newFile, this.cfgPath);
     } catch (err) {
       this.logger.write(
-        `error [ConfigStore] Failed to save the config: ${(err as Error).message}`,
+        `error [ConfigStore] Failed to save the config: ${errorMessage(err)}`,
       );
     }
   }

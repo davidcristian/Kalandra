@@ -46,10 +46,16 @@ class FakeServer implements ServerEvents {
 const STEP_1 = '{"step":1}';
 const STEP_2 = '{"step":2}';
 
+async function readText(file: string): Promise<string> {
+  return await fs.readFile(file, "utf8");
+}
+
 class SlowFiles implements ConfigFiles {
   finished = 0;
 
   constructor(private readonly delayMs: Record<string, number> = {}) {}
+
+  readFile = readText;
 
   writeFile = async (file: string, contents: string) => {
     const delay = this.delayMs[contents] ?? 0;
@@ -66,6 +72,7 @@ class SlowFiles implements ConfigFiles {
 function lockedFiles(failures: number): ConfigFiles {
   let left = failures;
   return {
+    readFile: readText,
     writeFile: async (file, contents) => {
       await fs.writeFile(file, contents);
     },
@@ -77,6 +84,26 @@ function lockedFiles(failures: number): ConfigFiles {
       }
       await fs.rename(from, to);
     },
+  };
+}
+
+const BUSY = "EBUSY: resource busy or locked, open";
+
+// Fails the first `failures` reads as Windows does while another program holds the file open
+function busyFiles(failures: number): ConfigFiles {
+  let left = failures;
+  return {
+    readFile: async (file) => {
+      if (left > 0) {
+        left -= 1;
+        throw Object.assign(new Error(BUSY), { code: "EBUSY" });
+      }
+      return await readText(file);
+    },
+    writeFile: async (file, contents) => {
+      await fs.writeFile(file, contents);
+    },
+    rename: fs.rename,
   };
 }
 
@@ -113,9 +140,9 @@ afterEach(async () => {
 });
 
 describe("ConfigStore", () => {
-  it("returns null when no config was saved", async () => {
+  it("returns no contents and no problem when no config was saved", async () => {
     const store = createStore();
-    expect(await store.load()).toBeNull();
+    expect(await store.load()).toEqual({ contents: null, problem: null });
   });
 
   it("keeps the second of two saves in a row when the first write is slower", async () => {
@@ -125,7 +152,7 @@ describe("ConfigStore", () => {
     server.saveConfig(STEP_1);
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_2);
+    expect((await store.load()).contents).toBe(STEP_2);
     expect(files.finished).toBe(2);
     expect(electron.exitCodes).toEqual([]);
   });
@@ -135,7 +162,7 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_1);
 
-    expect(await store.load()).toBe(STEP_1);
+    expect((await store.load()).contents).toBe(STEP_1);
   });
 
   it("sends each saved config to every client", async () => {
@@ -154,6 +181,7 @@ describe("ConfigStore", () => {
 
   it("logs why a write failed and keeps the app running", async () => {
     const store = createStore({
+      readFile: readText,
       writeFile: async () => {
         throw new Error("the disk is full");
       },
@@ -162,7 +190,7 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_1);
 
-    expect(await store.load()).toBeNull();
+    expect((await store.load()).contents).toBeNull();
     expect(logger.history).toContain(
       "error [ConfigStore] Failed to save the config: the disk is full",
     );
@@ -175,13 +203,14 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_2);
+    expect((await store.load()).contents).toBe(STEP_2);
     expect(await fs.readdir(configFolder())).toEqual(["config.json"]);
   });
 
   it("keeps the saved config when a write stops partway", async () => {
     await saveOnDisk(STEP_1);
     const store = createStore({
+      readFile: readText,
       writeFile: async (file, contents) => {
         await fs.writeFile(file, contents.slice(0, contents.length / 2));
         throw new Error("the process stopped during the write");
@@ -191,7 +220,7 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_1);
+    expect((await store.load()).contents).toBe(STEP_1);
     expect(logger.history).toContain("the process stopped during the write");
   });
 
@@ -201,7 +230,7 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_2);
+    expect((await store.load()).contents).toBe(STEP_2);
     expect(electron.exitCodes).toEqual([]);
   });
 
@@ -211,7 +240,7 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_1);
+    expect((await store.load()).contents).toBe(STEP_1);
     expect(logger.history).toContain("EPERM: operation not permitted, rename");
   });
 
@@ -220,9 +249,9 @@ describe("ConfigStore", () => {
     const store = createStore();
 
     server.saveConfig(STEP_1, true);
-    expect(await store.load()).toBe(STEP_1);
+    expect((await store.load()).contents).toBe(STEP_1);
     server.saveConfig(STEP_2);
-    expect(await store.load()).toBe(STEP_2);
+    expect((await store.load()).contents).toBe(STEP_2);
 
     expect(await readOnDisk("config.json")).toBe("a config that is not JSON");
     expect(await readOnDisk("config.json.tmp")).toBe(STEP_2);
@@ -235,17 +264,58 @@ describe("ConfigStore", () => {
 
     server.saveConfig(STEP_2);
 
-    expect(await store.load()).toBe(STEP_1);
+    expect((await store.load()).contents).toBe(STEP_1);
     expect(server.sent).toEqual([
       { name: "MAIN->CLIENT::config-changed", payload: { contents: STEP_2 } },
     ]);
   });
 
-  it("returns null when config.json cannot be read", async () => {
-    await fs.mkdir(path.join(configFolder(), "config.json"), {
-      recursive: true,
-    });
+  it("returns the problem and logs it when config.json is a folder", async () => {
+    const file = path.join(configFolder(), "config.json");
+    await fs.mkdir(file, { recursive: true });
 
-    expect(await createStore().load()).toBeNull();
+    const { contents, problem } = await createStore().load();
+
+    expect(contents).toBeNull();
+    expect(problem).toMatchObject({ reason: "unreadable", file });
+    expect(logger.history).toContain(
+      `error [ConfigStore] Failed to read ${file}`,
+    );
+  });
+
+  it("keeps config.json and logs each save while another program holds it at start", async () => {
+    await saveOnDisk(STEP_1);
+    const store = createStore(busyFiles(1));
+
+    expect(await store.load()).toEqual({
+      contents: null,
+      problem: {
+        reason: "unreadable",
+        file: path.join(configFolder(), "config.json"),
+        message: BUSY,
+      },
+    });
+    server.saveConfig(STEP_2);
+
+    expect((await store.load()).contents).toBe(STEP_1);
+    expect(logger.history).toContain(
+      "warn [ConfigStore] Did not save the config",
+    );
+    expect(
+      server.sent.filter((e) => e.name === "MAIN->CLIENT::config-changed"),
+    ).toEqual([
+      { name: "MAIN->CLIENT::config-changed", payload: { contents: STEP_2 } },
+    ]);
+  });
+
+  it("saves again once a later read of config.json succeeds", async () => {
+    await saveOnDisk(STEP_1);
+    const store = createStore(busyFiles(1));
+
+    expect((await store.load()).problem).not.toBeNull();
+    expect(await store.load()).toEqual({ contents: STEP_1, problem: null });
+    server.saveConfig(STEP_2);
+
+    expect((await store.load()).contents).toBe(STEP_2);
   });
 });

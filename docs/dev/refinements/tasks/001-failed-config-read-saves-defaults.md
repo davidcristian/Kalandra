@@ -1,9 +1,9 @@
 # A failed read of config.json can replace the saved config with defaults
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** config
 **Origin:** [main/src/host-files/ConfigStore.ts](../../../../main/src/host-files/ConfigStore.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 This can break the hard rule in [AGENTS.md](../../../../AGENTS.md#the-one-hard-rule): a user's saved
 config must survive every update. `ConfigStore.load()` wraps `fs.readFile` in an empty `catch {}`
@@ -29,3 +29,6 @@ is described in [modules/config.md](../../modules/config.md).
 
 - 2026-10-18: Found while the config module doc was written, by reading `ConfigStore.load()`,
   `initConfig()` and the blur listener in `OverlayWindow.vue`. Not reproduced in a running app.
+- 2026-10-26: Done in `fix(main): keep config.json when a read of it fails`. `load()` returns
+  the read error as a `ConfigProblem`, saves are skipped until a later read succeeds, and the
+  start banner names the file. Checked with fakes; the running app on Windows is unchecked.

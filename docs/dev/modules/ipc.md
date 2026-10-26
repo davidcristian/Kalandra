@@ -80,8 +80,8 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - `UpdateInfo` is the updater's state, by `state`: `initial`, `checking-for-update`, `update-available` (with
   `version` and `noDownloadReason`: `not-supported`, `disabled-by-flag` or `null`), `update-downloaded` (with
   `version`), and `update-not-available` or `error` (with `checkedAt`).
-- `HostState` is the body of `GET /config`: `contents` (the text of `config.json`, or `null`), `version` and
-  `updater`.
+- `HostState` is the body of `GET /config`: `contents` (the text of `config.json`, or `null`), `configProblem`,
+  `version` and `updater`.
 - `ClientLogEvent` is the union of the entries the renderer's client log parser (`renderer/src/web/client-log/`)
   makes from `Client.txt` lines. Each has `ts`, `ms` and `type`: `GeneralLogEvent` (`log`, `game-start`),
   `LoadZoneEvent`, `LevelUpEvent`, `GameVersionEvent`, `AltTabEvent`, `NpcEvent`, `PlayerDeathEvent`,
@@ -111,6 +111,12 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   `HotkeyFailure`: `unknown-key` (a key name without an accelerator), `game-key` (a key the game uses) or `taken` (a
   key another program holds, found when the game window becomes active). A hotkey that two actions share is not
   listed, since the Settings window finds those in the config it edits.
+
+`config-problem.ts`:
+
+- `ConfigProblem` is the `configProblem` of `HostState`, kept out of `types.ts` for the same reason. It says why
+  `contents` is `null` although `config.json` exists: reason `unreadable` with the `file` path and the read error's
+  `message`.
 
 ## Invariants
 
@@ -143,10 +149,10 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates
   [client-log-parser.md](../../client-log-parser.md) in the same commit.
 
-**Dependencies.** None: `KeyToCode.ts`, `library.ts` and `hotkeys.ts` import nothing, and `types.ts` imports only
-`library.ts` and `hotkeys.ts`. main imports them in `server.ts`, `AppUpdater.ts`, `Shortcuts.ts`,
-`registrable-actions.ts`, `GameConfig.ts` and `FileWriter.ts`; the renderer in `IPC.ts`, `Config.ts`, `client-log/`,
-`HotkeyInput.vue`, `settings/hotkey-conflicts.ts` and `library/session.ts`.
+**Dependencies.** None: `KeyToCode.ts`, `library.ts`, `hotkeys.ts` and `config-problem.ts` import nothing, and
+`types.ts` imports only `library.ts`, `hotkeys.ts` and `config-problem.ts`. main imports them in `server.ts`,
+`AppUpdater.ts`, `Shortcuts.ts`, `registrable-actions.ts`, `GameConfig.ts`, `FileWriter.ts` and `ConfigStore.ts`;
+the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `HotkeyInput.vue`, `settings/hotkey-conflicts.ts` and `library/session.ts`.
 
 **Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
 `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes. The type checks are `npm
