@@ -14,11 +14,11 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 |  main/  the main process (Node.js)                           |
 |    shortcuts/   hotkeys, key presses, the clipboard          |
 |    windowing/   the overlay window over the game window      |
-|    host-files/  apt-data files, Client.txt, game config      |    +-- outside hosts, over HTTPS ----+
-|    vision/      OCR worker, Windows only                     |    | official trade sites:           |
-|    AppUpdater   updates from GitHub releases                 |    |   www.pathofexile.com and       |
-|    AppTray      the tray icon and its menu                   |    |   eight regional hosts          |
-|    server.ts    HTTP and WebSocket server on 127.0.0.1       |    | www.poeprices.info              |
+|    host-files/  apt-data files, Client.txt, game config      |
+|    vision/      OCR worker, Windows only                     |    +-- outside hosts, over HTTPS ----+
+|    AppUpdater   updates from GitHub releases                 |    | official trade sites:           |
+|    AppTray      the tray icon and its menu                   |    |   www.pathofexile.com and       |
+|    server.ts    HTTP and WebSocket server on 127.0.0.1       |    |   eight regional hosts          |
 |    proxy.ts     /proxy/<host>/... ---------------------------+--->| kalandra.ashoal.com/prices/     |
 |        ^                                                     |    +----------------^----------------+
 |        | /events WebSocket: IpcEvent messages, ipc/types.ts  |                     | hourly files

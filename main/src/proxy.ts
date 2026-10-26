@@ -15,7 +15,6 @@ const PROXY_HOSTS = [
   { host: "es.pathofexile.com", official: true },
   { host: "br.pathofexile.com", official: true },
   { host: "fr.pathofexile.com", official: true },
-  { host: "www.poeprices.info", official: false },
   // Kalandra's price files; poe.ninja asks apps to use their own backend
   { host: "kalandra.ashoal.com", official: false },
 ];

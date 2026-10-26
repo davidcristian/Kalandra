@@ -162,20 +162,17 @@ describe("the /proxy route", () => {
     expect(Object.keys(forwarded.headers)).not.toContain("cookie");
   });
 
-  it.each(["www.poeprices.info", "kalandra.ashoal.com"])(
-    "sends no cookies to %s, which is not a trade site",
-    async (host) => {
-      const reply = await get(port, `/proxy/${host}/api`, {
-        [PROXY_HEADER]: "1",
-        cookie: "POESESSID=page-copy",
-      });
+  it("sends no cookies to kalandra.ashoal.com, which is not a trade site", async () => {
+    const reply = await get(port, "/proxy/kalandra.ashoal.com/api", {
+      [PROXY_HEADER]: "1",
+      cookie: "POESESSID=page-copy",
+    });
 
-      const forwarded = JSON.parse(reply.body) as ForwardedRequest;
-      expect(forwarded.url).toBe(`https://${host}/api`);
-      expect(forwarded.useSessionCookies).toBe(false);
-      expect(Object.keys(forwarded.headers)).not.toContain("cookie");
-    },
-  );
+    const forwarded = JSON.parse(reply.body) as ForwardedRequest;
+    expect(forwarded.url).toBe("https://kalandra.ashoal.com/api");
+    expect(forwarded.useSessionCookies).toBe(false);
+    expect(Object.keys(forwarded.headers)).not.toContain("cookie");
+  });
 
   it("returns the response headers of the host without its Set-Cookie", async () => {
     const reply = await getHeaders(
@@ -207,6 +204,7 @@ describe("the /proxy route", () => {
 
   it.each([
     "evil.example",
+    "www.poeprices.info",
     "pathofexile.com",
     "www.pathofexile.com.evil.example",
     "www.pathofexile.com:443",

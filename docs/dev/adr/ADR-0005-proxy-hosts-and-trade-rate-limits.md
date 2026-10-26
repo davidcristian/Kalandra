@@ -1,6 +1,6 @@
 # ADR-0005: Other hosts only through the proxy list, trade searches through the rate limiters
 
-**Status:** Accepted (2026-10-22)
+**Status:** Accepted (2026-10-26)
 
 ## Context
 
@@ -29,8 +29,9 @@ sends requests to, apart from the item icons, so a new host appears in the diff.
 `electron-updater` in `main` checks the GitHub releases itself.
 
 **3. Adding a host is a reviewed change to that list.** `poe.ninja` is not in it: the app reads prices from Kalandra's
-own price service instead ([ADR-0006](ADR-0006-own-price-service.md)). Reason: each host on the list receives
-requests from every running copy of the app.
+own price service instead ([ADR-0006](ADR-0006-own-price-service.md)). `www.poeprices.info` was removed from it on
+2026-10-26: the site predicts prices for Path of Exile 1 items, nothing shows that it supports Path of Exile 2, and the
+app has no price prediction. Reason: each host on the list receives requests from every running copy of the app.
 
 **4. Every trade search, exchange and fetch waits on its rate limiter set.** `RATE_LIMIT_RULES` in
 `renderer/src/web/price-check/trade/common.ts` holds three sets, `SEARCH`, `EXCHANGE` and `FETCH`, each starting with

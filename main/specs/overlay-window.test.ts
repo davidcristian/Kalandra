@@ -272,7 +272,6 @@ describe("OverlayWindow", () => {
 
   it.each([
     ["http://www.pathofexile.com/trade2", "http://www.pathofexile.com"],
-    ["https://www.poeprices.info/api", "https://www.poeprices.info"],
     ["https://kalandra.ashoal.com/prices", "https://kalandra.ashoal.com"],
     [
       "https://www.pathofexile.com.evil.example/",

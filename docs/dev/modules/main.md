@@ -54,7 +54,7 @@ The entry, the server and the app services, in `main/src/`:
   `startServer()` passes the defaults as `fallback` and logs the error. `pageUrl(address)` returns the page's address
   for a browser: `localhost` for `127.0.0.1`, `0.0.0.0` and `::`, else the address, an IPv6 one in brackets.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade sites
-  (`official: true`), `www.poeprices.info` and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an
+  (`official: true`) and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an
   `https:` address on an official trade site. It returns 403 for a request without the `x-kalandra-proxy` header, which
   `Host.proxy()` sends and a page on another site cannot
   ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`, `origin`,

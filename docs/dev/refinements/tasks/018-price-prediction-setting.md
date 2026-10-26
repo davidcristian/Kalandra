@@ -1,6 +1,6 @@
 # Decide what happens to the poeprices price prediction setting
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/CheckedItem.vue](../../../../renderer/src/web/price-check/CheckedItem.vue)
 **Verified:** 2026-10-26
@@ -38,3 +38,8 @@ and ADR-0005 match it.
   no request.
 - 2026-10-26: The conversion check was added here from a FIXME comment in `requestPoeprices`,
   which was removed.
+- 2026-10-26: Done. The maintainer chose to remove the price prediction, since poeprices.info
+  serves Path of Exile 1 and nothing shows that it supports Path of Exile 2. The checkbox, its
+  `show_prediction` text, the `price-prediction/` folder and `requestPricePrediction` left the
+  renderer, and saved configs keep that key unread. `www.poeprices.info` left `PROXY_HOSTS` and
+  ADR-0005.
