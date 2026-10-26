@@ -103,7 +103,7 @@ The files, per language under `renderer/public/data/<lang>/`:
 | `items.ndjson` | one `BaseType` JSON object per line | `dataParser` |
 | `stats.ndjson` | one `Stat` per line: its `ref`, its matchers (the stat texts with `#` for each number) and its trade ids by modifier type, or `null` for a stat without any | `dataParser` |
 | `*.index.bin` | sorted pairs of a 32-bit FNV-1a hash and the start of a line in the `.ndjson` file, as a JavaScript string index | `npm run make-index-files` |
-| `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)). A translation has the placeholders, such as `{0}`, of the English text, which `specs/web/i18n-placeholders.test.ts` checks. `specs/web/i18n-keys.test.ts` checks that the English file defines each literal key that `src/` passes to `t()` and each key of a translation, apart from those [task 019](../refinements/tasks/019-ui-text-not-in-app-i18n.md) lists. It also checks that `src/` names each English key in a quoted string or builds it from a key prefix the test lists, apart from two keys kept for tasks 016 and 019. `specs/web/i18n-syntax.test.ts` checks that each file holds only texts and groups of texts, and that vue-i18n compiles each text, since `t()` throws on a syntax error such as an unclosed `{` | by hand |
+| `app_i18n.json` | the UI text, not game text; `en` is the source and a missing key falls back to English ([AGENTS.md](../../../AGENTS.md)). A translation has the placeholders, such as `{0}`, of the English text, which `specs/web/i18n-placeholders.test.ts` checks, with a test that the languages with a translation are those of the `language` setting other than `en`. `specs/web/i18n-keys.test.ts` checks that the English file defines each literal key that `src/` passes to `t()` and each key of a translation, apart from those [task 019](../refinements/tasks/019-ui-text-not-in-app-i18n.md) lists. It also checks that `src/` names each English key in a quoted string or builds it from a key prefix the test lists, apart from two keys kept for tasks 016 and 019. `specs/web/i18n-syntax.test.ts` checks that each file holds only texts and groups of texts, and that vue-i18n compiles each text, since `t()` throws on a syntax error such as an unclosed `{` | by hand |
 
 A lookup hashes its key with `@sindresorhus/fnv1a`, binary searches the index file, and parses the line that
 starts there. The item index files have one row per namespace and `refName`, so items that share a translated name
@@ -122,7 +122,6 @@ row with the key's hash in file order and returns the first stat whose `ref` is 
 `ko`, `ja`, `de`, `es`, `pt` and `fr`, the same nine as the `language` setting in `Config.ts`.
 It exits with code 1 and names the file and line of an `items.ndjson` record without `refName`, which the item
 indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
-`renderer/public/data/th/` has only `app_i18n.json`.
 
 ## Invariants
 

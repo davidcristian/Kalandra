@@ -11,7 +11,7 @@ When an item search fails with an error that starts with `Query is too complex.`
 such option: `settings-price-check.vue` renders no checkbox for it.
 [docs/complex-query.md](../../../complex-query.md) tells the reader that Kalandra has no such setting.
 
-The translations of `fix_complex_query` in seven other `app_i18n.json` files name the same setting.
+The translations of `fix_complex_query` in six other `app_i18n.json` files name the same setting.
 
 Done looks like: the English hint names only what works, signing in to the trade site in the
 built-in browser. The old translations of `fix_complex_query` are removed, so those languages show

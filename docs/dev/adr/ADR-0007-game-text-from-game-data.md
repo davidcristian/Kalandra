@@ -52,8 +52,8 @@ same data.
 - Text the app writes itself is not game data. The UI text is in `renderer/public/data/<lang>/app_i18n.json`, a new
   string goes into the English file first, and `renderer/src/web/i18n.ts` falls back to English for a key a language
   lacks. One setting, `language`, selects both the game data and the UI text (`renderer/src/main.ts`).
-  `renderer/public/data/th/` has only an `app_i18n.json`, and the **Language** list in Settings, General does not
-  offer Thai.
+  So a language has an `app_i18n.json` only when it has game data and the **Language** list in Settings, General
+  offers it.
 
 ## Alternatives rejected
 
