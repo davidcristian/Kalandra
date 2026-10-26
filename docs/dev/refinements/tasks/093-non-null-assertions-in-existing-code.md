@@ -31,3 +31,5 @@ count.
   of the rest there assert a filter's `roll`.
 - 2026-10-26: `updateConfig()` and `saveConfig()` in `web/Config.ts` dropped theirs. The rest of
   that file is in `upgradeConfig()` steps, which never change, and in `AppConfig()`.
+- 2026-10-26: The 16 in `web/client-log/client-log-parser.ts` were replaced by reading the named
+  groups of each match with optional chaining.

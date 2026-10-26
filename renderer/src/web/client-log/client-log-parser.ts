@@ -52,7 +52,7 @@ export function parseClientLogText(
   datetime: string,
   millis: number,
 ): ClientLogEvent {
-  let match: RegExpMatchArray | null;
+  let groups: Record<string, string> | undefined;
   let data: ClientLogEvent = {
     ts: Date.parse(datetime),
     ms: millis,
@@ -102,13 +102,13 @@ export function parseClientLogText(
       };
     }
   } else if (namespace === LogNamespace.Scene) {
-    if ((match = text.match(MAP_NAV_REGEX))) {
+    if ((groups = text.match(MAP_NAV_REGEX)?.groups)) {
       // Logged when the Map or Atlas panel opens or closes; the source is (null) on close
 
       data = {
         ...data,
         type: ClientLogInfoType.MapNav,
-        mapName: match.groups!.map_name,
+        mapName: groups.map_name,
       };
     }
   } else if (namespace === LogNamespace.None) {
@@ -124,34 +124,32 @@ export function parseClientLogText(
           type: ClientLogInfoType.Afk,
           isAfk: colonLess === AFK_MODE_ON,
         };
-      } else if ((match = colonLess.match(_$.LOG_LEVEL_UP))) {
+      } else if ((groups = colonLess.match(_$.LOG_LEVEL_UP)?.groups)) {
         // level up
 
         data = {
           ...data,
           type: ClientLogInfoType.LevelUp,
-          level: Number.parseInt(match.groups!.level, 10),
-          charName: match.groups!.char_name,
-          charClass: match.groups!.char_class,
+          level: Number.parseInt(groups.level, 10),
+          charName: groups.char_name,
+          charClass: groups.char_class,
         };
-      } else if ((match = colonLess.match(PERMANENT_BONUS_REGEX))) {
+      } else if ((groups = colonLess.match(PERMANENT_BONUS_REGEX)?.groups)) {
         // permanent bonus
         data = {
           ...data,
           type: ClientLogInfoType.PermanentBonus,
-          permanentBonus: match.groups!.bonus,
-          charName: match.groups!.char_name,
+          permanentBonus: groups.bonus,
+          charName: groups.char_name,
         };
-      } else if ((match = colonLess.match(SKILL_POINT_REGEX))) {
+      } else if ((groups = colonLess.match(SKILL_POINT_REGEX)?.groups)) {
         // Skill points
         const count =
-          match.groups!.points[0] === "a"
-            ? 1
-            : Number.parseInt(match.groups!.points, 10);
+          groups.points[0] === "a" ? 1 : Number.parseInt(groups.points, 10);
 
         let pointType: SkillPointEvent["pointType"];
 
-        switch (match.groups!.point_type) {
+        switch (groups.point_type) {
           case "Atlas":
             pointType = "atlas";
             break;
@@ -191,11 +189,11 @@ export function parseClientLogText(
           points: count,
           pointType,
         };
-      } else if ((match = text.match(SLAIN_REGEX))) {
+      } else if ((groups = text.match(SLAIN_REGEX)?.groups)) {
         data = {
           ...data,
           type: ClientLogInfoType.PlayerDeath,
-          charName: match.groups!.char_name,
+          charName: groups.char_name,
         };
       }
     } else if (text[0] === "#") {
@@ -206,27 +204,27 @@ export function parseClientLogText(
       // some guild message
     } else if (text[0] === "$") {
       // some trade message
-    } else if ((match = text.match(_$.LOG_ZONE_GEN))) {
+    } else if ((groups = text.match(_$.LOG_ZONE_GEN)?.groups)) {
       // zone load
 
-      const zone = match.groups!.zone.toLowerCase();
+      const zone = groups.zone.toLowerCase();
 
       data = {
         ...data,
         type: ClientLogInfoType.LoadZone,
         zone: zone,
-        areaLevel: Number.parseInt(match.groups!.area_level, 10),
-        seed: Number.parseInt(match.groups!.seed, 10),
+        areaLevel: Number.parseInt(groups.area_level, 10),
+        seed: Number.parseInt(groups.seed, 10),
       };
-    } else if ((match = text.match(PASSIVE_SKILL_REGEX_REF))) {
+    } else if ((groups = text.match(PASSIVE_SKILL_REGEX_REF)?.groups)) {
       // passive point spend/refund
 
       data = {
         ...data,
         type: ClientLogInfoType.PassiveTree,
-        allocate: match.groups!.direction === "allocated",
-        nodeId: match.groups!.node_id,
-        nodeName: match.groups!.node_name,
+        allocate: groups.direction === "allocated",
+        nodeId: groups.node_id,
+        nodeName: groups.node_name,
       };
     } else {
       // either normal log with no namespace, or some npc/local chat message
