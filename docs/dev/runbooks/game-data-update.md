@@ -133,6 +133,7 @@ On 18 Oct 2026 the last two print 445 and 16.
 | `KeyError` from `use_game_store` in `src/services/client_strings_builder.py` | the patch renamed or removed a `ClientStrings` id the tool reads | find the entry with that id in `src/constants/client_string_data.py` and change it to the new id |
 | `ValueError: No data found for <file>` or `No descriptions found for <file>` | a stat description file is empty or has no `description` block | run the export again; if the file stays empty, stop and ask the maintainer |
 | `Unexpected status code` or `Retry limit exceeded` during step 3 | a lookup got a status other than 200 or 429, or got 429 three times; the error ends the run, and the cache is saved only at the end of the English build, so the lookups before the error are lost | stop; check `SEARCH_URL`, and do not retry in a loop, since the trade site bans clients that exceed its limits |
+| `<file> (<n> KB) exceeds 2048 KB.` from `check for added large files` when committing | a data file grew past the limit of that pre-commit hook, which checks every new or changed file; the largest, `ru/items.ndjson`, was 1738 KB on 26 Oct 2026 | stop and ask the maintainer whether to raise `--maxkb` in `.pre-commit-config.yaml` |
 | a parser test fails in step 7 | the new data changed a line the parser reads | fix the generator, or add the client string the parser needs; never edit the generated file |
 
 Each build shows a progress bar over the items. In an image mode other than `noLookup`, each lookup waits for the

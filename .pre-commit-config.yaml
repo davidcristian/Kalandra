@@ -8,7 +8,8 @@ repos:
     -   id: end-of-file-fixer
     -   id: check-yaml
     -   id: check-added-large-files
-        args: ['--maxkb=2048']
+        # --enforce-all also checks files already in git, such as a regenerated items.ndjson.
+        args: ['--maxkb=2048', '--enforce-all']
 -   repo: local
     hooks:
     -   id: check-version-consistency
