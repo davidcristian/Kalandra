@@ -94,6 +94,8 @@ export default {
   WAYSTONE_RARE_MONSTERS: 'Monstruos raros: ',
   WAYSTONE_DROP_CHANCE: 'Probabilidad de que caigan piedras guía: ',
   WAYSTONE_RARITY: 'Rareza de objetos: ',
+  WAYSTONE_TIER: 'Grado de la piedra guía',
+  MARTIAL_WEAPON: 'Arma marcial',
   WAYSTONE_MONSTER_RARITY: 'Rareza de los monstruos: ',
   WAYSTONE_EFFECTIVENESS: 'Efectividad de los monstruos: ',
   DOUBLE_CORRUPTED: 'Doblemente corrupto',

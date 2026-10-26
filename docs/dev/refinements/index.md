@@ -164,3 +164,4 @@ layout and its reasons.
 - 100: [No test covers getConfigForHost](tasks/100-host-config-tests.md)
 - 101: [The clipboard restore after a stash search can come before the game pastes](tasks/101-clipboard-restore-before-stash-search.md)
 - 102: [Traditional Chinese stat refs and the random keystone stat still differ from English](tasks/102-stat-refs-left-after-english-stat-list.md)
+- 103: [The default Map rolling search "Burning Ground" names no Waystone modifier of the game data](tasks/103-burning-ground-search.md)

@@ -28,8 +28,9 @@ say:
 - The game matches a search against the item text in the language it runs in. So the English
   searches of `Map rolling` and `Dump sorting` match nothing with the game in another language,
   while the searches that follow Settings, General, Language match the items of a game in that
-  language: the first search of a new widget, and `Currency`, `"Rarity: Normal"` and
-  `"Number of Trials:"` of `Dump sorting` (`entrySearchText` in
+  language: the first search of a new widget, and `Currency`, `"Martial Weapon"`,
+  `"Waystone Tier"`, `"Rarity: Normal"` and `"Number of Trials:"` of `Dump sorting`
+  (`entrySearchText` in
   `renderer/src/web/stash-search/presets.ts`). In English, `"Number of Trials:"` finds the items
   that the earlier search `Trials:` found.
 
@@ -57,3 +58,5 @@ History line.
   decides whether the English presets and the search of a new widget match in another language.
 - 2026-10-26: Three `Dump sorting` searches now take their text from the game data of the Language
   setting, and the last one changed from `Trials:` to `"Number of Trials:"`.
+- 2026-10-26: `"Martial Weapon"` and `"Waystone Tier"` of `Dump sorting` now take their text from
+  the game data of the Language setting too, such as `Kampfwaffe` and `Wegsteinlevel` in German.

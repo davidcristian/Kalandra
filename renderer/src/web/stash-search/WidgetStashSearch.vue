@@ -83,9 +83,21 @@ export default {
               hotkey: null,
               preset: "currency",
             },
-            { id: 2, name: "", text: '"Martial Weapon"', hotkey: null },
+            {
+              id: 2,
+              name: "",
+              text: '"Martial Weapon"',
+              hotkey: null,
+              preset: "martial-weapon",
+            },
             { id: 3, name: "", text: "Jewel", hotkey: null },
-            { id: 4, name: "", text: '"Waystone Tier"', hotkey: null },
+            {
+              id: 4,
+              name: "",
+              text: '"Waystone Tier"',
+              hotkey: null,
+              preset: "waystone-tier",
+            },
             {
               id: 5,
               name: "",

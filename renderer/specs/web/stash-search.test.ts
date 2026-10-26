@@ -8,6 +8,7 @@ import {
 import WidgetStashSearch from "@/web/stash-search/WidgetStashSearch.vue";
 import { widgetComponent } from "@/web/overlay/widget-component";
 import {
+  ENGLISH_DEFAULTS_40,
   entrySearchText,
   namePresetEntries,
   searchKeyword,
@@ -30,6 +31,8 @@ const PRESETS: StashSearchPreset[] = [
   "currency",
   "normal-rarity",
   "trial-count",
+  "waystone-tier",
+  "martial-weapon",
 ];
 
 describe("the searches of a new stash search widget", () => {
@@ -49,9 +52,36 @@ describe("the searches of a new stash search widget", () => {
 
 describe("the preset searches", () => {
   it.each([
-    ["en", ["Currency", '"Rarity: Normal"', '"Number of Trials:"']],
-    ["de", ["Währung", '"Seltenheit: Normal"', '"Anzahl der Prüfungen:"']],
-    ["ko", ["화폐", '"아이템 희귀도: 일반"', '"시련 수:"']],
+    [
+      "en",
+      [
+        "Currency",
+        '"Rarity: Normal"',
+        '"Number of Trials:"',
+        '"Waystone Tier"',
+        '"Martial Weapon"',
+      ],
+    ],
+    [
+      "de",
+      [
+        "Währung",
+        '"Seltenheit: Normal"',
+        '"Anzahl der Prüfungen:"',
+        "Wegsteinlevel",
+        "Kampfwaffe",
+      ],
+    ],
+    [
+      "ko",
+      [
+        "화폐",
+        '"아이템 희귀도: 일반"',
+        '"시련 수:"',
+        '"경로석 등급"',
+        '"무도 무기"',
+      ],
+    ],
   ])("search the game text of the %s game data", async (lang, texts) => {
     await init(lang);
 
@@ -60,7 +90,7 @@ describe("the preset searches", () => {
     ).toEqual(texts);
   });
 
-  it("give the default Dump sorting widget the game text of three searches", async () => {
+  it("give the default Dump sorting widget the game text of five searches", async () => {
     await init("de");
     const spec = widgetComponent(WidgetStashSearch).widget;
     const widgets = (("defaultInstances" in spec &&
@@ -70,9 +100,9 @@ describe("the preset searches", () => {
 
     expect(dumpSorting?.entries.map(entrySearchText)).toEqual([
       "Währung",
-      '"Martial Weapon"',
+      "Kampfwaffe",
       "Jewel",
-      '"Waystone Tier"',
+      "Wegsteinlevel",
       '"Seltenheit: Normal"',
       '"Anzahl der Prüfungen:"',
     ]);
@@ -169,5 +199,33 @@ describe("namePresetEntries", () => {
     ]);
     expect(kept.preset).toBe("currency");
     expect(notes.entries[0]).not.toHaveProperty("preset");
+  });
+
+  it("names only the texts of the defaults it is given", () => {
+    const dumpSorting = {
+      wmType: "stash-search",
+      entries: entries([
+        "Currency",
+        '"Martial Weapon"',
+        "Jewel",
+        '"Waystone Tier"',
+        "Kampfwaffe",
+      ]),
+    };
+    const kept = { ...presetEntry("currency", '"Waystone Tier"') };
+
+    namePresetEntries(
+      { widgets: [dumpSorting, { wmType: "stash-search", entries: [kept] }] },
+      ENGLISH_DEFAULTS_40,
+    );
+
+    expect(dumpSorting.entries.map((e) => "preset" in e && e.preset)).toEqual([
+      false,
+      "martial-weapon",
+      false,
+      "waystone-tier",
+      false,
+    ]);
+    expect(kept.preset).toBe("currency");
   });
 });

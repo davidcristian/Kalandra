@@ -14,11 +14,12 @@ Kalandra includes two Stash search widgets, `Map rolling` and `Dump sorting`. Op
 default) and click one of them in the main button bar to show it. [Widgets](/widgets) explains the overlay and the
 `hide`, `edit`, `move` and `delete` buttons.
 
-Three searches of `Dump sorting` follow the **Language** setting in Settings, `General`: Kalandra takes their text
-from the game data of that language. They are `Currency`, `"Rarity: Normal"` and `"Number of Trials:"` in English,
-and `Währung`, `"Seltenheit: Normal"` and `"Anzahl der Prüfungen:"` in German. The other searches of both widgets
-are English text, written for a game client in English. With the game in another language, edit them to the words
-that its item text shows, as [Change the searches](#change-the-searches) explains.
+Five searches of `Dump sorting` follow the **Language** setting in Settings, `General`: Kalandra takes their text
+from the game data of that language. They are `Currency`, `"Martial Weapon"`, `"Waystone Tier"`,
+`"Rarity: Normal"` and `"Number of Trials:"` in English, and `Währung`, `Kampfwaffe`, `Wegsteinlevel`,
+`"Seltenheit: Normal"` and `"Anzahl der Prüfungen:"` in German. The game data has no text for `Jewel` and the four
+searches of `Map rolling`, so they are English text, written for a game client in English. With the game in another
+language, edit them to the words that its item text shows, as [Change the searches](#change-the-searches) explains.
 
 To add another Stash search widget, hover over the three dots in the main button bar and click `Stash search`. A new
 widget has no title, shows `Untitled`, and starts with one search: the name of the Currency rarity in the language of

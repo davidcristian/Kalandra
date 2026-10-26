@@ -185,6 +185,8 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ),
     ClientString("WAYSTONE_DROP_CHANCE", ["ItemDisplayMapWaystoneDropChance"], "{0}: "),
     ClientString("WAYSTONE_RARITY", ["ItemDisplayMapItemRarity"], "{0}: "),
+    ClientString("WAYSTONE_TIER", ["ItemDisplayMapTier"]),
+    ClientString("MARTIAL_WEAPON", ["SoulCoreCategoryWeapons"]),
     ClientString("DOUBLE_CORRUPTED", ["ItemPopupDoubleCorrupted"]),
     ClientString("VAAL_UNIQUE_MODIFIER", ["ModDescriptionLineVaalUnique"]),
     ClientString("TRIAL_COUNT", ["ItemDisplaySanctumFloors"], "{0}: "),

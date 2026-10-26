@@ -1,6 +1,6 @@
 # The preset Stash search widgets search English text
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** renderer
 **Origin:** [renderer/src/web/stash-search/WidgetStashSearch.vue](../../../../renderer/src/web/stash-search/WidgetStashSearch.vue)
 **Verified:** 2026-10-26
@@ -65,3 +65,8 @@ language.
 - 2026-10-26: Presets that follow the game language added for the three searches whose game text
   the committed client strings have; an entry the user edits keeps its text. The two client strings
   and their lines were read from the game export, and wait for the maintainer's go-ahead.
+- 2026-10-26: Done by fix(data): take two more stash search presets from the game data.
+  The two entries wrote the lines in the table above, and the `< 40` step names the saved defaults.
+  `Jewel` and the four Map rolling searches stay English, since the game data has no text for
+  them, and docs/stash-search.md says so. `"Burning Ground"` matches no stat text:
+  [103](103-burning-ground-search.md).

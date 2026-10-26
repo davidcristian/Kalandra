@@ -212,6 +212,8 @@ export interface TranslationDict {
   WAYSTONE_RARITY: string;
   WAYSTONE_MONSTER_RARITY: string;
   WAYSTONE_EFFECTIVENESS: string;
+  WAYSTONE_TIER: string;
+  MARTIAL_WEAPON: string;
   TIMELESS_RADIUS: string;
   TIMELESS_SMALL_PASSIVES: string;
   TIMELESS_NOTABLE_PASSIVES: string;

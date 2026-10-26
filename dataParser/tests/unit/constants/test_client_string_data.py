@@ -51,6 +51,7 @@ ENGLISH_WAYSTONE_CLIENT_STRINGS = {
     "ItemDisplayMapRareMonsterQuantityBonus": "Rare Monsters",
     "ItemDisplayMapWaystoneDropChance": "Waystone Drop Chance",
     "ItemDisplayMapItemRarity": "[ItemRarity|Item Rarity]",
+    "ItemDisplayMapTier": "Waystone Tier",
 }
 
 
@@ -69,6 +70,7 @@ def test_waystone_client_strings_read_the_ids_of_the_current_game():
         "WAYSTONE_RARE_MONSTERS": "Rare Monsters: ",
         "WAYSTONE_DROP_CHANCE": "Waystone Drop Chance: ",
         "WAYSTONE_RARITY": "Item Rarity: ",
+        "WAYSTONE_TIER": "Waystone Tier",
     }
 
 
@@ -87,6 +89,24 @@ def test_runic_ward_reads_the_armour_label_of_each_language(
 
     assert (
         runic_ward.value({"ItemDisplayArmourWard": game_text}.__getitem__, lang)
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    ("lang", "game_text", "expected"),
+    [
+        (ENGLISH, "[MartialWeapon|Martial Weapon]", "Martial Weapon"),
+        (GERMAN, "[MartialWeapon|Kampfwaffe]", "Kampfwaffe"),
+    ],
+)
+def test_martial_weapon_reads_the_soul_core_weapon_category(
+    lang: LANG, game_text: str, expected: str
+):
+    (martial,) = [s for s in CLIENT_STRING_KEY_VALUES if s.my_key == "MARTIAL_WEAPON"]
+
+    assert (
+        martial.value({"SoulCoreCategoryWeapons": game_text}.__getitem__, lang)
         == expected
     )
 

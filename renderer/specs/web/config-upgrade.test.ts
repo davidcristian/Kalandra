@@ -222,9 +222,9 @@ describe("upgradeConfig", () => {
 
     expect(entries("Dump sorting").map((e) => e.preset ?? null)).toEqual([
       "currency",
+      "martial-weapon",
       null,
-      null,
-      null,
+      "waystone-tier",
       "normal-rarity",
       "trial-count",
     ]);
@@ -236,6 +236,36 @@ describe("upgradeConfig", () => {
       null,
       null,
       null,
+    ]);
+  });
+
+  it("names the Martial Weapon and Waystone Tier searches only in the < 40 step", () => {
+    const config = readSaved(36);
+    const presets = (saved: Config) =>
+      (
+        saved.widgets.find(
+          (w) => w.wmTitle === "Dump sorting",
+        ) as StashSearchWidget
+      ).entries.map((e) => e.preset ?? null);
+
+    runSteps(config, 39);
+
+    expect(config.configVersion).toBe(39);
+    expect(presets(config)).toEqual([
+      "currency",
+      null,
+      null,
+      null,
+      "normal-rarity",
+      "trial-count",
+    ]);
+    expect(presets(upgrade(config))).toEqual([
+      "currency",
+      "martial-weapon",
+      null,
+      "waystone-tier",
+      "normal-rarity",
+      "trial-count",
     ]);
   });
 

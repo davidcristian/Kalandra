@@ -94,6 +94,8 @@ export default {
   WAYSTONE_RARE_MONSTERS: 'Rare Monsters: ',
   WAYSTONE_DROP_CHANCE: 'Waystone Drop Chance: ',
   WAYSTONE_RARITY: 'Item Rarity: ',
+  WAYSTONE_TIER: 'Waystone Tier',
+  MARTIAL_WEAPON: 'Martial Weapon',
   WAYSTONE_MONSTER_RARITY: 'Monster Rarity: ',
   WAYSTONE_EFFECTIVENESS: 'Monster Effectiveness: ',
   DOUBLE_CORRUPTED: 'Twice Corrupted',
