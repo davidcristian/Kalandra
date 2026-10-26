@@ -47,7 +47,7 @@ contract, its invariants, its dependencies and its tests:
 | [price-service.md](modules/price-service.md) | `priceService/`: the files each cycle writes, the price file format and why its key order is a format, `namespaceMap.json`, the environment variables, its requests to poe.ninja, and the app side |
 | [renderer-parser.md](modules/renderer-parser.md) | `renderer/src/parser/` and `renderer/src/assets/data/`: `parseClipboard()` and `ParsedItem`, the parser files, and how the game data and its index files are loaded and searched |
 | [renderer-price-check.md](modules/renderer-price-check.md) | `renderer/src/web/price-check/` with `Prices.ts`, `price-source.ts` and `Leagues.ts`: the window and its hotkeys, the filters, the trade queries and rate limiters, and the price estimates |
-| [scripts.md](modules/scripts.md) | `scripts/`: `check.py`, which runs every check in AGENTS.md that a machine can run, and the line, dash and prose checks: what each one reads, reports and skips, and their tests |
+| [scripts.md](modules/scripts.md) | `scripts/`: `check.py`, which runs every check in AGENTS.md that a machine can run, the line, dash and prose checks, `linkcheck.py` and `backlogcheck.py` for the developer docs, `versioncheck.py`, `allowscripts.py`, `commitlint.py` for commit messages, and `ci_paths.py`, which picks the CI jobs a change affects: what each one reads, reports and skips, and their tests |
 | [renderer-widgets.md](modules/renderer-widgets.md) | `renderer/src/web/overlay/`: the `Widget` type and its flags, `WidgetSpec`, the registry, the window manager, every registered widget, and the steps to add one |
 
 ## Runbooks
