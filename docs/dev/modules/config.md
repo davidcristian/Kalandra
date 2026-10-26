@@ -56,11 +56,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
   version has, with the next free `wmId`, and logs `[config] Added the default widgets that the saved config
   lacks:` and their types to the console. A widget that a later step adds, such as the library to a config before
-  version 30, is left to that step. With a file that is not JSON it uses
-  `defaultConfig()` and calls `saveConfig({ isTemporary: true })` to make main write `config.json.tmp` and keep
-  the broken file. That save fails: `renderer/src/main.ts` calls `initConfig()` before `Host.init()` opens the
-  WebSocket, so `Host.sendEvent()` throws, and the page shows the start error
-  ([architecture.md](../architecture.md#the-game-data-from-patch-to-parser)) instead of mounting.
+  version 30, is left to that step. main sends only a JSON object, so `initConfig()` parses the text without a
+  check.
 - `AppConfig()` returns the current config, and `AppConfig<T>(type)` returns the first widget config whose
   `wmType` is `type`. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
   in place. The settings window edits a deep copy and applies it on Save
@@ -73,9 +70,8 @@ old one and keep that file, so a saved config must survive every update: this is
 - `updateConfig(config)` replaces the current config with a deep copy and sets the page's root font size from
   `fontSize`. `validFontSize()` in `settings/font-size.ts` first limits `fontSize` to 10 to 40 px, and replaces a
   value that is not a number, such as text an older Settings field saved, with 16.
-- `saveConfig(opts?)` sends `CLIENT->MAIN::save-config` with `JSON.stringify(AppConfig())` when the config differs
-  from the last one sent or received, and does nothing while an exclusive widget is shown. `opts.isTemporary` makes
-  main write `config.json.tmp`.
+- `saveConfig()` sends `CLIENT->MAIN::save-config` with `JSON.stringify(AppConfig())` when the config differs
+  from the last one sent or received, and does nothing while an exclusive widget is shown.
 - `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with `getConfigForHost()`, which builds the
   `HostConfig` main reads: every hotkey as a `ShortcutAction`, and the settings main uses. `shortcutActions(config)`
   in `shortcut-actions.ts` builds the hotkey list from any config, so the Settings window can check its edited copy.
@@ -103,14 +99,17 @@ old one and keep that file, so a saved config must survive every update: this is
   defaults, never replaces the file. `server.ts` returns both in `HostState` from `GET /config`. On
   `CLIENT->MAIN::save-config` it sends the text to every client as `MAIN->CLIENT::config-changed` at once and
   queues the write. Reads and writes of the file run one at a time in the order they arrive, so the last save is
-  the one on disk, and `load()` returns the text of a save that is still being written. The first temporary save
-  switches the path to `config.json.tmp` for the rest of the run, so a file that did not parse stays as it was. It
+  the one on disk, and `load()` returns the text of a save that is still being written. A file that is not a JSON
+  object, such as one cut short or emptied, moves to `config-broken-<time>.json` beside it, with `warn
+  [ConfigStore] <path> is not JSON, so it was moved to <backup>` in the log, and `load()` returns `null` and a
+  `ConfigProblem` with reason `not-json` and the `backup` path. The page then starts from the defaults, and its
+  first save writes a new `config.json`. A move that fails is handled as a read error. It
   creates `apt-data` when it is missing. A write goes to the file's name with `.new` added, is flushed to disk and
   is renamed over the file, so a crash or a power loss during a save leaves the previous file whole. Windows fails
   a rename over a file that another program has open, so the rename is tried again for up to 750 ms. When the
   write or the rename fails, the file stays as it was, `error [ConfigStore] Failed to save the config: <message>`
   goes to the log and the app keeps running; the next save writes the whole config to the `.new` file again. In
-  development (`VITE_DEV_SERVER_URL` is set) it writes nothing.
+  development (`VITE_DEV_SERVER_URL` is set) it writes no save.
 
 ## Invariants
 
@@ -144,7 +143,8 @@ old one and keep that file, so a saved config must survive every update: this is
 - A saved config with a higher `configVersion` than the app's, from a newer version, runs no step, only the code
   between the `< 21` and `< 22` steps, and is used as it is. Nothing compares the stored `configVersion` with the
   app's ([refinement 004](../refinements/tasks/004-older-version-uses-newer-config.md)).
-- main never parses the config: it stores the text and reads only `HostConfig`. A setting main needs goes through
+- main reads no setting from the config: it parses the text only to check that it is a JSON object, stores it,
+  and reads only `HostConfig`. A setting main needs goes through
   `getConfigForHost()` into `HostConfig` ([ipc.md](ipc.md)).
 - No `config.json` is committed to the repo ([AGENTS.md](../../../AGENTS.md#safety)).
 
@@ -177,8 +177,8 @@ on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and `trade-host.test.ts` beside it
 the host `tradeHost()` returns for each language and realm. `main/specs/ConfigStore.test.ts` checks
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
-that fails while another program has the file open, with the log line of each failed save, the temporary save, a
-run in development, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
+that fails while another program has the file open, with the log line of each failed save, a
+run in development, a `config.json` that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
 replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET /config` after a
 `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()` keeps the
 `ConfigProblem`.

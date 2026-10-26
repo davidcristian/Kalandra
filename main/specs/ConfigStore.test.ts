@@ -34,10 +34,9 @@ class FakeServer implements ServerEvents {
     this.sent.push(event);
   };
 
-  saveConfig(contents: string, isTemporary = false) {
+  saveConfig(contents: string) {
     const payload: IpcEventPayload<"CLIENT->MAIN::save-config"> = {
       contents,
-      isTemporary,
     };
     this.bus.emit("CLIENT->MAIN::save-config", payload);
   }
@@ -105,6 +104,14 @@ function busyFiles(failures: number): ConfigFiles {
     },
     rename: fs.rename,
   };
+}
+
+/** Returns the name of the one backup that a config.json that is not JSON was moved to. */
+async function brokenBackup(): Promise<string> {
+  const names = await fs.readdir(configFolder());
+  const backups = names.filter((name) => /^config-broken-.+\.json$/.test(name));
+  expect(backups).toHaveLength(1);
+  return backups[0];
 }
 
 function configFolder() {
@@ -244,17 +251,48 @@ describe("ConfigStore", () => {
     expect(logger.history).toContain("EPERM: operation not permitted, rename");
   });
 
-  it("writes a temporary save and every later save to config.json.tmp, and leaves config.json as it was", async () => {
+  it.each(["a config that is not JSON", "", "null", "[1]"])(
+    "moves a config.json of %j to a backup, logs its path and saves a new config.json",
+    async (text) => {
+      await saveOnDisk(text);
+      const store = createStore();
+
+      const { contents, problem } = await store.load();
+
+      expect(contents).toBeNull();
+      const backup = await brokenBackup();
+      expect(problem).toEqual({
+        reason: "not-json",
+        file: path.join(configFolder(), "config.json"),
+        backup: path.join(configFolder(), backup),
+      });
+      expect(await readOnDisk(backup)).toBe(text);
+      expect(logger.history).toContain(
+        `so it was moved to ${path.join(configFolder(), backup)}`,
+      );
+      server.saveConfig(STEP_1);
+      expect((await store.load()).contents).toBe(STEP_1);
+      expect((await fs.readdir(configFolder())).sort()).toEqual([
+        backup,
+        "config.json",
+      ]);
+    },
+  );
+
+  it("keeps a config.json that is not JSON and saves nothing when moving it fails", async () => {
     await saveOnDisk("a config that is not JSON");
-    const store = createStore();
+    const store = createStore(lockedFiles(Infinity));
 
-    server.saveConfig(STEP_1, true);
-    expect((await store.load()).contents).toBe(STEP_1);
-    server.saveConfig(STEP_2);
-    expect((await store.load()).contents).toBe(STEP_2);
+    const { problem } = await store.load();
+    server.saveConfig(STEP_1);
 
+    expect(problem).toMatchObject({ reason: "unreadable" });
+    expect((await store.load()).contents).toBeNull();
+    expect(await fs.readdir(configFolder())).toEqual(["config.json"]);
     expect(await readOnDisk("config.json")).toBe("a config that is not JSON");
-    expect(await readOnDisk("config.json.tmp")).toBe(STEP_2);
+    expect(logger.history).toContain(
+      "warn [ConfigStore] Did not save the config",
+    );
   });
 
   it("writes nothing in development, where Vite serves the page", async () => {

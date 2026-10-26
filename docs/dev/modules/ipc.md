@@ -24,7 +24,7 @@ type check covers the files it imports. The routes that move the messages are in
 
 | Event | Payload | Sent by | Handled by |
 | --- | --- | --- | --- |
-| `CLIENT->MAIN::save-config` | `contents`, `isTemporary` | `saveConfig()` in `Config.ts` | `ConfigStore` |
+| `CLIENT->MAIN::save-config` | `contents` | `saveConfig()` in `Config.ts` | `ConfigStore` |
 | `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus; `server.ts`, for the one client left after a close | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
@@ -116,7 +116,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 
 - `ConfigProblem` is the `configProblem` of `HostState`, kept out of `types.ts` for the same reason. It says why
   `contents` is `null` although `config.json` exists: reason `unreadable` with the `file` path and the read error's
-  `message`.
+  `message`, or reason `not-json` with the `file` path and the `backup` path main moved the file to.
 
 ## Invariants
 

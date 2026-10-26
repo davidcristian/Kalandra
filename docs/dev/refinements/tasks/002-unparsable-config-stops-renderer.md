@@ -1,9 +1,9 @@
 # A config.json that is not valid JSON stops the renderer from starting
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** config
 **Origin:** [renderer/src/web/Config.ts](../../../../renderer/src/web/Config.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-26
 
 When `JSON.parse` fails on the contents of `config.json`, the `catch` block in `initConfig()` applies
 `defaultConfig()` and calls `saveConfig({ isTemporary: true })`. That save is meant to make main
@@ -29,3 +29,7 @@ contents that do not parse checks that the app mounts with the defaults and that
   page shows no message. The save still fails.
 - 2026-10-22: The commented-out `dialog.showErrorBox` after the `return` of the `catch` block was
   deleted. Its message described the case in [004](004-older-version-uses-newer-config.md).
+- 2026-10-26: Done in `fix(main): move a config.json that is not json to a backup`. main moves
+  the file to `config-broken-<time>.json`, logs both paths and names them in the start banner, so
+  the renderer never parses such text, and the temporary save was removed. Checked with fakes;
+  the running app on Windows is unchecked.

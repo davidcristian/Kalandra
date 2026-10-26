@@ -33,7 +33,7 @@ export function updateConfig(updates: Config) {
   document.documentElement.style.fontSize = `${config.fontSize}px`;
 }
 
-export function saveConfig(opts?: { isTemporary: boolean }) {
+export function saveConfig() {
   if (!_config.value) return;
   const rawConfig = toRaw(_config.value);
   if (
@@ -48,10 +48,7 @@ export function saveConfig(opts?: { isTemporary: boolean }) {
     _lastSavedConfig = JSON.parse(JSON.stringify(rawConfig));
     Host.sendEvent({
       name: "CLIENT->MAIN::save-config",
-      payload: {
-        contents: JSON.stringify(AppConfig()),
-        isTemporary: opts?.isTemporary ?? false,
-      },
+      payload: { contents: JSON.stringify(AppConfig()) },
     });
   }
 }
@@ -75,15 +72,8 @@ export async function initConfig() {
     return;
   }
 
-  let config: Config;
-  try {
-    config = JSON.parse(contents);
-  } catch {
-    updateConfig(defaultConfig());
-    saveConfig({ isTemporary: true });
-    return;
-  }
-
+  // main sends only a JSON object, and moves a file that is not one aside
+  const config: Config = JSON.parse(contents);
   addMissingWidgets(config, defaultConfig().widgets);
   updateConfig(upgradeConfig(config));
 }

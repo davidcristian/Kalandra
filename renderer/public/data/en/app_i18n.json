@@ -2,6 +2,7 @@
   "please_wait": "Please wait…",
   "choose_file": "Choose File",
   "app_is_ready": "Is ready and running in background",
+  "config_not_json": "Your settings file {0} was not valid JSON. Kalandra kept it as {1} and started with the default settings.",
   "config_unreadable": "Kalandra could not read your settings file {0} ({1}) and started with the default settings. It does not save settings until a restart reads the file.",
   "reopen_settings": "Press {0} to continue editing.",
   "seconds": "seconds",

@@ -92,6 +92,11 @@ When Kalandra cannot read `config.json` at start, for example because another pr
 the default settings and names the file and the reason in the log and in the banner it shows when it finds the game
 window. It then saves no settings, so your file stays as it was. Restart Kalandra to load your settings again.
 
+When `config.json` is not valid JSON, for example after an edit by hand went wrong, Kalandra renames it to
+`config-broken-<date and time>.json` in the same folder and starts with the default settings. It never deletes that
+file, and it names it in the log and in the same banner. To get your settings back, quit Kalandra, fix the JSON in
+that file and rename it to `config.json`.
+
 ## Moving from Exiled Exchange 2
 
 Kalandra installs beside Exiled Exchange 2 and keeps its settings in its own folder. To copy your Exiled Exchange 2

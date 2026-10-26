@@ -156,7 +156,6 @@ type IpcSaveConfig = Event<
   "CLIENT->MAIN::save-config",
   {
     contents: string;
-    isTemporary: boolean;
   }
 >;
 

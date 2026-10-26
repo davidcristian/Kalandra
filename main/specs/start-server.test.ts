@@ -139,7 +139,7 @@ describe("startServer", () => {
     const contents = JSON.stringify({ configVersion: 1, fontSize: 16 });
     const save: IpcEvent = {
       name: "CLIENT->MAIN::save-config",
-      payload: { contents, isTemporary: false },
+      payload: { contents },
     };
     await sendMessages([JSON.stringify(save)]);
 
@@ -199,7 +199,7 @@ describe("a message main cannot use", () => {
   it("is logged when its handler throws, and the next event is handled", async () => {
     const event: IpcEvent = {
       name: "CLIENT->MAIN::save-config",
-      payload: { contents: "{}", isTemporary: false },
+      payload: { contents: "{}" },
     };
     expect(await logLinesFor(JSON.stringify(event))).toContain(
       "error [server] Handling CLIENT->MAIN::save-config failed: the handler failed",

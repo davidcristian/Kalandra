@@ -29,6 +29,9 @@ const notice = shallowRef<string | null>(null);
 let noticeShown = false;
 
 function configNotice(problem: ConfigProblem): string {
+  if (problem.reason === "not-json") {
+    return t("config_not_json", [problem.file, problem.backup]);
+  }
   return t("config_unreadable", [problem.file, problem.message]);
 }
 

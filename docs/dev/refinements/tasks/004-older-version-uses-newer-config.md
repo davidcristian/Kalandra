@@ -17,8 +17,8 @@ renderer does not have, so a message comes from main or from the page.
 This is a decision for the maintainer, then code. The options:
 
 - Show a message and stop.
-- Start from the defaults and keep the newer file aside, as main does with `config.json.tmp` for a
-  file that does not parse.
+- Start from the defaults and keep the newer file aside, as main does with a `config-broken-<time>.json`
+  backup for a file that is not JSON.
 - Accept the newer file as now, and state that in the docs.
 
 Done looks like: the maintainer's choice is in the History and in

@@ -1,6 +1,6 @@
 # ADR-0003: A user's saved config survives every update
 
-**Status:** Accepted (2026-10-18)
+**Status:** Accepted (2026-10-26)
 
 ## Context
 
@@ -47,16 +47,16 @@ so `tsc` fails while a required top-level field is missing from it.
 
 **7. A setting the main process needs goes through `HostConfig`.** `getConfigForHost()` copies it into `HostConfig`
 (`ipc/types.ts`), and `pushHostConfig()` sends it as `CLIENT->MAIN::update-host-config`. Reason: `ConfigStore` loads
-and saves the file as a string and never parses it, so `main` sees a setting only through that message
-([ADR-0004](ADR-0004-process-boundary.md)).
+and saves the file as a string and parses it only to check that it is a JSON object, so `main` sees a setting
+only through that message ([ADR-0004](ADR-0004-process-boundary.md)).
 
 ## Consequences
 
 - The current `configVersion`, the next step, the gaps in the step numbers, the checks that run on every start and
   what an older version does with a newer file are in [config.md](../modules/config.md#invariants).
-- A file that does not parse is left in place. `initConfig()` starts from `defaultConfig()` and calls
-  `saveConfig({ isTemporary: true })`, which throws because the WebSocket is not open yet, so no `config.json.tmp`
-  is written and the page does not start ([config.md](../modules/config.md#public-contract)).
+- A file that is not a JSON object is moved to a backup beside it, never deleted, and the page starts from
+  `defaultConfig()`. A file that cannot be read stays as it was, and no save replaces it until a read succeeds
+  ([config.md](../modules/config.md#public-contract)).
 - `renderer/specs/web/config-upgrade.test.ts` upgrades saved configs of six older versions, so a step that leaves out
   a key of `defaultConfig()`, writes the wrong version or runs again on a current config fails the renderer tests.
 

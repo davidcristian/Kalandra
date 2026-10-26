@@ -33,7 +33,7 @@ the box.
 
 On Windows it is `%APPDATA%\kalandra\apt-data\config.json`. The tray menu item **Open config folder** opens its
 folder. [Where Kalandra keeps your settings](/download#where-kalandra-keeps-your-settings) describes this folder and
-the other files in it.
+the other files in it, and what Kalandra does with a `config.json` it cannot read or that is not valid JSON.
 
 ## Safety and sources
 
