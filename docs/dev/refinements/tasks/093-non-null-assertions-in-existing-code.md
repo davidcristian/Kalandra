@@ -9,10 +9,10 @@ A non-null assertion (`value!`) tells TypeScript that a value is not `null` or `
 checking it, so a missing value fails later, at the line that reads it. ESLint checks
 `@typescript-eslint/no-non-null-assertion` in both processes, except for the code that broke it
 when it was turned on. In main, `existingOffenders` in `main/eslint.config.mjs` turns the rule off
-for the files listed, such as `req.url!` in `server.ts`. In the renderer,
-`renderer/eslint-suppressions.json` holds the count of each file. Most are in `parser/Parser.ts`,
-`web/Config.ts` and the price check filters, and many assert on a named group of a regex built
-from `client_strings.js` or on state that an earlier line set.
+for the three spec files listed. In the renderer, `renderer/eslint-suppressions.json` holds the
+count of each file. Most are in the specs, in `web/Config.ts`, whose `upgradeConfig()` steps never
+change, in `trade/pathofexile-trade.ts` and in the price check filters, where many assert a
+filter's `roll`.
 
 Done looks like: each place narrows the value with a check that handles the missing case, uses
 optional chaining where `undefined` is fine, or gets a type that cannot be missing. Then its file
