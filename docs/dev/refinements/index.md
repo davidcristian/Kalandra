@@ -163,3 +163,4 @@ layout and its reasons.
 - 099: [A saved config without a price check widget stops the overlay from starting](tasks/099-config-without-price-check-throws.md)
 - 100: [No test covers getConfigForHost](tasks/100-host-config-tests.md)
 - 101: [The clipboard restore after a stash search can come before the game pastes](tasks/101-clipboard-restore-before-stash-search.md)
+- 102: [Traditional Chinese stat refs and the random keystone stat still differ from English](tasks/102-stat-refs-left-after-english-stat-list.md)

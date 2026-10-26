@@ -1,6 +1,6 @@
 # The stats.ndjson files of the languages differ in their refs and stats
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** data
 **Origin:** [renderer/src/assets/data/index.ts](../../../../renderer/src/assets/data/index.ts)
 **Verified:** 2026-10-26
@@ -77,3 +77,8 @@ also [064](064-shared-stat-texts.md) for stats that share a text.
   tool merged stats by the text of each language and dropped the stats that the language's trade
   site does not list. The tool now writes the English stat list in every language; the data
   update waits for the maintainer's go-ahead.
+- 2026-10-26: Done by fix(data): use the english stat refs in every language. The records that
+  differ between builds with and without the English stat list are now the tool's output, field by
+  field: Traditional Chinese `Culling Strike` keeps its committed `id`, and four Traditional Chinese
+  stats that the committed file lacks were not added. `stat-refs.test.ts` checks the refs. The rest
+  is [102](102-stat-refs-left-after-english-stat-list.md).

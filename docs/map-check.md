@@ -44,10 +44,10 @@ seen. Click the icon to mark the modifier as seen, which hides the icon. Click t
 
 The default marks are in profile **I**. `#% maximum Player Resistances` is a warning.
 `Monsters reflect #% of Physical Damage` and `Monsters reflect #% of Elemental Damage` are danger, and
-`Area contains two Unique Bosses` is good. Those last three are not in the game data of this version, and the
-Traditional Chinese, Japanese, Spanish and French game data name the first one differently. While profile **I** is
-selected, the settings list shows the marks that are not in the game data of the current language as **outdated**,
-and the window shows the wording message until you delete them. Profiles **II** and **III** start with no marks.
+`Area contains two Unique Bosses` is good. Those last three are not in the game data of this version. While profile
+**I** is selected, the settings list shows the marks that are not in the game data of the current language as
+**outdated**, and the window shows the wording message until you delete them. Profiles **II** and **III** start with
+no marks.
 
 ## Marks from earlier versions
 
