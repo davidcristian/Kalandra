@@ -83,18 +83,18 @@ The entry, the server and the app services, in `main/src/`:
 - `Shortcuts.ts`: `Shortcuts.create(logger, overlay, poeWindow, gameConfig, server)` starts the OCR worker and returns
   the shortcuts. `updateActions(actions, stashScroll, logKeys, restoreClipboard, language)` replaces the hotkeys, and
   `updateDelay(delay)` sets the clipboard's first poll delay. Every hotkey is registered with Electron's
-  `globalShortcut` while the game window is active, and all are unregistered when it is not. It drops, with an
-  `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a hotkey the
-  game uses (`Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`, `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`,
-  `ArrowRight`, `ArrowLeft` and the copy keys) and a hotkey given to two actions, except that a `toggle-overlay`
-  action keeps it. On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when
-  `keepModKeys` is set) and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts
-  `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses the copy keys through `readItemText()`, sends
-  `MAIN->CLIENT::item-text` to the last active client and, with `focusOverlay`, makes the overlay active when the
-  overlay was the last active client) or `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it
-  logs each key while the game window is active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting)
-  it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active, except over the area
-  `isStashArea()` computes.
+  `globalShortcut` while the game window is active, and all are unregistered when it is not. `registrableActions()` in
+  `registrable-actions.ts` drops, with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron`
+  lacks (`withKnownKeys()` in `accelerator.ts`), a hotkey the game uses (`Ctrl + C`, `Ctrl + V`, `Ctrl + A`,
+  `Ctrl + F`, `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`, `ArrowRight`, `ArrowLeft` and the copy keys) and a
+  hotkey given to two actions, except that a `toggle-overlay` action keeps it. On a press it releases the hotkey's keys
+  through `uiohook-napi` (all but the modifiers when `keepModKeys` is set) and runs the action: `toggle-overlay`,
+  `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses
+  the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to the last active client and, with
+  `focusOverlay`, makes the overlay active when the overlay was the last active client) or `ocr-text` (Windows only,
+  sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is active (`key-log.ts`).
+  With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse
+  wheel while the game is active, except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: Electron's clipboard reads and writes return promises, and each one ends before main presses a
   key. `readItemText(pressCopyKeys)` clears the clipboard when it holds item text and then calls `pressCopyKeys`, so a
   write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for

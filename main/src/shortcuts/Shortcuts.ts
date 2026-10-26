@@ -2,7 +2,8 @@ import { screen, globalShortcut } from "electron";
 import { uIOhook, UiohookKey, UiohookWheelEvent } from "uiohook-napi";
 import { isModKey, mergeTwoHotkeys } from "../../../ipc/KeyToCode";
 import { typeInChat, stashSearch } from "./text-box";
-import { shortcutToElectron, withKnownKeys } from "./accelerator";
+import { shortcutToElectron } from "./accelerator";
+import { registrableActions } from "./registrable-actions";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
 import { HostClipboard } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
@@ -101,60 +102,10 @@ export class Shortcuts {
     this.logKeys = logKeys;
     this.clipboard.updateOptions(restoreClipboard);
     this.ocrWorker.updateOptions(language);
-
-    const copyItemShortcut = mergeTwoHotkeys(
-      "Ctrl + C",
+    this.actions = registrableActions(
+      actions,
       this.gameConfig.showModsKey,
-    );
-    if (copyItemShortcut !== "Ctrl + C") {
-      actions.push({
-        shortcut: copyItemShortcut,
-        action: { type: "test-only" },
-      });
-    }
-    actions = withKnownKeys(actions, this.logger);
-    const allShortcuts = new Set([
-      "Ctrl + C",
-      "Ctrl + V",
-      "Ctrl + A",
-      "Ctrl + F",
-      "Ctrl + Enter",
-      "Home",
-      "Delete",
-      "Enter",
-      "ArrowUp",
-      "ArrowRight",
-      "ArrowLeft",
-      copyItemShortcut,
-    ]);
-
-    for (const action of actions) {
-      if (
-        allShortcuts.has(action.shortcut) &&
-        action.action.type !== "test-only"
-      ) {
-        this.logger.write(
-          `error [Shortcuts] Hotkey "${action.shortcut}" reserved by the game will not be registered.`,
-        );
-      }
-    }
-    actions = actions.filter((action) => !allShortcuts.has(action.shortcut));
-
-    const duplicates = new Set<string>();
-    for (const action of actions) {
-      if (allShortcuts.has(action.shortcut)) {
-        this.logger.write(
-          `error [Shortcuts] It is not possible to use the same hotkey "${action.shortcut}" for multiple actions.`,
-        );
-        duplicates.add(action.shortcut);
-      } else {
-        allShortcuts.add(action.shortcut);
-      }
-    }
-    this.actions = actions.filter(
-      (action) =>
-        !duplicates.has(action.shortcut) ||
-        action.action.type === "toggle-overlay",
+      this.logger,
     );
   }
 
