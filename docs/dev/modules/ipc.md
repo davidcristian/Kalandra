@@ -139,8 +139,9 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   names an event main has no handler for, and logs a handler that throws; `IPC.ts` passes the untyped result of
   `JSON.parse()` to `selfDispatch()`. main serves the renderer files it was packaged with, so both ends come from
   one build.
-- A new `HostConfig` field is set in `getConfigForHost()`, whose return type makes `tsc` fail until it is, and is
-  read in the `main.ts` handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
+- A new `HostConfig` field is set in `getConfigForHost()` and in the expected payload of
+  `renderer/specs/web/host-config.test.ts`, whose types make `tsc` fail until it is, and is read in the `main.ts`
+  handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
 - Saved configs store hotkeys as `hotkeyToString()` writes them, so renaming a key in these tables changes what a
   saved hotkey means.
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates

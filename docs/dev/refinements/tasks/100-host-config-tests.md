@@ -1,9 +1,9 @@
 # No test covers getConfigForHost
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** config
 **Origin:** [renderer/src/web/Config.ts](../../../../renderer/src/web/Config.ts)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 `getConfigForHost()` in `renderer/src/web/Config.ts` builds the `HostConfig` that
 `pushHostConfig()` sends to main. It is not exported, and `renderer/specs/vitest.setup.ts`
@@ -21,3 +21,4 @@ trusting it.
 
 - 2026-10-26: Split from [005](005-config-upgrade-tests.md) when the config upgrade spec closed
   its `upgradeConfig()` part.
+- 2026-10-27: test(renderer): check the HostConfig that pushHostConfig sends.

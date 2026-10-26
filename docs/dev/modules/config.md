@@ -190,8 +190,9 @@ It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
 saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
 instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
 check widget and a version 15 config without its Delve grid still throw. It takes the last step version from `defaultConfig()`, so a new step needs no change to
-the spec. No test runs `getConfigForHost()`
-([refinement 100](../refinements/tasks/100-host-config-tests.md)).
+the spec. `renderer/specs/web/host-config.test.ts` sets configs with the real `updateConfig()` and checks the
+`HostConfig` that `pushHostConfig()` sends: each field, from the config and its price check and library widgets, and
+`libraryAlpha`, which is true only when `enableAlphas` is on and `alphas` includes `library`.
 `renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and checks that Save
 sends `save-config` with the edited copy and the window hidden, then `update-host-config`.
 `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
