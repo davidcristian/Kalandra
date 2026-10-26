@@ -35,8 +35,9 @@ If nothing happens, read [Nothing happens](/nothing-happens). If the window show
 
 The title bar shows the selected league. Click it to open Settings, **Price check** page, where you change the league.
 The button with two arrows shows how many Exalted Orbs (or Chaos Orbs, see **Primary base currency:** under
-[Settings](#settings)) one Divine Orb costs. Click it for a table that converts 0.1 to 0.9 Divine Orb. When a new
-version of Kalandra is available, a line under the title bar says so.
+[Settings](#settings)) one Divine Orb costs. Click it for a table that converts 0.1 to 0.9 Divine Orb. A line under
+the title bar names a new version of Kalandra: on the Windows installer and the Linux AppImage once it has downloaded,
+and on the portable download, on macOS or with the [`--no-updates` option](/cmd-flags) as soon as Kalandra finds it.
 
 ## Price estimate
 
