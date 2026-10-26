@@ -47,6 +47,9 @@ same data.
 - A parser fix adds the real copied item text as a test case under `renderer/specs/Parser/`
   ([AGENTS.md](../../../AGENTS.md), What every change must pass). Item text in tests and fixtures keeps its
   characters exactly as the game writes them.
+- Text that the game writes the same in all nine languages can stay a literal, and is listed here. The em dash
+  (`"\u2014"`) before the tags of a `{ ... }` modifier line is the same: the game string `AdvancedModDisplayTags`
+  is `" \u2014 {0}"` in every language of the export of 26 Oct 2026, so `parseModInfoLine()` splits on it.
 - Item text from a patch the data does not know yet can fail to match, and the parser must handle that without
   throwing ([AGENTS.md](../../../AGENTS.md), Safety).
 - Text the app writes itself is not game data. The UI text is in `renderer/public/data/<lang>/app_i18n.json`, a new

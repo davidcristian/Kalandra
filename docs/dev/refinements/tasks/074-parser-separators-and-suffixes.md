@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** parser
 **Origin:** [renderer/src/parser/advanced-mod-desc.ts](../../../../renderer/src/parser/advanced-mod-desc.ts)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-26
 
 The parser reads these parts of copied item text with string literals, and no `client_strings.js`
 of the nine languages has a key for any of them:
@@ -17,24 +17,40 @@ of the nine languages has a key for any of them:
 | `", "` | `parseWeapon()` in `Parser.ts` | the damage ranges of the elemental, fire, cold and lightning damage lines |
 | `"S"` | `parseAugmentSockets()` in `Parser.ts` | the sockets after `SOCKETS`, one letter each |
 
-The data gives one hint. `UNSCALABLE_VALUE`, which `dataParser` takes from the game string
-`DescriptionLabelFixedValueStat`, starts with a space, the em dash and a space in all nine
-languages, so the game uses the em dash in an advanced description string in every language. No
-key holds the separator alone, and reading it from the first character of `UNSCALABLE_VALUE` would
-make the modifier line depend on the text of another string. The other literals have no such hint,
-and which game strings hold them is not known here. The non-English item texts in
-`renderer/specs/Parser/items.ts` are normal and unique items without modifier lines, sockets or
-elemental damage, so no test shows how another language writes these parts.
+The game export of 2026-10-26 in `dataParser/data/vendor/tables/<Language>/ClientStrings.json` has
+three strings of a `{ ... }` modifier line, and two of them differ by language:
 
-Done looks like: [host task 015](../../host/tasks/015-other-game-languages.md) records copied text
-of a weapon with runes in its sockets, elemental damage and modifiers in at least one language
-besides English, and that text becomes a parser case under `renderer/specs/Parser/`. A literal that
-the game writes the same in every language is listed as such in
-[ADR-0007](../../adr/ADR-0007-game-text-from-game-data.md). A literal that differs gets an entry in
-`dataParser/src/constants/client_string_data.py`, a `TranslationDict` key in
-`renderer/src/assets/data/interfaces.ts` and a data update with the maintainer's go-ahead
-([runbooks/game-data-update.md](../../runbooks/game-data-update.md)), and the parser reads it
-through `CLIENT_STRINGS`.
+| Game string | Text | Languages |
+| --- | --- | --- |
+| `AdvancedModDisplayTags` | `" \u2014 {0}"` | all nine |
+| `AdvancedModDisplayTagSeparator` | `", "` | all but Traditional Chinese, which has `","` |
+| `AlternateQualityModIncreaseText` | `" \u2014 {0}% Increased"` in English | German starts with `"\u2014 "`, Japanese with `"- "` |
+
+So the em dash before the tags is the same in every language, and
+[ADR-0007](../../adr/ADR-0007-game-text-from-game-data.md) lists it. `tagsText.split(", ")` keeps
+the tags of a Traditional Chinese line as one tag, and the em dash split does not separate a
+Japanese roll increase, if the copied text uses these strings. `MODIFIER_INCREASED` already reads
+the Japanese text after its `"- "`. No `ClientStrings` row in any language holds a modifier type
+suffix, the braces, the `", "` between damage ranges or the socket letter `S`. The non-English item
+texts in `renderer/specs/Parser/items.ts` are normal and unique items without modifier lines,
+sockets or elemental damage, so no test shows how another language writes these parts.
+
+What remains:
+
+1. [Host task 015](../../host/tasks/015-other-game-languages.md) records copied text of a weapon
+   with runes in its sockets, elemental damage and modifiers, one with catalyst quality in Japanese
+   and one with tags in Traditional Chinese. That text becomes parser cases under
+   `renderer/specs/Parser/`, and a literal it shows to be the same in every language is listed in
+   ADR-0007.
+2. With the maintainer's go-ahead for a data update
+   ([runbooks/game-data-update.md](../../runbooks/game-data-update.md)), the tag separator becomes
+   a client string: an entry for `AdvancedModDisplayTagSeparator` in
+   `dataParser/src/constants/client_string_data.py`, a `TranslationDict` key in
+   `renderer/src/assets/data/interfaces.ts`, and one new line in each `client_strings.js`, such as
+   `MODIFIER_TAG_SEPARATOR: ', ',` in eight languages and `MODIFIER_TAG_SEPARATOR: ',',` in
+   `cmn-Hant`. `parseModInfoLine()` then splits the tags with it. The key and the line need the
+   data update in the same commit, because the tool's tests require every key it writes to be a
+   `TranslationDict` key.
 
 ## History
 
@@ -42,3 +58,5 @@ through `CLIENT_STRINGS`.
   keys of every language's `client_strings.js`. This clone has no game export to add strings from.
 - 2026-10-22: `filters/fill-augments.ts`, which also read the suffixes, was removed with the augment
   fill code that had no caller.
+- 2026-10-26: Compared the modifier line strings of the nine languages in a fresh game export. The
+  em dash before the tags is the same in all nine; the tag separator and the roll increase differ.

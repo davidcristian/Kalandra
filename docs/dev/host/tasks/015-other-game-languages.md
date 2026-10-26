@@ -24,7 +24,9 @@ and [docs/client-log-parser.md](../../../client-log-parser.md) say:
 - The parser also reads the em dash and the `, ` of a `{ ... }` modifier line, the `, ` between
   weapon damage ranges and the letter `S` of each socket as literals
   ([refinement 074](../../refinements/tasks/074-parser-separators-and-suffixes.md)). The open
-  question is whether every client writes them the same.
+  question is whether every client writes them the same. The game data says that the tag
+  separator is `,` in Traditional Chinese and the roll increase starts with `- ` in Japanese, so
+  copied text of such items in those two languages answers the most.
 - In `Client.txt`, Kalandra matches the `level-up` line in the app's language and every other line
   type in English. The open question is whether a client in another language writes those other
   lines in English ([refinement 073](../../refinements/tasks/073-client-log-chat-lines-in-english.md)
