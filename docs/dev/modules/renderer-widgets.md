@@ -75,6 +75,16 @@ when "Enable experimental features" together with "Item Data Collection" turns o
 `disableWidget` in `settings/utils.ts`). Adding the flag also hides the widget. The Delve grid is shown and
 hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-price-check.md](renderer-price-check.md).
 
+### Stash search presets
+
+A stash search entry (`StashSearchEntry` in `stash-search/presets.ts`) with a `preset` searches that preset's game
+text in the loaded game language, which `entrySearchText()` builds from the client strings: `currency` is
+`RARITY_CURRENCY`, `normal-rarity` is `RARITY` and `RARITY_NORMAL`, and `trial-count` is `TRIAL_COUNT`, put in
+quotes when the text has a space. The widget's buttons, the Settings field and the hotkeys sent to main all read
+it. Typing in the field calls `setEntryText()`, which removes the preset, so the user's text stays in every
+language. `Dump sorting` and a widget added from the menu start with presets; the other default searches are
+English text ([refinement 072](../refinements/tasks/072-stash-search-presets-in-english.md)).
+
 ## Adding a widget
 
 1. Write the component in its own folder under `renderer/src/web/`, with a static
@@ -154,8 +164,9 @@ shows the strip's red message when main does not store it), `specs/web/widget-co
 `specs/web/settings/utils.test.ts` (`settings/utils.ts`: the page props, the field models, `findWidget`, and
 `disableWidget` and `enableWidget`, which add `menu::skip` once and remove every copy),
 `specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
-share in the edited config, and the hint of a field for them and for each reason main gives), `specs/web/stash-search.test.ts` (`stash-search/widget.ts`, the search of a new
-Stash search widget in three languages) and
+share in the edited config, and the hint of a field for them and for each reason main gives), `specs/web/stash-search.test.ts` (`stash-search/widget.ts` and `presets.ts`: the search of a
+new Stash search widget and of each preset in English, German and Korean, an edited entry, the hotkey of a preset,
+and the `< 39` config step) and
 `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a
 browser tab, `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect, `Host.onEvent()`, which passes each message from the fake socket to

@@ -14,12 +14,16 @@ Kalandra includes two Stash search widgets, `Map rolling` and `Dump sorting`. Op
 default) and click one of them in the main button bar to show it. [Widgets](/widgets) explains the overlay and the
 `hide`, `edit`, `move` and `delete` buttons.
 
-The searches of both widgets are English text, written for a game client in English. With the game in another
-language, edit them to the words that its item text shows, as [Change the searches](#change-the-searches) explains.
+Three searches of `Dump sorting` follow the **Language** setting in Settings, `General`: Kalandra takes their text
+from the game data of that language. They are `Currency`, `"Rarity: Normal"` and `"Number of Trials:"` in English,
+and `Währung`, `"Seltenheit: Normal"` and `"Anzahl der Prüfungen:"` in German. The other searches of both widgets
+are English text, written for a game client in English. With the game in another language, edit them to the words
+that its item text shows, as [Change the searches](#change-the-searches) explains.
 
 To add another Stash search widget, hover over the three dots in the main button bar and click `Stash search`. A new
 widget has no title, shows `Untitled`, and starts with one search: the name of the Currency rarity in the language of
-the **Language** setting, such as `Currency` in English or `Währung` in German. You can add as many as you want.
+the **Language** setting, such as `Currency` in English or `Währung` in German, and it follows that setting too.
+You can add as many as you want.
 
 ![The add widget menu with Stash search circled](/reference-images/StashSearchAdd.png)
 
@@ -53,7 +57,8 @@ Waystone that has that modifier.
 ## Dump sorting
 
 A dump tab is a stash tab where you put all your loot to sort later. The `Dump sorting` widget has six searches:
-`Currency`, `"Martial Weapon"`, `Jewel`, `"Waystone Tier"`, `"Rarity: Normal"` and `Trials:`.
+`Currency`, `"Martial Weapon"`, `Jewel`, `"Waystone Tier"`, `"Rarity: Normal"` and `"Number of Trials:"`. A
+`Trials:` search that an earlier version saved now searches `"Number of Trials:"` too.
 
 ![The Dump sorting widget with its six searches](/reference-images/DumpSortWidget.png)
 
@@ -68,7 +73,7 @@ Hover over the widget and click `edit` to open its page in the Settings window. 
 - Type the widget title in the top field, which shows `widget title` when it is empty.
 - Drag the handle on the left of a search to change the order.
 - Edit the search in the `search text or regex` field. The field turns red when the text is longer than 250
-  characters.
+  characters. A search that follows the **Language** setting keeps your text in every language once you edit it.
 - Remove a search with the cross on its right.
 - Give a search a `friendly name` and a hotkey, as the next section explains.
 - Click `Add` to add an empty search.

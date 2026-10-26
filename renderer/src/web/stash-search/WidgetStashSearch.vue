@@ -16,10 +16,10 @@
         <button
           v-for="entry in config.entries"
           :key="entry.id"
-          @click="stashSearch(entry.text)"
+          @click="stashSearch(entrySearchText(entry))"
           :class="$style.searchBtn"
         >
-          <span>{{ entry.name || entry.text }}</span>
+          <span>{{ entry.name || entrySearchText(entry) }}</span>
           <span
             v-if="entry.hotkey && config.enableHotkeys"
             :class="$style.hotkey"
@@ -76,7 +76,13 @@ export default {
           },
           enableHotkeys: true,
           entries: [
-            { id: 1, name: "", text: "Currency", hotkey: null },
+            {
+              id: 1,
+              name: "",
+              text: "Currency",
+              hotkey: null,
+              preset: "currency",
+            },
             { id: 2, name: "", text: '"Martial Weapon"', hotkey: null },
             { id: 3, name: "", text: "Jewel", hotkey: null },
             { id: 4, name: "", text: '"Waystone Tier"', hotkey: null },
@@ -85,8 +91,15 @@ export default {
               name: "",
               text: '"Rarity: Normal"',
               hotkey: null,
+              preset: "normal-rarity",
             },
-            { id: 6, name: "", text: "Trials:", hotkey: null },
+            {
+              id: 6,
+              name: "",
+              text: "Trials:",
+              hotkey: null,
+              preset: "trial-count",
+            },
           ],
         },
       ];
@@ -102,6 +115,7 @@ import { MainProcess } from "@/web/background/IPC";
 import { pushHostConfig } from "@/web/Config";
 import type { WidgetManager } from "../overlay/interfaces.js";
 import { newWidgetEntries } from "./widget.js";
+import { entrySearchText } from "./presets.js";
 
 import Widget from "../overlay/Widget.vue";
 import UiToggle from "@/web/ui/UiToggle.vue";

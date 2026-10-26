@@ -3,41 +3,58 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/src/web/stash-search/WidgetStashSearch.vue](../../../../renderer/src/web/stash-search/WidgetStashSearch.vue)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-26
 
 `defaultInstances()` in `WidgetStashSearch.vue` gives `defaultConfig()` two Stash search widgets,
-`Map rolling` and `Dump sorting`, with ten English search texts. The game is assumed to match a
-search against the item text in the language it runs in, which
-[host task 009](../../host/tasks/009-stash-search.md) checks, so these searches would find nothing
-with the game in another language. [docs/stash-search.md](../../../stash-search.md) says the
-presets are English. A widget added from the menu already starts with `RARITY_CURRENCY` from the client strings
-(`newWidgetEntries()` in `stash-search/widget.ts`).
+`Map rolling` and `Dump sorting`, with ten searches. An entry with a `preset` searches that
+preset's game text in the loaded language (`entrySearchText()` in `stash-search/presets.ts`), and
+the `< 39` config step names the English defaults of earlier versions by preset
+([renderer-widgets.md](../../modules/renderer-widgets.md#stash-search-presets)). So `Currency`,
+`"Rarity: Normal"` and `Trials:`, which became `"Number of Trials:"`, follow the language, as
+does the first search of a widget added from the menu. The other seven are English text, which
+[docs/stash-search.md](../../../stash-search.md) says. The game is assumed to match a search
+against the item text in the language it runs in, which
+[host task 009](../../host/tasks/009-stash-search.md) checks.
 
-Presets in the game's language are not possible yet, for two reasons:
-
-- `defaultConfig()` runs at the first start with `language: "en"`, before the user picks a language
-  in Settings, General, and only one language's data is loaded at a time. So a preset in another
-  language needs a step that runs when the language changes, and that step must not change a search
-  the user saved ([ADR-0003](../../adr/ADR-0003-config-survives-updates.md)). Whether it replaces
-  presets the user never edited is the maintainer's decision.
-- Only some of the texts have a client string in `client_strings.js`:
+The game export of 25 Oct 2026 in `dataParser/data/vendor/` has this for the other seven:
 
 | Widget | Search text | Game data |
 | --- | --- | --- |
-| Dump sorting | `Currency` | `RARITY_CURRENCY` |
-| Dump sorting | `"Rarity: Normal"` | `RARITY` followed by `RARITY_NORMAL` |
-| Dump sorting | `"Waystone Tier"` | the game's client string `ItemDisplayMapTier`, which the data tool no longer writes as `WAYSTONE_TIER` |
-| Dump sorting | `Trials:` | the end of `TRIAL_COUNT` (`Number of Trials: `), a cut that does not work in another language's word order |
-| Dump sorting | `"Martial Weapon"`, `Jewel` | none; the game file they would come from is not known |
-| Map rolling | `"Increased Pack Size"`, `"Additional Packs"`, `"Less Recovery Rate"` | parts of Waystone modifier texts in `stats.ndjson`, such as `#% increased Pack Size`, `Area contains # additional packs of Beasts` and `Players have #% less Recovery Rate of Life and Energy Shield`; no client string, and a part of a stat text has no matching part in another language |
-| Map rolling | `"Burning Ground"` | none; no stat text in the English `stats.ndjson` contains it, which has `Area has patches of Ignited Ground` |
+| Dump sorting | `"Waystone Tier"` | the client string `ItemDisplayMapTier` |
+| Dump sorting | `"Martial Weapon"` | the client string `SoulCoreCategoryWeapons`, `[MartialWeapon\|Martial Weapon]` |
+| Dump sorting | `Jewel` | no client string with that text alone; the `ItemClasses` row `Jewel` is named `Jewels`, `Juwelen` in German, and the app's data does not hold item classes |
+| Map rolling | `"Increased Pack Size"`, `"Additional Packs"`, `"Less Recovery Rate"` | parts of the Waystone stats `#% increased Pack Size in Map`, the nine `Area contains # additional packs of ...` stats and `Players have #% less Recovery Rate of Life and Energy Shield` in `stats.ndjson`; no client string, and a part of a stat text has no matching part in another language |
+| Map rolling | `"Burning Ground"` | none: no stat text in the English `stats.ndjson` contains it, and the Waystone stat is `Area has patches of Ignited Ground` |
 
-Done looks like: the maintainer decides how the presets follow the language; each preset either has
-a client string, added to `dataParser/src/constants/client_string_data.py` and written by a data
-update with the maintainer's go-ahead ([runbooks/game-data-update.md](../../runbooks/game-data-update.md)),
-or is replaced by a text that has one; a test reads the presets in English and in another language;
-the note in docs/stash-search.md changes. A change to `defaultConfig()` follows the hard rule in
-[AGENTS.md](../../../../AGENTS.md#the-one-hard-rule).
+The first two need two client strings, which no committed `client_strings.js` has. These are the
+lines that `ClientString("WAYSTONE_TIER", ["ItemDisplayMapTier"])` and
+`ClientString("MARTIAL_WEAPON", ["SoulCoreCategoryWeapons"])` in
+`dataParser/src/constants/client_string_data.py` write into each language's file, as the tool
+built them from that export:
+
+| Language | `WAYSTONE_TIER` | `MARTIAL_WEAPON` |
+| --- | --- | --- |
+| en | `'Waystone Tier'` | `'Martial Weapon'` |
+| ru | `'Уровень путевого камня'` | `'Боевое оружие'` |
+| cmn-Hant | `'換界石階級'` | `'軍用武器'` |
+| ko | `'경로석 등급'` | `'무도 무기'` |
+| ja | `'ウェイストーンティア'` | `'マーシャル武器'` |
+| de | `'Wegsteinlevel'` | `'Kampfwaffe'` |
+| es | `'Grado de la piedra guía'` | `'Arma marcial'` |
+| fr | `'Palier de Pierre de téléportation'` | `'Arme martiale'` |
+| pt | `'Nível da Pedra-guia'` | `'Arma Marcial'` |
+
+Each line has the form `  WAYSTONE_TIER: 'Waystone Tier',`. As in
+[068](068-unidentified-tier-tag.md), the two entries, the two `TranslationDict` keys, the lines in
+every committed `client_strings.js` and the presets that read them (two `PRESET_TEXT` rows, two
+`ENGLISH_DEFAULTS` rows, a config step that names the saved entries, and test cases) are one
+change. `client_string_data.py` is at its count in `scripts/long-files.txt`, so the entries also
+raise that count or move to a module of their own.
+
+Done looks like: the maintainer's go-ahead for that data change; a decision on `Jewel` and the four
+Map rolling searches, which either get a search with game text, such as one built from a stat's
+matcher by a rule, or stay English; and docs/stash-search.md listing the searches that follow the
+language.
 
 ## History
 
@@ -45,3 +62,6 @@ the note in docs/stash-search.md changes. A change to `defaultConfig()` follows 
   strings. The client strings have no text for most presets, and this clone cannot run `dataParser`.
 - 2026-10-25: The data tool stopped writing `WAYSTONE_TIER`, which nothing read. The table now names
   its game client string id instead.
+- 2026-10-26: Presets that follow the game language added for the three searches whose game text
+  the committed client strings have; an entry the user edits keeps its text. The two client strings
+  and their lines were read from the game export, and wait for the maintainer's go-ahead.

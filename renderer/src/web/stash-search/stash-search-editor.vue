@@ -26,10 +26,13 @@
             <i class="fas fa-grip-vertical text-gray-400" />
           </button>
           <input
-            v-model="entry.text"
+            :value="entrySearchText(entry)"
+            @input="setText(entry, $event)"
             :placeholder="t('stash_search.search_text')"
             class="px-1 col-span-2 leading-6"
-            :class="entry.text.length > 250 ? 'bg-red-800' : 'bg-gray-900'"
+            :class="
+              entrySearchText(entry).length > 250 ? 'bg-red-800' : 'bg-gray-900'
+            "
           />
           <button
             class="leading-none rounded-r bg-gray-700 w-6 h-6"
@@ -59,6 +62,11 @@ import DndContainer from "vuedraggable";
 import HotkeyInput from "../settings/HotkeyInput.vue";
 import { configProp, configModelValue } from "../settings/utils.js";
 import type { StashSearchWidget } from "./widget.js";
+import {
+  entrySearchText,
+  setEntryText,
+  type StashSearchEntry,
+} from "./presets.js";
 
 export default defineComponent({
   name: "stash_search.name",
@@ -71,6 +79,10 @@ export default defineComponent({
       t,
       title: configModelValue(() => props.configWidget, "wmTitle"),
       entries: configModelValue(() => props.configWidget, "entries"),
+      entrySearchText,
+      setText(entry: StashSearchEntry, event: Event) {
+        setEntryText(entry, (event.target as HTMLInputElement).value);
+      },
       removeEntry(id: number) {
         props.configWidget.entries = props.configWidget.entries.filter(
           (_) => _.id !== id,

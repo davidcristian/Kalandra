@@ -18,7 +18,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 38. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 39. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -44,6 +44,10 @@ old one and keep that file, so a saved config must survive every update: this is
   version, and a new install of versions 15 to 21 has no item search `ocrGemsKey`. The step sets those four keys,
   the item check `craftOfExileKey`, the Delve grid `toggleKey` and the item search `ocrGemsKey` to their values in
   `defaultConfig()` where the saved config has none, and keeps a saved value, `null` included.
+- `namePresetEntries(config)` in `renderer/src/web/stash-search/presets.ts` is what the `< 39` step runs. It gives
+  each stash search entry whose text is an English default of earlier versions, `Currency`, `"Rarity: Normal"` or
+  `Trials:`, the `preset` that makes it search that game text in the game language
+  ([renderer-widgets.md](renderer-widgets.md#stash-search-presets)). It keeps the entry's text.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no file it uses
   `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. Before the steps, `addMissingWidgets()` in
   `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
@@ -105,8 +109,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 38, so the next step is `if (config.configVersion < 39)`, ending with
-  `config.configVersion = 39`, and `defaultConfig()` then returns 39. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 39, so the next step is `if (config.configVersion < 40)`, ending with
+  `config.configVersion = 40`, and `defaultConfig()` then returns 40. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -152,8 +156,9 @@ the price check widget, so `tsc` fails on it when a new required `Config` field 
 defaults at that version's commits, with a changed league, hotkeys and widget position. It checks that each ends at
 the current version with every key of `defaultConfig()`, gets the default of each key the `< 38` step sets, keeps the
 user's choices, and runs each step once and in order, with the same result when every version in between saved the
-file. It also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that a
-widget of an unknown type stays. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
+file. It also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that the
+`< 39` step names the default stash searches of a version 36 config by preset, that a widget of an unknown type
+stays. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
 saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
 instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
 check widget still throws. It takes the last step version from `defaultConfig()`, so a new step needs no change to

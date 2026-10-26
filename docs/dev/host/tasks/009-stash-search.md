@@ -3,7 +3,7 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [docs/stash-search.md](../../../stash-search.md)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-26
 
 **Claims.** `stashSearch` in `main/src/shortcuts/text-box.ts` focuses the game, puts the text on the
 clipboard, and presses Ctrl + F, Ctrl + V and Enter. When the game window does not have the focus
@@ -27,9 +27,11 @@ say:
   box has a length limit, and whether 50 is that limit.
 - The game matches a search against the item text in the language it runs in. So the English
   searches of `Map rolling` and `Dump sorting` match nothing with the game in another language,
-  while the first search of a new widget, the Currency rarity name in the language of Settings,
-  General, Language (`newWidgetEntries` in `renderer/src/web/stash-search/widget.ts`), matches
-  the currency items of a game in that language.
+  while the searches that follow Settings, General, Language match the items of a game in that
+  language: the first search of a new widget, and `Currency`, `"Rarity: Normal"` and
+  `"Number of Trials:"` of `Dump sorting` (`entrySearchText` in
+  `renderer/src/web/stash-search/presets.ts`). In English, `"Number of Trials:"` finds the items
+  that the earlier search `Trials:` found.
 
 **Do.** Open the stash and click a search in a Stash search widget. Set a key for Item info in
 Settings, Hotkeys (it has no default), open Item info on an item, and click Find in Stash. Repeat
@@ -38,7 +40,7 @@ Click the dollar sign on items with a price note whose note and name, without qu
 47 characters together. Open Kalandra's page with the tray's Open in Browser, click a search there,
 and check that nothing is typed into the browser and that Settings, Debug shows the warning.
 Set the game and the Language setting to German, add a Stash search widget, and click its search
-and a search of `Dump sorting`.
+and each search of `Dump sorting`.
 
 **Pass.** Each claim holds, and the game's own limit for the search box is noted.
 
@@ -53,3 +55,5 @@ History line.
   focus, such as after a click in a browser tab.
 - 2026-10-21: Added the claim that a search matches the item text in the game's language, which
   decides whether the English presets and the search of a new widget match in another language.
+- 2026-10-26: Three `Dump sorting` searches now take their text from the game data of the Language
+  setting, and the last one changed from `Trials:` to `"Number of Trials:"`.

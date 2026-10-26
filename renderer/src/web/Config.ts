@@ -12,6 +12,7 @@ import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
 import { addMissingWidgets } from "./missing-widgets";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
+import { namePresetEntries } from "./stash-search/presets";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 import { tradeHost } from "./trade-host";
 
@@ -137,7 +138,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 38,
+  configVersion: 39,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -680,6 +681,11 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 38) {
     addKeysWithoutStep(config, defaultConfig());
     config.configVersion = 38;
+  }
+
+  if (config.configVersion < 39) {
+    namePresetEntries(config);
+    config.configVersion = 39;
   }
 
   return config as Config;

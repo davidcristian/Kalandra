@@ -5,6 +5,7 @@ import type { Config } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
 import { Host } from "@/web/background/IPC";
 import { registry } from "@/web/overlay/widget-registry";
+import type { StashSearchWidget } from "@/web/stash-search/widget";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -210,6 +211,32 @@ describe("upgradeConfig", () => {
     config.configVersion = 37;
 
     expect(upgrade(config)).toEqual(changed);
+  });
+
+  it("names the default stash searches of a version 36 config by preset and keeps their text", () => {
+    const upgraded = upgrade(readSaved(36));
+    const entriesOf = (config: Config, title: string) =>
+      (config.widgets.find((w) => w.wmTitle === title) as StashSearchWidget)
+        .entries;
+    const entries = (title: string) => entriesOf(upgraded, title);
+
+    expect(entries("Dump sorting").map((e) => e.preset ?? null)).toEqual([
+      "currency",
+      null,
+      null,
+      null,
+      "normal-rarity",
+      "trial-count",
+    ]);
+    expect(entries("Dump sorting").map((e) => e.text)).toEqual(
+      entriesOf(readSaved(36), "Dump sorting").map((e) => e.text),
+    );
+    expect(entries("Map rolling").map((e) => e.preset ?? null)).toEqual([
+      null,
+      null,
+      null,
+      null,
+    ]);
   });
 
   it.each(VERSIONS)(

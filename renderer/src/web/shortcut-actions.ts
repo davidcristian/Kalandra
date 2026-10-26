@@ -2,6 +2,7 @@ import type { ShortcutAction } from "@ipc/types";
 import type { Config } from "./Config";
 import type * as widget from "./overlay/widgets";
 import type { StashSearchWidget } from "./stash-search/widget";
+import { entrySearchText } from "./stash-search/presets";
 import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import type { LibraryWidget } from "./library/widget";
@@ -111,7 +112,7 @@ export function shortcutActions(config: Config): ShortcutAction[] {
         if (entry.hotkey) {
           actions.push({
             shortcut: entry.hotkey,
-            action: { type: "stash-search", text: entry.text },
+            action: { type: "stash-search", text: entrySearchText(entry) },
           });
         }
       }
