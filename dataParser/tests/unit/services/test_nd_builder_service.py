@@ -201,7 +201,7 @@ def test_stats_combined_df_missing_part_ref():
     pd.testing.assert_frame_equal(result, expected)
 
 
-def test_stats_combined_df_missing_part_lang():
+def test_stats_combined_df_keeps_the_english_stats_without_a_language_text():
     ref_df = pd.DataFrame(
         [
             {
@@ -259,6 +259,18 @@ def test_stats_combined_df_missing_part_lang():
                 "type": "explicit",
             },
             {
+                "id": "explicit.stat_3299347043",
+                "text": None,
+                "ref": "# to maximum Life",
+                "type": "explicit",
+            },
+            {
+                "id": "explicit.stat_3372524247",
+                "text": None,
+                "ref": "#% to Fire Resistance",
+                "type": "explicit",
+            },
+            {
                 "id": "rune.stat_3523867985",
                 "text": "#% increased Armour, Evasion and Energy Shield",
                 "ref": "#% increased Armour, Evasion and Energy Shield",
@@ -280,7 +292,7 @@ def test_stats_combined_df_missing_part_lang():
     pd.testing.assert_frame_equal(result, expected)
 
 
-def test_stats_combined_df_missing_part_both():
+def test_stats_combined_df_leaves_out_the_stats_that_only_the_language_has():
     ref_df = pd.DataFrame(
         [
             {
@@ -335,6 +347,12 @@ def test_stats_combined_df_missing_part_both():
                 "id": "explicit.stat_3299347043",
                 "text": "# to maximum Life",
                 "ref": "# to maximum Life",
+                "type": "explicit",
+            },
+            {
+                "id": "explicit.stat_3372524247",
+                "text": None,
+                "ref": "#% to Fire Resistance",
                 "type": "explicit",
             },
             {

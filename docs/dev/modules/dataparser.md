@@ -130,7 +130,14 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   logbook faction), plus `id`, `dp`, `fromAreaMods`, `trade.option` and `trade.inverted` where they apply. The parser
   matches mod lines against `matchers`. The types of a trade id without a `|<value>` part are those in `MOD_TYPES`
   (`src/constants/mod_types.py`), with `augment` written as `rune`. Any other type on such an id in the trade site's
-  `stats.json` stops the build with a `ValueError`.
+  `stats.json` stops the build with a `ValueError`. Every language gets the English stat list
+  (`src/services/english_stat_list.py`): the same refs and a stat for every English trade id. Stats that share an
+  English matcher text become one stat in every language, under the ref the English build keeps. Stats that only the
+  language gives the same text stay apart, and each gets the trade ids of all of them, so a search finds any of
+  them. A stat that the language's trade site does not list takes its matchers from the game's descriptions, and
+  has none when the game has no description for it either: on 25 Oct 2026 `pathofexile.tw` listed 5915 of the 8229
+  stat ids of `www.pathofexile.com`, so 33 Traditional Chinese stats, such as the `Bonded:` rune stats, have no
+  matchers.
 - `items.ndjson`, one line per item: `name` (this language), `refName` (English), `namespace`, `icon`, `tags`, `w`,
   `h`, and `craftable`, `unique`, `tradeTag`, `gem`, `armour` and `augment` where they apply. A unique's `refName`
   is its name on the English trade site, and its `name` is the `Text2` of the game's `Words` row whose English
@@ -183,7 +190,8 @@ sample has one, since a description's hash can be checked by hand only against a
 `test_game_store_i.py` fails when parsed game text keeps markup such as `[` or `|` for an id outside
 `BROKEN_GAME_TEXT`, the ids whose game text is broken, or when one of those ids is fixed, so a game patch that changes
 either updates that set. `tests/test_main.py` runs `main()` end to end with `push`, checks the files it writes and
-copies, and tests the `--pull` step with a fake export and the fake session. Every test writes to a temporary folder:
+copies, checks that each language has the English refs and trade ids and that stats sharing a game text have the same
+trade ids, and tests the `--pull` step with a fake export and the fake session. Every test writes to a temporary folder:
 `main()` takes the output folder and `ImageProvider` the cache folder, and `NdBuilderService` opens the image cache
 only when it applies the icons.
 

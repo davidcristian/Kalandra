@@ -22,6 +22,7 @@ from constants.known_stats import (
 )
 from constants.lang import ENGLISH, LANG
 from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
+from services import english_stat_list
 from services.image_provider import MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
 from services.nd_builder_functions import (
@@ -75,8 +76,13 @@ class NdBuilderService:
 
         logger.info("Joining trade site and descriptions")
         joined_df = self.join_trade_and_descriptions(valueless_trade_stats_df, desc_df)
-
-        matcher_deduped = self.set_timeless_matchers(self.dedupe_matchers(joined_df))
+        english_df = self.join_trade_and_descriptions(
+            valueless_trade_stats_df, self.descriptions_hashed(self.ref_game_store)
+        )
+        deduped = self.dedupe_matchers(joined_df, self.get_refs_to_merge(english_df))
+        refs_sharing = self.get_refs_to_merge(deduped)
+        shared = english_stat_list.share_trade_ids(deduped, refs_sharing)
+        matcher_deduped = self.set_timeless_matchers(shared)
 
         logger.info("Joining stats with and without values")
         concated = pd.concat([matcher_deduped, value_trade_stats_df]).sort_values("ref")
@@ -155,29 +161,21 @@ class NdBuilderService:
     def stats_combined_df(self) -> pd.DataFrame:
         ref_stats_df = self.ref_trade_store.stats()[["id", "text", "type"]]
         lang_stats_df = self.trade_store.stats()[["id", "text"]]
-        combined_df = pd.merge(
-            ref_stats_df,
-            lang_stats_df,
-            on="id",
-            suffixes=("_ref", "_text"),
-            validate="1:1",
-        )
-        combined_df = combined_df.rename(
-            columns={"text_text": "text", "text_ref": "ref"}
-        )
+        combined_df = english_stat_list.with_language_text(ref_stats_df, lang_stats_df)
         out = combined_df[["id", "text", "ref", "type"]]
         out["ref"] = out["ref"].str.replace(r" \(.*\)", "", regex=True)
 
-        self.local_lookup = {row["ref"]: row["text"] for _, row in out.iterrows()}
+        self.local_lookup = english_stat_list.text_by_ref(out)
 
         return out
 
-    def descriptions_hashed(self) -> pd.DataFrame:
-        all_desc_de_dupped = self.game_store.get_all_descriptions().drop_duplicates(
+    def descriptions_hashed(self, store: GameStore | None = None) -> pd.DataFrame:
+        store = store or self.game_store
+        all_desc_de_dupped = store.get_all_descriptions().drop_duplicates(
             "id", keep="last"
         )
-        atlas_ones = self.game_store.get_description(ATLAS_STAT_DESCRIPTIONS)
-        tablet_ones = self.game_store.get_description(TABLET_STAT_DESCRIPTIONS)
+        atlas_ones = store.get_description(ATLAS_STAT_DESCRIPTIONS)
+        tablet_ones = store.get_description(TABLET_STAT_DESCRIPTIONS)
 
         return pd.concat([atlas_ones, tablet_ones, all_desc_de_dupped])
 
@@ -186,7 +184,7 @@ class NdBuilderService:
         return stats_df[~stats_df["id"].str.contains("\\|")]
 
     def value_trade_stats_df(self) -> pd.DataFrame:
-        stats_df = self.stats_combined_df()
+        stats_df = english_stat_list.language_text_rows(self.stats_combined_df())
         value_trade_stats_df: DataFrame = stats_df[
             stats_df["id"].str.contains("\\|")
         ].copy()
@@ -264,7 +262,8 @@ class NdBuilderService:
 
     def set_timeless_matchers(self, in_df: pd.DataFrame) -> pd.DataFrame:
         out_df = in_df.copy()
-        is_timeless = out_df["ref"].str.startswith(("Small", "Notable"))
+        has_text = out_df["ref"].isin(self.local_lookup)
+        is_timeless = out_df["ref"].str.startswith(("Small", "Notable")) & has_text
         column = [
             [{"string": self.local_lookup[ref]}] if timeless else matchers
             for ref, matchers, timeless in zip(
@@ -418,7 +417,7 @@ class NdBuilderService:
         return ImageProvider(self.image_mode, self.image_cache_dir).apply_images(items)
 
     def fill_in_missing_matchers(self, joined_df_i: pd.DataFrame) -> pd.DataFrame:
-        trade_stats_df = self.stats_combined_df()
+        trade_stats_df = english_stat_list.language_text_rows(self.stats_combined_df())
 
         def create_matchers(row: pd.Series) -> list[dict[str, str]]:
             text = row["text"]
@@ -452,8 +451,9 @@ class NdBuilderService:
         ]["ref"].apply(set)
         return refs_to_merge
 
-    def dedupe_matchers(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        refs_to_merge = self.get_refs_to_merge(in_df)
+    def dedupe_matchers(
+        self, in_df: pd.DataFrame, refs_to_merge: pd.Series
+    ) -> pd.DataFrame:
         refs_set = {item for row in refs_to_merge for item in row}
 
         data_with_saved_refs = (

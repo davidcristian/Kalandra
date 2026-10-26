@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +19,8 @@ from services.request_pacer import RequestPacer
 from tests.fake_http import FakeClock, FakeResponse, FakeSession
 
 OUTPUT_FILES = ("stats.ndjson", "items.ndjson", "client_strings.js")
+# A trade id of a stat with a game description; the others take the trade site's text
+STAT_TRADE_ID = re.compile(r"^[a-z]+\.stat_\d+$")
 
 
 @pytest.fixture(scope="module")
@@ -64,6 +68,46 @@ def test_main_matches_a_trade_stat_to_its_english_text(build: Path):
 
     assert life["matchers"] == [{"string": "# to maximum Life"}]
     assert life["trade"]["ids"]["explicit"] == ["explicit.stat_3299347043"]
+
+
+def trade_ids(stats: list[dict[str, Any]]) -> set[str]:
+    return {
+        trade_id
+        for stat in stats
+        for ids in ((stat.get("trade") or {}).get("ids") or {}).values()
+        for trade_id in ids
+    }
+
+
+@pytest.mark.parametrize("lang", [lang for lang in LANGUAGES if lang != ENGLISH])
+def test_main_writes_the_english_stat_list_in_each_language(build: Path, lang: str):
+    english = read_ndjson(build / "output" / ENGLISH / "stats.ndjson")
+    stats = read_ndjson(build / "output" / lang / "stats.ndjson")
+
+    assert sorted(stat["ref"] for stat in stats) == sorted(
+        stat["ref"] for stat in english
+    )
+    assert trade_ids(stats) == trade_ids(english)
+
+
+def has_described_ids(stat: dict[str, Any]) -> bool:
+    ids = trade_ids([stat])
+    return bool(ids) and all(STAT_TRADE_ID.match(trade_id) for trade_id in ids)
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_main_gives_the_stats_that_share_a_game_text_the_same_trade_ids(
+    build: Path, lang: str
+):
+    stats = read_ndjson(build / "output" / lang / "stats.ndjson")
+    ids_by_text: defaultdict[str, set[frozenset[str]]] = defaultdict(set)
+    for stat in filter(has_described_ids, stats):
+        for matcher in stat["matchers"]:
+            key = json.dumps(matcher, sort_keys=True, ensure_ascii=False)
+            ids_by_text[key].add(frozenset(trade_ids([stat])))
+
+    shared = {key: ids for key, ids in ids_by_text.items() if len(ids) > 1}
+    assert shared == {}
 
 
 @pytest.mark.parametrize("lang", LANGUAGES)
