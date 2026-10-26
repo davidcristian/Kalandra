@@ -9,6 +9,7 @@ import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
 import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
+import { addMissingWidgets } from "./missing-widgets";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
@@ -82,6 +83,7 @@ export async function initConfig() {
     return;
   }
 
+  addMissingWidgets(config, defaultConfig().widgets);
   updateConfig(upgradeConfig(config));
 }
 

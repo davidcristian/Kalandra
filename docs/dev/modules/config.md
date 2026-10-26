@@ -45,7 +45,11 @@ old one and keep that file, so a saved config must survive every update: this is
   the item check `craftOfExileKey`, the Delve grid `toggleKey` and the item search `ocrGemsKey` to their values in
   `defaultConfig()` where the saved config has none, and keeps a saved value, `null` included.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no file it uses
-  `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. With a file that is not JSON it uses
+  `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. Before the steps, `addMissingWidgets()` in
+  `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
+  version has, with the next free `wmId`, and logs `[config] Added the default widgets that the saved config
+  lacks:` and their types to the console. A widget that a later step adds, such as the library to a config before
+  version 30, is left to that step. With a file that is not JSON it uses
   `defaultConfig()` and calls `saveConfig({ isTemporary: true })` to make main write `config.json.tmp` and keep
   the broken file. That save fails: `renderer/src/main.ts` calls `initConfig()` before `Host.init()` opens the
   WebSocket, so `Host.sendEvent()` throws, and the page shows the start error
@@ -116,13 +120,15 @@ old one and keep that file, so a saved config must survive every update: this is
   and `< 16` steps copy into widgets, such as `priceCheckKey` and `itemCheckKey`, also stay. These keys change
   nothing, so no step deletes them: such a step would raise `configVersion` and rewrite every saved config with no
   change in behavior.
-- A config without a price check widget throws a `TypeError` at any version
-  ([refinement 099](../refinements/tasks/099-config-without-price-check-throws.md)).
+- The steps read the single instance widgets without a check, so `initConfig()` adds the missing ones first. A
+  config older than version 7 without a map check widget still throws a `TypeError` in the `< 4` or `< 7` step:
+  `defaultConfig()` has no widget of that type, and only an Awakened PoE Trade config edited by hand lacks one.
 - Field names and `wmType` values are keys in saved files. Renaming one takes an upgrade step that moves the value,
   as the `< 7` step does when it turns the `map-check` widget into `item-check`.
 - A new widget type also takes an upgrade step that adds its default instance to saved configs, as the `< 29` and
   `< 30` steps do for `experience-tracker` and `library`. Without one, `AppConfig(type)` returns `undefined` for a
-  user whose saved config is older than the widget.
+  user whose saved config is older than the widget. A single instance type also gets that step's version in
+  `SAVED_SINCE` in `missing-widgets.ts`, and the config upgrade spec fails for a type missing there.
 - A saved config with a higher `configVersion` than the app's, from a newer version, runs no step, only the code
   between the `< 21` and `< 22` steps, and is used as it is. Nothing compares the stored `configVersion` with the
   app's ([refinement 004](../refinements/tasks/004-older-version-uses-newer-config.md)).
@@ -146,8 +152,11 @@ defaults at that version's commits, with a changed league, hotkeys and widget po
 the current version with every key of `defaultConfig()`, gets the default of each key the `< 38` step sets, keeps the
 user's choices, and runs each step once and in order, with the same result when every version in between saved the
 file. It also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that a
-widget of an unknown type stays, and that a config without a price check widget throws. It takes the last step
-version from `defaultConfig()`, so a new step needs no change to the spec. No test runs `getConfigForHost()`
+widget of an unknown type stays. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
+saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
+instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
+check widget still throws. It takes the last step version from `defaultConfig()`, so a new step needs no change to
+the spec. No test runs `getConfigForHost()`
 ([refinement 100](../refinements/tasks/100-host-config-tests.md)).
 `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`

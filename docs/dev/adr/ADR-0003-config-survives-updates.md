@@ -32,7 +32,8 @@ version would end up with different configs.
 
 **4. A new widget type adds its instance in its step.** The `< 3` step shows the form: it pushes the default
 `image-strip` and `delve-grid` widgets into `config.widgets`, each with a new `wmId`. Reason: an existing config has
-only the widgets it was saved with, because `initConfig()` does not merge a saved file with `defaultConfig()`.
+only the widgets it was saved with, because `initConfig()` does not merge a saved file with `defaultConfig()`. It
+adds a missing single instance widget only to a config at or above the version whose step adds that widget.
 
 **5. Field names and `wmType` strings are part of the stored format.** Renaming a field or a widget's `wmType` is a
 change to the config shape, so its step moves the saved value to the new name. Reason: `AppConfig(type)` finds a

@@ -146,8 +146,8 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
 1. At start, `initConfig()` in `renderer/src/web/Config.ts` fetches `GET /config`. main returns the text of
    `apt-data/config.json` from `ConfigStore.load()`; on Windows the file is
    `%APPDATA%\kalandra\apt-data\config.json`.
-2. With no file, the renderer uses `defaultConfig()`. Otherwise `upgradeConfig()` runs every upgrade step above
-   the file's `configVersion`. A file that is not JSON gives `defaultConfig()` and a temporary save that throws, so
+2. With no file, the renderer uses `defaultConfig()`. Otherwise `addMissingWidgets()` adds each single instance
+   widget the file lacks, and `upgradeConfig()` runs every upgrade step above the file's `configVersion`. A file that is not JSON gives `defaultConfig()` and a temporary save that throws, so
    the page shows the start error described below instead of starting ([modules/config.md](modules/config.md)
    says why).
 3. When the overlay mounts, `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with the `HostConfig` that

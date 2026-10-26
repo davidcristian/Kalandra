@@ -1,6 +1,6 @@
 # A saved config without a price check widget stops the overlay from starting
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** config
 **Origin:** [renderer/specs/web/config-upgrade.test.ts](../../../../renderer/specs/web/config-upgrade.test.ts)
 **Verified:** 2026-10-26
@@ -27,3 +27,7 @@ Done looks like: a decision on how to load such a file. A step never changes
 
 - 2026-10-26: Found by the config upgrade spec, which removes the price check widget from each
   saved config and from `defaultConfig()`.
+- 2026-10-26: Done in `fix(renderer): add missing single instance widgets to a saved config`.
+  Before the steps, `initConfig()` adds the default of each single instance widget that the file
+  lacks and a config of its version has, and logs their types. A config older than version 7
+  without a map check widget still throws, since `defaultConfig()` has no widget of that type.

@@ -1,8 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import path from "path";
 import type { Config } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
+import { Host } from "@/web/background/IPC";
+import { registry } from "@/web/overlay/widget-registry";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -18,6 +20,10 @@ const CURRENT = actual.defaultConfig().configVersion;
 // before the XP tracker and the library; 32 is before the library profile; 36 is before the
 // map check marks by ref.
 const VERSIONS = [2, 16, 25, 28, 32, 36];
+
+const SINGLE_WIDGETS = registry.widgets
+  .filter((component) => component.widget.instances === "single")
+  .map((component) => component.widget.type);
 
 const USER_CHOICES = {
   leagueId: "Standard",
@@ -289,19 +295,94 @@ describe("upgradeConfig", () => {
       "filter-generator",
     );
   });
+});
 
-  // The code between the < 21 and < 22 steps reads the price check widget on every load
-  // (docs/dev/refinements/tasks/099-config-without-price-check-throws.md)
+/** Runs the real initConfig() on `config` as the saved file, and returns the config it loads and the lines it logs. */
+async function load(config: Config) {
+  const warnings: string[] = [];
+  const warn = vi
+    .spyOn(console, "warn")
+    .mockImplementation((...args: unknown[]) => {
+      warnings.push(args.join(" "));
+    });
+  vi.mocked(Host.getConfig).mockResolvedValueOnce(JSON.stringify(config));
+  try {
+    await actual.initConfig();
+  } finally {
+    warn.mockRestore();
+  }
+  return { loaded: asSaved(actual.AppConfig()), warnings };
+}
+
+/** Returns each single instance widget type that `config` does not have exactly once. */
+function singleWidgetsNotOnce(config: Config): string[] {
+  return SINGLE_WIDGETS.filter(
+    (type) => config.widgets.filter((w) => w.wmType === type).length !== 1,
+  );
+}
+
+describe("initConfig", () => {
+  beforeAll(() => {
+    vi.stubGlobal("document", { documentElement: { style: {} } });
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it.each(VERSIONS)(
+    "loads a version %i config as upgradeConfig() returns it, without a log line",
+    async (version) => {
+      const { loaded, warnings } = await load(readSaved(version));
+
+      expect(loaded).toEqual(upgrade(readSaved(version)));
+      expect(warnings).toEqual([]);
+    },
+  );
+
+  // The < 4 step, most later ones and the code that runs on every load read the price check
   it.each([...VERSIONS, CURRENT])(
-    "throws a TypeError for a version %i config without a price check widget",
-    (version) => {
+    "adds the default price check widget to a version %i config without one, and logs it",
+    async (version) => {
       const config =
         version === CURRENT
           ? asSaved(actual.defaultConfig())
           : readSaved(version);
       config.widgets = config.widgets.filter((w) => w.wmType !== "price-check");
 
-      expect(() => actual.upgradeConfig(config)).toThrow(TypeError);
+      const { loaded, warnings } = await load(config);
+
+      expect(warnings).toEqual([
+        "[config] Added the default widgets that the saved config lacks: price-check",
+      ]);
+      expect(singleWidgetsNotOnce(loaded)).toEqual([]);
+      expect(configShapeDifferences(loaded, actual.defaultConfig())).toEqual(
+        [],
+      );
     },
   );
+
+  it.each(SINGLE_WIDGETS)(
+    "adds the default %s widget with a new wmId to a current config without one",
+    async (wmType) => {
+      const defaults = asSaved(actual.defaultConfig());
+      const config = asSaved(defaults);
+      config.widgets = config.widgets.filter((w) => w.wmType !== wmType);
+      const wmId = Math.max(...config.widgets.map((w) => w.wmId)) + 1;
+
+      const { loaded } = await load(config);
+
+      expect(loaded.widgets.filter((w) => w.wmType === wmType)).toEqual([
+        { ...defaults.widgets.find((w) => w.wmType === wmType), wmId },
+      ]);
+    },
+  );
+
+  // defaultConfig() has no map check widget, which the steps below version 7 read
+  it("still stops at a version 2 config without a map check widget", async () => {
+    const config = readSaved(2);
+    config.widgets = config.widgets.filter((w) => w.wmType !== "map-check");
+
+    await expect(load(config)).rejects.toThrow(TypeError);
+  });
 });
