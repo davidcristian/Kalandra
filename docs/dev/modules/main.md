@@ -91,7 +91,8 @@ The entry, the server and the app services, in `main/src/`:
   On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when `keepModKeys` is set)
   and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`),
   `stash-search` or `copy-item` (presses the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to
-  the last active client and, with `focusOverlay`, makes the overlay active when it was the last active client). With
+  the last active client and, with `focusOverlay`, makes the overlay active when it was the last active client; it
+  logs each error but `NoItemTextError` as `error [Shortcuts] Failed to copy the item text: <message>`). With
   `logKeys` it logs each key while the game window is active (`key-log.ts`). With `stashScroll` (the Stash tab
   scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active,
   except over the area `isStashArea()` computes.
@@ -100,14 +101,14 @@ The entry, the server and the app services, in `main/src/`:
   write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for
   at most 500 ms (`POLL_LIMIT`). A call during a read presses the keys again and returns the same result. It resolves
   with text that starts as `LANGUAGE_DETECTOR` expects, or logs `warn [ClipboardPoller] No item text found.` and
-  rejects. On Linux it always writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard"
-  feature and a Proton 10 bug (linked in the code). With Restore clipboard on it writes the previous text back, or
-  empty text when that was item text. On Linux it also writes that text back after a failed read that leaves the
-  marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`THROTTLE_TIME`), and until then drops
-  another call to avoid the game's "Too many actions" disconnects. It leaves the text of `cb` on the clipboard, also
-  with Restore clipboard on, since main cannot see when the game pastes. An error in `cb`, such as a failed clipboard
-  write, logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text, and an uncut gem's
-  rarity line, per game language as literals: main reads no game data.
+  rejects with `NoItemTextError`. On Linux it always writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's
+  "Prevent empty clipboard" feature and a Proton 10 bug (linked in the code). With Restore clipboard on it writes the
+  previous text back, or empty text when that was item text. On Linux it also writes that text back after a failed
+  read that leaves the marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`THROTTLE_TIME`), and
+  until then drops another call to avoid the game's "Too many actions" disconnects. It leaves the text of `cb` on the
+  clipboard, also with Restore clipboard on, since main cannot see when the game pastes. An error in `cb`, such as a
+  failed clipboard write, logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text,
+  and an uncut gem's rarity line, per game language as literals: main reads no game data.
 - `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `throttle()`. After its clipboard write ends, it
   presses `Enter`, then `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and
   pastes the text. When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
@@ -215,9 +216,8 @@ The entry, the server and the app services, in `main/src/`:
 - Item text goes to the last active client only; the log, the updater state, the config and the focus state go to
   every client.
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
-- Some existing code drops errors in an empty `.catch()` handler: the `copy-item` handler in `Shortcuts`. New code
-  handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on a new empty `catch` block or
-  `.catch()` handler.
+- Code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on an empty `catch` block
+  or `.catch()` handler.
 
 **Dependencies.** `ipc/types.ts`, `ipc/KeyToCode.ts` and `renderer/content-security-policy.ts`, by relative path. At run
 time Electron 44, and the native modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle

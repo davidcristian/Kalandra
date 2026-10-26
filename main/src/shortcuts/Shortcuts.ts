@@ -5,7 +5,7 @@ import { typeInChat, stashSearch } from "./text-box";
 import { shortcutToElectron } from "./accelerator";
 import { registrableActions } from "./registrable-actions";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
-import { HostClipboard } from "./HostClipboard";
+import { HostClipboard, NoItemTextError } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
 import type { ShortcutAction } from "../../../ipc/types";
 import type { UnregisteredHotkey } from "../../../ipc/hotkeys";
@@ -174,7 +174,14 @@ export class Shortcuts {
                   this.overlay.assertOverlayActive();
                 }
               })
-              .catch(() => {});
+              .catch((error: unknown) => {
+                if (error instanceof NoItemTextError) return;
+                const message =
+                  error instanceof Error ? error.message : String(error);
+                this.logger.write(
+                  `error [Shortcuts] Failed to copy the item text: ${message}`,
+                );
+              });
           }
         },
       );

@@ -1,9 +1,9 @@
 # Existing code in main breaks the empty catch checks of rule 7
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** rules
 **Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 Rule 7 of [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass) bans `any`, a cast through
 `unknown` and an error dropped by an empty `catch`. ESLint checks these in both processes with
@@ -45,3 +45,6 @@ the line. Then its file leaves the main lists.
 - 2026-10-26: The Heist gem OCR was removed ([031](031-path-of-exile-1-features.md)) with the 2
   empty `catch` blocks in `OcrWorker` and the empty `.catch()` handler of the `ocr-text` key, and
   `link-main.ts` left the `no-empty` list.
+- 2026-10-27: fix(main): log the copy item errors that the hotkey handler dropped. The handler
+  logs each error but a copy that finds no item text, which `readItemText()` logs already, and
+  `Shortcuts.ts` left the `no-restricted-syntax` override. No exemption is left.

@@ -10,8 +10,8 @@ import { hook } from "./fake-hook";
 import { FakeServer } from "./fake-server";
 
 // Stands in for the system clipboard and the cursor. A clipboard write ends on a later tick, as the operating
-// system's does.
-const desktop = vi.hoisted(() => ({ clipboard: "" }));
+// system's does, and a read fails while another application holds the clipboard.
+const desktop = vi.hoisted(() => ({ clipboard: "", held: false }));
 
 vi.mock("electron", async () => {
   const os = await import("node:os");
@@ -20,7 +20,10 @@ vi.mock("electron", async () => {
     app: { getPath: () => os.tmpdir() },
     globalShortcut,
     clipboard: {
-      readText: async () => desktop.clipboard,
+      readText: async () => {
+        if (desktop.held) throw new Error("The clipboard is in use");
+        return desktop.clipboard;
+      },
       writeText: async (text: string) => {
         await Promise.resolve();
         desktop.clipboard = text;
@@ -65,6 +68,7 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
   onPlatform("win32");
   desktop.clipboard = "";
+  desktop.held = false;
   // The game copies the item under the cursor when it gets C
   hook.onPress = (pressed) => {
     if (pressed === "C tap") desktop.clipboard = ITEM_TEXT;
@@ -192,6 +196,19 @@ describe("the copy item hotkey", () => {
     expect(itemTexts()).toEqual([]);
     expect(logger.history).toContain(
       "warn [ClipboardPoller] No item text found.",
+    );
+    expect(logger.history).not.toContain("error [Shortcuts]");
+  });
+
+  it("logs an error that stops the copy and sends nothing", async () => {
+    desktop.held = true;
+    await registerOnFocus([copyItem("Ctrl + D")]);
+
+    await pressHotkey("Ctrl+D");
+
+    expect(itemTexts()).toEqual([]);
+    expect(logger.history).toContain(
+      "error [Shortcuts] Failed to copy the item text: The clipboard is in use",
     );
   });
 });

@@ -125,11 +125,6 @@ export default defineConfig(
     files,
     rules: { [rule]: "off" },
   })),
-  // Files that broke one restricted pattern when it was turned on, checked for the other; this list only shrinks too
-  {
-    files: ["src/shortcuts/Shortcuts.ts"],
-    rules: { "no-restricted-syntax": ["error", castThroughUnknown] },
-  },
   // The build script prints its progress to the terminal
   {
     files: ["build/*.mjs"],

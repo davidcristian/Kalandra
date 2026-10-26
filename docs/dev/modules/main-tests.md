@@ -55,8 +55,9 @@ replaces it with `vi.mock("electron", ...)`.
   hotkey and reads the keys it releases from `fake-hook.ts`, which keeps each key main presses, and turns the mouse
   wheel with `Ctrl` at the edges of the stash area.
 - `hotkey-actions.test.ts` presses the copy item hotkey on Windows and macOS with a fake clipboard that the game
-  fills when main taps `C`, and reads the keys and the item text main sends. It also presses the test-only hotkey
-  and registers one that another application holds in `fake-global-shortcut.ts`.
+  fills when main taps `C`, and reads the keys and the item text main sends. A test makes each clipboard read fail
+  and reads the error log line. It also presses the test-only hotkey and registers one that another application holds
+  in `fake-global-shortcut.ts`.
 - `key-names.test.ts` writes hotkeys with `hotkeyToString()`, `mergeTwoHotkeys()` and `shortcutToElectron()`, and
   checks that `KeyToCode` gives each key a code of its own and that `KeyToElectron` has an accelerator for each key.
 

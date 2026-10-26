@@ -7,6 +7,14 @@ const POLL_LIMIT = 500;
 // A chat command or a stash search that comes within this time of the last one is dropped
 const THROTTLE_TIME = 120;
 
+/** The error of a `readItemText()` call that finds no item text, which it has already logged. */
+export class NoItemTextError extends Error {
+  constructor() {
+    super("Reading clipboard timed out");
+    this.name = "NoItemTextError";
+  }
+}
+
 export class HostClipboard {
   private pollPromise?: Promise<string>;
   private elapsed = 0;
@@ -66,7 +74,7 @@ export class HostClipboard {
           await clipboard.writeText(textBefore);
         }
         this.logger.write("warn [ClipboardPoller] No item text found.");
-        throw new Error("Reading clipboard timed out");
+        throw new NoItemTextError();
       }
       textAfter = await readTextAfter(POLL_DELAY);
     }

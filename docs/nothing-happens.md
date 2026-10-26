@@ -76,6 +76,11 @@ time. These lines name a problem and its fix:
 
   Read the next section.
 
+- `error [Shortcuts] Failed to copy the item text: <message>`
+
+  A clipboard read or write failed during the copy, or sending the item text failed, and `<message>` names the error.
+  Press the key again. If the line comes back, [open an issue](https://github.com/davidcristian/Kalandra/issues) with the line.
+
 ## No item text found
 
 ```
