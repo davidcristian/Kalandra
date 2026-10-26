@@ -7,8 +7,7 @@ The trade site rejects a search that has too many filters. The price check windo
 ![The Trade site request failed error box with the message Query is too complex, and the buttons Retry and Browser](/reference-images/complex.png)
 
 The message comes from the trade site: `Query is too complex. Please reduce the amount of filters used. Logging in
-will increase this limit.` The hint under the error also names a **Use pseudo mods** setting. Kalandra has no such
-setting.
+will increase this limit.`
 
 ## Fix it
 

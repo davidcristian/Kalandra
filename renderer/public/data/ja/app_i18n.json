@@ -275,8 +275,7 @@
     "getting_price": "価格取得中 {0}",
     "getting_price_from": "poe.ninjaから…",
     "you_have": "既に所持しています",
-    "stack": "スタック",
-    "fix_complex_query": "設定で\"Use pseudo mods\"を無効にするか、組み込みブラウザでログインしてください"
+    "stack": "スタック"
   },
   "settings": {
     "title": "設定 - Kalandra",

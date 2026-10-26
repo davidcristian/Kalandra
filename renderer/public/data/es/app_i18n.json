@@ -296,7 +296,6 @@
     "stack": "Pila",
     "stock": "Existencias",
     "item_level": "Nivel del objeto",
-    "fix_complex_query": "Desactive la opción \"Usar pseudo mods\" en la configuración o inicie sesión con el navegador integrado",
     "likely_price_fixed": "En su mayoría, moneda no estándar: ",
     "filter_exalt_divine": "Filtrar por Exaltado/Divino",
     "highest_volume": "Volumen máximo:"

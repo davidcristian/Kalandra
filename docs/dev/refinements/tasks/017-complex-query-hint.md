@@ -1,9 +1,9 @@
 # The complex query hint names a setting that does not exist
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/trade/TradeListing.vue](../../../../renderer/src/web/price-check/trade/TradeListing.vue)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 When an item search fails with an error that starts with `Query is too complex.`, `errorFix` in
 `TradeListing.vue` shows `trade_result.fix_complex_query`. The English `app_i18n.json` gives it as
@@ -24,3 +24,4 @@ commit.
   setting the hint names.
 - 2026-10-22: `price_check.use_pseudo`, the label of the setting the hint names, was removed from every
   `app_i18n.json` with the other keys that no code reads.
+- 2026-10-27: fix(trade): remove the nonexistent setting from the complex query hint

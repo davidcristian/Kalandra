@@ -288,8 +288,7 @@
     "getting_price": "Получение цены {0}",
     "getting_price_from": "с poe.ninja …",
     "you_have": "В наличии",
-    "stack": "Стак",
-    "fix_complex_query": "Отключите \"Use pseudo mods\" в настройках или залогиньтесь во встроенном браузере"
+    "stack": "Стак"
   },
   "settings": {
     "title": "Настройки - Kalandra",
