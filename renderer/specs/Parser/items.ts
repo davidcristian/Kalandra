@@ -800,14 +800,18 @@ Monsters have 293(260-300)% increased Critical Hit Chance
 Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.
 `);
 RareMap.category = ItemCategory.Map;
-RareMap.rarity = ItemRarity.Normal;
+RareMap.rarity = ItemRarity.Rare;
+RareMap.itemLevel = 80;
 RareMap.mapTier = 14;
+RareMap.info.refName = "Waystone (Tier 14)";
 RareMap.info.map = { tier: RareMap.mapTier };
 RareMap.mapRevives = 2;
 RareMap.mapPackSize = 34;
 RareMap.mapRareMonsters = 28;
 RareMap.mapDropChance = 75;
 RareMap.sectionCount = 5;
+RareMap.prefixCount = 2;
+RareMap.suffixCount = 2;
 // #endregion RareMap
 
 // #region RareMapFakeAllProps

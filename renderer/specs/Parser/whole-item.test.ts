@@ -9,6 +9,7 @@ import {
   ItemAllTheModifierTypes,
   NewExplicitTypeDefinitions,
   NormalShield,
+  RareMap,
   UnidentifiedBase,
   UnidentifiedTier,
   type TestItem,
@@ -91,6 +92,7 @@ describe("parseClipboard on whole items", () => {
     ["an unidentified wand", UnidentifiedBase],
     ["an unidentified ring with a tier", UnidentifiedTier],
     ["a normal shield with a note", NormalShield],
+    ["a rare waystone", RareMap],
   ])("reads the properties of %s", (_item, item) => {
     expect(fields(parse(item))).toEqual(fields(item));
   });
@@ -105,6 +107,7 @@ describe("parseClipboard on whole items", () => {
     ["a corrupted bow with three runes", BowThreeAugments],
     ["an unidentified wand", UnidentifiedBase],
     ["an unidentified ring with a tier", UnidentifiedTier],
+    ["a rare waystone", RareMap],
   ])("counts the modifiers of %s", (_item, item) => {
     expect(modifierCounts(parse(item))).toEqual(expectedCounts(item));
   });

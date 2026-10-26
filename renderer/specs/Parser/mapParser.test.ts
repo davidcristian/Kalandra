@@ -4,6 +4,7 @@ import { setupTests } from "@specs/vitest.setup";
 import { RareMap, RareMapFakeAllProps, TestItem } from "./items";
 import { init } from "@/assets/data";
 import { ParsedItem } from "@/parser/ParsedItem";
+import { ModifierType } from "@/parser/modifiers";
 import { createTestItem } from "@specs/helper";
 
 function waystoneFields(item: ParsedItem) {
@@ -61,5 +62,52 @@ describe("parseWaystone", () => {
       "SECTION_SKIPPED",
     );
     expect(item.mapRevives).toBeUndefined();
+  });
+
+  it("reads each modifier of a copied waystone, with its stats and rolls", () => {
+    const item = parseClipboard(RareMap.rawText)._unsafeUnwrap();
+
+    expect(item.unknownModifiers).toEqual([]);
+    expect(
+      item.newMods.map(({ info, stats }) => [
+        info.type,
+        info.generation,
+        info.name,
+        info.tier,
+        stats.map(({ stat, roll }) => [stat.ref, roll?.value]),
+      ]),
+    ).toEqual([
+      [
+        ModifierType.Explicit,
+        "prefix",
+        "Shocking",
+        1,
+        [["Area has patches of Shocked Ground", undefined]],
+      ],
+      [
+        ModifierType.Explicit,
+        "prefix",
+        "Painful",
+        1,
+        [["#% increased Monster Damage", 28]],
+      ],
+      [
+        ModifierType.Explicit,
+        "suffix",
+        "of Splitting",
+        2,
+        [["Monsters fire # additional Projectiles", 2]],
+      ],
+      [
+        ModifierType.Explicit,
+        "suffix",
+        "of Destruction",
+        1,
+        [
+          ["Monsters have #% increased Critical Hit Chance", 293],
+          ["#% to Monster Critical Damage Bonus", 26],
+        ],
+      ],
+    ]);
   });
 });
