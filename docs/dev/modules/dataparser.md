@@ -130,7 +130,9 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   logbook faction), plus `id`, `dp`, `fromAreaMods`, `trade.option` and `trade.inverted` where they apply. The parser
   matches mod lines against `matchers`. The types of a trade id without a `|<value>` part are those in `MOD_TYPES`
   (`src/constants/mod_types.py`), with `augment` written as `rune`. Any other type on such an id in the trade site's
-  `stats.json` stops the build with a `ValueError`. Every language gets the English stat list
+  `stats.json` stops the build with a `ValueError`. Each matcher of `Allocates #` has `oils`, the English item names
+  of the three oils that anoint the notable, from the game's `BlightCraftingItems` rows (`get_blight()` in
+  `src/services/value_converter_service.py`). Every language gets the English stat list
   (`src/services/english_stat_list.py`): the same refs and a stat for every English trade id. Stats that share an
   English matcher text become one stat in every language, under the ref the English build keeps. Stats that only the
   language gives the same text stay apart, and each gets the trade ids of all of them, so a search finds any of

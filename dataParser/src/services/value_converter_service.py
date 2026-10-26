@@ -8,6 +8,8 @@ import pandas as pd
 
 from constants.filenames import (
     ADVANCED_MOD_STAT_DESCRIPTIONS,
+    BASE_ITEM_TYPES,
+    BLIGHT_CRAFTING_ITEMS,
     BLIGHT_CRAFTING_RECIPES,
     BLIGHT_CRAFTING_RESULTS,
     PASSIVE_SKILLS,
@@ -24,7 +26,7 @@ from constants.known_stats import (
     VALUE_TO_DESCRIPTION_ID,
     VALUE_TO_REF,
 )
-from constants.lang import GERMAN, LANG
+from constants.lang import ENGLISH, GERMAN, LANG
 from stores.game_store import GameStore
 from stores.helpers.description import Description
 
@@ -55,12 +57,23 @@ def hash_list(stat_hash: int) -> list[int]:
     return [int(stat_hash)]
 
 
+def oil_ref_names(ref_store: GameStore) -> dict[int, str]:
+    """Returns the English item name of each row of BlightCraftingItems, by row index."""
+    oils = ref_store.get(BLIGHT_CRAFTING_ITEMS)[["_index", "BaseItemType"]]
+    names = ref_store.get(BASE_ITEM_TYPES)[["_index", "Name"]]
+    merged = oils.merge(
+        names, left_on="BaseItemType", right_on="_index", suffixes=("", "_base")
+    )
+    return {int(r["_index"]): str(r["Name"]) for r in merged.to_dict(orient="records")}
+
+
 class ValueConverterService:
     def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
         self.blight = self.get_blight()
 
-    def get_blight(self) -> dict[int, str]:
+    def get_blight(self) -> dict[int, list[str]]:
+        """Returns the English names of the oils that anoint each passive, by its graph id."""
         g = GameStore(self.lang)
         passives = g.get(PASSIVE_SKILLS)[["_index", "PassiveSkillGraphId"]]
         blight_recipes = g.get(BLIGHT_CRAFTING_RECIPES)[
@@ -80,10 +93,11 @@ class ValueConverterService:
         filtered = merged2[["BlightCraftingItems", "PassiveSkillGraphId"]].dropna()
         filtered["PassiveSkillGraphId"] = filtered["PassiveSkillGraphId"].astype(int)
         records = filtered.to_dict(orient="records")
+        oil_names = oil_ref_names(GameStore(ENGLISH))
         return {
-            r["PassiveSkillGraphId"]: ",".join(
-                str(oil) for oil in r["BlightCraftingItems"]
-            )
+            r["PassiveSkillGraphId"]: [
+                oil_names[oil] for oil in r["BlightCraftingItems"]
+            ]
             for r in records
         }
 
@@ -122,11 +136,11 @@ class ValueConverterService:
             "better": 1 if id not in BETTER_LOOKUP else BETTER_LOOKUP[id],
         }
         ids: defaultdict[str, set[str]] = defaultdict(set)
-        matchers: list[dict[str, str | int]] = []
+        matchers: list[dict[str, str | int | list[str]]] = []
         seen: set[str] = set()
         for row in value_stat_rows(in_df):
             ids[row.type].add(row.id)
-            matcher: dict[str, str | int] = {
+            matcher: dict[str, str | int | list[str]] = {
                 "string": row.text,
                 "value": int(row.value),
             }
@@ -139,7 +153,7 @@ class ValueConverterService:
                 seen.add(signature)
                 matchers.append(matcher)
         out["trade"] = {"ids": {k: list(v) for k, v in ids.items()}, "option": True}
-        matchers.sort(key=lambda x: x["value"])
+        matchers.sort(key=lambda x: cast(int, x["value"]))
         out["matchers"] = matchers
 
         return pd.DataFrame([out])

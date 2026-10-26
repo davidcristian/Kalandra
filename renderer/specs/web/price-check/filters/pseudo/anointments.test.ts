@@ -3,7 +3,7 @@ import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
 import { NewExplicitTypeDefinitions } from "@specs/Parser/items";
 import { init } from "@/assets/data";
-import { ModifierType } from "@/parser/modifiers";
+import { ModifierType, type StatCalculated } from "@/parser/modifiers";
 import { parseClipboard } from "@/parser";
 import type { ParsedItem } from "@/parser";
 import { createPresets } from "@/web/price-check/filters/create-presets";
@@ -16,6 +16,22 @@ function amulet(enchant = "Allocates Cooked"): ParsedItem {
     enchant,
   );
   return parseClipboard(text)._unsafeUnwrap();
+}
+
+function enchantOf(item: ParsedItem): StatCalculated {
+  return item.statsByType.find((calc) => calc.type === ModifierType.Enchant)!;
+}
+
+function withOils(
+  enchant: StatCalculated,
+  oils: string | string[],
+): StatCalculated {
+  const [source] = enchant.sources;
+  const translation = { ...source.stat.translation, oils };
+  return {
+    ...enchant,
+    sources: [{ ...source, stat: { ...source.stat, translation } }],
+  };
 }
 
 function anointment(item: ParsedItem) {
@@ -68,13 +84,31 @@ describe("the anointment filter of an amulet", () => {
   });
 
   it("names the emotions of an enchant only, not of an explicit Allocates stat", () => {
-    const enchant = amulet().statsByType.find(
-      (calc) => calc.type === ModifierType.Enchant,
-    )!;
+    const enchant = enchantOf(amulet());
 
     expect(decodeOils(enchant)).toHaveLength(3);
     expect(
       decodeOils({ ...enchant, type: ModifierType.Explicit }),
     ).toBeUndefined();
+  });
+
+  it("names the oils of data that lists them by name", () => {
+    const oils = [
+      "Concentrated Liquid Suffering",
+      "Diluted Liquid Ire",
+      "Liquid Envy",
+    ];
+
+    expect(decodeOils(withOils(enchantOf(amulet()), oils))).toEqual(oils);
+  });
+
+  it("names no oils when an index is past the end of the oil table", () => {
+    expect(decodeOils(withOils(enchantOf(amulet()), "13,0,4"))).toBeUndefined();
+  });
+
+  it("names no oils when the item data lacks one of them", () => {
+    const oils = ["Liquid Envy", "Liquid Courage", "Diluted Liquid Ire"];
+
+    expect(decodeOils(withOils(enchantOf(amulet()), oils))).toBeUndefined();
   });
 });

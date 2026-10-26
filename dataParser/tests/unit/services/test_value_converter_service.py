@@ -4,6 +4,8 @@ import pandas as pd
 import pytest
 
 from constants.filenames import (
+    BASE_ITEM_TYPES,
+    BLIGHT_CRAFTING_ITEMS,
     BLIGHT_CRAFTING_RECIPES,
     BLIGHT_CRAFTING_RESULTS,
     PASSIVE_SKILLS,
@@ -171,69 +173,77 @@ def test_convert_value_stats_to_trade_filters_and_transforms():
         )
 
 
-def test_get_blight_correct_output_structure():
-    lang = MagicMock()
+class FakeGameStore:
+    """Returns the tables of a small game export per language, as GameStore reads them."""
 
-    passives_df = pd.DataFrame(
-        [
+    exports: dict[str, dict[str, pd.DataFrame]] = {}
+
+    def __init__(self, lang: str) -> None:
+        self.tables = self.exports[lang]
+
+    def get(self, name: str) -> pd.DataFrame:
+        return self.tables[name].copy()
+
+
+def blight_export(oil_names: dict[int, str]) -> dict[str, pd.DataFrame]:
+    """Returns two anointable passives, 101 and 102, and the oils of the game's first rows."""
+    return {
+        PASSIVE_SKILLS: pd.DataFrame(
+            {"_index": [1, 2, 3], "PassiveSkillGraphId": [101, 102, 103]}
+        ),
+        BLIGHT_CRAFTING_RESULTS: pd.DataFrame(
+            {"_index": [10, 20, 30], "PassiveSkill": [1, 2, 999]}
+        ),
+        BLIGHT_CRAFTING_RECIPES: pd.DataFrame(
             {
-                "_index": 1,
-                "PassiveSkillGraphId": 101,
-                "column_should_be_dropped_1": "x",
-            },
+                "BlightCraftingResult": [10, 20, 999],
+                "BlightCraftingItems": [[9, 0, 4], [10, 10, 0], [0, 0, 0]],
+            }
+        ),
+        # The row order and base items of BlightCraftingItems in the game export
+        BLIGHT_CRAFTING_ITEMS: pd.DataFrame(
             {
-                "_index": 2,
-                "PassiveSkillGraphId": 102,
-                "column_should_be_dropped_1": "y",
-            },
-        ]
-    )
-
-    blight_results_df = pd.DataFrame(
-        [
-            {"_index": 10, "PassiveSkill": 1, "column_should_be_dropped_2": "a"},
-            {"_index": 20, "PassiveSkill": 2, "column_should_be_dropped_2": "b"},
-            {"_index": 30, "PassiveSkill": 999, "column_should_be_dropped_2": "z"},
-        ]
-    )
-
-    blight_recipes_df = pd.DataFrame(
-        [
-            {
-                "BlightCraftingResult": 10,
-                "BlightCraftingItems": [1, 2, 3],
-                "column_should_be_dropped_3": "m",
-            },
-            {
-                "BlightCraftingResult": 20,
-                "BlightCraftingItems": [4, 5, 6],
-                "column_should_be_dropped_3": "n",
-            },
-            {
-                "BlightCraftingResult": 999,
-                "BlightCraftingItems": [9, 9, 9],
-                "column_should_be_dropped_3": "z",
-            },
-        ]
-    )
-
-    game_store_mock = MagicMock()
-    game_store_mock.get.side_effect = lambda key: {
-        PASSIVE_SKILLS: passives_df,
-        BLIGHT_CRAFTING_RESULTS: blight_results_df,
-        BLIGHT_CRAFTING_RECIPES: blight_recipes_df,
-    }[key]
-
-    with patch(
-        "services.value_converter_service.GameStore", return_value=game_store_mock
-    ):
-        svc = ValueConverterService(lang)
-        out = svc.get_blight()
-
-    assert out == {
-        101: "1,2,3",
-        102: "4,5,6",
+                "_index": [0, 4, 9, 10],
+                "BaseItemType": [1111, 1115, 1120, 1131],
+            }
+        ),
+        BASE_ITEM_TYPES: pd.DataFrame(
+            {"_index": list(oil_names), "Name": list(oil_names.values())}
+        ),
     }
+
+
+def test_get_blight_names_each_oil_by_its_english_base_item(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    english = {
+        1131: "Potent Liquid Melancholy",
+        1111: "Diluted Liquid Ire",
+        1120: "Concentrated Liquid Isolation",
+        1115: "Liquid Envy",
+    }
+    german = {
+        1131: "Wirkungsvolle Flüssige Melancholie",
+        1111: "Verdünnter Flüssiger Zorn",
+        1120: "Konzentrierte Flüssige Isolation",
+        1115: "Flüssiger Neid",
+    }
+    FakeGameStore.exports = {
+        ENGLISH: blight_export(english),
+        GERMAN: blight_export(german),
+    }
+    monkeypatch.setattr("services.value_converter_service.GameStore", FakeGameStore)
+
+    expected = {
+        101: ["Concentrated Liquid Isolation", "Diluted Liquid Ire", "Liquid Envy"],
+        102: [
+            "Potent Liquid Melancholy",
+            "Potent Liquid Melancholy",
+            "Diluted Liquid Ire",
+        ],
+    }
+    assert ValueConverterService(ENGLISH).blight == expected
+    assert ValueConverterService(GERMAN).blight == expected
 
 
 def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():

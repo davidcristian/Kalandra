@@ -5,7 +5,7 @@ export interface StatMatcher {
   advanced?: string;
   negate?: true;
   value?: number;
-  oils?: string; // Amulet anointment
+  oils?: string | string[]; // Amulet anointment: oil ref names, or BlightCraftingItems row indexes
 }
 
 export enum StatBetter {

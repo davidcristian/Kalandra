@@ -1,7 +1,9 @@
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { itemIsModifiable, type ParsedItem } from "@/parser";
+import { ITEM_BY_REF } from "@/assets/data";
 import type { StatFilter } from "../interfaces";
 
+// The rows of the game's BlightCraftingItems table, for data that lists oils by row index
 const EMOTIONS = [
   "Diluted Liquid Ire",
   "Diluted Liquid Guilt",
@@ -41,12 +43,15 @@ export function decodeOils(calc: StatCalculated): string[] | undefined {
   }
   if (!encoded) return;
 
-  const decoded = encoded
-    .split(",")
-    .map(Number)
-    .map((idx) => EMOTIONS[idx]);
+  const oils: Array<string | undefined> = Array.isArray(encoded)
+    ? encoded
+    : encoded.split(",").map((idx) => EMOTIONS[Number(idx)]);
+  const known = oils.filter(
+    (oil): oil is string =>
+      oil !== undefined && ITEM_BY_REF("ITEM", oil) !== undefined,
+  );
 
-  return decoded;
+  return known.length === oils.length ? known : undefined;
 }
 
 export function applyAnointmentRules(filters: StatFilter[], item: ParsedItem) {
