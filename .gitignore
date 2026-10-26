@@ -20,16 +20,17 @@ yarn-error.log*
 *.sw?
 .DS_Store
 
-# Electron-builder output
-/dist_electron
-
 # vitepress
 docs/.vitepress/dist
 docs/.vitepress/cache
 
+# The index files that npm run make-index-files writes
 *.bin
 
 # Python
 __pycache__/
 .coverage
+.pytest_cache/
+.ruff_cache/
+htmlcov/
 priceService/.env
