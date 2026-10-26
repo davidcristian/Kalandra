@@ -30,7 +30,9 @@ and [docs/client-log-parser.md](../../../client-log-parser.md) say:
 - In `Client.txt`, Kalandra matches the `level-up` line in the app's language and every other line
   type in English. The open question is whether a client in another language writes those other
   lines in English ([refinement 073](../../refinements/tasks/073-client-log-chat-lines-in-english.md)
-  lists them).
+  lists them). The game data has the Atlas skill point, AFK and NPC texts in each language, so
+  only real lines show the slain, `has received` and Passive skill point texts. A `Temple Atlas`
+  skill point line in English is also needed.
 
 The item texts in other languages in `renderer/specs/Parser/items.ts` are normal and unique items
 without modifier lines, sockets or elemental damage.
