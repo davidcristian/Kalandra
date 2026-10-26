@@ -15,7 +15,7 @@ vi.mock("uiohook-napi", async () => {
   return { uIOhook: chat, UiohookKey: Key };
 });
 
-// A new clipboard for each command, because restoreShortly() skips a command within 120 ms of the last
+// A new clipboard for each command, because throttle() skips a command within 120 ms of the last
 async function type(text: string, send: boolean) {
   await typeInChat(text, send, new HostClipboard(new Logger(new FakeServer())));
 }

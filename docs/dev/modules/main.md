@@ -103,20 +103,20 @@ The entry, the server and the app services, in `main/src/`:
   rejects. On Linux it always writes a `__EE2_FORCE_EMPTY_<time>` marker first, for KDE's "Prevent empty clipboard"
   feature and a Proton 10 bug (linked in the code). With Restore clipboard on it writes the previous text back, or
   empty text when that was item text. On Linux it also writes that text back after a failed read that leaves the
-  marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`RESTORE_AFTER`), and until then drops a
-  call to it or `restoreShortly()` to avoid the game's "Too many actions" disconnects. `restoreShortly(cb)` does the
-  same, then writes the text from before `cb` back with Restore clipboard on. A failed clipboard read or write logs
-  `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text, and an uncut gem's rarity
-  line, per game language as literals: main reads no game data.
-- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `throttle()` and leaves the text on the clipboard,
-  since main cannot see when the game pastes. After its clipboard write ends, it presses `Enter`, then `Ctrl + A`
-  unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and pastes the text.
-  When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
-  `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text
-  ends with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With
-  `send` it presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring back the last chat line.
-  `stashSearch(text, clipboard, overlay)` calls `overlay.focusGameFor()` and, when the game window has the focus,
-  presses `Ctrl + F`, pastes the text and presses `Enter`. macOS uses `Meta` for `Ctrl` in `Ctrl + A`, `Ctrl + Enter` and the paste.
+  marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`THROTTLE_TIME`), and until then drops
+  another call to avoid the game's "Too many actions" disconnects. It leaves the text of `cb` on the clipboard, also
+  with Restore clipboard on, since main cannot see when the game pastes. An error in `cb`, such as a failed clipboard
+  write, logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text, and an uncut gem's
+  rarity line, per game language as literals: main reads no game data.
+- `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `throttle()`. After its clipboard write ends, it
+  presses `Enter`, then `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and
+  pastes the text. When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses
+  `Ctrl + Enter` in place of `Enter` and `Ctrl + A`; `@lasthope hi` stays a whisper to `lasthope`. When the text ends
+  with `@last`, it removes `@last`, presses `Ctrl + Enter`, `Home` twice and `Delete`, and then pastes. With `send` it
+  presses `Enter`, then `Enter`, `ArrowUp` twice and `Escape` to bring back the last chat line.
+  `stashSearch(text, clipboard, overlay)` runs inside `throttle()`, calls `overlay.focusGameFor()` and, when the game
+  window has the focus, presses `Ctrl + F`, pastes the text and presses `Enter`. macOS uses `Meta` for `Ctrl` in
+  `Ctrl + A`, `Ctrl + Enter` and the paste.
 - `key-log.ts`: `logKeyPresses(logger, gameWindow, isOn)` logs `debug [Shortcuts] Keydown <keys>` and
   `debug [Shortcuts] Keyup <key>` for each key the `uiohook-napi` global hook reports while `isOn()` returns true
   and the game window is active. It leaves out the keys typed in other programs, which the global hook also reports.

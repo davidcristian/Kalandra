@@ -61,7 +61,8 @@ export async function stashSearch(
   clipboard: HostClipboard,
   overlay: OverlayWindow,
 ) {
-  await clipboard.restoreShortly(async (clipboard) => {
+  // No restore, as for a chat command: a game that pastes after a restore pastes the previous text
+  await clipboard.throttle(async (clipboard) => {
     if (!overlay.focusGameFor("a stash search")) return;
     await clipboard.writeText(text);
     uIOhook.keyTap(Key.F, [Key.Ctrl]);

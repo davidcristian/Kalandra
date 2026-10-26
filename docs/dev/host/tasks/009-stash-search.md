@@ -9,8 +9,8 @@
 clipboard, and presses Ctrl + F, Ctrl + V and Enter. When the game window does not have the focus
 after that, `focusGameFor` in `main/src/windowing/OverlayWindow.ts` logs
 `warn [Overlay] Skipped a stash search because the game window does not have the focus` and nothing
-is pressed. With Restore clipboard ticked in Settings, General, it puts the old clipboard text back
-120 ms later (`restoreShortly` in `main/src/shortcuts/HostClipboard.ts`). The game does the rest.
+is pressed. The search text stays on the clipboard, also with Restore clipboard ticked in Settings,
+General (`throttle` in `main/src/shortcuts/HostClipboard.ts`). The game does the rest.
 [docs/stash-search.md](../../../stash-search.md) and [docs/item-info.md](../../../item-info.md)
 say:
 
@@ -33,6 +33,8 @@ say:
   (`entrySearchText` in
   `renderer/src/web/stash-search/presets.ts`). In English, `"Number of Trials:"` finds the items
   that the earlier search `Trials:` found.
+- With Restore clipboard on, a game that stalls before it pastes still pastes the search, never the
+  text copied before it.
 
 **Do.** Open the stash and click a search in a Stash search widget. Set a key for Item info in
 Settings, Hotkeys (it has no default), open Item info on an item, and click Find in Stash. Repeat
@@ -41,9 +43,12 @@ Click the dollar sign on items with a price note whose note and name, without qu
 47 characters together. Open Kalandra's page with the tray's Open in Browser, click a search there,
 and check that nothing is typed into the browser and that Settings, Debug shows the warning.
 Set the game and the Language setting to German, add a Stash search widget, and click its search
-and each search of `Dump sorting`.
+and each search of `Dump sorting`. Tick Restore clipboard, copy a word in another program, open the
+stash and click a search.
 
-**Pass.** Each claim holds, and the game's own limit for the search box is noted.
+**Pass.** Each claim holds, and the game's own limit for the search box is noted. With Restore
+clipboard on, the search box never shows the copied word, and a paste in another program after the
+search gives the search text.
 
 **Record.** Any difference goes into the page that states it, in the same commit as this file's
 History line.
@@ -60,3 +65,5 @@ History line.
   setting, and the last one changed from `Trials:` to `"Number of Trials:"`.
 - 2026-10-26: `"Martial Weapon"` and `"Waystone Tier"` of `Dump sorting` now take their text from
   the game data of the Language setting too, such as `Kampfwaffe` and `Wegsteinlevel` in German.
+- 2026-10-26: A stash search now leaves its text on the clipboard with Restore clipboard on, so a
+  game that stalls pastes the search.

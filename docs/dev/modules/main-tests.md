@@ -45,8 +45,9 @@ replaces it with `vi.mock("electron", ...)`.
   stalls pastes the command with Restore clipboard on, that a command during the last one is dropped, and the log
   line and the next command after a failed write.
 - `stash-search.test.ts` runs stash searches through `OverlayWindow` and `GameWindow` with a fake desktop that
-  records the window each key press reaches and the text each paste reaches it with, and checks the restore with
-  Restore clipboard on.
+  records the window each key press reaches and the text each paste reaches it with, or keeps the presses while the
+  game stalls and handles them when it resumes. The tests check that a game that stalls pastes the search with
+  Restore clipboard on, and that a search during the last one is dropped.
 - `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
 - `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts` while the game window is active and checks
   the hotkeys `updateActions()` leaves out. It reads each `MAIN->CLIENT::unregistered-hotkeys` list main sends, as

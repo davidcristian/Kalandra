@@ -1,6 +1,6 @@
 # The clipboard restore after a stash search can come before the game pastes
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** main
 **Origin:** [main/src/shortcuts/text-box.ts](../../../../main/src/shortcuts/text-box.ts)
 **Verified:** 2026-10-26
@@ -28,3 +28,6 @@ Done looks like: a decision for the maintainer, then the change with a test in
 
 - 2026-10-26: Filed when chat commands stopped restoring the clipboard, which left the stash search
   with the timed restore.
+- 2026-10-26: The maintainer chose to leave the search on the clipboard. Done in
+  `fix(main): keep the search text on the clipboard after a stash search`. `stashSearch()` runs in
+  `throttle()`, so Restore clipboard applies only to the keys that copy an item.

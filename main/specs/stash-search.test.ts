@@ -8,12 +8,33 @@ import { FakeServer } from "./fake-server";
 
 // Stands in for the desktop: the window with the focus, the clipboard, each key press with the window it reached
 // and the text each paste reached it with. A clipboard write ends on a later tick, as the operating system's does.
-const desktop = vi.hoisted(() => ({
-  focused: "browser",
-  clipboard: "",
-  presses: [] as string[],
-  pasted: [] as string[],
-}));
+const desktop = vi.hoisted(() => {
+  const state = {
+    focused: "browser",
+    clipboard: "",
+    presses: [] as string[],
+    pasted: [] as string[],
+    // The key presses that wait while the game stalls, or null while it handles each one at once
+    stalled: null as Array<[string, string[]]> | null,
+    keyTap: (key: string, modifiers: string[] = []) => {
+      if (state.stalled) {
+        state.stalled.push([key, modifiers]);
+        return;
+      }
+      state.presses.push(
+        `${state.focused}: ${[...modifiers, key].join(" + ")}`,
+      );
+      if (key === "V") state.pasted.push(state.clipboard);
+    },
+    /** Handles the key presses kept while the game stalled in order, each with the clipboard text of now. */
+    resume: () => {
+      const presses = state.stalled ?? [];
+      state.stalled = null;
+      for (const [key, modifiers] of presses) state.keyTap(key, modifiers);
+    },
+  };
+  return state;
+});
 
 vi.mock("electron", () => ({
   clipboard: {
@@ -27,14 +48,7 @@ vi.mock("electron", () => ({
 
 vi.mock("uiohook-napi", () => ({
   UiohookKey: { Ctrl: "Ctrl", Enter: "Enter", F: "F", Meta: "Meta", V: "V" },
-  uIOhook: {
-    keyTap: (key: string, modifiers: string[] = []) => {
-      desktop.presses.push(
-        `${desktop.focused}: ${[...modifiers, key].join(" + ")}`,
-      );
-      if (key === "V") desktop.pasted.push(desktop.clipboard);
-    },
-  },
+  uIOhook: { keyTap: desktop.keyTap },
 }));
 
 vi.mock("electron-overlay-window", async () => {
@@ -65,13 +79,14 @@ beforeEach(() => {
   desktop.clipboard = "";
   desktop.presses = [];
   desktop.pasted = [];
+  desktop.stalled = null;
 });
 
 afterEach(() => {
   game.removeAllListeners();
 });
 
-// A new clipboard for each search, because restoreShortly() skips a search within 120 ms of the last
+// A new clipboard for each search, because throttle() skips a search within 120 ms of the last
 async function search(text: string) {
   await stashSearch(text, new HostClipboard(logger), overlay);
 }
@@ -91,17 +106,31 @@ describe("stashSearch", () => {
     expect(desktop.pasted).toEqual(["Currency"]);
   });
 
-  it("writes the text copied before back after the search with Restore clipboard on", async () => {
+  it("pastes the search from a game that stalls with Restore clipboard on", async () => {
     desktop.focused = "game";
     game.isActive = true;
-    desktop.clipboard = "copied text";
+    desktop.clipboard = "password";
     const clipboard = new HostClipboard(logger);
     clipboard.updateOptions(true);
+    desktop.stalled = [];
 
     await stashSearch("Currency", clipboard, overlay);
+    desktop.resume();
 
     expect(desktop.pasted).toEqual(["Currency"]);
-    expect(desktop.clipboard).toBe("copied text");
+    expect(desktop.clipboard).toBe("Currency");
+  });
+
+  it("drops a search that comes before the last one ends", async () => {
+    desktop.focused = "game";
+    game.isActive = true;
+    const clipboard = new HostClipboard(logger);
+
+    const first = stashSearch("Currency", clipboard, overlay);
+    await stashSearch("Waystone", clipboard, overlay);
+    await first;
+
+    expect(desktop.pasted).toEqual(["Currency"]);
   });
 
   it("focuses the game first while the overlay has the focus", async () => {
