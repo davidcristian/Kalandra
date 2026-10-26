@@ -71,6 +71,8 @@ jobs:
       with:
         node-version: 24
     - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
     - run: npm ci
       working-directory: ./renderer
     - run: npm ci
