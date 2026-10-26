@@ -121,7 +121,7 @@ The interface text of each language is in
 
 ### Why does the price check show another item with the same name?
 
-In some game languages, Kalandra's game data gives two items the same name. Kalandra picks a unique by its base type
+In some game languages, the game gives two items the same name. Kalandra picks a unique by its base type
 and a base type by the defences the item shows: armour, evasion and energy shield. When those match too, it takes
 the first of the two in its data, which can be the wrong one. Check the item the price check shows before you use
 its prices.
