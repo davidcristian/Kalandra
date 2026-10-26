@@ -15,9 +15,10 @@ which nothing renders, and `www.poeprices.info` is still in `PROXY_HOSTS` in `ma
 
 This is a decision for the maintainer, with two outcomes:
 
-- Restore the component, after checking that poeprices returns prices for Path of Exile 2 items. The
-  request goes to a live site, so it needs the maintainer's go-ahead
-  ([AGENTS.md](../../../../AGENTS.md#safety)), and the user page then documents the setting. Its
+- Restore the component, after checking that poeprices returns prices for Path of Exile 2 items
+  and that `requestPoeprices` converts a price in Exalted Orbs correctly. The request goes to a
+  live site, so it needs the maintainer's go-ahead ([AGENTS.md](../../../../AGENTS.md#safety)),
+  and the user page then documents the setting. Its
   English text moves into `app_i18n.json`, `price-prediction/` leaves `SKIPPED_DIRS` in
   `renderer/specs/web/template-text.test.ts`, and the Acknowledgments in the README credit
   poeprices.info again.
@@ -35,3 +36,5 @@ and ADR-0005 match it.
   reviews, by reading `CheckedItem.vue` and searching for callers of `requestPoeprices`.
 - 2026-10-26: Checked again. The README no longer credits poeprices.info, since the app sends it
   no request.
+- 2026-10-26: The conversion check was added here from a FIXME comment in `requestPoeprices`,
+  which was removed.

@@ -433,7 +433,6 @@ async function loadTradeData() {
       }
     } else if (!baseType) {
       if (name && items.has(name)) {
-        // TODO: currency works without tradeTag, just ninja only, see if that is fine
         const craftable = category
           ? { category }
           : forceCraftable

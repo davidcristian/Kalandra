@@ -66,7 +66,6 @@ export async function requestPoeprices(
       throw new Error("poeprices.info gave the price in Exalted Orbs.");
     }
     const converted = autoCurrency([
-      // FIXME: check this if poeprices ever gets poe2 support
       data.min * xchgExalted.primaryValue,
       data.max * xchgExalted.primaryValue,
     ]);
@@ -130,9 +129,7 @@ function querystring(q: Record<string, string | number>) {
     .join("&");
 }
 
-/**
- * @deprecated TODO blocked by poeprices.info not supporting advanced text
- */
+/** Removes the roll ranges and modifier headers of advanced item text, which poeprices.info does not read. */
 function transformItemText(rawText: string) {
   // this may not account for all cases
   return rawText

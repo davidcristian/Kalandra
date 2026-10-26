@@ -515,7 +515,7 @@ function parseNamePlate(section: string[]) {
   let missingItemClass = false;
 
   if (!line?.startsWith(_$.ITEM_CLASS)) {
-    // HACK: Meta skill gems
+    // Meta skill gems copy without the Item Class line
     if (line && section.unshift(line) && isItemMissingItemClass(section)) {
       missingItemClass = true;
     } else {

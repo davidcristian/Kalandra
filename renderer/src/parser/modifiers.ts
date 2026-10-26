@@ -144,7 +144,6 @@ export function translateStatWithRoll(
       translation = matchers.find((m) => m.value === roll.value);
     }
     if (!translation) {
-      // TODO: for some stats reduced is better (m.negate === true)
       const sameSign = Math.sign(roll.min) === Math.sign(roll.max);
       translation = sameSign
         ? matchers.find(

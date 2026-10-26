@@ -1582,7 +1582,6 @@ function buildNameBlock(
       const { name, values, type } = prop;
       let text: string | undefined;
       switch (type) {
-        // TODO: swap to dps from extended
         case TradePropType.WeaponPhysicalDamage:
           block.push({
             text: "item.physical_dps",

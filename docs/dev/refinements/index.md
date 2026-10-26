@@ -156,3 +156,6 @@ layout and its reasons.
 - 092: [The default macOS Client.txt path is the folder of the Path of Exile 1 Mac client](tasks/092-macos-client-log-path.md)
 - 093: [Existing code in main and the renderer uses non-null assertions](tasks/093-non-null-assertions-in-existing-code.md)
 - 094: [No check follows a link to another site](tasks/094-no-check-for-links-to-other-sites.md)
+- 095: [No ESLint config checks type assertions on object literals](tasks/095-object-literal-type-assertions.md)
+- 096: [The trade site's league and item lists name no Hardcore league and no trade tag](tasks/096-trade-site-lists-lack-hardcore-and-trade-tags.md)
+- 097: [A stat whose roll range crosses zero always gets the text without negate](tasks/097-stat-range-across-zero-text.md)

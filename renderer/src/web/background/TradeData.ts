@@ -184,7 +184,6 @@ export const useTradeData = createGlobalState(() => {
     lastInterestTime = Date.now();
   }
 
-  // TODO: remove possibly, if this is laggy then don't want to load at random times
   setInterval(() => {
     load();
   }, RETRY_INTERVAL_MS);

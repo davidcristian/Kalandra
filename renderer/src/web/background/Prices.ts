@@ -117,7 +117,6 @@ export const DivCurrency: CoreCurrency = {
 export const usePoeninja = createGlobalState(() => {
   const leagues = useLeagues();
 
-  // TODO: move out of here
   const ITEM_DROP = shallowRef<DropEntry[]>([]);
 
   const availableCoreCurrencies = shallowRef<CoreCurrency[]>([]);
@@ -202,7 +201,6 @@ export const usePoeninja = createGlobalState(() => {
 
       PRICES_DB = splitJsonBlob(jsonBlob, ninjaSchema);
 
-      // TODO: update to search for requested currency instead of divine
       const divineRates = ninjaXchg.rates;
       const preferred = selectedCoreCurrencyId.value;
 

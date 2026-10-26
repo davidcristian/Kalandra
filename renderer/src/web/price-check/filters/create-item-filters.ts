@@ -137,7 +137,7 @@ export function createFilters(
   } else if (item.category === ItemCategory.HeistBlueprint) {
     filters.searchRelaxed = {
       category: item.category,
-      disabled: true, // TODO: blocked by https://www.pathofexile.com/forum/view-thread/3109852
+      disabled: true,
     };
     filters.searchExact = {
       baseType: item.info.name,

@@ -63,9 +63,6 @@ export default defineConfigWithVueTs(
       "no-empty": ["error", { allowEmptyCatch: false }],
       "no-restricted-syntax": ["error", castThroughUnknown, emptyCatchHandler],
       "vue/require-valid-default-prop": "error",
-
-      // TODO: refactor IPC and enable
-      "@typescript-eslint/consistent-type-assertions": "off",
     },
   },
 
