@@ -155,10 +155,10 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    starts it when main creates it.
 4. `saveConfig()` sends `CLIENT->MAIN::save-config` with the whole config as JSON when it differs from the last
    one sent or received, and never while an exclusive widget is shown. It runs when the overlay window loses
-   focus and after an exclusive widget other than the settings window closes. Save in the settings window applies
-   the edited copy and calls `pushHostConfig()`, which main applies at once, and `saveConfig()`. The settings
-   window is itself an exclusive widget that is still shown at that moment, so that call sends nothing, and the
-   file is written by the next save that runs, such as the one when the overlay window loses focus.
+   focus, after an exclusive widget other than the settings window closes, and on Save in the settings window.
+   Save runs `saveSettings()` in `renderer/src/web/settings/save-settings.ts`. It applies the edited copy, hides
+   the window, which is itself an exclusive widget, and then calls `saveConfig()` and `pushHostConfig()`, so main
+   writes the file and applies the new settings at once.
 5. `ConfigStore` sends `MAIN->CLIENT::config-changed` to every client, and each client replaces its config with
    the one sent. It writes the file after any earlier save, so the last save is the one on disk. In development,
    main writes no file.

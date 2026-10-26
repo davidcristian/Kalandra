@@ -4,9 +4,8 @@ title: Settings
 
 The settings window holds Kalandra's options. To open it, press the overlay key in Path of Exile 2 (`Shift + Space`
 by default) and click the cog icon in the main button bar, the row of icons that the overlay shows for opening
-its widgets. Click **Save** at the bottom of the window to apply your changes,
-or **Cancel** to close the window without them. Kalandra stores the settings in `config.json`
-([where it is](/download#where-kalandra-keeps-your-settings)).
+its widgets. Click **Save** at the bottom of the window to apply your changes and store them in `config.json`
+([where it is](/download#where-kalandra-keeps-your-settings)), or **Cancel** to close the window without them.
 
 The menu on the left lists the pages in this order: Hotkeys, Chat, General, Price check, Map check, Item info,
 Leveling, Help, Debug and About. The **Quit** button under the menu closes Kalandra.

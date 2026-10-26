@@ -70,9 +70,9 @@ old one and keep that file, so a saved config must survive every update: this is
   check.
 - `AppConfig()` returns the current config, and `AppConfig<T>(type)` returns the first widget config whose
   `wmType` is `type`. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
-  in place. The settings window edits a deep copy and applies it on Save
-  ([architecture.md](../architecture.md#the-config-from-file-to-settings) says when the file is then written).
-  `settings/draft.ts` holds the copy. While the window is open, Language and Preferred trade site also go into the
+  in place. The settings window edits a deep copy. On Save, `saveSettings()` in `settings/save-settings.ts`
+  applies it and hides the window before it calls `saveConfig()`, so the save is sent at once
+  ([architecture.md](../architecture.md#the-config-from-file-to-settings)). `settings/draft.ts` holds the copy. While the window is open, Language and Preferred trade site also go into the
   current config, so the window's text switches at once and **Refresh** on its Price check page uses the new trade
   site. Closing the window without Save puts back the old values. `settings/hotkey-conflicts.ts` runs
   `shortcutActions()` on the copy, and `HotkeyInput.vue` outlines in red a field whose hotkey another action has,
@@ -191,6 +191,8 @@ instance widget gets the default one with a new `wmId` and a log line, and that 
 check widget and a version 15 config without its Delve grid still throw. It takes the last step version from `defaultConfig()`, so a new step needs no change to
 the spec. No test runs `getConfigForHost()`
 ([refinement 100](../refinements/tasks/100-host-config-tests.md)).
+`renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and checks that Save
+sends `save-config` with the edited copy and the window hidden, then `update-host-config`.
 `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and

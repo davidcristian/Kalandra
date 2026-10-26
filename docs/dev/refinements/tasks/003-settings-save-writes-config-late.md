@@ -1,9 +1,9 @@
 # Save in the Settings window does not write config.json at once
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** config
 **Origin:** [renderer/src/web/settings/SettingsWindow.vue](../../../../renderer/src/web/settings/SettingsWindow.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `save()` in `SettingsWindow.vue` calls `updateConfig()` with the edited copy, then `saveConfig()`,
 `pushHostConfig()` and `wm.hide()`. `saveConfig()` in `renderer/src/web/Config.ts` returns without
@@ -27,3 +27,4 @@ Done looks like: Save sends `CLIENT->MAIN::save-config`, for example by hiding t
 
 - 2026-10-18: Found while the config module doc was written, by reading `save()`, `saveConfig()`
   and the `topmostOrExclusiveWidget` watch. Not reproduced in a running app.
+- 2026-10-27: fix(renderer): write config.json at once on save in the settings window

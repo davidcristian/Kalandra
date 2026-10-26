@@ -112,12 +112,7 @@ import {
   watch,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import {
-  AppConfig,
-  updateConfig,
-  saveConfig,
-  pushHostConfig,
-} from "@/web/Config";
+import { AppConfig } from "@/web/Config";
 import { APP_PATRONS } from "@/assets/data";
 import { Host } from "@/web/background/IPC";
 import type {
@@ -141,6 +136,7 @@ import SettingsLeveling from "../leveling/settings-leveling.vue";
 import SettingsLibrary from "../library/settings-library.vue";
 import { disableWidget, enableWidget, findWidget } from "./utils";
 import { settingsDraft } from "./draft";
+import { saveSettings } from "./save-settings";
 import { menuPages, type SettingsPage } from "./menu";
 
 const PAGES: Record<SettingsPage, Component> = {
@@ -312,11 +308,7 @@ export default defineComponent({
     return {
       t,
       save() {
-        updateConfig(configClone.value!);
-        saveConfig();
-        pushHostConfig();
-
-        wm.hide(props.config.wmId);
+        saveSettings(configClone.value!, () => wm.hide(props.config.wmId));
       },
       cancel() {
         wm.hide(props.config.wmId);
