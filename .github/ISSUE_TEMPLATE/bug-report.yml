@@ -37,8 +37,8 @@ body:
       description: Selection for bugs that are known to occur frequently with game updates
       options:
         - An error occurred while parsing the item
-        - Not Recognized Modifier
-        - No modifiers found
+        - Not recognized modifier
+        - No relevant stats were found
         - Other
       default: 3
     validations:
