@@ -1,9 +1,9 @@
 # The XP tracker page describes Over in words that differ from its formula at a safe zone step
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** docs
 **Origin:** [docs/xp-tracker.md](../../../xp-tracker.md)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-26
 
 [docs/xp-tracker.md](../../../xp-tracker.md) says that `Over` is how many levels you are above the
 lowest level that still gets full experience in the area. The widget shows
@@ -23,3 +23,6 @@ Done looks like: the sentence about `Over` in docs/xp-tracker.md matches the for
 
 - 2026-10-25: Found while the XP formula moved into `xp-formula.ts` and its tests compared the
   page with the code.
+- 2026-10-26: The page now says that the area level plus `Over` is the highest area level with
+  full experience. The safe zone text, the image and its alt text apply the safe zone only when the
+  area level is above the player's, as `getExpPenalty()` does.

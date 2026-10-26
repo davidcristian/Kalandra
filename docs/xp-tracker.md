@@ -63,8 +63,9 @@ Windows). [Client log file](/client-log-parser) describes the file.
 - `Exp` is your experience multiplier in this area: green at 100%, red below. It shows while
   `Show experience gain percentage` is checked on the `Leveling` page, which is the default. `Exp *` marks a value
   the formula has no test data for, as [The formula](#the-formula) explains.
-- `Over` is how many levels you are above the lowest level that still gets full experience in this area. It is green
-  at 0 or 1, and red below 0, where the area is too far above your level and you lose experience.
+- `Over` is how many levels higher an area can be than this one while you still get full experience, so the area
+  level plus `Over` is the highest area level that gives you 100%. It is green at 0 or 1, and red below 0, where the
+  area is too far above your level and you lose experience.
 
 ![The Show experience gain percentage checkbox](/reference-images/LevelingSettings2.png)
 
@@ -83,9 +84,9 @@ level, `P`, and the area level, `A`.
 
 The safe zone is the number of levels an area can be above yours while you still get 100%. Its formula is the same
 as [in Path of Exile 1](https://www.poewiki.net/wiki/Experience#Experience_penalties), except that the safe zone is 0
-when your level is higher than the area level. Any area below your level reduces your experience.
+unless the area level is higher than yours. Any area below your level reduces your experience.
 
-![SafeZone is floor(3 + PlayerLevel / 16) when the player level is at most the monster level, and 0 otherwise](/reference-images/safeZoneFormula.svg)
+![SafeZone is floor(3 + PlayerLevel / 16) when the player level is below the monster level, and 0 otherwise](/reference-images/safeZoneFormula.svg)
 
 Outside the safe zone, `D` is how many levels the area is outside it, and the widget computes the multiplier from it:
 
