@@ -1,0 +1,183 @@
+{
+  "configVersion": 28,
+  "leagueId": "Standard",
+  "overlayKey": "Alt + Space",
+  "overlayBackground": "rgba(129, 139, 149, 0.15)",
+  "overlayBackgroundClose": true,
+  "overlayAlwaysClose": false,
+  "restoreClipboard": false,
+  "showAttachNotification": true,
+  "commands": [
+    { "text": "/hideout", "hotkey": "F5", "send": true },
+    { "text": "/exit", "hotkey": "F10", "send": true },
+    { "text": "@last ty", "hotkey": null, "send": true },
+    { "text": "/invite @last", "hotkey": null, "send": true },
+    { "text": "/tradewith @last", "hotkey": null, "send": true },
+    { "text": "/hideout @last", "hotkey": null, "send": true }
+  ],
+  "clientLog": null,
+  "gameConfig": null,
+  "windowTitle": "Path of Exile 2",
+  "logKeys": false,
+  "accountName": "",
+  "stashScroll": true,
+  "language": "en",
+  "preferredTradeSite": "default",
+  "realm": "pc-ggg",
+  "fontSize": 16,
+  "widgets": [
+    {
+      "wmId": 1,
+      "wmType": "menu",
+      "wmTitle": "",
+      "wmWants": "show",
+      "wmZorder": 1,
+      "wmFlags": ["invisible-on-blur", "menu::skip"],
+      "anchor": { "pos": "tl", "x": 5, "y": 5 },
+      "alwaysShow": false
+    },
+    {
+      "wmId": 2,
+      "wmType": "settings",
+      "wmTitle": "{icon=fa-cog}",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["invisible-on-blur", "ignore-ui-visibility"]
+    },
+    {
+      "wmId": 3,
+      "wmType": "item-search",
+      "wmTitle": "{icon=fa-search}",
+      "wmWants": "hide",
+      "wmZorder": null,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 10, "y": 20 },
+      "ocrGemsKey": null
+    },
+    {
+      "wmId": 4,
+      "wmType": "stash-search",
+      "wmTitle": "Map rolling",
+      "wmWants": "hide",
+      "wmZorder": null,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 61.5, "y": 30.25 },
+      "enableHotkeys": true,
+      "entries": [
+        {
+          "id": 1,
+          "name": "",
+          "text": "\"Increased Pack Size\"",
+          "hotkey": null
+        },
+        { "id": 2, "name": "", "text": "\"Additional Packs\"", "hotkey": null },
+        { "id": 3, "name": "", "text": "\"Burning Ground\"", "hotkey": null },
+        {
+          "id": 4,
+          "name": "",
+          "text": "\"Less Recovery Rate\"",
+          "hotkey": null
+        }
+      ]
+    },
+    {
+      "wmId": 5,
+      "wmType": "stash-search",
+      "wmTitle": "Dump sorting",
+      "wmWants": "hide",
+      "wmZorder": null,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 34, "y": 56 },
+      "enableHotkeys": true,
+      "entries": [
+        { "id": 1, "name": "", "text": "Currency", "hotkey": null },
+        { "id": 2, "name": "", "text": "\"Martial Weapon\"", "hotkey": null },
+        { "id": 3, "name": "", "text": "Jewel", "hotkey": null },
+        { "id": 4, "name": "", "text": "\"Waystone Tier\"", "hotkey": null },
+        { "id": 5, "name": "", "text": "\"Rarity: Normal\"", "hotkey": null },
+        { "id": 6, "name": "", "text": "Trials:", "hotkey": null }
+      ]
+    },
+    {
+      "wmId": 6,
+      "wmType": "price-check",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["hide-on-blur", "menu::skip"],
+      "showRateLimitState": false,
+      "apiLatencySeconds": 2,
+      "collapseListings": "api",
+      "smartInitialSearch": true,
+      "lockedInitialSearch": true,
+      "activateStockFilter": false,
+      "builtinBrowser": false,
+      "hotkey": "E",
+      "hotkeyHold": "Ctrl",
+      "hotkeyLocked": "Ctrl + Alt + D",
+      "showSeller": false,
+      "searchStatRange": 10,
+      "showCursor": true,
+      "requestPricePrediction": false,
+      "rememberCurrency": false,
+      "defaultAllSelected": false,
+      "itemHoverTooltip": "keybind",
+      "autoFillEmptyRuneSockets": false,
+      "alwaysShowTier": false,
+      "openItemEditorAbove": false
+    },
+    {
+      "wmId": 7,
+      "wmType": "item-check",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["hide-on-blur", "menu::skip"],
+      "hotkey": null,
+      "wikiKey": null,
+      "poedbKey": null,
+      "craftOfExileKey": null,
+      "stashSearchKey": null,
+      "samePricedKey": null,
+      "samePricedType": "both",
+      "maps": {
+        "profile": 1,
+        "showNewStats": false,
+        "selectedStats": [
+          { "matcher": "#% maximum Player Resistances", "decision": "w--" },
+          {
+            "matcher": "Monsters reflect #% of Physical Damage",
+            "decision": "d--"
+          },
+          {
+            "matcher": "Monsters reflect #% of Elemental Damage",
+            "decision": "d--"
+          },
+          { "matcher": "Area contains two Unique Bosses", "decision": "g--" }
+        ]
+      }
+    },
+    {
+      "wmId": 8,
+      "wmType": "image-strip",
+      "wmTitle": "Cheat sheets",
+      "wmWants": "hide",
+      "wmZorder": null,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tc", "x": 50, "y": 10 },
+      "images": [{ "id": 1, "url": "syndicate.jpg" }]
+    },
+    {
+      "wmId": 9,
+      "wmType": "delve-grid",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": null,
+      "wmFlags": ["hide-on-focus", "menu::skip"],
+      "toggleKey": null
+    }
+  ],
+  "enableAlphas": false,
+  "alphas": [],
+  "tipsFrequency": 3
+}

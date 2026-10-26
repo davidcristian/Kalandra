@@ -1,0 +1,168 @@
+{
+  "configVersion": 16,
+  "leagueId": "Standard",
+  "overlayKey": "Alt + Space",
+  "overlayBackground": "rgba(129, 139, 149, 0.15)",
+  "overlayBackgroundClose": true,
+  "restoreClipboard": false,
+  "showAttachNotification": true,
+  "commands": [
+    { "text": "/hideout", "hotkey": "F5", "send": true },
+    { "text": "/exit", "hotkey": "F10", "send": true },
+    { "text": "@last ty", "hotkey": null, "send": true },
+    { "text": "/invite @last", "hotkey": null, "send": true },
+    { "text": "/tradewith @last", "hotkey": null, "send": true },
+    { "text": "/hideout @last", "hotkey": null, "send": true }
+  ],
+  "clientLog": null,
+  "gameConfig": null,
+  "windowTitle": "Path of Exile 2",
+  "logKeys": false,
+  "accountName": "",
+  "stashScroll": true,
+  "language": "en",
+  "realm": "pc-ggg",
+  "fontSize": 16,
+  "widgets": [
+    {
+      "wmId": 1,
+      "wmType": "menu",
+      "wmTitle": "",
+      "wmWants": "show",
+      "wmZorder": 1,
+      "wmFlags": ["invisible-on-blur", "skip-menu"],
+      "anchor": { "pos": "tl", "x": 5, "y": 5 },
+      "alwaysShow": false
+    },
+    {
+      "wmId": 2,
+      "wmType": "price-check",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["hide-on-blur", "skip-menu"],
+      "showRateLimitState": false,
+      "apiLatencySeconds": 2,
+      "collapseListings": "api",
+      "smartInitialSearch": true,
+      "lockedInitialSearch": true,
+      "activateStockFilter": false,
+      "builtinBrowser": false,
+      "hotkey": "E",
+      "hotkeyHold": "Ctrl",
+      "hotkeyLocked": "Ctrl + Alt + D",
+      "showSeller": false,
+      "searchStatRange": 10,
+      "showCursor": true,
+      "requestPricePrediction": false,
+      "rememberCurrency": false
+    },
+    {
+      "wmId": 3,
+      "wmType": "item-check",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["hide-on-blur", "skip-menu"],
+      "hotkey": null,
+      "wikiKey": null,
+      "poedbKey": null,
+      "craftOfExileKey": null,
+      "stashSearchKey": null,
+      "maps": {
+        "profile": 1,
+        "showNewStats": false,
+        "selectedStats": [
+          { "matcher": "#% maximum Player Resistances", "decision": "w--" },
+          {
+            "matcher": "Monsters reflect #% of Physical Damage",
+            "decision": "d--"
+          },
+          {
+            "matcher": "Monsters reflect #% of Elemental Damage",
+            "decision": "d--"
+          },
+          { "matcher": "Area contains two Unique Bosses", "decision": "g--" }
+        ]
+      }
+    },
+    {
+      "wmId": 4,
+      "wmType": "delve-grid",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": 4,
+      "wmFlags": ["hide-on-focus", "skip-menu"],
+      "toggleKey": null
+    },
+    {
+      "wmId": 5,
+      "wmType": "settings",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": "exclusive",
+      "wmFlags": ["invisible-on-blur", "ignore-ui-visibility"]
+    },
+    {
+      "wmId": 6,
+      "wmType": "item-search",
+      "wmTitle": "",
+      "wmWants": "hide",
+      "wmZorder": 6,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 10, "y": 20 }
+    },
+    {
+      "wmId": 101,
+      "wmType": "stash-search",
+      "wmTitle": "Map rolling",
+      "wmWants": "hide",
+      "wmZorder": 101,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 61.5, "y": 30.25 },
+      "entries": [
+        { "id": 1, "name": "", "text": "\"Pack Size: +3\"", "hotkey": null },
+        { "id": 2, "name": "", "text": "Reflect", "hotkey": null },
+        {
+          "id": 3,
+          "name": "",
+          "text": "\"Cannot Leech Life\"",
+          "hotkey": null
+        },
+        { "id": 4, "name": "", "text": "\"Cannot Leech Mana\"", "hotkey": null }
+      ]
+    },
+    {
+      "wmId": 102,
+      "wmType": "stash-search",
+      "wmTitle": "Dump sorting",
+      "wmWants": "hide",
+      "wmZorder": 102,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tl", "x": 34, "y": 56 },
+      "entries": [
+        { "id": 1, "name": "", "text": "Currency", "hotkey": null },
+        { "id": 2, "name": "", "text": "\"Divination Card\"", "hotkey": null },
+        { "id": 3, "name": "", "text": "Fossil", "hotkey": null },
+        { "id": 4, "name": "", "text": "\"Map Tier\"", "hotkey": null },
+        {
+          "id": 5,
+          "name": "",
+          "text": "\"Map Device\" \"Rarity: Normal\"",
+          "hotkey": null
+        },
+        { "id": 6, "name": "", "text": "Tane Laboratory", "hotkey": null }
+      ]
+    },
+    {
+      "wmId": 103,
+      "wmType": "image-strip",
+      "wmTitle": "Cheat sheets",
+      "wmWants": "hide",
+      "wmZorder": 103,
+      "wmFlags": ["invisible-on-blur"],
+      "anchor": { "pos": "tc", "x": 50, "y": 10 },
+      "images": [{ "id": 1, "url": "syndicate.jpg" }]
+    }
+  ]
+}

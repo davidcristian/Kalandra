@@ -159,3 +159,6 @@ layout and its reasons.
 - 095: [No ESLint config checks type assertions on object literals](tasks/095-object-literal-type-assertions.md)
 - 096: [The trade site's league and item lists name no Hardcore league and no trade tag](tasks/096-trade-site-lists-lack-hardcore-and-trade-tags.md)
 - 097: [A stat whose roll range crosses zero always gets the text without negate](tasks/097-stat-range-across-zero-text.md)
+- 098: [Saved configs of versions 2 to 21 upgrade without some keys of defaultConfig()](tasks/098-old-configs-lack-default-keys.md)
+- 099: [A saved config without a price check widget stops the overlay from starting](tasks/099-config-without-price-check-throws.md)
+- 100: [No test covers getConfigForHost](tasks/100-host-config-tests.md)

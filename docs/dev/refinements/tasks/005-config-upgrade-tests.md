@@ -1,9 +1,9 @@
 # No test covers upgradeConfig, defaultConfig or getConfigForHost
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** config
 **Origin:** [renderer/specs/vitest.setup.ts](../../../../renderer/specs/vitest.setup.ts)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-26
 
 `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test file:
 `vi.mock("@/web/Config", ...)` returns only `AppConfig` and `TipsFrequency`, and `AppConfig` reads
@@ -32,3 +32,7 @@ defaults at older commits, found with `git log -p -- renderer/src/web/Config.ts`
 - 2026-10-25: `renderer/vitest.config.ts` adds the Vue plugin, so a test can load the real `Config.ts`
   and the widget registry. `renderer/specs/web/widget-registry.test.ts` checks the widgets of
   `defaultConfig()`. `upgradeConfig()`, `getConfigForHost()` and the other defaults still have no test.
+- 2026-10-26: Closed for `upgradeConfig()`, which is now exported.
+  `renderer/specs/web/config-upgrade.test.ts` upgrades the saved configs of six versions in
+  `renderer/specs/saved-configs/` and checks each result against `defaultConfig()`. The
+  `getConfigForHost()` part moved to [100](100-host-config-tests.md).

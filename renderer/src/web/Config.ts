@@ -210,7 +210,7 @@ export const defaultConfig = (): Config => ({
   readClientLog: false,
 });
 
-function upgradeConfig(_config: Config): Config {
+export function upgradeConfig(_config: Config): Config {
   /* eslint-disable @typescript-eslint/no-explicit-any -- the old steps read fields that Config no longer has */
   const config = _config as Omit<Config, "widgets"> & {
     widgets: Array<Record<string, any>>;

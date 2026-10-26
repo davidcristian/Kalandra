@@ -25,7 +25,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `/tradewith @last` and `/hideout @last` with no hotkey. `widgets` has one `initInstance()` of each single
   instance widget and the `defaultInstances()` of each multi instance one, in the order of
   `renderer/src/web/overlay/widget-registry.ts`, with `wmId` numbered from 1.
-- `upgradeConfig(config)`, not exported, runs each `if (config.configVersion < N)` step in order on a parsed config.
+- `upgradeConfig(config)`, exported for the tests, runs each `if (config.configVersion < N)` step in order on a parsed config.
   A step sets what version N added and ends with `config.configVersion = N`. A step that adds a widget adds that
   widget's default instance from `defaultConfig()` with the next free `wmId`, and takes the index to insert at from
   `findIndex()`. The `< 29` and `< 30` steps pass the item search `wmId` to `splice()` as an index instead.
@@ -111,6 +111,11 @@ old one and keep that file, so a saved config must survive every update: this is
   and `< 16` steps copy into widgets, such as `priceCheckKey` and `itemCheckKey`, also stay. These keys change
   nothing, so no step deletes them: such a step would raise `configVersion` and rewrite every saved config with no
   change in behavior.
+- No step adds a key that entered the defaults without one. A config of version 2 upgrades without `language`,
+  `restoreClipboard`, `clientLog`, `gameConfig` and two hotkeys, and a new install of versions 15 to 21 without the
+  item search `ocrGemsKey` ([refinement 098](../refinements/tasks/098-old-configs-lack-default-keys.md)). A config
+  without a price check widget throws a `TypeError` at any version
+  ([refinement 099](../refinements/tasks/099-config-without-price-check-throws.md)).
 - Field names and `wmType` values are keys in saved files. Renaming one takes an upgrade step that moves the value,
   as the `< 7` step does when it turns the `map-check` widget into `item-check`.
 - A new widget type also takes an upgrade step that adds its default instance to saved configs, as the `< 29` and
@@ -132,9 +137,17 @@ the `Logger` from `main/src/RemoteLogger.ts`.
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it.
 `renderer/specs/web/widget-registry.test.ts` loads the real module with `vi.importActual`, checks the widgets of
-`defaultConfig()` and checks that the mock has each top-level field of `defaultConfig()`. No test runs
-`upgradeConfig()` or `getConfigForHost()`, so an upgrade step is checked by reading it against the steps before it
-and against the type. `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
+`defaultConfig()` and checks that the mock has each top-level field of `defaultConfig()`.
+`renderer/specs/web/config-upgrade.test.ts` runs the real `upgradeConfig()` on the saved configs in
+`renderer/specs/saved-configs/`: a new install's config of versions 2, 16, 25, 28, 32 and 36, each built from the
+defaults at that version's commits, with a changed league, hotkeys and widget position. It checks that each ends at
+the current version with every key of `defaultConfig()` except those refinement 098 lists, keeps the user's choices,
+and runs each step once and in order, with the same result when every version in between saved the file. It also
+checks that a current config stays unchanged, that a widget of an unknown type stays, and that a config without a
+price check widget throws. It takes the last step version from `defaultConfig()`, so a new step needs no change to
+the spec. No test runs `getConfigForHost()`
+([refinement 100](../refinements/tasks/100-host-config-tests.md)).
+`renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
 `shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
 on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
 `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and `trade-host.test.ts` beside it

@@ -56,8 +56,8 @@ and saves the file as a string and never parses it, so `main` sees a setting onl
 - A file that does not parse is left in place. `initConfig()` starts from `defaultConfig()` and calls
   `saveConfig({ isTemporary: true })`, which throws because the WebSocket is not open yet, so no `config.json.tmp`
   is written and the page does not start ([config.md](../modules/config.md#public-contract)).
-- `upgradeConfig()` is not exported and no test calls it, so a new step is checked by review and by starting the app
-  with an old config.
+- `renderer/specs/web/config-upgrade.test.ts` upgrades saved configs of six older versions, so a step that leaves out
+  a key of `defaultConfig()`, writes the wrong version or runs again on a current config fails the renderer tests.
 
 ## Alternatives rejected
 
