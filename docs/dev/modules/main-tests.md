@@ -49,8 +49,10 @@ replaces it with `vi.mock("electron", ...)`.
   Restore clipboard on.
 - `key-log.test.ts` sends key events through the fake global hook of `fake-hook.ts` and reads the log lines.
 - `shortcuts.test.ts` registers hotkeys through `fake-global-shortcut.ts` while the game window is active and checks
-  the hotkeys `updateActions()` leaves out. It presses a hotkey and reads the keys it releases from `fake-hook.ts`,
-  which keeps each key main presses, and turns the mouse wheel with `Ctrl` at the edges of the stash area.
+  the hotkeys `updateActions()` leaves out. It reads each `MAIN->CLIENT::unregistered-hotkeys` list main sends, as
+  the config changes and as other applications take and release keys in `fake-global-shortcut.ts`. It presses a
+  hotkey and reads the keys it releases from `fake-hook.ts`, which keeps each key main presses, and turns the mouse
+  wheel with `Ctrl` at the edges of the stash area.
 - `hotkey-actions.test.ts` presses the copy item hotkey on Windows and macOS with a fake clipboard that the game
   fills when main taps `C`, and reads the keys and the item text main sends. It also presses the OCR and
   test-only hotkeys and registers one that another application holds in `fake-global-shortcut.ts`.

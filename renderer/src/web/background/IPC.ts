@@ -4,6 +4,7 @@ import type {
   UpdateInfo,
   HostState,
 } from "@ipc/types";
+import type { UnregisteredHotkey } from "@ipc/hotkeys";
 import { shallowRef } from "vue";
 import Sockette from "sockette";
 
@@ -25,6 +26,8 @@ class HostTransport {
   logs = shallowRef("");
   version = shallowRef("0.0.00000");
   updateInfo = shallowRef<UpdateInfo>({ state: "initial" });
+  /** The hotkeys of the saved config that main did not register, which the Settings window marks. */
+  unregisteredHotkeys = shallowRef<UnregisteredHotkey[]>([]);
 
   async init() {
     this.onEvent("MAIN->CLIENT::log-entry", (entry) => {
@@ -35,6 +38,9 @@ class HostTransport {
     });
     this.onEvent("MAIN->CLIENT::updater-state", (info) => {
       this.updateInfo.value = info;
+    });
+    this.onEvent("MAIN->CLIENT::unregistered-hotkeys", (e) => {
+      this.unregisteredHotkeys.value = e.hotkeys;
     });
     await new Promise((resolve) => {
       this.socket = new Sockette(`ws://${window.location.host}/events`, {

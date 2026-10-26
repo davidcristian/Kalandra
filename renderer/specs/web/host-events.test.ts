@@ -153,6 +153,24 @@ describe("Host.logs after a reconnect", () => {
 // Each test after the reconnect test reads the socket that test opened
 const socket = () => FakeWebSocket.created.at(-1)!;
 
+describe("Host.unregisteredHotkeys", () => {
+  it("keeps the last list of hotkeys main did not register", () => {
+    socket().receive({
+      name: "MAIN->CLIENT::unregistered-hotkeys",
+      payload: { hotkeys: [{ shortcut: "Ctrl + F", reason: "game-key" }] },
+    });
+    expect(Host.unregisteredHotkeys.value).toEqual([
+      { shortcut: "Ctrl + F", reason: "game-key" },
+    ]);
+
+    socket().receive({
+      name: "MAIN->CLIENT::unregistered-hotkeys",
+      payload: { hotkeys: [] },
+    });
+    expect(Host.unregisteredHotkeys.value).toEqual([]);
+  });
+});
+
 describe("Host.onEvent", () => {
   it("passes each message of main to the listeners of its name until their controller aborts", () => {
     const targets: string[] = [];

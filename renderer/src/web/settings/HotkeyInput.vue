@@ -3,10 +3,10 @@
     @keyup="handleKeyup"
     @keydown.prevent
     :placeholder="modelValue || t('settings.no_key')"
-    :title="isDuplicate ? t('settings.hotkey_duplicate') : undefined"
+    :title="hint && t(hint)"
     :class="{
-      'placeholder-red-400': !modelValue || isDuplicate,
-      'ring-1 ring-red-400': isDuplicate,
+      'placeholder-red-400': !modelValue || hint,
+      'ring-1 ring-red-400': hint,
     }"
     class="rounded bg-gray-900 px-1 text-center font-poe"
   />
@@ -16,7 +16,7 @@
 import { computed, defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
 import { KeyToCode, hotkeyToString } from "@ipc/KeyToCode";
-import { isDuplicateInDraft } from "./hotkey-conflicts";
+import { hotkeyHint } from "./hotkey-conflicts";
 
 export default defineComponent({
   emits: ["update:modelValue"],
@@ -43,9 +43,7 @@ export default defineComponent({
 
     return {
       t,
-      isDuplicate: computed(() =>
-        isDuplicateInDraft(props.modelValue, props.shortcut),
-      ),
+      hint: computed(() => hotkeyHint(props.modelValue, props.shortcut)),
       handleKeyup(e: KeyboardEvent) {
         e.preventDefault();
         e.stopPropagation();
@@ -67,6 +65,8 @@ export default defineComponent({
 
         if ((KeyToCode as Record<string, number>)[code]) {
           code = hotkeyToString([code], ctrlKey, shiftKey, altKey);
+          // Windows reserves F12 for a debugger, and the RegisterHotKey docs say not to make it a hotkey:
+          // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey
           if (code.includes("F12")) return;
           if (props.noModKeys && code.includes("+")) return;
           ctx.emit("update:modelValue", code);

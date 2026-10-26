@@ -9,6 +9,7 @@ import { HostClipboard } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
 import { OcrWorker } from "../vision/link-main";
 import type { ShortcutAction } from "../../../ipc/types";
+import type { UnregisteredHotkey } from "../../../ipc/hotkeys";
 import type { Logger } from "../RemoteLogger";
 import type { OverlayWindow } from "../windowing/OverlayWindow";
 import type { GameWindow } from "../windowing/GameWindow";
@@ -19,6 +20,8 @@ type UiohookKeyT = keyof typeof UiohookKey;
 
 export class Shortcuts {
   private actions: ShortcutAction[] = [];
+  private unregistered: UnregisteredHotkey[] = [];
+  private taken: string[] = [];
   private stashScroll = false;
   private logKeys = false;
   private areaTracker: WidgetAreaTracker;
@@ -102,14 +105,33 @@ export class Shortcuts {
     this.logKeys = logKeys;
     this.clipboard.updateOptions(restoreClipboard);
     this.ocrWorker.updateOptions(language);
-    this.actions = registrableActions(
+    const registrable = registrableActions(
       actions,
       this.gameConfig.showModsKey,
       this.logger,
     );
+    this.actions = registrable.actions;
+    this.unregistered = registrable.unregistered;
+    this.taken = this.taken.filter((shortcut) =>
+      this.actions.some((action) => action.shortcut === shortcut),
+    );
+    // Each page sends update-host-config when it loads, so this also gives the list to a page that connects later
+    this.sendUnregistered();
+  }
+
+  private sendUnregistered() {
+    const taken = this.taken.map((shortcut) => ({
+      shortcut,
+      reason: "taken" as const,
+    }));
+    this.server.sendEventTo("broadcast", {
+      name: "MAIN->CLIENT::unregistered-hotkeys",
+      payload: { hotkeys: [...this.unregistered, ...taken] },
+    });
   }
 
   private register() {
+    const taken: string[] = [];
     for (const entry of this.actions) {
       const isOk = globalShortcut.register(
         shortcutToElectron(entry.shortcut),
@@ -208,11 +230,16 @@ export class Shortcuts {
         this.logger.write(
           `error [Shortcuts] Failed to register a shortcut "${entry.shortcut}". It is already registered by another application.`,
         );
+        taken.push(entry.shortcut);
       }
 
       if (entry.action.type === "test-only") {
         globalShortcut.unregister(shortcutToElectron(entry.shortcut));
       }
+    }
+    if (taken.join("\n") !== this.taken.join("\n")) {
+      this.taken = taken;
+      this.sendUnregistered();
     }
   }
 

@@ -1,9 +1,9 @@
 # The Settings window does not show the hotkeys that main cannot register
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** main
 **Origin:** [main/src/shortcuts/Shortcuts.ts](../../../../main/src/shortcuts/Shortcuts.ts)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-26
 
 The Settings window outlines a hotkey field in red when another action in the edited config has
 the same key (`renderer/src/web/settings/hotkey-conflicts.ts`). The other reasons main does not
@@ -29,3 +29,9 @@ own commit. [ipc.md](../../modules/ipc.md) lists the new event.
 
 - 2026-10-21: Left out when the Settings window started to mark hotkeys that two actions share,
   because main's reasons need a new event, a split of `Shortcuts.ts` and a handler in the renderer.
+- 2026-10-26: Closed by "fix: mark hotkey fields whose key main did not register", after
+  "refactor(main): move the hotkey filter out of Shortcuts.ts". main sends the list in reply to
+  each `update-host-config`, which every page sends when it loads, so `server.ts` sends nothing
+  on connect. A field with a key the game uses or another program holds is marked after Save. The
+  red outline for a key another program holds is in host check
+  [003](../../host/tasks/003-overlay-key-and-focus.md).

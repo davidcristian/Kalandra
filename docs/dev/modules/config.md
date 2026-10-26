@@ -61,7 +61,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `settings/draft.ts` holds the copy. While the window is open, Language and Preferred trade site also go into the
   current config, so the window's text switches at once and **Refresh** on its Price check page uses the new trade
   site. Closing the window without Save puts back the old values. `settings/hotkey-conflicts.ts` runs
-  `shortcutActions()` on the copy, and `HotkeyInput.vue` outlines in red a field whose hotkey another action has.
+  `shortcutActions()` on the copy, and `HotkeyInput.vue` outlines in red a field whose hotkey another action has,
+  or that main did not register for the saved config (`Host.unregisteredHotkeys`), with a tooltip for the reason.
 - `updateConfig(config)` replaces the current config with a deep copy and sets the page's root font size from
   `fontSize`. `validFontSize()` in `settings/font-size.ts` first limits `fontSize` to 10 to 40 px, and replaces a
   value that is not a number, such as text an older Settings field saved, with 16.

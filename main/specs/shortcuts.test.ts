@@ -58,6 +58,7 @@ afterEach(() => {
   game.removeAllListeners();
   hook.reset();
   globalShortcut.unregisterAll();
+  globalShortcut.taken.clear();
 });
 
 function trigger(shortcut: string): ShortcutAction {
@@ -72,6 +73,19 @@ async function registerOnFocus(actions: ShortcutAction[]) {
 }
 
 const registered = () => [...globalShortcut.registered.keys()];
+
+async function setGameActive(isActive: boolean) {
+  game.isActive = isActive;
+  await new Promise((resolve) => setImmediate(resolve));
+}
+
+// Each list of hotkeys main sent as not registered, the oldest first
+const unregisteredLists = () =>
+  server.sent.flatMap((event) =>
+    event.name === "MAIN->CLIENT::unregistered-hotkeys"
+      ? [event.payload.hotkeys]
+      : [],
+  );
 
 function pressHotkey(accelerator: string) {
   const callback = globalShortcut.registered.get(accelerator);
@@ -167,6 +181,84 @@ describe("updateActions", () => {
     ]);
 
     expect(registered()).toEqual(["Shift+Space"]);
+  });
+});
+
+describe("the hotkeys main sends as not registered", () => {
+  it("names each hotkey left out for its keys with the reason, but not one that two actions share", async () => {
+    await registerOnFocus([
+      trigger("Ctrl + Foo"),
+      trigger("Ctrl + F"),
+      trigger("Ctrl + Alt + C"),
+      trigger("F5"),
+      trigger("F5"),
+      trigger("F6"),
+    ]);
+
+    expect(unregisteredLists()).toEqual([
+      [
+        { shortcut: "Ctrl + Foo", reason: "unknown-key" },
+        { shortcut: "Ctrl + F", reason: "game-key" },
+        { shortcut: "Ctrl + Alt + C", reason: "game-key" },
+      ],
+    ]);
+  });
+
+  it("sends an empty list for a config whose hotkeys main all registers", async () => {
+    await registerOnFocus([trigger("F5")]);
+
+    expect(unregisteredLists()).toEqual([[]]);
+  });
+
+  it("adds a hotkey another program holds when the game window becomes active", async () => {
+    globalShortcut.taken.add("Shift+F6");
+    await registerOnFocus([trigger("F5"), trigger("Shift + F6")]);
+
+    expect(registered()).toEqual(["F5"]);
+    expect(unregisteredLists()).toEqual([
+      [],
+      [{ shortcut: "Shift + F6", reason: "taken" }],
+    ]);
+  });
+
+  it("sends no new list when the game window becomes active again with the same hotkeys taken", async () => {
+    globalShortcut.taken.add("F6");
+    await registerOnFocus([trigger("F6")]);
+    await setGameActive(false);
+    await setGameActive(true);
+
+    expect(unregisteredLists()).toHaveLength(2);
+  });
+
+  it("removes a hotkey once the other program no longer holds it", async () => {
+    globalShortcut.taken.add("F6");
+    await registerOnFocus([trigger("F6")]);
+    await setGameActive(false);
+    globalShortcut.taken.clear();
+    await setGameActive(true);
+
+    expect(registered()).toEqual(["F6"]);
+    expect(unregisteredLists().at(-1)).toEqual([]);
+  });
+
+  it("keeps a taken hotkey in the list a page gets when it sends the same config again", async () => {
+    globalShortcut.taken.add("F6");
+    await registerOnFocus([trigger("F6")]);
+    await setGameActive(false);
+    shortcuts.updateActions([trigger("F6")], false, false, false, "en");
+
+    expect(unregisteredLists().at(-1)).toEqual([
+      { shortcut: "F6", reason: "taken" },
+    ]);
+  });
+
+  it("drops a taken hotkey from the list when the config no longer has it", async () => {
+    globalShortcut.taken.add("F6");
+    await registerOnFocus([trigger("F6")]);
+    await setGameActive(false);
+    shortcuts.updateActions([trigger("F7")], false, false, false, "en");
+
+    expect(unregisteredLists().at(-1)).toEqual([]);
   });
 });
 

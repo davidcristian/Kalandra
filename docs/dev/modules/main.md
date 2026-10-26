@@ -82,19 +82,19 @@ The entry, the server and the app services, in `main/src/`:
 
 - `Shortcuts.ts`: `Shortcuts.create(logger, overlay, poeWindow, gameConfig, server)` starts the OCR worker and returns
   the shortcuts. `updateActions(actions, stashScroll, logKeys, restoreClipboard, language)` replaces the hotkeys, and
-  `updateDelay(delay)` sets the clipboard's first poll delay. Every hotkey is registered with Electron's
-  `globalShortcut` while the game window is active, and all are unregistered when it is not. `registrableActions()` in
-  `registrable-actions.ts` drops, with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron`
-  lacks (`withKnownKeys()` in `accelerator.ts`), a hotkey the game uses (`Ctrl + C`, `Ctrl + V`, `Ctrl + A`,
-  `Ctrl + F`, `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`, `ArrowRight`, `ArrowLeft` and the copy keys) and a
-  hotkey given to two actions, except that a `toggle-overlay` action keeps it. On a press it releases the hotkey's keys
-  through `uiohook-napi` (all but the modifiers when `keepModKeys` is set) and runs the action: `toggle-overlay`,
-  `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`), `stash-search`, `copy-item` (presses
-  the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to the last active client and, with
-  `focusOverlay`, makes the overlay active when the overlay was the last active client) or `ocr-text` (Windows only,
-  sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is active (`key-log.ts`).
-  With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse
-  wheel while the game is active, except over the area `isStashArea()` computes.
+  `updateDelay(delay)` sets the clipboard's first poll delay. Each hotkey is registered with Electron's
+  `globalShortcut` only while the game window is active. `registrableActions()` in `registrable-actions.ts` drops,
+  with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a
+  hotkey the game uses ([settings.md](../../settings.md#hotkeys) lists them) and a hotkey given to two actions, except
+  that a `toggle-overlay` action keeps it. It broadcasts `MAIN->CLIENT::unregistered-hotkeys` with the first two kinds
+  and the hotkeys `globalShortcut` refused, after each `updateActions()` and when `register()` finds other keys taken.
+  On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when `keepModKeys` is set)
+  and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`),
+  `stash-search`, `copy-item` (presses the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to the
+  last active client and, with `focusOverlay`, makes the overlay active when it was the last active client) or
+  `ocr-text` (Windows only, sends `MAIN->CLIENT::ocr-text`). With `logKeys` it logs each key while the game window is
+  active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for
+  `Ctrl` and the mouse wheel while the game is active, except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: Electron's clipboard reads and writes return promises, and each one ends before main presses a
   key. `readItemText(pressCopyKeys)` clears the clipboard when it holds item text and then calls `pressCopyKeys`, so a
   write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for
@@ -242,7 +242,7 @@ releases. The `electron` package has no install script. `require("electron")` do
 time it runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.7% of the lines of `src/` on 26 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (85.9% of the lines of `src/` on 26 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and the
 production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
 `eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus, clipboard capture

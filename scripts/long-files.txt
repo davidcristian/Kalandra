@@ -4,7 +4,7 @@
 301 dataParser/src/constants/client_string_data.py
 360 dataParser/src/constants/css_rules.py
 510 dataParser/src/services/nd_builder_service.py
-337 ipc/types.ts
+338 ipc/types.ts
 486 renderer/src/assets/data/index.ts
 2002 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts

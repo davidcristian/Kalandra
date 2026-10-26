@@ -19,7 +19,7 @@ built on. Move the mouse over the bar to see all the names at once.
 A hotkey works only while the Path of Exile 2 window is active, so Kalandra does not take keys from other programs.
 To set a hotkey, click its field and press the keys. Press Backspace in a hotkey field to clear it. **Overlay** is
 marked with `*` because it is required, and it cannot be cleared. A cleared hotkey shows "Not Set". A hotkey field
-does not accept a key combination that contains `F12`.
+does not accept a key combination that contains `F12`, which Windows reserves for debuggers.
 
 | Label | Default | What it does |
 | --- | --- | --- |
@@ -34,10 +34,11 @@ does not accept a key combination that contains `F12`.
 Kalandra does not register a key that the game uses: `Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`,
 `Ctrl + Enter`, `Home`, `Delete`, `Enter`, `ArrowUp`, `ArrowRight`, `ArrowLeft`, and `Ctrl + C` together with the
 game's advanced item descriptions key (`Ctrl + Alt + C` with the game's default `Alt`). When two actions use the
-same key, Kalandra registers neither of them, except the **Overlay** key. The settings window shows such a key in
-red with a red outline, in the field of each action that uses it on any page, and the field's tooltip says that
-another action uses the key. When another program already uses a key, Kalandra cannot register it. In each case
-Kalandra writes an error to the [Debug](#debug) log.
+same key, Kalandra registers neither of them, except the **Overlay** key. When another program already uses a key,
+Kalandra cannot register it. In each case Kalandra writes an error to the [Debug](#debug) log, and the settings
+window shows the key in red with a red outline, in each field that has it on any page, with a tooltip that says why.
+A key that two actions share is marked as soon as you set it. The other keys are marked after **Save**, and a key
+that another program uses only after the game window has been active, since Kalandra registers hotkeys only then.
 
 More hotkeys are set on the Chat and Item info pages and in the settings of the Stash search, Stopwatch, Item search
 and Library widgets.

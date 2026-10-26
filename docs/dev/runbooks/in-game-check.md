@@ -78,6 +78,8 @@ Four lines from `main/src/shortcuts/` apply to every key below:
   - Hotkeys work only while the game has focus: main registers them when the game window becomes
     active and removes them when it loses focus. With another window focused, Ctrl + D reaches that
     window.
+  - Set a hotkey that another program has registered, Save, and give the game focus once. In
+    Settings, Hotkeys the field has a red outline, and its tooltip says another program uses the key.
   - Switching to another window hides the overlay window, and returning to the game shows it
     again, whether "Fully hide overlay when it loses focus instead of making it transparent." in
     Settings, General is ticked or not: `electron-overlay-window` hides the window while neither

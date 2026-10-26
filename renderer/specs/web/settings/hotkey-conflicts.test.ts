@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { Config } from "@/web/Config";
+import { Host } from "@/web/background/IPC";
 import { settingsDraft } from "@/web/settings/draft";
 import {
   duplicateHotkeys,
+  hotkeyHint,
   isDuplicateInDraft,
 } from "@/web/settings/hotkey-conflicts";
 import { hotkeyConfig, widgetEntry } from "../hotkey-config";
@@ -16,6 +18,7 @@ function openDraft(edit: (config: Config) => void): Config {
 
 afterEach(() => {
   settingsDraft.close(hotkeyConfig());
+  Host.unregisteredHotkeys.value = [];
 });
 
 describe("hotkeys that more than one action uses", () => {
@@ -91,5 +94,51 @@ describe("the duplicate mark of a field in the Settings window", () => {
     settingsDraft.close(config);
 
     expect(isDuplicateInDraft("D", "Ctrl + D")).toBe(false);
+  });
+});
+
+describe("the hint of a hotkey field", () => {
+  it("names the reason main gave for each hotkey it did not register", () => {
+    openDraft(() => {});
+    Host.unregisteredHotkeys.value = [
+      { shortcut: "Ctrl + Foo", reason: "unknown-key" },
+      { shortcut: "Ctrl + Alt + C", reason: "game-key" },
+      { shortcut: "Shift + F6", reason: "taken" },
+    ];
+
+    expect(hotkeyHint("Ctrl + Foo")).toBe("settings.hotkey_unknown_key");
+    expect(hotkeyHint("Ctrl + Alt + C")).toBe("settings.hotkey_game_key");
+    expect(hotkeyHint("Shift + F6")).toBe("settings.hotkey_taken");
+    expect(hotkeyHint("F5")).toBeUndefined();
+    expect(hotkeyHint(null)).toBeUndefined();
+  });
+
+  it("checks the price check key field by the hotkey main registers for it", () => {
+    Host.unregisteredHotkeys.value = [
+      { shortcut: "Ctrl + C", reason: "game-key" },
+    ];
+
+    expect(hotkeyHint("C", "Ctrl + C")).toBe("settings.hotkey_game_key");
+    expect(hotkeyHint("C")).toBeUndefined();
+    expect(hotkeyHint(null, "Ctrl + null")).toBeUndefined();
+  });
+
+  it("names a hotkey that two actions share in the edited config first", () => {
+    openDraft((config) => {
+      config.overlayKey = "Ctrl + Alt + D";
+    });
+    Host.unregisteredHotkeys.value = [
+      { shortcut: "Ctrl + Alt + D", reason: "taken" },
+    ];
+
+    expect(hotkeyHint("Ctrl + Alt + D")).toBe("settings.hotkey_duplicate");
+  });
+
+  it("follows each list main sends", () => {
+    Host.unregisteredHotkeys.value = [{ shortcut: "F6", reason: "taken" }];
+    expect(hotkeyHint("F6")).toBe("settings.hotkey_taken");
+
+    Host.unregisteredHotkeys.value = [];
+    expect(hotkeyHint("F6")).toBeUndefined();
   });
 });

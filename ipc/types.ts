@@ -95,7 +95,8 @@ export type IpcEvent =
   | IpcConfigChanged
   | IpcUserAction
   | IpcWriteToFile
-  | import("./library").IpcLibrarySession;
+  | import("./library").IpcLibrarySession
+  | import("./hotkeys").IpcUnregisteredHotkeys;
 
 export type IpcEventPayload<
   Name extends IpcEvent["name"],

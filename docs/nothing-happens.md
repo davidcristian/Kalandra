@@ -43,13 +43,13 @@ time. These lines name a problem and its fix:
 - `error [Shortcuts] Failed to register a shortcut "<keys>". It is already registered by another application.`
 
   Another program uses this key combination. Choose another hotkey on the **Hotkeys** settings page, or change the
-  shortcut in the other program. When `<keys>` are the copy keys, such as `Ctrl + Alt + C`, read
-  [Another program takes the copy keys](#another-program-takes-the-copy-keys).
+  shortcut in the other program. The settings window outlines the hotkey's field in red. When `<keys>` are the copy
+  keys, such as `Ctrl + Alt + C`, read [Another program takes the copy keys](#another-program-takes-the-copy-keys).
 
 - `error [Shortcuts] Hotkey "<keys>" reserved by the game will not be registered.`
 
   Kalandra presses this key combination in the game to do its work, for example `Ctrl + C` to copy an item, so it
-  cannot be a hotkey. Choose another hotkey.
+  cannot be a hotkey. Choose another hotkey. The settings window outlines the hotkey's field in red.
 
 - `error [Shortcuts] It is not possible to use the same hotkey "<keys>" for multiple actions.`
 
@@ -59,7 +59,8 @@ time. These lines name a problem and its fix:
 - `error [Shortcuts] Hotkey "<keys>" has an unknown key name and will not be registered.`
 
   The hotkey in `config.json` names a key that Kalandra does not know, for example after the file was edited by
-  hand. Kalandra still registers the other hotkeys. Choose this hotkey again in the settings.
+  hand. Kalandra still registers the other hotkeys. Choose this hotkey again in the settings, where its field has a
+  red outline.
 
 - `error [GameConfig] Failed to find game configuration file in the default location.`
 

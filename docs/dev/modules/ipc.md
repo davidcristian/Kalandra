@@ -37,6 +37,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
 | `MAIN->CLIENT::game-log` | `lines` | `GameLogWatcher` | `OverlayWindow.vue` |
 | `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |
+| `MAIN->CLIENT::unregistered-hotkeys` | `hotkeys`, each a `shortcut` and a `reason`: `unknown-key`, `game-key` or `taken` | `Shortcuts`, after each `update-host-config`, which every page sends when it loads, and when the keys another program holds change | `Host` (`Host.unregisteredHotkeys`) |
 | `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
 | `MAIN->OVERLAY::focus-change` | `game`, `overlay` | `OverlayWindow` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::visibility` | `isVisible` | `OverlayVisibility` | `OverlayWindow.vue` |
@@ -103,6 +104,14 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   `session` action of `CLIENT->MAIN::write-data`, both kept out of `types.ts` because that file is over the line
   limit. `LibrarySessionFailure` is the `result` of `IpcLibrarySession` when no session starts.
 
+`hotkeys.ts`:
+
+- `IpcUnregisteredHotkeys` is the `MAIN->CLIENT::unregistered-hotkeys` member of `IpcEvent`, kept out of `types.ts`
+  for the same reason. Each `UnregisteredHotkey` is a hotkey of the saved config that main did not register, with its
+  `HotkeyFailure`: `unknown-key` (a key name without an accelerator), `game-key` (a key the game uses) or `taken` (a
+  key another program holds, found when the game window becomes active). A hotkey that two actions share is not
+  listed, since the Settings window finds those in the config it edits.
+
 ## Invariants
 
 - Every message is a member of `IpcEvent`. The send and listen functions on both ends take only its names and
@@ -134,9 +143,10 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates
   [client-log-parser.md](../../client-log-parser.md) in the same commit.
 
-**Dependencies.** None: `KeyToCode.ts` and `library.ts` import nothing, and `types.ts` imports only `library.ts`.
-main imports them in `server.ts`, `AppUpdater.ts`, `Shortcuts.ts`, `GameConfig.ts` and `FileWriter.ts`; the
-renderer in `IPC.ts`, `Config.ts`, `client-log/`, `HotkeyInput.vue` and `library/session.ts`.
+**Dependencies.** None: `KeyToCode.ts`, `library.ts` and `hotkeys.ts` import nothing, and `types.ts` imports only
+`library.ts` and `hotkeys.ts`. main imports them in `server.ts`, `AppUpdater.ts`, `Shortcuts.ts`,
+`registrable-actions.ts`, `GameConfig.ts` and `FileWriter.ts`; the renderer in `IPC.ts`, `Config.ts`, `client-log/`,
+`HotkeyInput.vue`, `settings/hotkey-conflicts.ts` and `library/session.ts`.
 
 **Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
 `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes. The type checks are `npm

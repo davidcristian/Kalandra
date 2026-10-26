@@ -12,6 +12,9 @@
 
 - Hotkeys work only while the game window is active: main registers them when the game window
   becomes active and removes them when it loses focus (`main/src/shortcuts/Shortcuts.ts`).
+- After Save and once the game window has been active, a hotkey field whose key another program
+  has registered shows a red outline and a tooltip that says so
+  (`renderer/src/web/settings/hotkey-conflicts.ts`).
 - With Record all key presses ticked in Settings, Debug, main logs keys only while the game window
   is active, not while the overlay or another program is (`main/src/shortcuts/key-log.ts`).
 - Shift + Space gives the overlay focus. Shift + Space again, Escape, Ctrl + W or a click on the
@@ -52,3 +55,4 @@ key log from Settings, Debug, with Record all key presses on.
 
 - 2026-10-18: Filed from the claims about focus that the writers of the user pages and of the
   developer docs could not settle without the overlay over the game.
+- 2026-10-26: Added the claim about the outline of a hotkey field whose key another program holds.
