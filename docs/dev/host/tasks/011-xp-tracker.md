@@ -40,8 +40,8 @@ the widget follows each new area and level up, also after `Client.txt` was empti
 above level 1 cannot enter `G1_1`.
 
 **Record.** The game patch, and real lines if they differ from the test logs. A difference goes into
-docs/xp-tracker.md or a refinement, in the same commit as this file's History line. The macOS path
-in docs/settings.md needs a Mac, which this list does not cover
+docs/xp-tracker.md or a refinement, in the same commit as this file's History line. Kalandra has no
+default path on macOS, where the user enters it
 ([refinement 092](../../refinements/tasks/092-macos-client-log-path.md)).
 
 ## History
@@ -55,3 +55,5 @@ in docs/settings.md needs a Mac, which this list does not cover
   ([refinement 085](../../refinements/tasks/085-unescaped-client-string-regexes.md)).
 - 2026-10-25: The macOS path points to [refinement 092](../../refinements/tasks/092-macos-client-log-path.md),
   which holds the Mac check of the default paths.
+- 2026-10-26: Kalandra no longer looks for `Client.txt` in a default folder on macOS
+  ([refinement 092](../../refinements/tasks/092-macos-client-log-path.md)).

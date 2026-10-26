@@ -2,14 +2,19 @@ import { promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { GameConfig } from "../src/host-files/GameConfig";
+import { GameConfig, defaultConfigFiles } from "../src/host-files/GameConfig";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 import { unreadableFiles } from "./unreadable-files";
 
+// app.getPath(name) returns the folder `name` in the folder that each test sets to its own temporary folder
+const home = vi.hoisted(() => ({ folder: "" }));
+
 vi.mock("electron", async () => {
-  const os = await import("node:os");
-  return { app: { getPath: () => os.tmpdir() } };
+  const path = await import("node:path");
+  return {
+    app: { getPath: (name: string) => path.join(home.folder, name) },
+  };
 });
 
 vi.mock("fs/promises", async (importOriginal) => {
@@ -53,6 +58,7 @@ async function readKey(contents: string): Promise<string> {
 
 beforeEach(async () => {
   folder = await fs.mkdtemp(path.join(os.tmpdir(), "kalandra-game-config-"));
+  home.folder = folder;
 });
 
 afterEach(async () => {
@@ -201,4 +207,52 @@ describe("GameConfig.readConfig after a read succeeded", () => {
 
     expect(reader.showModsKey).toBe("X");
   });
+});
+
+describe("the default game configuration files", () => {
+  it("are the one in the documents folder on Windows", () => {
+    expect(defaultConfigFiles("win32")).toEqual([
+      path.join(
+        folder,
+        "documents",
+        "My Games\\Path of Exile 2\\poe2_production_Config.ini",
+      ),
+    ]);
+  });
+
+  it("are the ones in the documents folder and the Proton prefix on Linux", () => {
+    expect(defaultConfigFiles("linux")).toEqual([
+      path.join(
+        folder,
+        "documents",
+        "My Games/Path of Exile 2/poe2_production_Config.ini",
+      ),
+      path.join(
+        folder,
+        "home",
+        ".local/share/Steam/steamapps/compatdata/2694490/pfx/drive_c/users/steamuser/Documents/My Games/Path of Exile 2/poe2_production_Config.ini",
+      ),
+    ]);
+  });
+
+  it.each([
+    ["a file", false],
+    ["an unreadable file", true],
+  ])(
+    "are none on macOS, where a read without a path ignores %s in the application data folder",
+    async (_, unreadable) => {
+      const macConfig = configPath("appData", "Path of Exile 2", "Preferences");
+      await writeConfig(macConfig);
+      if (unreadable) unreadableFiles.add(macConfig);
+      const reader = createReader(defaultConfigFiles("darwin"));
+
+      await reader.readConfig("");
+
+      expect(reader.showModsKey).toBe("Alt");
+      expect(logger.history).not.toContain("warn");
+      expect(logger.history).toContain(
+        "error [GameConfig] Failed to find game configuration file in the default location.",
+      );
+    },
+  );
 });

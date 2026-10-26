@@ -170,22 +170,22 @@ The entry, the server and the app services, in `main/src/`:
   the connection of a body over 16,000,000 bytes and stores nothing. A failed write returns 500 and logs
   `error [uploads] <message>`. Any method but `GET` and `POST` gets 405.
 - `GameConfig.ts`: `GameConfig.readConfig(filePath)` reads `show_advanced_item_descriptions` in `[ACTION_KEYS]` of
-  `poe2_production_Config.ini`, from the path in settings or the default location for the platform:
+  `poe2_production_Config.ini`, from the path in settings or the locations `defaultConfigFiles(platform)` returns:
   `My Games/Path of Exile 2/` under Documents on Windows and Linux, the Steam Proton prefix of app 2694490 on
-  Linux, and `Path of Exile 2/Preferences/` under the application data folder on macOS. When the file exists in
-  more than one default location, it reads neither and logs an error that names them and asks for a path.
+  Linux, and none on macOS, where no source gives the folder of Path of Exile 2. When the file exists in more
+  than one default location, it reads neither and logs an error that names them and asks for a path.
   `showModsKey` is that key, or `Alt` when none was read. Each `CLIENT->MAIN::update-host-config` reads the file
   again until a read succeeds; after that, only a new path reads it again.
 - `GameLogWatcher.ts`: `GameLogWatcher.restart(logFile, readLog)` follows `Client.txt` only when `readLog` is true.
-  With no path it tries the standalone and Steam install folders for the platform, and when both exist it logs an
-  error that asks for a path. It polls the file every 450 ms with `fs.watchFile`, starts at the end of the file, and
-  sends new non-empty lines as `MAIN->CLIENT::game-log`. `LineSplitter.ts` keeps a partial line until the game writes
-  the rest, so a line or a character that the end of a 64 KiB read cuts is sent whole, and it skips a line longer than
-  64 KiB with a warning. Each time it reads, it first compares the open file with the path: when the file is shorter
-  than the read position, or the path holds another file, it reads from the start. When the path holds no file, or
-  its new file is deleted before it opens, it reads the open file. A restart with the same `logFile` keeps the open
-  file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again. A restart
-  that closes the file stops a read in progress after its current chunk, and a failed read is logged.
+  With no path it tries the standalone and Steam paths from `defaultLogFiles(platform)`, none on macOS, and when both
+  exist it logs an error that asks for a path. It polls the file every 450 ms with `fs.watchFile`, starts at the end
+  of the file, and sends new non-empty lines as `MAIN->CLIENT::game-log`. `LineSplitter.ts` keeps a partial line until
+  the game writes the rest, so a line or a character that the end of a 64 KiB read cuts is sent whole, and it skips a
+  line longer than 64 KiB with a warning. Each time it reads, it first compares the open file with the path: when the
+  file is shorter than the read position, or the path holds another file, it reads from the start. When the path holds
+  no file, or its new file is deleted before it opens, it reads the open file. A restart with the same `logFile` keeps
+  the open file. After a restart with `readLog` false, or one that found or opened no file, it opens the file again. A
+  restart that closes the file stops a read in progress after its current chunk, and a failed read is logged.
 - `FileWriter.ts`: `FileWriter` handles `CLIENT->MAIN::write-data` only while `restart(enabled, outputPath)` has
   enabled it. `main.ts` enables it for the library alpha: Enable experimental features with Item Data Collection on,
   in the General settings page (`libraryAlpha` in `HostConfig`). It writes `log-item` lines to `<name>.csv` between a

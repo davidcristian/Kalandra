@@ -26,8 +26,9 @@ clicking `Save` adds the button back, and Kalandra reads the log again.
 
 ### Find the log file
 
-When `PoE log file` is empty, Kalandra looks for `Client.txt` in the default game folders, which
-[Settings](/settings#general) lists for each operating system.
+When `PoE log file` is empty, Kalandra looks for `Client.txt` in the default game folders of Windows and Linux,
+which [Settings](/settings#general) lists. On macOS it has no default folder, so enter the full path of your
+`Client.txt` in `PoE log file` and click `Save`.
 
 If the widget does not update, open the Settings window and go to `Debug`:
 

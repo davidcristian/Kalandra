@@ -6,33 +6,33 @@ import { hotkeyToString, CodeToKey } from "../../../ipc/KeyToCode";
 import { guessFileLocation } from "./utils";
 import type { Logger } from "../RemoteLogger";
 
-const POSSIBLE_PATH =
-  process.platform === "win32"
-    ? [
-        path.join(
-          app.getPath("documents"),
-          "My Games\\Path of Exile 2\\poe2_production_Config.ini",
-        ),
-      ]
-    : process.platform === "linux"
-      ? [
-          path.join(
-            app.getPath("documents"),
-            "My Games/Path of Exile 2/poe2_production_Config.ini",
-          ),
-          path.join(
-            app.getPath("home"),
-            ".local/share/Steam/steamapps/compatdata/2694490/pfx/drive_c/users/steamuser/Documents/My Games/Path of Exile 2/poe2_production_Config.ini",
-          ),
-        ]
-      : process.platform === "darwin"
-        ? [
-            path.join(
-              app.getPath("appData"),
-              "Path of Exile 2/Preferences/poe2_production_Config.ini",
-            ),
-          ]
-        : [];
+/**
+ * Returns the default paths of the game's config file on a platform. It returns none on macOS,
+ * because no source gives the folder where Path of Exile 2 writes the file there.
+ */
+export function defaultConfigFiles(platform: NodeJS.Platform): string[] {
+  if (platform === "win32") {
+    return [
+      path.join(
+        app.getPath("documents"),
+        "My Games\\Path of Exile 2\\poe2_production_Config.ini",
+      ),
+    ];
+  }
+  if (platform === "linux") {
+    return [
+      path.join(
+        app.getPath("documents"),
+        "My Games/Path of Exile 2/poe2_production_Config.ini",
+      ),
+      path.join(
+        app.getPath("home"),
+        ".local/share/Steam/steamapps/compatdata/2694490/pfx/drive_c/users/steamuser/Documents/My Games/Path of Exile 2/poe2_production_Config.ini",
+      ),
+    ];
+  }
+  return [];
+}
 
 export class GameConfig {
   private _wantedPath: string | null = null;
@@ -45,7 +45,9 @@ export class GameConfig {
 
   constructor(
     private logger: Logger,
-    private possiblePaths: readonly string[] = POSSIBLE_PATH,
+    private possiblePaths: readonly string[] = defaultConfigFiles(
+      process.platform,
+    ),
   ) {}
 
   async readConfig(filePath: string) {

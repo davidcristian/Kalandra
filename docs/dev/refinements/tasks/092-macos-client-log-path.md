@@ -1,9 +1,9 @@
 # The default macOS Client.txt path is the folder of the Path of Exile 1 Mac client
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** main
 **Origin:** [main/src/host-files/GameLogWatcher.ts](../../../../main/src/host-files/GameLogWatcher.ts)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-26
 
 On macOS, `GameLogWatcher` looks for `Client.txt` only in `~/Library/Caches/com.GGG.PathOfExile/Logs/`,
 the folder of the Path of Exile 1 Mac client, and [docs/settings.md](../../../settings.md) lists the
@@ -30,3 +30,7 @@ Done looks like: someone on a Mac with Path of Exile 2 finds `Client.txt` and
 
 - 2026-10-25: Found while the default file search was changed to log unreadable files, by
   comparing the default paths of each platform.
+- 2026-10-26: The maintainer chose to stop guessing on macOS until a Mac user reports the Path of
+  Exile 2 path. Done in `fix(main): stop guessing the macOS paths of the game log and config`.
+  `defaultLogFiles()` and `defaultConfigFiles()` return no path on macOS, so the settings stay
+  empty until the user enters each file, and no warning names a file at a guessed path.

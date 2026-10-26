@@ -57,8 +57,8 @@ This page lists the chat commands that Kalandra types into the game chat, each w
 | **Realm** | International | Shown when **Language** is 正體中文 (Traditional Chinese). The other choice, **Hotcool**, is the Taiwan realm, whose trade site is `pathofexile.tw`. |
 | **Font size** | 16 px | The base text size of the overlay, from 10 to 40 px. A number outside that range is stored as the nearest limit, and text that is not a number leaves the size unchanged. |
 | **Restore clipboard** | Off | When on, Kalandra puts back the text that was on the clipboard before it copied an item. When that text was item text, such as an item you copied yourself, a key that copies an item leaves the clipboard empty instead. After a [chat command](/chat-commands#how-kalandra-types-a-command) or a [stash search](/stash-search#how-a-search-runs), the clipboard keeps the text Kalandra pasted even with this on. Kalandra cannot see when the game pastes, so a game that stalls would paste your previous text in its place, and a chat command that presses Enter would send that text to chat. |
-| **PoE log file** | Empty | The path of the game's log file, `Client.txt`. When empty, Kalandra looks in the default install folders. |
-| **PoE config file** | Empty | The path of the game's `poe2_production_Config.ini`, which Kalandra reads to learn the game's advanced item descriptions key. When empty, Kalandra looks in the default folder. |
+| **PoE log file** | Empty | The path of the game's log file, `Client.txt`. When empty, Kalandra looks in the default install folders on Windows and Linux. On macOS, enter the path. |
+| **PoE config file** | Empty | The path of the game's `poe2_production_Config.ini`, which Kalandra reads to learn the game's advanced item descriptions key. When empty, Kalandra looks in the default folders on Windows and Linux. On macOS, enter the path. |
 | **Background when the Overlay is clickable** | `rgba(129, 139, 149, 0.15)` | The color behind the widgets while the overlay is active, as a CSS color. **Transparent** removes it. |
 | **Clicking on the background focuses the game** | On | Shown when the background is not transparent. A click on the background returns to the game. |
 | **Show a notification when the Overlay detects a PoE window** | On | Shows "Is ready and running in background" for a few seconds when Kalandra finds the game window. When Kalandra started without your saved settings, the notification also says why and shows for 20 seconds, even with this setting off. |
@@ -78,8 +78,9 @@ When **PoE log file** or **PoE config file** is empty, Kalandra looks for the fi
   `~/Documents/My Games/Path of Exile 2/` or in the same folder inside the game's Proton prefix,
   `~/.local/share/Steam/steamapps/compatdata/2694490/pfx/drive_c/users/steamuser/Documents/My Games/Path of Exile 2/`.
   Proton is the Steam tool that runs Windows games on Linux.
-- **macOS.** `Client.txt` in `~/Library/Caches/com.GGG.PathOfExile/Logs/`. The config file in
-  `~/Library/Application Support/Path of Exile 2/Preferences/`.
+- **macOS.** No folder, because no source gives the folders where Path of Exile 2 writes these files on a Mac.
+  Enter the full path of `Client.txt` in **PoE log file** and of `poe2_production_Config.ini` in **PoE config
+  file**. Without the config file, Kalandra uses `Alt` as the advanced item descriptions key.
 
 When a file exists in two of these folders, Kalandra uses neither and writes an error to the Debug log. Enter the
 path of the one you play.

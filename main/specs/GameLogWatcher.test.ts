@@ -4,6 +4,7 @@ import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   GameLogWatcher,
+  defaultLogFiles,
   type FileWatch,
 } from "../src/host-files/GameLogWatcher";
 import { MAX_LINE_BYTES } from "../src/host-files/LineSplitter";
@@ -11,10 +12,10 @@ import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 import { unreadableFiles } from "./unreadable-files";
 
-vi.mock("electron", async () => {
-  const os = await import("node:os");
-  return { app: { getPath: () => os.tmpdir() } };
-});
+// The folder that app.getPath() returns, which each test sets to its own temporary folder
+const home = vi.hoisted(() => ({ folder: "" }));
+
+vi.mock("electron", () => ({ app: { getPath: () => home.folder } }));
 
 // Stands in for the fs.watchFile polls that the default FileWatch starts and stops
 const polls = vi.hoisted(
@@ -90,6 +91,7 @@ async function followAndWrite(content: string) {
 
 beforeEach(async () => {
   folder = await fs.mkdtemp(path.join(os.tmpdir(), "kalandra-log-"));
+  home.folder = folder;
   file = path.join(folder, "Client.txt");
   createWatcher();
 });
@@ -389,4 +391,51 @@ describe("the default FileWatch", () => {
     await watcher.restart(file, false);
     expect(polls.has(file)).toBe(false);
   });
+});
+
+describe("the default log files", () => {
+  it("are the standalone and Steam logs on Windows", () => {
+    expect(defaultLogFiles("win32")).toEqual([
+      "C:\\Program Files (x86)\\Grinding Gear Games\\Path of Exile 2\\logs\\Client.txt",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Path of Exile 2\\logs\\Client.txt",
+    ]);
+  });
+
+  it("are the Wine and Steam logs under the home folder on Linux", () => {
+    expect(defaultLogFiles("linux")).toEqual([
+      path.join(
+        folder,
+        ".wine/drive_c/Program Files (x86)/Grinding Gear Games/Path of Exile 2/logs/Client.txt",
+      ),
+      path.join(
+        folder,
+        ".local/share/Steam/steamapps/common/Path of Exile 2/logs/Client.txt",
+      ),
+    ]);
+  });
+
+  it.each([
+    ["log", false],
+    ["unreadable log", true],
+  ])(
+    "are none on macOS, where a restart without a path ignores the %s of the Path of Exile 1 Mac client",
+    async (_, unreadable) => {
+      const macLog = path.join(
+        folder,
+        "Library/Caches/com.GGG.PathOfExile/Logs/Client.txt",
+      );
+      await fs.mkdir(path.dirname(macLog), { recursive: true });
+      await fs.writeFile(macLog, "");
+      if (unreadable) unreadableFiles.add(macLog);
+      createWatcher(defaultLogFiles("darwin"));
+
+      await watcher.restart("", true);
+
+      expect(files.watched).toEqual([]);
+      expect(logger.history).not.toContain("warn");
+      expect(logger.history).toContain(
+        "error [GameLogWatcher] No log file found",
+      );
+    },
+  );
 });

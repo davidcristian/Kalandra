@@ -6,31 +6,31 @@ import { ServerEvents } from "../server";
 import { Logger } from "../RemoteLogger";
 import { LineSplitter } from "./LineSplitter";
 
-const POSSIBLE_PATH =
-  process.platform === "win32"
-    ? [
-        "C:\\Program Files (x86)\\Grinding Gear Games\\Path of Exile 2\\logs\\Client.txt",
-        "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Path of Exile 2\\logs\\Client.txt",
-      ]
-    : process.platform === "linux"
-      ? [
-          path.join(
-            app.getPath("home"),
-            ".wine/drive_c/Program Files (x86)/Grinding Gear Games/Path of Exile 2/logs/Client.txt",
-          ),
-          path.join(
-            app.getPath("home"),
-            ".local/share/Steam/steamapps/common/Path of Exile 2/logs/Client.txt",
-          ),
-        ]
-      : process.platform === "darwin"
-        ? [
-            path.join(
-              app.getPath("home"),
-              "Library/Caches/com.GGG.PathOfExile/Logs/Client.txt",
-            ),
-          ]
-        : [];
+/**
+ * Returns the standalone and Steam paths of the game's Client.txt on a platform. It returns none
+ * on macOS, because no source gives the folder where Path of Exile 2 writes the log there.
+ */
+export function defaultLogFiles(platform: NodeJS.Platform): string[] {
+  if (platform === "win32") {
+    return [
+      "C:\\Program Files (x86)\\Grinding Gear Games\\Path of Exile 2\\logs\\Client.txt",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Path of Exile 2\\logs\\Client.txt",
+    ];
+  }
+  if (platform === "linux") {
+    return [
+      path.join(
+        app.getPath("home"),
+        ".wine/drive_c/Program Files (x86)/Grinding Gear Games/Path of Exile 2/logs/Client.txt",
+      ),
+      path.join(
+        app.getPath("home"),
+        ".local/share/Steam/steamapps/common/Path of Exile 2/logs/Client.txt",
+      ),
+    ];
+  }
+  return [];
+}
 
 // The path holds no file between a delete and the game writing the file again. Windows fails an
 // open with EPERM while the delete runs (measured on Node 24).
@@ -79,7 +79,9 @@ export class GameLogWatcher {
   constructor(
     private server: ServerEvents,
     private logger: Logger,
-    private possiblePaths: readonly string[] = POSSIBLE_PATH,
+    private possiblePaths: readonly string[] = defaultLogFiles(
+      process.platform,
+    ),
     private files: FileWatch = pollFile,
   ) {}
 

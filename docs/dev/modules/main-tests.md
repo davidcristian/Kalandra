@@ -84,6 +84,8 @@ replaces it with `vi.mock("electron", ...)`.
   reads a `config.json` that is a folder or is not a JSON object, and fails a read with `EBUSY`.
 - `GameConfig.test.ts`, `GameLogWatcher.test.ts` and `FileWriter.test.ts` read and write real files in a temporary
   folder, and the first two pass their own default paths, of which `unreadable-files.ts` makes some fail with EACCES.
+  They also check the default paths of each platform, and that on macOS, which has none, a read without a path
+  ignores the log folder of the Path of Exile 1 Mac client and the game folder under the application data folder.
 - `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key
   codes it cannot read, and reads a file again only at a new path.
 - `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its
