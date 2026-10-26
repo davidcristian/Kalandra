@@ -1,4 +1,12 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from "vitest";
 import type * as IPC from "@/web/background/IPC";
 
 // Answers every fetch with the URL and headers it received, as main's /proxy route would see them
@@ -45,5 +53,9 @@ describe("Host.proxy", () => {
     const echo = (await response.json()) as Echo;
 
     expect(echo.headers).toEqual({ "x-kalandra-proxy": "1" });
+  });
+
+  it("takes the host and path as a string, the only input it can forward", () => {
+    expectTypeOf(Host.proxy).parameter(0).toEqualTypeOf<string>();
   });
 });

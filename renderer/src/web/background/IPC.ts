@@ -106,11 +106,14 @@ class HostTransport {
     return body.name;
   }
 
-  proxy: (typeof window)["fetch"] = async (url, init) => {
+  proxy = async (
+    hostAndPath: string,
+    init?: RequestInit,
+  ): Promise<Response> => {
     const headers = new Headers(init?.headers);
     // main's /proxy route returns 403 without it (PROXY_HEADER in main/src/proxy.ts)
     headers.set("x-kalandra-proxy", "1");
-    return await window.fetch(`/proxy/${url as string}`, { ...init, headers });
+    return await window.fetch(`/proxy/${hostAndPath}`, { ...init, headers });
   };
 
   get isElectron() {

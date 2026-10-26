@@ -12,7 +12,7 @@ const savedProxy = vi.mocked(Host.proxy).getMockImplementation()!;
 
 // The saved trade site item list with one unique that the item data does not have
 async function proxyWithAddedUnique(
-  url: RequestInfo | URL,
+  url: string,
   init?: RequestInit,
 ): Promise<Response> {
   const response = await savedProxy(url, init);
