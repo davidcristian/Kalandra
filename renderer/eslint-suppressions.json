@@ -1,12 +1,233 @@
 {
+  "specs/Parser/augment.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/Parser/integration.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "specs/Parser/parsers.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/Parser/sectionUnit.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/Parser/skillGem.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 8
+    }
+  },
+  "specs/Parser/tradeItemFallback.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/helper.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/vitest.setup.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/host-events.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/web/i18n-loader.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/i18n-product-name.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/map-check-marks.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 6
+    }
+  },
+  "specs/web/map-check-stats.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/parser-settings.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/filters/create-item-filters.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/web/price-check/filters/gem-filters.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/filters/mageblood.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "specs/web/price-check/filters/null-trade-ids.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/filters/pseudo/anointments.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "specs/web/price-check/filters/pseudo/index.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/web/price-check/filters/stat-filter-rolls.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 6
+    }
+  },
+  "specs/web/price-check/trade/bulk-search.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 10
+    }
+  },
+  "specs/web/price-check/trade/listing-prices.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "specs/web/price-check/trade/listing-properties.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/trade/listing-sockets.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/price-check/trade/pathofexile-trade.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 13
+    }
+  },
+  "specs/web/price-check/trade/property-filters.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "specs/web/price-check/trade/tooltip-text.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 7
+    }
+  },
+  "specs/web/price-check/trends/getDetailsId.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 5
+    }
+  },
+  "specs/web/prices-selection.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/settings/alphas.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/settings/draft.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "specs/web/settings/hotkey-conflicts.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "specs/web/shortcut-actions.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/assets/data/index.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/assets/data/loads.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
   "src/main.ts": {
     "@typescript-eslint/no-floating-promises": {
       "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/parser/Parser.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 47
+    }
+  },
+  "src/parser/advanced-mod-desc.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 27
+    }
+  },
+  "src/parser/augment-builder.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/parser/calc-q20.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/parser/modifiers.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/parser/stat-translations.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/Config.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 34
     }
   },
   "src/web/background/Prices.ts": {
     "@typescript-eslint/no-floating-promises": {
       "count": 3
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 5
     }
   },
   "src/web/background/TradeData.ts": {
@@ -14,38 +235,226 @@
       "count": 1
     }
   },
+  "src/web/client-log/client-log-parser.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 16
+    }
+  },
+  "src/web/client-log/client-log.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/item-check/WidgetItemCheck.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/item-check/hotkeyable-actions.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/item-check/settings-item-check.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 6
+    }
+  },
   "src/web/item-search/WidgetItemSearch.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/web/item-search/settings-item-search.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/leveling/settings-leveling.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/library/SingleItemSession.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/library/settings-library.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/map-check/settings-maps.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/notepad/WidgetNotepad.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
   "src/web/overlay/OverlayWindow.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 3
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 5
+    }
+  },
+  "src/web/overlay/Widget.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/overlay/WidgetDelveGrid.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
     }
   },
   "src/web/overlay/WidgetImageStrip.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/overlay/WidgetMenu.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/web/parser-settings.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/BackgroundInfo.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
   "src/web/price-check/CheckedItem.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 2
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 7
     }
   },
   "src/web/price-check/PriceCheckWindow.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 2
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
     }
   },
   "src/web/price-check/filters/FilterModifier.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 3
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 17
+    }
+  },
+  "src/web/price-check/filters/FilterModifierAnointment.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/filters/FilterModifierItemHasEmpty.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 6
+    }
+  },
+  "src/web/price-check/filters/FilterModifierItemIsElemental.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/filters/FilterModifierTiers.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/filters/FilterName.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/filters/SourceInfo.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/filters/common.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/filters/create-item-filters.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 21
+    }
+  },
+  "src/web/price-check/filters/create-stat-filters.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 26
+    }
+  },
+  "src/web/price-check/filters/create-unique-filters.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/filters/pseudo/anointments.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/filters/pseudo/index.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 25
+    }
+  },
+  "src/web/price-check/filters/pseudo/item-property.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/item-editor/AugmentEditor.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
     }
   },
   "src/web/price-check/price-prediction/FeedbackOption.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/price-prediction/poeprices.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/settings-price-check.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/stack-value/StackValue.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
+    }
+  },
+  "src/web/price-check/trade/ExtractionValue.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
@@ -54,18 +463,107 @@
       "count": 1
     }
   },
+  "src/web/price-check/trade/RateLimiterState.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
   "src/web/price-check/trade/TradeBulk.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/trade/TradeItem.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/price-check/trade/TradeLinks.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
   "src/web/price-check/trade/TradeListing.vue": {
     "@typescript-eslint/no-floating-promises": {
       "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/trade/bulk-api.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/trade/common.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trade/pathofexile-bulk.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trade/pathofexile-trade.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 24
+    }
+  },
+  "src/web/price-check/trade/trade-api.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/trends/PriceTrend.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/price-check/trends/getDetailsId.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/price-check/unidentified-resolver/UnidentifiedResolver.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 4
     }
   },
   "src/web/settings/SettingsWindow.vue": {
     "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 6
+    }
+  },
+  "src/web/settings/hotkeys.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    }
+  },
+  "src/web/stash-search/WidgetStashSearch.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/stopwatch/WidgetTimer.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    }
+  },
+  "src/web/ui/Popover.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    }
+  },
+  "src/web/ui/StatRollSlider.vue": {
+    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   }

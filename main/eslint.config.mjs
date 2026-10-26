@@ -20,6 +20,17 @@ const existingOffenders = {
     "src/server.ts",
   ],
   "no-empty": ["src/host-files/ConfigStore.ts", "src/vision/link-main.ts"],
+  "@typescript-eslint/no-non-null-assertion": [
+    "specs/AppTray.test.ts",
+    "specs/ocr-worker-body.test.ts",
+    "specs/overlay-window.test.ts",
+    "src/AppTray.ts",
+    "src/proxy.ts",
+    "src/server.ts",
+    "src/vision/link-worker.ts",
+    "src/vision/wasm-bindings.ts",
+    "src/windowing/OverlayWindow.ts",
+  ],
 };
 
 const castThroughUnknown = {
@@ -50,7 +61,6 @@ export default defineConfig(
       "object-shorthand": ["error", "properties"],
       "dot-notation": "error",
       "n/no-deprecated-api": "error",
-      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
       // A void statement marks a promise left to run on its own, which no-floating-promises accepts
       "no-void": ["error", { allowAsStatement: true }],
