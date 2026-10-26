@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Remove ./renderer/dist if it exists
 rm -rf ./renderer/dist
@@ -8,13 +9,13 @@ rm -rf ./main/dist
 
 cd ./renderer
 
-npm install
+npm ci
 npm run make-index-files
 npm run build
 cd ..
 
 cd ./main
 
-npm install
+npm ci
 npm run build
 npm run package

@@ -1,9 +1,9 @@
 # testUpdate.sh runs npm install instead of npm ci
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** release
 **Origin:** [testUpdate.sh](../../../../testUpdate.sh)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `testUpdate.sh` at the repo root removes `renderer/dist` and `main/dist`. It then runs
 `npm install`, `npm run make-index-files` and `npm run build` in `renderer/`, and `npm install`,
@@ -28,3 +28,6 @@ and the Package locally section of DEVELOPING.md changes to match, without that 
   jobs.
 - 2026-10-18: The task review found that DEVELOPING.md already describes the script, removed that
   from the done part, and added the missing `set -e`.
+- 2026-10-27: Done in `build: install with npm ci and stop at a failure in testUpdate.sh`.
+  Checked with `bash -n` and a run against a fake `npm`, which stopped after a failed renderer
+  build; the packaging itself was not run.

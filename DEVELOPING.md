@@ -153,15 +153,13 @@ Windows:
 sh testUpdate.sh
 ```
 
-It deletes `renderer/dist` and `main/dist`, then runs `npm install`, `npm run make-index-files` and
-`npm run build` in `renderer/`, and `npm install`, `npm run build` and `npm run package` in
-`main/`. `npm run package` is electron-builder with the targets in `main/electron-builder.yml`, so
-on Windows it writes the NSIS installer and the portable exe to `main/dist/`. Outside CI and without
-a tag, electron-builder uploads nothing. It signs nothing either, since the repo sets no
-certificate.
-
-`npm install` can rewrite `package-lock.json`. Run `git status` afterwards and keep no lock file
-change you did not intend.
+It deletes `renderer/dist` and `main/dist`, then runs `npm ci`, `npm run make-index-files` and
+`npm run build` in `renderer/`, and `npm ci`, `npm run build` and `npm run package` in `main/`. It
+stops at the first command that fails. `npm ci` installs the versions in `package-lock.json`, as
+CI does, and leaves that file unchanged. `npm run package` is electron-builder with the targets in
+`main/electron-builder.yml`, so on Windows it writes the NSIS installer and the portable exe to
+`main/dist/`. Outside CI and without a tag, electron-builder uploads nothing. It signs nothing
+either, since the repo sets no certificate.
 
 ## Dependencies
 
