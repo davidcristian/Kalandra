@@ -86,8 +86,7 @@ main returns on `/config`. The pre-commit hook runs `versioncheck.py` when a `.j
    - in `main/`, `npm version X.Y.Z --no-git-tag-version`, which writes `package.json` and both
      versions in `package-lock.json` and makes no commit or tag;
    - in `README.md`, the version in the downloads badge;
-   - in `bug-report.yml`, a new `- X.Y.Z` line at the top of the Version options, and `default`
-     increased by one so it still selects `Change me`;
+   - in `bug-report.yml`, a new `- X.Y.Z` line at the top of the Version options;
    - in `docs/.vitepress/config.js`, `appVersion`.
 
    From the repo root, `python scripts/versioncheck.py` prints

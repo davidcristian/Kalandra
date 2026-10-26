@@ -49,7 +49,6 @@ body:
       label: What happened?
       description: Also what did you expect to happen?
       placeholder: Tell us what you see!
-      value: "Change this text please"
     validations:
       required: true
   - type: dropdown
@@ -72,15 +71,13 @@ body:
         - 0.15.2
         - 0.15.1
         - 0.15.0
-        - Change me
-      default: 14
     validations:
       required: true
   - type: textarea
     id: item
     attributes:
       label: Item Copy text
-      description: PLEASE copy the item's text and paste it here. You can do so with `ctrl + alt + c` when hovering over the item, if your bug doesn't related to any items at all, write "None" (if it is about an item in any way and you write None it will be ignored)
+      description: Copy the item's text and paste it here. To copy it, hover over the item in the game and press `Ctrl + Alt + C`. If the bug is not about an item, write "None". A report about an item that says "None" here is ignored.
       render: shell
     validations:
       required: true
