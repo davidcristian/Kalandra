@@ -215,7 +215,6 @@ the bottom of the screen, beside the window, turns red while requests wait. Clic
   or suffix.
 - **POE2 language doesn't match Kalandra**: set the same language in the game and in the General settings.
 - **Trade site request failed**: **Retry** sends the search again and **Browser** opens it in the built-in browser.
-  For a bulk exchange search with **Enable builtin browser** off, **Browser** opens your default browser.
   Read [Query is too complex](/complex-query) and [Invalid JSON](/invalid-json) for the two common messages.
 - **Failed to load leagues**: read [Failed to load leagues](/failed-load-leagues).
 - For an unidentified unique, the window lists the uniques with that base type. Click the one you have.

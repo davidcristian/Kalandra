@@ -83,7 +83,7 @@ that the route needs ([main.md](main.md)).
 | `common.ts` | `RATE_LIMIT_RULES`, `adjustRateLimits`, `preventQueueCreation`, `apiToSatisfySearch`, `searchListingType` and `exchangeListingType`, which return the status each request sends for a listing type the other offers, and `getTradeEndpoint`, which is `poeWebApi()` in `Config.ts`: the trade host for the language and realm settings, or `www.pathofexile.com` when the trade site setting is `www` |
 | `RateLimiter.ts` | `RateLimiter(max, window)`: at most `max` requests in `window` seconds; `wait`, `waitMulti(limiters)`, `estimateTime`, `restrict(seconds)`, which holds every request for that time, and `addHits(count)`, which counts requests the server reports without waiting |
 | `Cache.ts` | keeps a search, fetch or exchange result for 300 seconds (`CACHE_TTL`) from its last write, keyed by a SHA-1 of the request (`object-hash`); `requestResults` clears its cache and the pending deletions when the core currency changes |
-| `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message |
+| `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message and a "Browser" button, which always opens the search in the built-in browser, since the trade requests use that browser's cookies |
 | `listing-markers.ts` | `listingMarkers(listing, showSeller)`: the "You", "in demand" and "Gone" markers of a listing, shown after its listed time, or after its seller when "Show seller" is set |
 | `TradeLinks.vue` | the "Trade" button, which opens the same search on the trade site with `window.open`; with "Enable builtin browser" (`builtinBrowser`) on, it opens the built-in browser and a second button opens the search outside |
 | `RateLimiterState.vue` | the "Rate limiting" button, which shows each limiter's use and queue (`showRateLimitState`) |
@@ -227,6 +227,7 @@ returns the saved listings, and checks the grouped rows and how many listings it
 the test says.
 `bulk-search.test.ts` in `specs/web/price-check/trade/` runs `execBulkSearch` on hand-written exchange responses
 and checks the order and the totals per currency, the seller states and the cache.
+`bulk-error-browser.test.ts` there checks that the Browser button of `TradeBulk.vue` opens the built-in browser.
 `property-filters.test.ts` there turns on the item property filters of real items and checks the trade site
 filters that `createTradeRequest` sends for them, with a maximum the user sets, and the elements an elemental damage
 filter leaves out.

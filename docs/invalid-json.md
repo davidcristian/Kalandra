@@ -24,11 +24,6 @@ check: a page that tells people from automated programs.
    [built-in browser](/price-check#built-in-browser). Complete any check the page shows.
 3. Click **Retry**. A check passed in the built-in browser also applies to Kalandra's own trade requests.
 
-On a bulk search, **Browser** opens the built-in browser only with **Enable builtin browser** on (Settings,
-**Price check** page). Otherwise it opens your default browser, and a check passed there does not apply to
-Kalandra. Turn on **Enable builtin browser** and click **Save**, then price check the item again and click
-**Browser**.
-
 [Failed to load leagues](/failed-load-leagues) describes the same bot check when it blocks the list of leagues.
 
 If the error stays while the trade site works in your browser, [open an issue](https://github.com/davidcristian/Kalandra/issues)

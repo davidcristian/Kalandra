@@ -1,9 +1,9 @@
 # The bulk search Browser button does not always open the built-in browser
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** trade
 **Origin:** [renderer/src/web/price-check/trade/TradeBulk.vue](../../../../renderer/src/web/price-check/trade/TradeBulk.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 When a trade search fails, the price check window shows an error box with a `Browser` button. On an
 item search, `openTradeLink()` in `TradeListing.vue` always calls `showBrowser()`, which opens the
@@ -31,3 +31,7 @@ difference for that reason, the reason goes into the History and the task is dec
   comparing the two `openTradeLink()` functions.
 - 2026-10-18: Checked against the tree. The docs reference now points at docs/invalid-json.md, which
   describes the bulk search case, because the league error button always opens the built-in browser.
+- 2026-10-27: fix(trade): open failed bulk searches in the built-in browser. The claim still matched
+  the code, and only the error box button called `openTradeLink()`. The `POESESSID` warning gives no
+  reason to keep the difference, because the item search opens the built-in browser whatever the
+  setting. The same commit removes the bulk search sentence from docs/price-check.md.
