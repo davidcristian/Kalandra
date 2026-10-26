@@ -77,6 +77,8 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Hash
       if: ${{ startsWith(matrix.os, 'windows') }}
+      # pwsh is the Windows default; naming it stops actionlint from reading the command as bash.
+      shell: pwsh
       run: type .\main\dist\latest.yml
     - name: Hash
       if: ${{ startsWith(matrix.os, 'ubuntu') }}

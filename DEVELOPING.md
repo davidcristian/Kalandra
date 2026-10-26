@@ -125,6 +125,12 @@ part alone:
 - `no-console` allows only `console.warn` and `console.error`, except in `main/build/script.mjs`.
   main writes the rest of its messages with `Logger`, which the Debug settings page shows, and
   uses the console only before `Logger` exists.
+- The `actionlint` hook checks `.github/workflows/`: the expressions, the `needs` of each job and
+  the inputs of each action. pre-commit builds it with Go, which it downloads when Go is not
+  installed. It runs shellcheck on the `run:` scripts only when `shellcheck` is on the PATH, as on
+  the CI runner, so on Windows a shell script problem can show first in CI. In PowerShell at the
+  repo root, `docker run --rm -v "${PWD}:/repo" -w /repo rhysd/actionlint:1.7.12` runs the same
+  check with shellcheck.
 - `check.py` leaves out the data tool, whose tests need files the repo does not have
   ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
 
