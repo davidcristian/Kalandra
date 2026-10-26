@@ -249,6 +249,18 @@ Gain 24 Mana per enemy killed (rune)
     ]);
   });
 
+  it("Should leave a section whose first line is not a modifier header", () => {
+    const section = `A line before the header
+{ Suffix Modifier "of Acclaim" (Tier: 1) — Attack, Speed }
+18(17-19)% increased Attack Speed
+`;
+
+    const res = __testExports.parseModifiers(section.split("\n"), parsedItem);
+    expect(res).toBe("SECTION_SKIPPED");
+    expect(parsedItem.newMods).toEqual([]);
+    expect(parsedItem.unknownModifiers).toEqual([]);
+  });
+
   it("Should parse new enchant modifiers", () => {
     const section = `{ Enhancement }
 Allocates Core of the Guardian — Unscalable Value

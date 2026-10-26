@@ -1119,7 +1119,11 @@ function parseModifiers(section: string[], item: ParsedItem) {
       isModInfoLine(line),
   );
 
-  if (!recognizedLine) {
+  // groupLinesByMod reads a section only when its first line is a header.
+  if (
+    !recognizedLine ||
+    (isModInfoLine(recognizedLine) && !isModInfoLine(section[0]))
+  ) {
     return "SECTION_SKIPPED";
   }
 

@@ -144,14 +144,16 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
 - **Item text is untrusted.** `parseClipboard` runs inside a `try`, passes what it caught to `console.error` and
   returns `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat
   goes to `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is
-  not its own instead of throwing. A requirements line that `REQUIRES_LINE` does not match is logged with
-  `console.warn` and leaves `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or `MODIFIER_INCREASED` does not
-  match is logged the same way, and the modifier keeps its type and tags without the parts that did not match.
+  not its own instead of throwing. `parseModifiers` skips a section that has a `{ ... }` line but does not start with
+  one, because `groupLinesByMod` reads only a section that starts with one. A requirements line that `REQUIRES_LINE`
+  does not match is logged with `console.warn` and leaves `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or
+  `MODIFIER_INCREASED` does not match is logged the same way, and the modifier keeps its type and tags without the
+  parts that did not match.
 - **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
   parser reads which section, so the change comes with parser cases for the item kinds it affects.
-- **`Parser.ts` is 2101 lines** (2026-10-22, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+- **`Parser.ts` is 2015 lines** (2026-10-26, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
