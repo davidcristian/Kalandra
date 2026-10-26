@@ -57,7 +57,6 @@ export default defineConfig({
           { text: 'XP tracker', link: '/xp-tracker' },
           { text: 'Extra widgets', link: '/extra-widgets' },
           { text: 'Chat commands', link: '/chat-commands' },
-          { text: 'OCR guide', link: '/ocr-guide' },
           { text: 'Item data', link: '/item-data' },
           { text: 'Client log file', link: '/client-log-parser' }
         ]

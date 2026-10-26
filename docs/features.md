@@ -84,9 +84,7 @@ Details: [XP tracker](/xp-tracker).
 
 Finds an item by name, without holding it, and shows its estimated price from the price file. Click the magnifier icon
 in the main button bar, choose **Skill Gems**, **Uniques** or **Base Items** and type a name. **Select** adds a result
-to a row at the top of the widget, and a click on an item in that row opens its price check. An optional OCR hotkey,
-on Windows only, reads the text between two lock icons on one line of the screen as the name of a Heist gem. Heist is
-a Path of Exile 1 feature. The [OCR guide](/ocr-guide) sets it up.
+to a row at the top of the widget, and a click on an item in that row opens its price check.
 
 Details: [Extra widgets](/extra-widgets).
 

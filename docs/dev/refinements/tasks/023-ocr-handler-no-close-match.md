@@ -1,9 +1,9 @@
 # The OCR handler throws when no gem name has a close length
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** renderer
 **Origin:** [renderer/src/web/item-search/WidgetItemSearch.vue](../../../../renderer/src/web/item-search/WidgetItemSearch.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 `fuzzyFindHeistGem()` in `WidgetItemSearch.vue` compares the text OCR read with each gem name plus
 the prefix `Anomalous`, `Divergent` or `Phantasmal`. It skips a candidate whose length differs from
@@ -20,3 +20,6 @@ skips that line, and a test covers a line with no close candidate. If the mainta
 
 - 2026-10-18: Found while docs/ocr-guide.md was rewritten, by reading `fuzzyFindHeistGem()` and the
   `ocr-text` handler.
+- 2026-10-26: Done. The maintainer chose to remove the Heist gem OCR
+  ([031](031-path-of-exile-1-features.md)), and `fuzzyFindHeistGem()` and the
+  `MAIN->CLIENT::ocr-text` handler were removed with it.

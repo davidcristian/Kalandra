@@ -18,8 +18,8 @@ back to English, until Kalandra restarts.
 
 Rule 7 of [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass) says errors are never
 dropped by an empty `catch`. The in-game check in
-[runbooks/in-game-check.md](../../runbooks/in-game-check.md#7-ocr-of-skill-gem-names) has no log
-line to read for this reason.
+[runbooks/in-game-check.md](../../runbooks/in-game-check.md) had no log line to read for this
+reason.
 
 Done looks like: each of the three places writes one error line through `Logger`, so a missing
 `cv-ocr` folder shows in Settings, Debug, and the runbook names that line. `OcrWorker` has no

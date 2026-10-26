@@ -50,7 +50,6 @@ background" over the game for a few seconds. [Quick start](/quick-start) shows t
 
 Some parts depend on the operating system:
 
-- **Windows.** OCR, which reads skill gem names from a screenshot ([OCR guide](/ocr-guide)), works only on Windows.
 - **macOS.** Kalandra needs the Accessibility permission to read hotkeys and send key presses. When it starts without
   the permission, macOS asks you to grant it. Kalandra waits 15 seconds for the permission and starts when you grant
   it. If you do not grant it in that time, Kalandra quits: grant it in System Settings under Privacy & Security,
@@ -81,7 +80,7 @@ An update keeps your settings.
 Kalandra stores its settings in `config.json` in a folder named `apt-data`. On Windows this folder is
 `%APPDATA%\kalandra\apt-data\`. To open it, type `%APPDATA%\kalandra` in the File Explorer address bar, or use the
 tray menu item **Open config folder**, which opens `apt-data` on every operating system. The same folder holds the
-other files Kalandra saves, such as uploaded images and the OCR files.
+other files Kalandra saves, such as uploaded images.
 
 Kalandra writes new settings to `config.json.new` first and then renames that file to `config.json`, so a crash or
 a power loss during a save keeps your previous settings. When a save fails, for example because another program

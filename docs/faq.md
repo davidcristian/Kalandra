@@ -41,8 +41,7 @@ the other files in it, and what Kalandra does with a `config.json` it cannot rea
 
 Grinding Gear Games, the developer of Path of Exile 2, does not approve community tools. Kalandra does not read or
 change the game's memory and does not change the game's files. It reads the item text that the game copies to the
-clipboard. With **Allow reading of Client.txt file** on, it also reads the game's log file. When you press the
-[OCR](/ocr-guide) key, it reads a screenshot of the game window.
+clipboard. With **Allow reading of Client.txt file** on, it also reads the game's log file.
 
 Kalandra sends key presses to the game only after you press a key, click or turn the mouse wheel. For example, it
 presses `Ctrl + Alt + C` to copy an item when you press the price check hotkey, and an arrow key for each mouse wheel

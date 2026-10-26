@@ -33,7 +33,7 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
   while the game window is active as `debug [Shortcuts] Keydown <keys>` and
   `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
   `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`,
-  `paste-in-chat`, `stash-search`, `trigger-event` or `ocr-text`.
+  `paste-in-chat`, `stash-search` or `trigger-event`.
 - **The renderer's console** holds what the page logs, such as a price file that failed to load. A
   dev run opens the developer tools at start. In a packaged build, focus the overlay and press
   Ctrl + Shift + I: the overlay window's menu has the `toggleDevTools` role
@@ -181,28 +181,7 @@ General, sets another path), and uses Alt when the file does not set it
   `main/src/shortcuts/Shortcuts.ts`).
 - **Logs:** main writes no line for a wheel step.
 
-## 7. OCR of skill gem names
-
-OCR (optical character recognition) reads text from a screenshot of the game window.
-
-- **Setup:** the files from the [OCR guide](../../ocr-guide.md) in
-  `%APPDATA%\kalandra\apt-data\cv-ocr`. OCR runs on Windows only, and for the app languages English
-  and Russian only (`langMap` in `main/src/vision/wasm-bindings.ts`). The key is "Perform an OCR for
-  a Skill Gem" in the settings of the Item search widget, opened with edit on the widget, and it
-  has no default.
-- **Press:** the key, with skill gem names on screen as the OCR guide shows.
-- **See:** the Item search widget lists each gem it recognized with its price, at most five items.
-  The finder looks in the screenshot for two copies of the icon in `heist-lock.bmp`, from the
-  `cv-ocr` files, on one line, and reads the text between them
-  (`main/src/vision/HeistGemFinder.ts`). This is why the OCR guide asks for both icons to be fully
-  visible.
-- **Logs:** no error line for a failed OCR. `OcrWorker` in `main/src/vision/link-main.ts` drops its
-  start-up errors in empty `catch` blocks, and `Shortcuts.ts` drops a failed OCR, so a missing
-  `cv-ocr` folder shows no error. Only a worker thread that crashes or exits logs
-  `error [OCR] Worker failed: <message>` or `error [OCR] Worker exited with code <code>`. With key
-  recording on, `debug [Shortcuts] Action type: ocr-text` shows that the key fired.
-
-## 8. Client.txt for the XP tracker
+## 7. Client.txt for the XP tracker
 
 `Client.txt` is the log file the game writes. The XP tracker reads area changes and level ups from
 it.

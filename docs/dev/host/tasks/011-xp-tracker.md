@@ -30,7 +30,7 @@ from April 2026, game version `4.4.0j`. [docs/xp-tracker.md](../../../xp-tracker
   Korean `LOG_LEVEL_UP` in `renderer/public/data/ko/client_strings.js` matches literally. No test
   log is Korean.
 
-**Do.** [Section 8 of the runbook](../../runbooks/in-game-check.md#8-clienttxt-for-the-xp-tracker),
+**Do.** [Section 7 of the runbook](../../runbooks/in-game-check.md#7-clienttxt-for-the-xp-tracker),
 with a character that can gain a level. Enter a town, the hideout and another area, gain a level,
 and try to return to The Riverbank with that character. Open `Client.txt` and find the line for
 each.

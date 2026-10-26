@@ -84,7 +84,7 @@ A check is not a design, so it has more outcomes than a refinement:
 - 007: [Chat commands do in the game what the pages say](tasks/007-chat-commands.md)
 - 008: [Ctrl and the mouse wheel switch stash tabs](tasks/008-stash-tab-scrolling.md)
 - 009: [Stash search and Find in Stash type into the game's search box](tasks/009-stash-search.md)
-- 010: [Whether OCR and the Delve grid match anything Path of Exile 2 shows](tasks/010-ocr-and-delve-grid.md)
+- 010: [Whether the Delve grid matches anything Path of Exile 2 shows](tasks/010-ocr-and-delve-grid.md)
 - 011: [The XP tracker follows the game's Client.txt](tasks/011-xp-tracker.md)
 - 012: [What the client log events mean in the game](tasks/012-client-log-events.md)
 - 013: [The item check key opens Map check or Item info, and Map check marks modifiers](tasks/013-map-check.md)

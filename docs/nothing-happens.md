@@ -28,8 +28,8 @@ it never appears:
 Kalandra sends a copied item to one page only: the page that connected or had the focus last. The overlay is one
 page. Kalandra's page in a web browser is another, whether **Open in Browser** in the tray menu opened it, or
 `--no-overlay`, or another device with `--listen` ([Command-line options](/cmd-flags)). When that page connects,
-connects again or gets the focus, the price check, Item info, the other keys that copy an item and the OCR key of
-Item search show their result in that page, and the overlay shows nothing. No log line says so.
+connects again or gets the focus, the price check, Item info and the other keys that copy an item show their result
+in that page, and the overlay shows nothing. No log line says so.
 
 The overlay gets these keys back when you give it the focus with the overlay key (`Shift + Space` by default), or
 when you close the other pages. Chat commands, stash searches and the widget keys, such as the stopwatch keys, work

@@ -26,7 +26,7 @@ wrote each line, read from the real log `renderer/specs/web/FullCampaign.txt` wi
 time of each action: enter an area, leave it and enter the same instance again, open and close the
 full-screen map and the Atlas, take a campaign reward, type `/afk` in the chat, then move. Find the
 lines with those times in `Client.txt`
-([section 8 of the runbook](../../runbooks/in-game-check.md#8-clienttxt-for-the-xp-tracker) gives
+([section 7 of the runbook](../../runbooks/in-game-check.md#7-clienttxt-for-the-xp-tracker) gives
 its path). Compare the `ms` number with the time since the computer started, shown as Up time in
 Task Manager, Performance.
 

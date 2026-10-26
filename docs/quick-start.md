@@ -59,8 +59,8 @@ These actions have no hotkey until you set one:
 - **Open item on wiki**, **Open item on PoEDB**, **Open base item on Craft of Exile**, **Find in Stash** and
   **Filter by** in Settings, Item info.
 - Four more chat commands in Settings, Chat, such as `/invite @last`.
-- The entries of a Stash search widget, the keys of a Stopwatch, the OCR key of the Item search widget and the
-  **Log item to csv** key of the Library widget. Set them with the widget's **edit** button.
+- The entries of a Stash search widget, the keys of a Stopwatch and the **Log item to csv** key of the Library
+  widget. Set them with the widget's **edit** button.
 
 To open Settings, press `Shift + Space` and click the cog icon in the main button bar. [Settings](/settings#hotkeys)
 explains how to set a hotkey and which keys Kalandra cannot use, and it describes each page of the Settings window.

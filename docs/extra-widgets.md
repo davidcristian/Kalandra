@@ -106,11 +106,7 @@ game. Click the magnifier in the main button bar to show it.
 The row holds five items, sorted from the highest price to the lowest. Selecting a sixth item starts a new row with
 it, and selecting an item that is already in the row does nothing. `Reset items` clears the row.
 
-Item search has no `delete` button. Its `edit` button opens its page in the Settings window, which has one hotkey,
-`Perform an OCR for a Skill Gem`. OCR reads text from a screenshot. This hotkey reads the text between two lock icons
-on one line of the screen as a gem name, and adds the gems it finds to the row. When you opened Item search and did
-not hide it, it then stays on screen over the game for 4 seconds. The OCR hotkey works only on Windows and needs the
-files from the [OCR guide](/ocr-guide).
+Item search has only the `hide` and `move` buttons. It has no settings and no hotkey.
 
 ## Delve grid
 

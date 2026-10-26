@@ -46,7 +46,8 @@ Hover over a widget to show its buttons. Not every widget has all four:
 | --- | --- |
 | Stash search, Image strip, Notepad | `hide`, `edit`, `move`, `delete` |
 | Stopwatch | `edit`, `move`, `delete` |
-| XP tracker, Item search, Library | `hide`, `edit`, `move` |
+| XP tracker, Library | `hide`, `edit`, `move` |
+| Item search | `hide`, `move` |
 | Main button bar | `edit`, `move` |
 | Item info, Map check | `hide`, `edit` |
 | Price check, Settings window | none |
@@ -98,8 +99,6 @@ Most widgets close with the overlay and come back when you open it again. These 
 
 - The XP tracker stays on screen over the game while it is shown.
 - A stopwatch stays on screen while it runs, or while it holds a paused time of one second or more.
-- Item search, when you opened it and did not hide it, stays on screen for 4 seconds after its OCR hotkey adds an
-  item.
 - The Library widget stays on screen while a session runs.
 - The Delve grid shows over the game and hides when you open the overlay.
 
@@ -107,7 +106,7 @@ Price check, Item info and Map check open and close with their own hotkeys, whic
 
 ## Hotkeys
 
-Stash searches, stopwatches, Item search, the Delve grid and [Chat commands](/chat-commands) have hotkeys.
+Stash searches, stopwatches, the Delve grid and [Chat commands](/chat-commands) have hotkeys.
 [Settings](/settings#hotkeys) lists the rules that every hotkey follows, such as the keys that Kalandra does not
 register because it presses them itself to copy items and to type into the game.
 

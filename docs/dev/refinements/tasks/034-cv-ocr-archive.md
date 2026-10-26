@@ -1,9 +1,9 @@
 # Check the cv-ocr.zip file list and decide where the archive comes from
 
-**Status:** open
+**Status:** declined 2026-10-26
 **Area:** docs
-**Origin:** [docs/ocr-guide.md](../../../ocr-guide.md)
-**Verified:** 2026-10-18
+**Origin:** [docs/extra-widgets.md](../../../extra-widgets.md)
+**Verified:** 2026-10-26
 
 The OCR guide links `cv-ocr.zip` from release v3.20.10007 of Awakened PoE Trade on GitHub. It tells
 the user to extract a `cv-ocr` folder from the archive into `%APPDATA%\kalandra\apt-data`, and shows
@@ -27,3 +27,7 @@ removed ([031](031-path-of-exile-1-features.md)).
 - 2026-10-18: Found while docs/ocr-guide.md was rewritten. The download needs the maintainer's
   go-ahead, so the writer sent one `HEAD` request, which reported 5,332,857 bytes, and downloaded
   nothing. A second `HEAD` request on the same day, during the task review, reported the same size.
+- 2026-10-26: Declined without work, as this task said it would be. The maintainer chose to remove
+  the Heist gem OCR ([031](031-path-of-exile-1-features.md)), so no page links `cv-ocr.zip` and no
+  code reads `apt-data/cv-ocr`. The Origin links `docs/extra-widgets.md`, since `docs/ocr-guide.md`
+  is gone.

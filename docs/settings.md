@@ -40,8 +40,8 @@ window shows the key in red with a red outline, in each field that has it on any
 A key that two actions share is marked as soon as you set it. The other keys are marked after **Save**, and a key
 that another program uses only after the game window has been active, since Kalandra registers hotkeys only then.
 
-More hotkeys are set on the Chat and Item info pages and in the settings of the Stash search, Stopwatch, Item search
-and Library widgets.
+More hotkeys are set on the Chat and Item info pages and in the settings of the Stash search, Stopwatch and Library
+widgets.
 
 ## Chat
 
@@ -149,8 +149,6 @@ The **edit** button of these widgets opens the settings window with only that wi
 - **Stash search**: the widget title, the searches and their hotkeys. [Stash search](/stash-search) documents it.
 - **Stopwatch**: the **Start and Pause** and **Reset** hotkeys. [Extra widgets](/extra-widgets#stopwatch)
   documents it.
-- **Item search**: the hotkey that reads skill gem names with OCR, which reads text from a screenshot.
-  [Extra widgets](/extra-widgets#item-search) documents it.
 - **Library**: the hotkey that logs an item, the output folder and which mods a recording keeps.
   [Item data](/item-data) documents it.
 - **XP tracker**: the **Leveling** page, with **PoE log file**, **Allow reading of Client.txt file** and
