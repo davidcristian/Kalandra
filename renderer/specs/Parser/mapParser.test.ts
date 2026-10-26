@@ -33,8 +33,8 @@ describe("parseWaystone", () => {
   });
 
   it.each([
-    ["RareMap", RareMap],
-    ["RareMapFakeAllProps", RareMapFakeAllProps],
+    ["a copied waystone", RareMap],
+    ["a waystone written by hand with every property", RareMapFakeAllProps],
   ])(
     "reads the tier from the item data and each property line of %s",
     (_name: string, testItem: TestItem) => {

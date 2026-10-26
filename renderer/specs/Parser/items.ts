@@ -815,6 +815,8 @@ RareMap.suffixCount = 2;
 // #endregion RareMap
 
 // #region RareMapFakeAllProps
+// Not copied from the game: its property section was written by hand to have
+// every waystone property line, so it lists Item Rarity twice.
 export const RareMapFakeAllProps = new TestItem(`Item Class: Waystones
 Rarity: Rare
 Blasted Control

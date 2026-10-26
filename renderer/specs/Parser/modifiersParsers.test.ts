@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import {
   ArmourHighValueRareItem,
+  BowThreeAugments,
   HighDamageRareItem,
+  ItemAllTheModifierTypes,
   MagicItem,
   NormalShield,
   RareItem,
@@ -165,40 +167,52 @@ describe("[unit] parseModifiers", () => {
     parsedItem.category = ItemCategory.Bow;
   });
 
-  it("Should parse explicit modifiers", () => {
-    const section = `{ Fractured Prefix Modifier "Electrocuting" (Tier: 2) — Damage, Elemental, Lightning, Attack }
-Adds 10(1-16) to 273(239-300) Lightning Damage
-{ Prefix Modifier "Razor-sharp" (Tier: 3) — Damage, Physical, Attack }
-Adds 24(23-35) to 51(39-59) Physical Damage
-{ Crafted Prefix Modifier "Overpowering" (Tier: 2) — Damage, Elemental, Attack }
-109(100-119)% increased Elemental Damage with Attacks
-{ Suffix Modifier "of the Drought" (Tier: 1) — Mana, Physical, Attack }
-Leeches 7.59(7-7.9)% of Physical Damage as Mana
-{ Desecrated Suffix Modifier "of Siphoning" (Tier: 3) — Mana }
-Gain 21(21-27) Mana per enemy killed
-{ Suffix Modifier "of Acclaim" (Tier: 1) — Attack, Speed }
-18(17-19)% increased Attack Speed
-`;
+  it.each([
+    [
+      "a fractured crossbow",
+      ItemAllTheModifierTypes,
+      9,
+      [
+        [ModifierType.Fractured, "prefix", "Electrocuting", 2],
+        [ModifierType.Explicit, "prefix", "Razor-sharp", 3],
+        [ModifierType.Explicit, "prefix", "Overpowering", 2],
+        [ModifierType.Explicit, "suffix", "of the Drought", 1],
+        [ModifierType.Desecrated, "suffix", "of Siphoning", 3],
+        [ModifierType.Explicit, "suffix", "of Acclaim", 1],
+      ],
+    ],
+    [
+      "a bow with a crafted suffix",
+      BowThreeAugments,
+      7,
+      [
+        [ModifierType.Explicit, "prefix", "Cruel", 3],
+        [ModifierType.Desecrated, "prefix", "Razor-sharp", 3],
+        [ModifierType.Explicit, "prefix", "Blasting", 3],
+        [ModifierType.Explicit, "suffix", "of Renown", 2],
+        [ModifierType.Explicit, "suffix", "of the Vampire", 1],
+        [ModifierType.Crafted, "suffix", "of Calamity", 3],
+      ],
+    ],
+  ])(
+    "Should parse the explicit modifiers of %s",
+    (_name, testItem, section, expected) => {
+      const sections = __testExports.itemTextToSections(testItem.rawText);
+      parsedItem.category = testItem.category;
 
-    const res = __testExports.parseModifiers(section.split("\n"), parsedItem);
-    expect(res).toBe("SECTION_PARSED");
-    expect(parsedItem.unknownModifiers).toEqual([]);
-    expect(
-      parsedItem.newMods.map(({ info }) => [
-        info.type,
-        info.generation,
-        info.name,
-        info.tier,
-      ]),
-    ).toEqual([
-      [ModifierType.Fractured, "prefix", "Electrocuting", 2],
-      [ModifierType.Explicit, "prefix", "Razor-sharp", 3],
-      [ModifierType.Crafted, "prefix", "Overpowering", 2],
-      [ModifierType.Explicit, "suffix", "of the Drought", 1],
-      [ModifierType.Desecrated, "suffix", "of Siphoning", 3],
-      [ModifierType.Explicit, "suffix", "of Acclaim", 1],
-    ]);
-  });
+      const res = __testExports.parseModifiers(sections[section], parsedItem);
+      expect(res).toBe("SECTION_PARSED");
+      expect(parsedItem.unknownModifiers).toEqual([]);
+      expect(
+        parsedItem.newMods.map(({ info }) => [
+          info.type,
+          info.generation,
+          info.name,
+          info.tier,
+        ]),
+      ).toEqual(expected);
+    },
+  );
 
   it("Should parse implicit modifiers", () => {
     const section = `{ Implicit Modifier — Attack }
