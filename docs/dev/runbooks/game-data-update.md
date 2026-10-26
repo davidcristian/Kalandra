@@ -18,9 +18,10 @@ This repo installs nothing below; each item names the file that expects it.
 
 - Path of Exile 2, installed in the folder that `steam` names in `dataParser/data/vendor/config.json`. The committed
   value is a Steam install folder on Windows.
-- The `pathofexile-dat` command on the PATH, which `src/providers/game_api.py` runs. This repo does not say where the
-  command comes from or which version the data was built with, so ask the maintainer.
-- Node.js on the PATH, for `cloudscraper` in `src/providers/trade_api.py`.
+- The export tool, the npm package `pathofexile-dat` from
+  [SnosMe/poe-dat-viewer](https://github.com/SnosMe/poe-dat-viewer). Step 1 runs version 16.0.0, which exported the
+  current game on 25 Oct 2026, through `npx`, which downloads it.
+- Node.js on the PATH, for `npx` in step 1 and for `cloudscraper` in `src/providers/trade_api.py`.
 - Python 3.12 and the packages in `dataParser/requirements.txt`, installed into `dataParser/.venv` as
   [dataparser.md](../modules/dataparser.md#setup) says. The steps below write `python` for that Python.
 - The item image cache `dataParser/src/services/itemImageCache.json` from the last run. Without it, every icon that
@@ -41,25 +42,35 @@ On 18 Oct 2026 the last two print 445 and 16.
 
 ## Steps
 
-1. **Check the export settings.** In `dataParser/data/vendor/config.json`, `steam` must be the game's install folder
-   on this machine. When the tool must read a table or a stat description file that the patch adds, add it to
-   `tables` or `files` there and to `src/constants/filenames.py`.
+1. **Export the game files.** In `dataParser/data/vendor/config.json`, `steam` must be the game's install folder
+   on this machine. The committed value is the default Steam folder on drive C:, so for a Steam library on another
+   drive, set `steam` to that folder for the run and put the committed value back before a commit. When the tool
+   must read a table or a stat description file that the patch adds, add it to `tables` or `files` there and to
+   `src/constants/filenames.py`. Then, from `dataParser/data/vendor/`:
 
-2. **Pull the inputs** (ask first). From `dataParser/`:
+   ```sh
+   npx -y pathofexile-dat@16.0.0
+   ```
+
+   It writes `tables/<Language>/<Table>.json` and `files/data@StatDescriptions@<name>.csd` there.
+
+2. **Pull the trade data** (ask first). From `dataParser/`:
 
    ```sh
    python ./src/main.py --pull
    ```
 
-   This runs the game export into `data/vendor/`, requests the trade site data for each language into
-   `data/json/<lang>/`, then builds every language into `output/`. The log shows `Exported game data to: <path>`
-   once, then `Fetching JSON from: <url> for language: <lang>` and `Saved JSON to: <path>` for each of the 36 trade
-   files, then `Building <lang>: <n>/9` for each language. The trade requests go one at a time, 5 seconds apart,
-   or further apart when the trade site's rate limit headers set a longer wait, so they take at least three minutes.
+   This requests the trade site data for each language into `data/json/<lang>/`, then builds every language into
+   `output/`. It first runs the command `pathofexile-dat` from the PATH, where `npx` does not put it, so the log
+   starts with `Game data export failed: pathofexile-dat is not on the PATH` and the build reads the export of
+   step 1. A `pathofexile-dat` that is on the PATH exports again and logs `Exported game data to: <path>`, so it
+   must also be version 16.0.0. Then the log shows `Fetching JSON from: <url> for language: <lang>` and
+   `Saved JSON to: <path>` for each of the 36 trade files, then `Building <lang>: <n>/9` for each language. The
+   trade requests go one at a time, 5 seconds apart, or further apart when the trade site's rate limit headers set a
+   longer wait, so they take at least three minutes.
 
-   `Game data export failed: <error>` means the export did not run, and the build used whatever `data/vendor/` held.
    A `Failed to fetch JSON from: <url>` or `Failed to read JSON from: <url>` line means that file kept its old copy.
-   Fix either before going on, since the build in step 4 reads whatever `data/` holds.
+   Fix it before going on, since the build in step 4 reads whatever `data/` holds.
 
 3. **Look up new icons** (optional, ask first). Items new in the patch have no icon in the cache. `SEARCH_URL` in
    `src/services/image_provider.py` names the league the lookups search, `Fate of the Vaal` on 18 Oct 2026, which is
@@ -125,7 +136,7 @@ On 18 Oct 2026 the last two print 445 and 16.
 
 | Error | Cause | What to do |
 | --- | --- | --- |
-| `FileNotFoundError` for `data/vendor/tables/<Language>/<Table>.json` | the export did not write that table | read the export's own output in step 2, and check the table and `translations` in `config.json` |
+| `FileNotFoundError` for `data/vendor/tables/<Language>/<Table>.json` | the export did not write that table | read the export's own output in step 1, and check the table and `translations` in `config.json` |
 | `FileNotFoundError` for `data/vendor/files/data@StatDescriptions@<name>.csd` | the export did not write that stat description file | check `files` in `config.json` against `STAT_DESCRIPTION_FILES` in `src/constants/filenames.py` |
 | `FileNotFoundError` for `data/json/fr/<name>.json.tmp` during `--pull` | the folder does not exist | create `dataParser/data/json/fr/` and run step 2 again |
 | `Rate limited 4 times, gave up on: <url>` during step 2 | the trade site returned 429 for the request and its three retries; that file kept its old copy | run step 2 again only after the seconds in the last `Waiting <seconds> seconds for the rate limit of: <url>` line have passed, and never in a loop |

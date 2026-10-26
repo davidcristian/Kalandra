@@ -20,6 +20,20 @@ py -3.12 -m venv .venv
 On Linux and macOS, create it with `python3.12 -m venv .venv` and use `.venv/bin/python`. The commands below write
 `python` for the Python in `.venv`.
 
+## Exporting the game files
+
+The build reads an export of the game's files in `data/vendor/`. The export tool is the npm package `pathofexile-dat`
+from [SnosMe/poe-dat-viewer](https://github.com/SnosMe/poe-dat-viewer), and version 16.0.0 exported the current game
+on 25 Oct 2026. From `data/vendor/`:
+
+```bash
+npx -y pathofexile-dat@16.0.0
+```
+
+It reads the game from the folder that `steam` names in [config.json](./data/vendor/config.json), the default Steam
+folder on drive C:. For a Steam library on another drive, set `steam` to that folder for the run, and do not commit
+that path.
+
 ## Running it
 
 [main.py](./src/main.py) is the entry point. Run it from this folder:

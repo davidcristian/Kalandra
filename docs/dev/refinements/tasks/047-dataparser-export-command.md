@@ -1,9 +1,9 @@
 # The source and version of the game export command are not recorded
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** dataparser
 **Origin:** [dataParser/src/providers/game_api.py](../../../../dataParser/src/providers/game_api.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-26
 
 `python ./src/main.py --pull` first runs the shell command `pathofexile-dat` in
 `dataParser/data/vendor/` (`run_export()` of `GameDataProvider` in `game_api.py`).
@@ -28,3 +28,11 @@ pip, it also goes into the dependency list of [048](048-dataparser-dependencies.
 
 - 2026-10-18: Found while the game data update runbook was written. A review of the repo against
   the maintainer's documentation practices listed it as an open question.
+- 2026-10-26: Done. The maintainer named the tool: the npm package `pathofexile-dat` from
+  [SnosMe/poe-dat-viewer](https://github.com/SnosMe/poe-dat-viewer). A `package-lock.json` in this
+  repo's history, first under `renderer/public/.DS_Store/` and then in `dataParser/`, records 11.0.1
+  from the first data tool commit and 14.0.0 from v0.5.0 of January 2025, until the data tool moved
+  to a private repo and the file was removed. Version 16.0.0 exported the current game on
+  2026-10-25, after two columns in `config.json` got the names of the current schema. The module
+  doc, the runbook and `dataParser/README.md` give `npx -y pathofexile-dat@16.0.0`, run in
+  `data/vendor/`. It comes from npm, not pip, so [048](048-dataparser-dependencies.md) does not list it.

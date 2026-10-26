@@ -59,12 +59,24 @@ No `.gitignore` entry covers them either, so `git status` lists them after a run
 | `data/json/<lang>/{filters,stats,items,static}.json` | the trade site's `/api/trade2/data/` endpoints, one set per language | `--pull` |
 | `src/services/itemImageCache.json` | item icon URLs found by earlier image lookups | every build: `ImageProvider` creates it empty when it is missing and saves it after it sets the icons |
 
-**The game export.** `--pull` finds the command `pathofexile-dat` on the PATH and runs it in `data/vendor/` without a
-shell (`GameDataProvider` in `src/providers/game_api.py`). The command reads `data/vendor/config.json`: `steam`, the
-Path of Exile 2 install folder it reads from, set to a Steam install on Windows; `files`, the stat description files
-to extract; `translations`, the languages; and `tables`, each table with the columns to keep. No file in this repo
-installs that command or names its version. A command missing from the PATH or a failed export is logged as
-`Game data export failed: <error>`, and the build continues with whatever `data/vendor/` already holds.
+**The game export.** The export tool is the npm package `pathofexile-dat` from
+[SnosMe/poe-dat-viewer](https://github.com/SnosMe/poe-dat-viewer). Version 16.0.0 exported the current game on
+25 Oct 2026. Run it from `data/vendor/`:
+
+```sh
+npx -y pathofexile-dat@16.0.0
+```
+
+It reads `data/vendor/config.json`: `steam`, the Path of Exile 2 install folder it reads from; `files`, the stat
+description files to extract; `translations`, the languages; and `tables`, each table with the columns to keep. The
+committed `steam` is the default Steam folder on drive C:. When the game is in a Steam library on another drive, set
+`steam` to that folder for the run and do not commit it. When a game patch renames a column that `tables` lists, the
+export stops at that table, and the column needs the new name there.
+
+`--pull` also runs the export, but only as the command `pathofexile-dat` on the PATH, in `data/vendor/` and without a
+shell (`GameDataProvider` in `src/providers/game_api.py`). `npx` does not put it on the PATH. A command missing from
+the PATH or a failed export is logged as `Game data export failed: <error>`, and the build continues with whatever
+`data/vendor/` already holds.
 
 **The trade data.** `TradeApiProvider` (`src/providers/trade_api.py`) requests the four endpoints for each language
 from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests one at a time through one `RequestPacer`
@@ -212,5 +224,5 @@ A fresh clone with the packages installed still cannot pass the tests as of 18 O
 needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
 since it reads game tables when it is built.
 
-**Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper`, the
-`pathofexile-dat` command, a local Path of Exile 2 install, and the official trade sites.
+**Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper` and
+`npx`, `pathofexile-dat` 16.0.0 from npm, a local Path of Exile 2 install, and the official trade sites.
