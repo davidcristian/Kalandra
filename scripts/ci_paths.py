@@ -40,7 +40,6 @@ RULES = (
     Rule("pyrightconfig.json", NONE),
     Rule(".gitignore", NONE),
     Rule("LICENSE", NONE),
-    Rule("crowdin.yml", NONE),
     Rule("kalandra.code-workspace", NONE),
     Rule("testUpdate.sh", NONE),
 )

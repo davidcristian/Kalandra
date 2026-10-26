@@ -1,9 +1,9 @@
 # crowdin.yml maps translations while AGENTS.md says no service is connected
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** repo
-**Origin:** [crowdin.yml](../../../../crowdin.yml)
-**Verified:** 2026-10-18
+**Origin:** [AGENTS.md](../../../../AGENTS.md#architecture-rules)
+**Verified:** 2026-10-26
 
 `crowdin.yml` at the repo root tells the Crowdin translation service to take
 `/renderer/public/data/en/app_i18n.json` as the source and write each translation to
@@ -25,3 +25,6 @@ change the rule in AGENTS.md, with the folder names that service writes checked 
 
 - 2026-10-18: Found by a review of the repo against the maintainer's engineering practices, which
   listed it as an open question.
+- 2026-10-26: Done. The maintainer chose to remove `crowdin.yml` and its rule in
+  `scripts/ci_paths.py`. No translation service is connected, as AGENTS.md says, so nothing read
+  the file. The Origin links AGENTS.md, since the file is gone.
