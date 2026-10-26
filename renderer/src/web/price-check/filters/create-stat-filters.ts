@@ -137,10 +137,10 @@ export function createExactStatFilters(
       filter.disabled = false;
     }
 
-    if (filter.statRef === "# uses remaining") {
-      filter.roll!.min = filter.roll!.value;
-      filter.roll!.default.min = filter.roll!.value;
-      filter.roll!.default.max = filter.roll!.value;
+    if (filter.statRef === "# uses remaining" && filter.roll) {
+      filter.roll.min = filter.roll.value;
+      filter.roll.default.min = filter.roll.value;
+      filter.roll.default.max = filter.roll.value;
     }
   }
 
@@ -399,23 +399,11 @@ export function calculatedStatToFilter(
       if (!fixedStats.includes(filter.statRef)) {
         filter.tag = FilterTag.Variant;
       }
-    } else if (
-      sources.some((s) =>
-        CLIENT_STRINGS.DELVE_MODS.includes(s.modifier.info.name!),
-      )
-    ) {
+    } else if (hasModNamed(sources, CLIENT_STRINGS.DELVE_MODS)) {
       filter.tag = FilterTag.Delve;
-    } else if (
-      sources.some((s) =>
-        CLIENT_STRINGS.VEILED_MODS.includes(s.modifier.info.name!),
-      )
-    ) {
+    } else if (hasModNamed(sources, CLIENT_STRINGS.VEILED_MODS)) {
       // A veiled modifier keeps its tag
-    } else if (
-      sources.some((s) =>
-        CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!),
-      )
-    ) {
+    } else if (hasModNamed(sources, CLIENT_STRINGS.INCURSION_MODS)) {
       filter.tag = FilterTag.Incursion;
     }
   } else if (type === ModifierType.Enchant) {
@@ -455,7 +443,7 @@ export function calculatedStatToFilter(
     const dp =
       calc.stat.dp ||
       calc.sources.some(
-        (s) => s.stat.stat.ref === calc.stat.ref && s.stat.roll!.dp,
+        (s) => s.stat.stat.ref === calc.stat.ref && s.stat.roll?.dp,
       );
 
     const filterBounds = {
@@ -660,8 +648,8 @@ export function finalFilterTweaks(ctx: FiltersCreationContext) {
     ) {
       const mod = ctx.item.statsByType.find(
         (mod) => mod.stat.ref === filter.statRef,
-      )!;
-      if (mod.stat.trade.ids?.[ModifierType.Explicit]) {
+      );
+      if (mod?.stat.trade.ids?.[ModifierType.Explicit]) {
         filter.hidden = "filters.hide_for_crafting";
       }
     } else if (filter.tag === FilterTag.Skill && filter.roll) {
@@ -729,6 +717,14 @@ export function finalFilterTweaks(ctx: FiltersCreationContext) {
   }
 }
 
+function hasModNamed(sources: StatFilter["sources"], names: string[]) {
+  return sources.some(
+    (s) =>
+      s.modifier.info.name !== undefined &&
+      names.includes(s.modifier.info.name),
+  );
+}
+
 function applyClusterJewelRules(filters: StatFilter[]) {
   for (const filter of filters) {
     if (filter.statRef === "# Added Passive Skills are Jewel Sockets") {
@@ -740,19 +736,14 @@ function applyClusterJewelRules(filters: StatFilter[]) {
     if (filter.statRef === "Adds # Passive Skills") {
       filter.disabled = false;
 
-      if (filter.roll!.value === 4) {
-        filter.roll!.max = 5;
-      } else if (filter.roll!.value === 5) {
-        filter.roll!.min = filter.roll!.default.min;
-      } else if (
-        filter.roll!.value === 3 ||
-        filter.roll!.value === 6 ||
-        filter.roll!.value === 10 ||
-        filter.roll!.value === 11 ||
-        filter.roll!.value === 12
-      ) {
-        filter.roll!.min = filter.roll!.default.min;
-        filter.roll!.max = undefined;
+      const roll = filter.roll;
+      if (roll?.value === 4) {
+        roll.max = 5;
+      } else if (roll?.value === 5) {
+        roll.min = roll.default.min;
+      } else if (roll && [3, 6, 10, 11, 12].includes(roll.value)) {
+        roll.min = roll.default.min;
+        roll.max = undefined;
       }
       // Other values keep the range that calculatedStatToFilter set
     }

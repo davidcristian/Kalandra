@@ -364,7 +364,7 @@ function createGemFilters(
   filters: ItemFilters,
   opts: CreateOptions,
 ) {
-  if (!item.info.gem!.transfigured) {
+  if (!item.info.gem?.transfigured) {
     filters.searchExact = {
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info),
@@ -384,7 +384,7 @@ function createGemFilters(
     value: item.isCorrupted,
   };
 
-  if (item.info.gem!.awakened) {
+  if (item.info.gem?.awakened) {
     filters.gemLevel = {
       value: item.gemLevel!,
       disabled: item.gemLevel! < 5,
@@ -400,7 +400,7 @@ function createGemFilters(
     return filters;
   }
 
-  if (item.gemSockets!) {
+  if (item.gemSockets) {
     filters.socketNumber = {
       value: item.gemSockets.number,
       disabled: item.gemSockets.number < 3,

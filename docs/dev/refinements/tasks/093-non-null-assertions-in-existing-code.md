@@ -27,3 +27,5 @@ count.
   `main/src/env.d.ts`, so only 3 spec files stay in the main list.
 - 2026-10-26: 68 in the parser were replaced by checks and optional chaining, which leaves 6 in
   `parser/Parser.ts` and none in `parser/advanced-mod-desc.ts`.
+- 2026-10-26: 41 in the price check filters were replaced by checks and optional chaining. Most
+  of the rest there assert a filter's `roll`.

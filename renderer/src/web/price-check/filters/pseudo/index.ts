@@ -224,15 +224,16 @@ export function filterPseudo(ctx: FiltersCreationContext) {
   rulesLoop: for (const rule of PSEUDO_RULES) {
     const sources = filterPseudoSources(ctx.statsByType, ({ stat }, source) => {
       const info = rule.stats.find((info) => info.ref === stat.ref);
-      if (!info) return null;
+      const roll = source.contributes;
+      if (!info || !roll) return null;
 
       const multi = info.multiplier ?? 1;
       return {
         ...source,
         contributes: {
-          value: source.contributes!.value * multi,
-          min: source.contributes!.min * multi,
-          max: source.contributes!.max * multi,
+          value: roll.value * multi,
+          min: roll.min * multi,
+          max: roll.max * multi,
         },
       };
     });
@@ -267,19 +268,17 @@ export function filterPseudo(ctx: FiltersCreationContext) {
 
     ctx.filters.push(filter);
 
-    if (rule.replaces && filterByGroup.has(rule.replaces)) {
-      const replacedFilters = filterByGroup.get(rule.replaces)!;
+    const replacedFilters = rule.replaces && filterByGroup.get(rule.replaces);
+    if (replacedFilters) {
       ctx.filters = ctx.filters.filter(
         (filter) => !replacedFilters.includes(filter),
       );
     }
 
     if (rule.group) {
-      if (filterByGroup.has(rule.group)) {
-        filterByGroup.get(rule.group)!.push(filter);
-      } else {
-        filterByGroup.set(rule.group, [filter]);
-      }
+      const group = filterByGroup.get(rule.group);
+      if (group) group.push(filter);
+      else filterByGroup.set(rule.group, [filter]);
     }
   }
 
@@ -290,9 +289,8 @@ export function filterPseudo(ctx: FiltersCreationContext) {
       ),
   );
 
-  if (filterByGroup.has("to_x_ele_res")) {
-    const resFilters = filterByGroup.get("to_x_ele_res")!;
-
+  const resFilters = filterByGroup.get("to_x_ele_res");
+  if (resFilters) {
     resFilters.sort((a, b) => b.roll!.value - a.roll!.value);
     const maxFilter =
       resFilters[0]?.roll?.value === resFilters[1]?.roll?.value
@@ -308,8 +306,8 @@ export function filterPseudo(ctx: FiltersCreationContext) {
     );
   }
 
-  if (filterByGroup.has("to_x_attr")) {
-    const attrFilters = filterByGroup.get("to_x_attr")!;
+  const attrFilters = filterByGroup.get("to_x_attr");
+  if (attrFilters) {
     attrFilters.sort((a, b) => b.roll!.value - a.roll!.value);
     if (attrFilters.length === 3) {
       const toAll = filterByGroup.get("to_all_attrs");
@@ -339,8 +337,8 @@ export function filterPseudo(ctx: FiltersCreationContext) {
     }
   }
 
-  if (filterByGroup.has("to_all_res")) {
-    const filters = filterByGroup.get("to_all_res")!;
+  const filters = filterByGroup.get("to_all_res");
+  if (filters) {
     if (filters.length > 1) {
       throw new Error("Multiple to_all_res filters");
     }
@@ -373,17 +371,18 @@ export function filterPseudo(ctx: FiltersCreationContext) {
       const info = RESISTANCES_INFO.find(
         (info) => info.ref === source.stat.stat.ref,
       );
-      if (!info) continue;
+      const roll = source.contributes;
+      if (!info || !roll) continue;
 
       if (info.elements.length === 3) {
-        all.value += source.contributes!.value;
-        all.min += source.contributes!.min;
-        all.max += source.contributes!.max;
+        all.value += roll.value;
+        all.min += roll.min;
+        all.max += roll.max;
       } else {
         for (const element of info.elements) {
-          elements[element].value += source.contributes!.value;
-          elements[element].min += source.contributes!.min;
-          elements[element].max += source.contributes!.max;
+          elements[element].value += roll.value;
+          elements[element].min += roll.min;
+          elements[element].max += roll.max;
         }
       }
     }
