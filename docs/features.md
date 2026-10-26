@@ -114,13 +114,6 @@ Kalandra saves the text with its settings. Use the **edit** button to rename the
 
 Details: [Extra widgets](/extra-widgets).
 
-## Delve grid
-
-Draws a grid of 11 columns and 9 rows over the game, sized for the Delve chart of Path of Exile 1. It has no default
-hotkey: set one in Settings, Hotkeys, **Grid for Delve Chart**. The hotkey shows or hides the grid.
-
-Details: [Extra widgets](/extra-widgets).
-
 ## Item data
 
 Item Data Collection is an experimental feature that adds the Library widget, which collects crafting results. Start

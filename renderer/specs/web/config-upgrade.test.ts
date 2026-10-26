@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import path from "path";
 import type { Config } from "@/web/Config";
-import type { Widget } from "@/web/overlay/widgets";
+import type { ImageStripWidget, Widget } from "@/web/overlay/widgets";
 import { Host } from "@/web/background/IPC";
 import { registry } from "@/web/overlay/widget-registry";
 import type { StashSearchWidget } from "@/web/stash-search/widget";
@@ -143,8 +143,26 @@ function keysWithoutStep(config: Config) {
     clientLog: config.clientLog,
     gameConfig: config.gameConfig,
     craftOfExileKey: field(widget("item-check"), "craftOfExileKey"),
-    toggleKey: field(widget("delve-grid"), "toggleKey"),
     ocrGemsKey: field(widget("item-search"), "ocrGemsKey"),
+  };
+}
+
+const SYNDICATE_SHEET = { id: 1, url: "syndicate.jpg" };
+const OWN_IMAGE = { id: 2, url: "5d41402abc4b2a76b9719d911017c592.png" };
+
+function imageStrip(
+  wmTitle: string,
+  images: ImageStripWidget["images"],
+): ImageStripWidget {
+  return {
+    wmId: 900,
+    wmType: "image-strip",
+    wmTitle,
+    wmWants: "hide",
+    wmZorder: null,
+    wmFlags: ["invisible-on-blur"],
+    anchor: { pos: "tc", x: 40, y: 8 },
+    images: [...images],
   };
 }
 
@@ -190,8 +208,8 @@ describe("upgradeConfig", () => {
     },
   );
 
-  // Awakened PoE Trade added the first four keys and two hotkeys without a new version, and
-  // a new install of versions 15 to 21 has no ocrGemsKey
+  // Awakened PoE Trade added the first four keys and craftOfExileKey without a new version,
+  // and a new install of versions 15 to 21 has no ocrGemsKey
   it.each([2, 16])(
     "sets each key that entered the defaults without a step to its default in a version %i config",
     (version) => {
@@ -345,6 +363,92 @@ describe("upgradeConfig", () => {
     },
   );
 
+  it.each(VERSIONS)(
+    "removes the Delve grid and the default Cheat sheets strip from a version %i config",
+    (version) => {
+      const types = upgrade(readSaved(version)).widgets.map((w) => w.wmType);
+
+      expect(types).not.toContain("delve-grid");
+      expect(types).not.toContain("image-strip");
+    },
+  );
+
+  it("removes the Delve grid and the syndicate sheet only in the < 41 step", () => {
+    const config = readSaved(36);
+
+    const types = (saved: Config) => saved.widgets.map((w) => w.wmType);
+
+    runSteps(config, 40);
+
+    expect(config.configVersion).toBe(40);
+    expect(types(config)).toContain("delve-grid");
+    expect(types(config)).toContain("image-strip");
+    const upgraded = upgrade(config);
+    expect(upgraded.configVersion).toBe(41);
+    expect(types(upgraded)).not.toContain("delve-grid");
+    expect(types(upgraded)).not.toContain("image-strip");
+  });
+
+  it("removes a Delve grid whose hotkey the user set from a version 40 config", () => {
+    const delveGrid = {
+      wmId: 900,
+      wmType: "delve-grid",
+      wmTitle: "",
+      wmWants: "show" as const,
+      wmZorder: null,
+      wmFlags: ["hide-on-focus", "menu::skip"],
+      toggleKey: "Alt + G",
+    };
+    const config = asSaved(actual.defaultConfig());
+    config.configVersion = 40;
+    config.widgets.push(delveGrid);
+
+    const upgraded = upgrade(config);
+
+    expect(upgraded.widgets).toEqual(actual.defaultConfig().widgets);
+  });
+
+  it.each([
+    [
+      "the default strip",
+      "Cheat sheets",
+      [SYNDICATE_SHEET, OWN_IMAGE],
+      [OWN_IMAGE],
+    ],
+    [
+      "a strip added from the menu",
+      "",
+      [OWN_IMAGE, SYNDICATE_SHEET],
+      [OWN_IMAGE],
+    ],
+    ["a strip the user named", "Bosses", [SYNDICATE_SHEET], []],
+    ["a strip the user emptied", "Cheat sheets", [], []],
+  ])(
+    "keeps %s and its own images, without the syndicate sheet",
+    (_, wmTitle, images, kept) => {
+      const config = readSaved(36);
+      config.widgets.push(imageStrip(wmTitle, images));
+
+      const upgraded = upgrade(config);
+
+      expect(upgraded.widgets.filter((w) => w.wmId === 900)).toEqual([
+        imageStrip(wmTitle, kept),
+      ]);
+    },
+  );
+
+  it.each([
+    ["the default strip", "Cheat sheets"],
+    ["a strip added from the menu", ""],
+  ])("removes %s when the syndicate sheet is its only image", (_, wmTitle) => {
+    const config = readSaved(36);
+    config.widgets.push(imageStrip(wmTitle, [SYNDICATE_SHEET]));
+
+    const upgraded = upgrade(config);
+
+    expect(upgraded.widgets.filter((w) => w.wmId === 900)).toEqual([]);
+  });
+
   it("removes the filter generator widget, which the app no longer has, from a version 25 config", () => {
     const upgraded = upgrade(readSaved(25));
 
@@ -439,6 +543,15 @@ describe("initConfig", () => {
   it("still stops at a version 2 config without a map check widget", async () => {
     const config = readSaved(2);
     config.widgets = config.widgets.filter((w) => w.wmType !== "map-check");
+
+    await expect(load(config)).rejects.toThrow(TypeError);
+  });
+
+  // defaultConfig() has no Delve grid widget, which the < 16 step reads
+  it("still stops at a version 15 config without a Delve grid widget", async () => {
+    const config = readSaved(16);
+    config.configVersion = 15;
+    config.widgets = config.widgets.filter((w) => w.wmType !== "delve-grid");
 
     await expect(load(config)).rejects.toThrow(TypeError);
   });

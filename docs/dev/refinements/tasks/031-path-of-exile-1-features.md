@@ -1,6 +1,6 @@
 # Decide whether the Path of Exile 1 features stay
 
-**Status:** open
+**Status:** done 2026-10-26
 **Area:** renderer
 **Origin:** [docs/extra-widgets.md](../../../extra-widgets.md)
 **Verified:** 2026-10-26
@@ -42,3 +42,8 @@ Each removal is its own commit.
   [023](023-ocr-handler-no-close-match.md) and [034](034-cv-ocr-archive.md) closed. Saved configs
   keep `ocrGemsKey`, which no code reads. The Delve grid and the default image strip follow in a
   later commit.
+- 2026-10-26: Done. The Delve grid went with its hotkey, settings text and pages, and the default
+  image strip with `syndicate.jpg`; a new image strip starts empty. The `< 41` config step removes
+  Delve grid widgets and the syndicate sheet from saved configs
+  ([config.md](../../modules/config.md#public-contract)).
+  [Host task 010](../../host/tasks/010-ocr-and-delve-grid.md) closed without a run.

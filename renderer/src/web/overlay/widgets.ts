@@ -76,10 +76,6 @@ export interface StopwatchWidget extends Widget {
   resetKey: string | null;
 }
 
-export interface DelveGridWidget extends Widget {
-  toggleKey: string | null;
-}
-
 export interface ImageStripWidget extends Widget {
   anchor: Anchor;
   images: Array<{

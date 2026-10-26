@@ -18,7 +18,7 @@ function addTo(config: { images: Array<{ id: number; url: string }> }) {
   return useImageImport(config, (file) => Host.importFile(file));
 }
 
-const strip = () => ({ images: [{ id: 1, url: "syndicate.jpg" }] });
+const strip = () => ({ images: [{ id: 1, url: "9b1c.png" }] });
 
 describe("useImageImport", () => {
   it("adds the name main stores the file under, with the next id", async () => {
@@ -32,7 +32,7 @@ describe("useImageImport", () => {
     await addImage(new File(["image"], "map.png"));
 
     expect(config.images).toEqual([
-      { id: 1, url: "syndicate.jpg" },
+      { id: 1, url: "9b1c.png" },
       { id: 2, url: "0f3a.png" },
     ]);
     expect(failed.value).toBe(false);

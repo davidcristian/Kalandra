@@ -51,7 +51,6 @@ Hover over a widget to show its buttons. Not every widget has all four:
 | Main button bar | `edit`, `move` |
 | Item info, Map check | `hide`, `edit` |
 | Price check, Settings window | none |
-| Delve grid | none you can reach, because it hides when the overlay opens |
 
 ### Move
 
@@ -100,13 +99,12 @@ Most widgets close with the overlay and come back when you open it again. These 
 - The XP tracker stays on screen over the game while it is shown.
 - A stopwatch stays on screen while it runs, or while it holds a paused time of one second or more.
 - The Library widget stays on screen while a session runs.
-- The Delve grid shows over the game and hides when you open the overlay.
 
 Price check, Item info and Map check open and close with their own hotkeys, which their pages describe.
 
 ## Hotkeys
 
-Stash searches, stopwatches, the Delve grid and [Chat commands](/chat-commands) have hotkeys.
+Stash searches, stopwatches and [Chat commands](/chat-commands) have hotkeys.
 [Settings](/settings#hotkeys) lists the rules that every hotkey follows, such as the keys that Kalandra does not
 register because it presses them itself to copy items and to type into the game.
 
@@ -116,5 +114,5 @@ register because it presses them itself to copy items and to type into the game.
   hotkeys over an item.
 - [Stash search](/stash-search) types saved searches into the stash search box.
 - [XP tracker](/xp-tracker) shows your experience multiplier while you level.
-- [Extra widgets](/extra-widgets) covers the image strip, stopwatch, notepad, item search and Delve grid.
+- [Extra widgets](/extra-widgets) covers the image strip, stopwatch, notepad and item search.
 - [Item data](/item-data) covers the Library widget of the experimental Item Data Collection feature.

@@ -81,15 +81,6 @@ export function shortcutActions(config: Config): ShortcutAction[] {
       action: { type: "copy-item", target: "log-item" },
     });
   }
-
-  const delveGrid = widgetOfType<widget.DelveGridWidget>(config, "delve-grid");
-  if (delveGrid.toggleKey) {
-    actions.push({
-      shortcut: delveGrid.toggleKey,
-      action: { type: "trigger-event", target: "delve-grid" },
-      keepModKeys: true,
-    });
-  }
   for (const command of config.commands) {
     if (command.hotkey) {
       actions.push({

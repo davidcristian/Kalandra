@@ -1,6 +1,6 @@
 # Whether the Delve grid matches anything Path of Exile 2 shows
 
-**Status:** never attempted
+**Status:** done 2026-10-26
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [docs/extra-widgets.md](../../../extra-widgets.md)
 **Verified:** 2026-10-26
@@ -30,3 +30,6 @@ file's History line.
 - 2026-10-26: The OCR claims left this task when the Heist gem OCR was removed
   ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)), so it checks only the
   Delve grid. The Origin links docs/extra-widgets.md, since docs/ocr-guide.md is gone.
+- 2026-10-26: Done without a run. The Delve grid was removed
+  ([refinement 031](../../refinements/tasks/031-path-of-exile-1-features.md)), so no claim is left to
+  check in the game.

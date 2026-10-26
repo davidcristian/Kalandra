@@ -2,7 +2,7 @@
 title: Extra widgets
 ---
 
-This page covers five smaller widgets: the image strip, the stopwatch, the notepad, item search and the Delve grid.
+This page covers four smaller widgets: the image strip, the stopwatch, the notepad and item search.
 [Widgets](/widgets) explains how to open the overlay and how the `hide`, `edit`, `move` and `delete` buttons work.
 
 ## Image strip
@@ -13,6 +13,10 @@ read.
 
 To add a strip, open the overlay (`Shift + Space` by default), hover over the three dots and click `Image strip`.
 You can add more than one. A new strip has no title, shows `Untitled`, and has no images until you add them.
+
+Kalandra no longer includes the Path of Exile 1 syndicate cheat sheet that the `Cheat sheets` strip showed. When
+Kalandra updates from a version that had it, it removes that sheet from each strip. It also removes a strip whose
+only image was that sheet, unless you gave the strip your own title.
 
 ![The add widget menu with Image strip circled](/reference-images/AddImageStrip.png)
 
@@ -102,12 +106,3 @@ The row holds five items, sorted from the highest price to the lowest. Selecting
 it, and selecting an item that is already in the row does nothing. `Reset items` clears the row.
 
 Item search has only the `hide` and `move` buttons. It has no settings and no hotkey.
-
-## Delve grid
-
-The Delve grid draws a grid of 11 columns and 9 rows in the top center of the screen, sized for the Delve chart of
-Path of Exile 1. Its size follows the height of the game window.
-
-The grid has no hotkey by default. Set one at `Grid for Delve Chart` in Settings, `Hotkeys`, and click `Save`. The
-hotkey shows or hides the grid over the game. The grid hides when you open the overlay, and it has no button in the
-main button bar.

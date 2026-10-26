@@ -129,7 +129,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 40,
+  configVersion: 41,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -218,7 +218,7 @@ export function upgradeConfig(_config: Config): Config {
     });
 
     config.widgets.push({
-      ...defaultConfig().widgets.find((w) => w.wmType === "delve-grid")!,
+      ...removed.delveGridDefault(),
       wmId: Math.max(0, ...config.widgets.map((_) => _.wmId)) + 1,
       wmZorder: null,
     });
@@ -425,7 +425,7 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 16) {
     const delve = config.widgets.find(
       (w) => w.wmType === "delve-grid",
-    ) as widget.DelveGridWidget;
+    ) as removed.DelveGridWidget;
     delve.toggleKey = (config as any).delveGridKey;
 
     const itemCheck = config.widgets.find(
@@ -682,6 +682,11 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 40) {
     namePresetEntries(config, ENGLISH_DEFAULTS_40);
     config.configVersion = 40;
+  }
+
+  if (config.configVersion < 41) {
+    removed.removePathOfExile1Widgets(config);
+    config.configVersion = 41;
   }
 
   return config as Config;

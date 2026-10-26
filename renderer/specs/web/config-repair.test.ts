@@ -32,7 +32,7 @@ function ids(config: SavedConfig): unknown[] {
   return config.widgets.map((w) => w.wmId);
 }
 
-// The widgets of defaultConfig() in the order of widget-registry.ts
+// The widgets of a new install from version 30 to 40, in the order of widget-registry.ts
 function newInstallWidgets(): SavedWidget[] {
   return [
     widget(1, "menu"),

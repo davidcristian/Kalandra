@@ -47,7 +47,7 @@ issue on [GitHub](https://github.com/davidcristian/Kalandra/issues).
 - [Stash search](/stash-search): saved search texts that Kalandra types into the game's search box.
 - [XP tracker](/xp-tracker): a widget that shows your level, your experience multiplier in the current area and how
   far you are from the level penalty.
-- [Extra widgets](/extra-widgets): the Image strip, Stopwatch, Notepad and Item search widgets and the Delve grid.
+- [Extra widgets](/extra-widgets): the Image strip, Stopwatch, Notepad and Item search widgets.
 - [Chat commands](/chat-commands): send a chat command, such as `/hideout`, with one key.
 - [Item data](/item-data): an experimental widget that records crafting results to a CSV file.
 - [Client log file](/client-log-parser): the format of `client-log.ndjson`, the file in which Kalandra stores the

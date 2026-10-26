@@ -30,7 +30,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
 | `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
-| `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetDelveGrid.vue`, `WidgetTimer.vue` |
+| `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetTimer.vue` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
 | `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`, the last 1000 lines, cleared when the socket opens) |
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
@@ -68,7 +68,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 | `type` | Fields | What main does | Built from |
 | --- | --- | --- | --- |
 | `copy-item` | `target`, `focusOverlay?` | presses the copy keys and sends `item-text` with `target` | the price check (`price-check`), the item check widget (`item-check`, `open-wiki`, `open-craft-of-exile`, `open-poedb`, `search-similar`, `search-same-priced`), the library (`log-item`) |
-| `trigger-event` | `target` | broadcasts `widget-action` with `target` | `delve-grid`, and `stopwatch-start-stop:<wmId>` and `stopwatch-reset:<wmId>` per stopwatch |
+| `trigger-event` | `target` | broadcasts `widget-action` with `target` | `stopwatch-start-stop:<wmId>` and `stopwatch-reset:<wmId>` per stopwatch |
 | `stash-search` | `text` | types `text` into the stash search | the stash search widget's entries, when its hotkeys are on |
 | `toggle-overlay` | none | moves the focus between the overlay and the game | `overlayKey` |
 | `paste-in-chat` | `text`, `send` | types a chat command | each entry in `commands` with a hotkey |

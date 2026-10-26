@@ -166,7 +166,7 @@
   },
   "specs/web/shortcut-actions.test.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
+      "count": 3
     }
   },
   "src/assets/data/index.ts": {
@@ -214,7 +214,7 @@
   },
   "src/web/Config.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 29
+      "count": 28
     }
   },
   "src/web/background/Prices.ts": {
@@ -294,11 +294,6 @@
   "src/web/overlay/Widget.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
-    }
-  },
-  "src/web/overlay/WidgetDelveGrid.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
     }
   },
   "src/web/overlay/WidgetImageStrip.vue": {
@@ -519,7 +514,7 @@
   },
   "src/web/settings/hotkeys.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
+      "count": 2
     }
   },
   "src/web/stash-search/WidgetStashSearch.vue": {

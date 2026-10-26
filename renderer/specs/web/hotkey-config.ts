@@ -38,7 +38,6 @@ export function hotkeyConfig(): Config {
         samePricedKey: null,
       }),
       widgetEntry(3, "library", { logItemKey: null }),
-      widgetEntry(4, "delve-grid", { toggleKey: null }),
     ],
   });
   return JSON.parse(JSON.stringify(AppConfig()));

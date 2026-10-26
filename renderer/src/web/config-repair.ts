@@ -1,5 +1,6 @@
 import type { Config } from "./Config";
-import type { DelveGridWidget, Widget } from "./overlay/widgets";
+import type { Widget } from "./overlay/widgets";
+import type { DelveGridWidget } from "./removed-widgets";
 import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 

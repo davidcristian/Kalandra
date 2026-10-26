@@ -6,7 +6,6 @@ import type { Widget } from "./overlay/widgets";
 const SAVED_SINCE = new Map<string, number>([
   ["menu", 0],
   ["price-check", 0],
-  ["delve-grid", 3],
   ["item-check", 7],
   ["settings", 10],
   ["item-search", 12],

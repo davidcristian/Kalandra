@@ -45,7 +45,6 @@ describe("the widget registry", () => {
       ["price-check", "single"],
       ["item-check", "single"],
       ["image-strip", "multi"],
-      ["delve-grid", "single"],
       ["notepad", "multi"],
       ["library", "single"],
     ]);
@@ -86,8 +85,7 @@ describe("the widgets of defaultConfig()", () => {
       [6, "stash-search"],
       [7, "price-check"],
       [8, "item-check"],
-      [9, "delve-grid"],
-      [10, "library"],
+      [9, "library"],
     ]);
   });
 
@@ -118,7 +116,7 @@ describe("the widgets of defaultConfig()", () => {
     expect(ordered.map((w) => w.wmType)).toEqual(["menu"]);
   });
 
-  it("leave the menu, price check, item check, Delve grid and library out of the menu", () => {
+  it("leave the menu, price check, item check and library out of the menu", () => {
     const skipped = actual
       .defaultConfig()
       .widgets.filter((w) => w.wmFlags.includes("menu::skip"));
@@ -127,7 +125,6 @@ describe("the widgets of defaultConfig()", () => {
       "menu",
       "price-check",
       "item-check",
-      "delve-grid",
       "library",
     ]);
   });

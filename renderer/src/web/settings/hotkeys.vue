@@ -35,7 +35,7 @@ import {
   _configModelValue,
   findWidget,
 } from "./utils";
-import { PriceCheckWidget, DelveGridWidget } from "@/web/overlay/interfaces";
+import { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { ItemCheckWidget } from "../item-check/widget.js";
 
 import UiRadio from "@/web/ui/UiRadio.vue";
@@ -50,10 +50,6 @@ const hotkeys = computed<HotkeySchema[]>(() => {
   )!;
   const itemCheckWidget = findWidget<ItemCheckWidget>(
     "item-check",
-    props.config,
-  )!;
-  const delveGridWidget = findWidget<DelveGridWidget>(
-    "delve-grid",
     props.config,
   )!;
   return [
@@ -85,10 +81,6 @@ const hotkeys = computed<HotkeySchema[]>(() => {
     {
       translationKey: "item.info",
       config: _configModelValue(itemCheckWidget, "hotkey"),
-    },
-    {
-      translationKey: "settings.delve_grid",
-      config: _configModelValue(delveGridWidget, "toggleKey"),
     },
   ];
 });

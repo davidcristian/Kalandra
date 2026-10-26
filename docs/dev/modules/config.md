@@ -18,7 +18,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 40. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 41. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -29,8 +29,9 @@ old one and keep that file, so a saved config must survive every update: this is
   A step sets what version N added and ends with `config.configVersion = N`. A step that adds a widget adds that
   widget's default instance from `defaultConfig()` with the next free `wmId`, and takes the index to insert at from
   `findIndex()`. The `< 29` and `< 30` steps pass the item search `wmId` to `splice()` as an index instead.
-  `defaultConfig()` has no image strip, so the `< 3` step takes its `Cheat sheets` strip, with the Path of Exile 1
-  syndicate sheet, from `cheatSheetsDefault()` in `renderer/src/web/removed-widgets.ts`.
+  `defaultConfig()` has no image strip and no Delve grid, so the `< 3` step takes its `Cheat sheets` strip, with
+  the Path of Exile 1 syndicate sheet, and its Delve grid from `cheatSheetsDefault()` and `delveGridDefault()` in
+  `renderer/src/web/removed-widgets.ts`. `DelveGridWidget` there is the type the `< 16` step reads.
 - `repairSavedConfig(config)` in `renderer/src/web/config-repair.ts` is what the `< 36` step runs. It sets
   `overlayAlwaysClose` to false when it is missing, since no step adds it to a config from Awakened PoE Trade. It
   keeps the first library widget, which the settings window and the hotkeys read, and removes the others: a v0.14.0
@@ -45,12 +46,18 @@ old one and keep that file, so a saved config must survive every update: this is
   added `language`, `restoreClipboard`, `clientLog`, `gameConfig` and two hotkeys to its defaults without a new
   version, and a new install of versions 15 to 21 has no item search `ocrGemsKey`. The step sets those four keys,
   the item check `craftOfExileKey`, the Delve grid `toggleKey` and the item search `ocrGemsKey` to their values in
-  `defaultConfig()` where the saved config has none, and keeps a saved value, `null` included.
+  `defaultConfig()` where the saved config has none, and keeps a saved value, `null` included. `defaultConfig()`
+  has no Delve grid, so the step sets its `toggleKey` to `undefined`, which the saved file leaves out.
 - `namePresetEntries(config, englishDefaults)` in `renderer/src/web/stash-search/presets.ts` gives each stash
   search entry whose text is one of the English defaults the `preset` that makes it search that game text in the
   game language ([renderer-widgets.md](renderer-widgets.md#stash-search-presets)). It keeps the entry's text. The
   `< 39` step names `Currency`, `"Rarity: Normal"` and `Trials:`, and the `< 40` step `"Martial Weapon"` and
   `"Waystone Tier"` (`ENGLISH_DEFAULTS_40`).
+- `removePathOfExile1Widgets(config)` in `removed-widgets.ts` is what the `< 41` step runs. It removes every
+  `delve-grid` widget and every image strip image whose `url` is `syndicate.jpg`, the Path of Exile 1 sheet that
+  `renderer/public/images/` no longer has. A strip whose only images were that sheet goes too when its title is
+  `Cheat sheets`, the default strip's, or empty, a strip added from the menu; a strip the user named or emptied
+  stays. An uploaded image is named by its MD5 hash, so the step keeps every image the user added.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -87,7 +94,7 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - `Widget` has the fields the overlay manages for every widget: `wmId`, `wmType`, `wmTitle`, `wmWants` (`show` or
   `hide`), `wmZorder` (a number, `exclusive` or `null`) and `wmFlags`. Each widget's config type extends it:
-  `WidgetMenu`, `PriceCheckWidget`, `StopwatchWidget`, `DelveGridWidget`, `ImageStripWidget` and `NotepadWidget`
+  `WidgetMenu`, `PriceCheckWidget`, `StopwatchWidget`, `ImageStripWidget` and `NotepadWidget`
   in `widgets.ts`, and `ItemCheckWidget`, `ItemSearchWidget`, `StashSearchWidget`, `XpWidget` and `LibraryWidget`
   in the `widget.ts` of their folders. A widget's defaults are in its component's `initInstance()` or
   `defaultInstances()` ([renderer-widgets.md](renderer-widgets.md)).
@@ -118,8 +125,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 40, so the next step is `if (config.configVersion < 41)`, ending with
-  `config.configVersion = 41`, and `defaultConfig()` then returns 41. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 41, so the next step is `if (config.configVersion < 42)`, ending with
+  `config.configVersion = 42`, and `defaultConfig()` then returns 42. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -139,9 +146,13 @@ old one and keep that file, so a saved config must survive every update: this is
   the config upgrade spec checks the value the `< 38` step gives it.
 - The steps read the single instance widgets without a check, so `initConfig()` adds the missing ones first. A
   config older than version 7 without a map check widget still throws a `TypeError` in the `< 4` or `< 7` step:
-  `defaultConfig()` has no widget of that type, and only an Awakened PoE Trade config edited by hand lacks one.
+  `defaultConfig()` has no widget of that type, and only an Awakened PoE Trade config edited by hand lacks one. A
+  config of versions 3 to 15 without a Delve grid widget throws in the `< 16` step for the same reason.
 - Field names and `wmType` values are keys in saved files. Renaming one takes an upgrade step that moves the value,
-  as the `< 7` step does when it turns the `map-check` widget into `item-check`.
+  as the `< 7` step does when it turns the `map-check` widget into `item-check`. Removing a widget type takes a
+  step that removes its entries, as the `< 26` and `< 41` steps do: the overlay draws nothing for an entry of an
+  unknown type and keeps it in every save ([renderer-widgets.md](renderer-widgets.md#invariants)). An older step
+  that copies the widget from `defaultConfig()` then takes it from `removed-widgets.ts`, as the `< 3` step does.
 - A new widget type also takes an upgrade step that adds its default instance to saved configs, as the `< 29` and
   `< 30` steps do for `experience-tracker` and `library`. Without one, `AppConfig(type)` returns `undefined` for a
   user whose saved config is older than the widget. A single instance type also gets that step's version in
@@ -171,10 +182,13 @@ the current version with every key of `defaultConfig()`, gets the default of eac
 user's choices, and runs each step once and in order, with the same result when every version in between saved the
 file. It also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that the
 `< 39` and `< 40` steps name the default stash searches of a version 36 config by preset, that the `< 39` step
-leaves the two that the `< 40` step names, that a widget of an unknown type stays. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
+leaves the two that the `< 40` step names, and that a widget of an unknown type stays. For the `< 41` step it checks
+that no saved config keeps a Delve grid or the default `Cheat sheets` strip, that a version 40 config loses a Delve
+grid with a hotkey, which strips keep their own images and which go, and that the step runs only at version 41.
+It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
 saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
 instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
-check widget still throws. It takes the last step version from `defaultConfig()`, so a new step needs no change to
+check widget and a version 15 config without its Delve grid still throw. It takes the last step version from `defaultConfig()`, so a new step needs no change to
 the spec. No test runs `getConfigForHost()`
 ([refinement 100](../refinements/tasks/100-host-config-tests.md)).
 `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that

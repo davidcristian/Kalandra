@@ -25,7 +25,7 @@ describe("the pages the Settings window menu lists", () => {
   });
 
   it("lists every page for a widget without its own settings", () => {
-    expect(menuPages("delve-grid")).toEqual(menuPages());
+    expect(menuPages("notepad")).toEqual(menuPages());
     expect(menuPages("item-search")).toEqual(menuPages());
   });
 });

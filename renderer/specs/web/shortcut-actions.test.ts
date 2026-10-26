@@ -3,7 +3,6 @@ import { shortcutActions } from "@/web/shortcut-actions";
 import { findWidget } from "@/web/settings/utils";
 import type { ItemCheckWidget } from "@/web/item-check/widget";
 import type { LibraryWidget } from "@/web/library/widget";
-import type { DelveGridWidget } from "@/web/overlay/widgets";
 import { hotkeyConfig, widgetEntry } from "./hotkey-config";
 
 describe("the hotkeys the renderer sends to main", () => {
@@ -30,7 +29,7 @@ describe("the hotkeys the renderer sends to main", () => {
     ]);
   });
 
-  it("adds each item check, library and Delve grid hotkey that is set", () => {
+  it("adds each item check and library hotkey that is set", () => {
     const config = hotkeyConfig();
     const itemCheck = findWidget<ItemCheckWidget>("item-check", config)!;
     itemCheck.wikiKey = "Alt + W";
@@ -40,7 +39,6 @@ describe("the hotkeys the renderer sends to main", () => {
     itemCheck.samePricedKey = "Alt + P";
     itemCheck.hotkey = "Alt + M";
     findWidget<LibraryWidget>("library", config)!.logItemKey = "Alt + L";
-    findWidget<DelveGridWidget>("delve-grid", config)!.toggleKey = "Alt + G";
 
     expect(shortcutActions(config).slice(3)).toEqual([
       {
@@ -71,11 +69,6 @@ describe("the hotkeys the renderer sends to main", () => {
         shortcut: "Alt + L",
         keepModKeys: true,
         action: { type: "copy-item", target: "log-item" },
-      },
-      {
-        shortcut: "Alt + G",
-        action: { type: "trigger-event", target: "delve-grid" },
-        keepModKeys: true,
       },
     ]);
   });

@@ -65,15 +65,14 @@ https://davidcristian.github.io/Kalandra/ (each link opens the page's source).
 | `price-check` | `price-check/PriceCheckWindow.vue` | `PriceCheckWidget` (`overlay/widgets.ts`) | single | [`/price-check`](../../price-check.md) |
 | `item-check` | `item-check/WidgetItemCheck.vue`, with `map-check/MapCheck.vue` | `ItemCheckWidget` (`item-check/widget.ts`) | single | [`/item-info`](../../item-info.md), [`/map-check`](../../map-check.md) |
 | `image-strip` | `overlay/WidgetImageStrip.vue` | `ImageStripWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
-| `delve-grid` | `overlay/WidgetDelveGrid.vue` | `DelveGridWidget` (`overlay/widgets.ts`) | single | [`/extra-widgets`](../../extra-widgets.md) |
 | `notepad` | `notepad/WidgetNotepad.vue` | `NotepadWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `library` | `library/WidgetLibrary.vue` | `LibraryWidget` (`library/widget.ts`) | single | [`/item-data`](../../item-data.md) |
 
-The menu, price check, item check, library and Delve grid start with `menu::skip`. The settings window removes
+The menu, price check, item check and library start with `menu::skip`. The settings window removes
 and adds `menu::skip` on the XP tracker when "Allow reading of Client.txt file" turns on or off, and on the library
 when "Enable experimental features" together with "Item Data Collection" turns on or off (`enableWidget` and
-`disableWidget` in `settings/utils.ts`). Adding the flag also hides the widget. The Delve grid is shown and
-hidden by the "Grid for Delve Chart" hotkey. The price check is in [renderer-price-check.md](renderer-price-check.md).
+`disableWidget` in `settings/utils.ts`). Adding the flag also hides the widget. The price check is in
+[renderer-price-check.md](renderer-price-check.md).
 
 ### Stash search presets
 
@@ -91,8 +90,8 @@ text, since the game data has no text for them
 
 1. Write the component in its own folder under `renderer/src/web/`, with a static
    `widget: { ... } satisfies WidgetSpec` in its component options, as every registered widget has. Seven put it
-   in `defineComponent`; five put it in a plain `export default` next to `<script setup>`, as
-   `WidgetDelveGrid.vue` does. The `type` becomes the `wmType` in every user's saved config, and only an upgrade
+   in `defineComponent`; four put it in a plain `export default` next to `<script setup>`, as
+   `WidgetImageStrip.vue` does. The `type` becomes the `wmType` in every user's saved config, and only an upgrade
    step can change it later.
 2. Write its config type as an interface that extends `Widget`. It goes in `overlay/widgets.ts` or, as for five
    widgets, in a `widget.ts` in the widget's own folder. A single widget sets every field in
@@ -104,7 +103,7 @@ text, since the game data has no text for them
    `experience-tracker` and the `< 30` step for `library`; without it an existing config has no entry for the type.
    Add the widget to `defaultConfigMock` in `renderer/specs/vitest.setup.ts` only when a test reads its config.
 5. A hotkey goes into `shortcutActions()` in `shortcut-actions.ts` as a `ShortcutAction`, such as `trigger-event` with a
-   target, as the stopwatch and the Delve grid have. The component handles `MAIN->CLIENT::widget-action` with that
+   target, as the stopwatch has. The component handles `MAIN->CLIENT::widget-action` with that
    target.
 6. A settings page is a component in the widget's folder, a name in `SettingsPage` and a `case "<type>"` in
    `menuPages()` in `settings/menu.ts`, and an entry in `PAGES` in `settings/SettingsWindow.vue`. Its frame sets
@@ -119,9 +118,11 @@ text, since the game data has no text for them
 ## Invariants
 
 - **`wmType` is a storage key.** It is renamed or removed only by an upgrade step: the `< 7` step renames
-  `map-check` to `item-check`, and the `< 26` step removes `filter-generator` entries.
+  `map-check` to `item-check`, the `< 26` step removes `filter-generator` entries, and the `< 41` step removes
+  `delve-grid` entries. `OverlayWindow.vue` draws nothing for an entry whose `wmType` has no registered component,
+  since `getWidgetComponent()` returns `undefined`, and the entry stays in the config and in every save.
 - **Every single widget has an entry in every config.** Code reads it as `AppConfig("<type>")!`, and
-  `shortcutActions()` reads the `price-check`, `item-check`, `library` and `delve-grid` entries without a check.
+  `shortcutActions()` reads the `price-check`, `item-check` and `library` entries without a check.
 - **A widget changes its config in place**, through its `config` prop, which is the entry in `AppConfig()`.
   `saveConfig()` sends the whole config to main with `CLIENT->MAIN::save-config` when it differs from the last
   one saved, and does nothing while an `exclusive` widget is shown.

@@ -55,7 +55,6 @@ These actions have no hotkey until you set one:
 
 - **Item info** and **Map check** in Settings, Hotkeys. They share one hotkey, which opens Map check for a waystone
   and Item info for most other items.
-- **Grid for Delve Chart** in Settings, Hotkeys, which shows or hides a grid over the game.
 - **Open item on wiki**, **Open item on PoEDB**, **Open base item on Craft of Exile**, **Find in Stash** and
   **Filter by** in Settings, Item info.
 - Four more chat commands in Settings, Chat, such as `/invite @last`.

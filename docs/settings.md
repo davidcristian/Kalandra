@@ -28,7 +28,6 @@ does not accept a key combination that contains `F12`, which Windows reserves fo
 | **Overlay** | `Shift + Space` | Switches between the game and the overlay with its widgets. `Escape` also returns to the game. |
 | **Map check** | Not Set | Opens Map check for a Waystone that is not unique and for the other items that [Map check](/map-check) lists, and Item info for any other item. |
 | **Item info** | Not Set | The same key as **Map check**: changing one changes both. |
-| **Grid for Delve Chart** | Not Set | Shows or hides a grid of 11 by 9 squares, centered horizontally near the top of the game window. [Extra widgets](/extra-widgets#delve-grid) documents it. |
 | **Stash tab scrolling** | Ctrl + MouseWheel | While you hold `Ctrl` and the cursor is not over the stash grid, Kalandra presses the Right or Left arrow key for each step of the mouse wheel, which switches stash tabs. Turn off **Mousewheel Zoom** in the game's options (Options, UI) to use it. **Disabled** turns off Kalandra's stash tab scrolling. |
 
 Kalandra does not register a key that the game uses: `Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`,
