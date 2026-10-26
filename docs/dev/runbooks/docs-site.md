@@ -91,7 +91,9 @@ The Docs workflow, `.github/workflows/pages.yml`, deploys the site.
 workflow. To start it by hand: Actions, Docs, Run workflow, with `master` as the branch. Its one
 job runs `npm ci` and `npm run build` in `docs/`, then `actions/configure-pages`,
 `actions/upload-pages-artifact` with `docs/.vitepress/dist`, and `actions/deploy-pages` into the
-`github-pages` environment.
+`github-pages` environment. One run deploys at a time: a new run waits for the running one, and a
+newer run replaces a run that waits (the `pages` concurrency group), so the newest commit deploys
+last.
 
 You should see the site address under the deploy job on the run's page, and the site serve the new
 pages a short time later.

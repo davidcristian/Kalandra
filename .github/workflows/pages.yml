@@ -14,6 +14,11 @@ on:
 permissions:
   contents: read
 
+# A new run waits for the running one, so the newest commit deploys last and no deploy stops halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
