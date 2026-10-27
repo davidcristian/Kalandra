@@ -13,9 +13,6 @@ export default defineConfig({
   optimizeDeps: {
     rolldownOptions: { transform: { target: "esnext" } },
   },
-  // vue3-apexcharts 1.1.1 is a CommonJS build with __esModule set, and Vite 8 otherwise
-  // returns its module.exports for a default import from a "type": "module" package
-  legacy: { inconsistentCjsInterop: true },
   plugins: [
     vue({
       template: {
@@ -36,8 +33,8 @@ export default defineConfig({
         find: "@specs",
         replacement: path.resolve(import.meta.dirname, "./specs"),
       },
-      // require("vue") in vuedraggable and vue3-apexcharts resolves to vue's CommonJS build,
-      // which adds the template compiler; this keeps them on the runtime build the app imports
+      // require("vue") in vuedraggable resolves to vue's CommonJS build, which adds the
+      // template compiler; this keeps it on the runtime build the app imports
       { find: /^vue$/, replacement: "vue/dist/vue.runtime.esm-bundler.js" },
     ],
     extensions: [".ts", ".js", ".vue", ".json"],

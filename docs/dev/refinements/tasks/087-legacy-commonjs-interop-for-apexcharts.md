@@ -1,9 +1,9 @@
 # The renderer build needs Vite's legacy CommonJS interop for vue3-apexcharts
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/vite.config.mts](../../../../renderer/vite.config.mts)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-27
 
 `legacy.inconsistentCjsInterop` in `renderer/vite.config.mts` keeps the default import rules that
 Vite used before version 8 for every CommonJS dependency. The Vite 8 migration guide calls it a
@@ -22,3 +22,6 @@ the price trend chart checked in the built page with a price file.
 
 - 2026-10-25: Found when the renderer build moved from Vite 5 to Vite 8: without the option, the
   built page showed the price trend without its chart.
+- 2026-10-27: vue3-apexcharts 1.8.0 is the newest release under the MIT License, since 1.9.0 and
+  1.10.0 are under the ApexCharts license. Done in "build(renderer): move vue3-apexcharts to its
+  ES module build"; the built page draws the chart for an Exalted Orb with the price file.

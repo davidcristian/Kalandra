@@ -192,6 +192,10 @@ and lists the skipped ones at the end of the install; `npm install-scripts ls` l
   GHSA-rj75-hqrm-r3gf. Tailwind CSS 3 depends on it through `^6`, and 6.1.5 has the fix
   backported from 7.1.6, but the advisory names only 7.1.6 as fixed. So no override moves
   Tailwind CSS 3 to version 7.
+- `renderer/` keeps vue3-apexcharts on `~1.8.0` and apexcharts on `^4.0.0`. vue3-apexcharts 1.9.0
+  and newer, and apexcharts 5.3.0 and newer, are under the ApexCharts license, which limits use by
+  an organization's revenue, instead of the MIT License. Moving to them is the maintainer's
+  licensing decision.
 - A Vue update in `renderer/` must keep the watchers of a component in the order they are
   defined, which `CheckedItem.vue` needs
   ([renderer-price-check.md](docs/dev/modules/renderer-price-check.md)).
