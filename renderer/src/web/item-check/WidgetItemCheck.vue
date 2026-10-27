@@ -111,9 +111,6 @@ const isMapLike = computed(() => {
   } = item.value;
   return (
     (category === ItemCategory.Map && rarity !== ItemRarity.Unique) ||
-    category === ItemCategory.HeistContract ||
-    category === ItemCategory.HeistBlueprint ||
-    category === ItemCategory.Invitation ||
     refName === "Expedition Logbook"
   );
 });

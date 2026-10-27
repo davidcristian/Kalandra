@@ -3,15 +3,14 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [docs/map-check.md](../../../map-check.md)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-27
 
 **Claims.** Map check and Item info in Settings, Hotkeys set one key, the `hotkey` of the item check
 widget, which has no default. The widget shows Map check when `isMapLike` in
 `renderer/src/web/item-check/WidgetItemCheck.vue` is true, and Item info otherwise. `isMapLike` is
 true for a non-unique item of the category `Map`, which holds Waystones, and for the
-`Expedition Logbook`. It also lists three categories the Path of Exile 2 data does not have
-([refinement 022](../../refinements/tasks/022-category-checks-for-missing-item-kinds.md)).
-[docs/map-check.md](../../../map-check.md) and [docs/item-info.md](../../../item-info.md) say:
+`Expedition Logbook`. [docs/map-check.md](../../../map-check.md) and
+[docs/item-info.md](../../../item-info.md) say:
 
 - The key opens Map check for a Waystone that is not unique and for an Expedition Logbook, and Item
   info for any other item.
@@ -44,3 +43,5 @@ text for parser cases.
   [refinement 015](../../refinements/tasks/015-default-map-marks-outdated.md) settles from the
   code and data, and the DPS formula, which is arithmetic on the copied text.
 - 2026-10-21: Added the language change, since marks now name a modifier by its stat ref.
+- 2026-10-27: `isMapLike` no longer lists the heist contract, heist blueprint and invitation
+  categories, which no item of the game data has.
