@@ -46,10 +46,8 @@ policy asks contributors not to use agents.
 
 **6. Credit stays.** The README credits both projects, and `.github/FUNDING.yml` keeps the Patreon account of Awakened
 PoE Trade's author. The settings window shows Awakened PoE Trade's patrons from `renderer/public/data/patrons.json`
-under a label that names that project. The Patreon links in `renderer/src/web/price-check/CheckedItem.vue` and
-`renderer/src/web/settings/SettingsWindow.vue` are inside HTML comments, which Exiled Exchange 2 added before the
-fork, so the app shows neither. Reason: Kalandra is built on their code. The license side of this, the MIT notice, is
-[ADR-0002](ADR-0002-agpl-with-mit-notice.md).
+under a label that names that project. The app shows no Patreon link. Reason: Kalandra is built on their code. The
+license side of this, the MIT notice, is [ADR-0002](ADR-0002-agpl-with-mit-notice.md).
 
 ## Consequences
 

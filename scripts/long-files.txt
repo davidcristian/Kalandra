@@ -11,7 +11,7 @@
 373 renderer/src/web/item-search/WidgetItemSearch.vue
 394 renderer/src/web/overlay/OverlayWindow.vue
 424 renderer/src/web/overlay/Widget.vue
-333 renderer/src/web/price-check/CheckedItem.vue
+324 renderer/src/web/price-check/CheckedItem.vue
 432 renderer/src/web/price-check/PriceCheckWindow.vue
 604 renderer/src/web/price-check/filters/FilterModifier.vue
 434 renderer/src/web/price-check/filters/FiltersBlock.vue
@@ -22,4 +22,4 @@
 367 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
 1812 renderer/src/web/price-check/trade/pathofexile-trade.ts
-524 renderer/src/web/settings/SettingsWindow.vue
+511 renderer/src/web/settings/SettingsWindow.vue

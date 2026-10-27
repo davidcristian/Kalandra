@@ -1,9 +1,9 @@
 # Decide whether the app shows the Patreon links to Awakened PoE Trade's author
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [ADR-0001](../../adr/ADR-0001-kalandra-continues-exiled-exchange-2.md)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 The two blocks that link `https://patreon.com/awakened_poe_trade`, in
 `renderer/src/web/price-check/CheckedItem.vue` and `renderer/src/web/settings/SettingsWindow.vue`,
@@ -29,3 +29,6 @@ AGENTS.md match it.
 - 2026-10-27: The maintainer chose to leave the links out. Left: delete the two blocks and the
   `Support development on` key from every `app_i18n.json`, and make ADR-0001 and AGENTS.md match.
   The README, `.github/FUNDING.yml` and the patron list in Settings keep the credit.
+- 2026-10-27: Done in `refactor(renderer): remove the commented-out Patreon links`, which also
+  deletes the key and the two images only those blocks showed. ADR-0001 now says the app shows no
+  Patreon link; AGENTS.md names only the README and `.github/FUNDING.yml`, so it already matched.
