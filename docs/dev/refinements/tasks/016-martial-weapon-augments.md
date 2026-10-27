@@ -1,9 +1,9 @@
 # Augments saved for martial weapons are never applied
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/price-check/item-editor/AugmentEditor.vue](../../../../renderer/src/web/price-check/item-editor/AugmentEditor.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The augment editor in the price check window saves a set of augments per item group in
 `savedAugments`, a map in the price check widget config (`PriceCheckWidget` in
@@ -31,3 +31,7 @@ commit of their own.
 - 2026-10-22: `PLANNED` in `renderer/specs/web/i18n-keys.test.ts` keeps `item_editor.sceptre`. The
   test fails when code reads the key or the English file drops it, so the commit that does either
   removes it from that list.
+- 2026-10-27: Became `fix(renderer): apply the augments saved for martial weapons`, with the
+  `< 42` config step that moves a saved `maritalWeapon` set to `martialWeapon`, and
+  `refactor(renderer): remove the unused sceptre augment save type`, which also removes
+  `item_editor.sceptre` and its `PLANNED` entry.

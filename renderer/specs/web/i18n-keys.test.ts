@@ -37,8 +37,8 @@ const COMPUTED_KEYS = [
   "item.wrong_language_help",
 ];
 
-// Keys that no code reads yet, kept until task 016 puts them to use or removes them
-const PLANNED = ["item_editor.sceptre"];
+// Keys of the English file that no code reads yet, each kept for a planned use
+const PLANNED: string[] = [];
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
