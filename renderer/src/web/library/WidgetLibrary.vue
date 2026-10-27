@@ -104,14 +104,6 @@ export default defineComponent({
               enchant: false,
               augment: false,
             },
-            modOpts: {
-              name: true,
-              tier: true,
-              roll: true,
-              ref: true,
-              type: true,
-              generation: true,
-            },
           },
         },
       };

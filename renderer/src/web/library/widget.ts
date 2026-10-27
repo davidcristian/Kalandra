@@ -34,14 +34,6 @@ export interface ColumnOpts {
     enchant: boolean;
     augment: boolean;
   };
-  modOpts: {
-    name: true;
-    tier: boolean;
-    roll: boolean;
-    ref: boolean;
-    type: boolean;
-    generation: boolean;
-  };
 }
 
 type ColumnKey =

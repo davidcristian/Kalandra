@@ -8,6 +8,7 @@ import type { ItemCheckWidget } from "./item-check/widget";
 import type { ItemSearchWidget } from "./item-search/widget";
 import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
+import * as savedLibrary from "./library/saved-mod-options";
 import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
 import { addMissingWidgets } from "./missing-widgets";
 import { warnIfNewerConfig } from "./newer-config";
@@ -133,7 +134,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 42,
+  configVersion: 43,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -610,7 +611,7 @@ export function upgradeConfig(_config: Config): Config {
     )!.wmId;
     // splicing to insert after the item-search widget, for positioning on the main overlay
     config.widgets.splice(itemSearchId, 0, {
-      ...defaultConfig().widgets.find((w) => w.wmType === "library")!,
+      ...savedLibrary.libraryDefaultWithModOptions(),
       wmId: Math.max(0, ...config.widgets.map((_) => _.wmId)) + 1,
     });
 
@@ -641,7 +642,7 @@ export function upgradeConfig(_config: Config): Config {
     // NOTE: v0.15.6 || poe0.5.2
     const libraryWidget = config.widgets.find(
       (w) => w.wmType === "library",
-    ) as LibraryWidget;
+    ) as savedLibrary.LibraryWidgetWithModOptions;
     libraryWidget.selectedProfile = "chaos";
     libraryWidget.profiles.chaos!.modOpts.generation = true;
 
@@ -696,6 +697,11 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 42) {
     moveMartialWeaponAugments(config);
     config.configVersion = 42;
+  }
+
+  if (config.configVersion < 43) {
+    savedLibrary.removeModOptions(config);
+    config.configVersion = 43;
   }
 
   return config as Config;

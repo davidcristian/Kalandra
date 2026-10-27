@@ -10,6 +10,8 @@ import type {
 import { Host } from "@/web/background/IPC";
 import { registry } from "@/web/overlay/widget-registry";
 import type { StashSearchWidget } from "@/web/stash-search/widget";
+import type { ColumnOpts, LibraryWidget } from "@/web/library/widget";
+import type { LibraryWidgetWithModOptions } from "@/web/library/saved-mod-options";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -159,6 +161,19 @@ function priceCheckOf(config: Config): PriceCheckWidget {
     (w) => w.wmType === "price-check",
   ) as PriceCheckWidget;
 }
+
+function libraryOf(config: Config): LibraryWidget {
+  return config.widgets.find((w) => w.wmType === "library") as LibraryWidget;
+}
+
+const MOD_OPTIONS = {
+  name: true,
+  tier: true,
+  roll: true,
+  ref: true,
+  type: true,
+  generation: true,
+};
 
 const SYNDICATE_SHEET = { id: 1, url: "syndicate.jpg" };
 const OWN_IMAGE = { id: 2, url: "5d41402abc4b2a76b9719d911017c592.png" };
@@ -509,6 +524,100 @@ describe("upgradeConfig", () => {
     ).toEqual([{ martialWeapon: [IRON] }, { martialWeapon: [STORM] }, null]);
   });
 
+  it("removes modOpts from each profile of every library widget in a version 42 config and keeps the other fields", () => {
+    const expected = asSaved(actual.defaultConfig());
+    const library = libraryOf(expected);
+    const own: ColumnOpts = {
+      refName: true,
+      itemLevel: true,
+      rarity: true,
+      sockets: true,
+      mods: true,
+      addedMods: false,
+      removedMods: true,
+      keep: { explicit: true, implicit: true, enchant: false, augment: true },
+    };
+    library.profiles.own = own;
+    library.selectedProfile = "own";
+    const second: LibraryWidget = { ...library, wmId: 900, profiles: { own } };
+    expected.widgets.push(second);
+    const config = asSaved(expected);
+    config.configVersion = 42;
+    for (const widget of config.widgets) {
+      if (widget.wmType !== "library") continue;
+      for (const profile of Object.values((widget as LibraryWidget).profiles)) {
+        Object.assign(profile, { modOpts: { ...MOD_OPTIONS, tier: false } });
+      }
+    }
+
+    expect(upgrade(config)).toEqual(expected);
+  });
+
+  it.each([
+    [
+      "without a library widget",
+      (config: Config) => {
+        config.widgets = config.widgets.filter((w) => w.wmType !== "library");
+      },
+    ],
+    [
+      "with modOpts in a profile of a widget of another type",
+      (config: Config) => {
+        const other: Widget & { profiles: unknown } = {
+          wmId: 900,
+          wmType: "loot-tracker",
+          wmTitle: "",
+          wmWants: "hide",
+          wmZorder: null,
+          wmFlags: [],
+          profiles: { chaos: { modOpts: MOD_OPTIONS } },
+        };
+        config.widgets.push(other);
+      },
+    ],
+    [
+      "whose library widget has no profiles",
+      (config: Config) => {
+        Reflect.deleteProperty(libraryOf(config), "profiles");
+      },
+    ],
+    [
+      "whose library profiles are not objects",
+      (config: Config) => {
+        Object.assign(libraryOf(config), {
+          profiles: { chaos: null, own: "text" },
+        });
+      },
+    ],
+  ])(
+    "passes a version 42 config %s through unchanged but for its version",
+    (_, change) => {
+      const expected = asSaved(actual.defaultConfig());
+      change(expected);
+      const config = asSaved(expected);
+      config.configVersion = 42;
+
+      expect(upgrade(config)).toEqual(expected);
+    },
+  );
+
+  it.each([28, 32])(
+    "sets generation in the < 33 step of a version %i config, and the < 43 step removes modOpts",
+    (version) => {
+      const config = readSaved(version);
+      const chaos = (saved: Config) =>
+        (libraryOf(saved) as LibraryWidgetWithModOptions).profiles.chaos;
+
+      runSteps(config, 42);
+
+      expect(config.configVersion).toBe(42);
+      expect(chaos(config)?.modOpts).toEqual(MOD_OPTIONS);
+      expect(chaos(upgrade(config))).toEqual(
+        libraryOf(actual.defaultConfig()).profiles.chaos,
+      );
+    },
+  );
+
   it("removes the filter generator widget, which the app no longer has, from a version 25 config", () => {
     const upgraded = upgrade(readSaved(25));
 
@@ -619,6 +728,21 @@ describe("initConfig", () => {
       expect(mainLog).toEqual([]);
     },
   );
+
+  it("adds the library widget with the modOpts the < 33 step sets to a version 32 config without one", async () => {
+    const config = readSaved(32);
+    config.widgets = config.widgets.filter((w) => w.wmType !== "library");
+
+    const { loaded, warnings } = await load(config);
+
+    expect(warnings).toEqual([
+      "[config] Added the default widgets that the saved config lacks: library",
+    ]);
+    expect(libraryOf(loaded)).toEqual({
+      ...libraryOf(actual.defaultConfig()),
+      wmId: libraryOf(loaded).wmId,
+    });
+  });
 
   it("uses a config from a newer version as it is, and warns in main's log with both versions", async () => {
     const config = asSaved(actual.defaultConfig());

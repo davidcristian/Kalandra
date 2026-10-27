@@ -1,9 +1,9 @@
 # The Library widget saves mod options that nothing reads
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** config
 **Origin:** [renderer/src/web/library/widget.ts](../../../../renderer/src/web/library/widget.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 Each profile of the Library widget config has a `modOpts` object (`ColumnOpts` in
 `renderer/src/web/library/widget.ts`): `name`, `tier`, `roll`, `ref`, `type` and `generation`.
@@ -25,3 +25,4 @@ upgrade step deletes it from saved configs, and no existing step changes.
 - 2026-10-27: The maintainer chose to remove `modOpts`. Left: remove it from the profile type in
   `widget.ts` and from `initInstance()`, and add an upgrade step that deletes it from saved
   profiles.
+- 2026-10-27: refactor(renderer): remove the unread mod options from library profiles

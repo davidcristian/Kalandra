@@ -119,14 +119,6 @@ function profile(addedMods: boolean, removedMods: boolean): ColumnOpts {
     addedMods,
     removedMods,
     keep: { explicit: true, implicit: false, enchant: false, augment: false },
-    modOpts: {
-      name: true,
-      tier: true,
-      roll: true,
-      ref: true,
-      type: true,
-      generation: true,
-    },
   };
 }
 

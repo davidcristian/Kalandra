@@ -104,7 +104,7 @@ text, since the game data has no text for them
 3. Add one `registerWidget` line with the component to `widget-registry.ts`. It needs no cast.
 4. Follow [the one hard rule](../../../AGENTS.md#the-one-hard-rule) for the new config type. For a single widget,
    the new upgrade step inserts `defaultConfig()`'s entry with a new `wmId`, as the `< 29` step does for
-   `experience-tracker` and the `< 30` step for `library`; without it an existing config has no entry for the type.
+   `experience-tracker`; without it an existing config has no entry for the type.
    Add the widget to `defaultConfigMock` in `renderer/specs/vitest.setup.ts` only when a test reads its config.
 5. A hotkey goes into `shortcutActions()` in `shortcut-actions.ts` as a `ShortcutAction`, such as `trigger-event` with a
    target, as the stopwatch has. The component handles `MAIN->CLIENT::widget-action` with that

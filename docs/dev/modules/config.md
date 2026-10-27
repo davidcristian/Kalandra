@@ -18,7 +18,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 42. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 43. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -31,7 +31,10 @@ old one and keep that file, so a saved config must survive every update: this is
   `findIndex()`. The `< 29` and `< 30` steps pass the item search `wmId` to `splice()` as an index instead.
   `defaultConfig()` has no image strip and no Delve grid, so the `< 3` step takes its `Cheat sheets` strip, with
   the Path of Exile 1 syndicate sheet, and its Delve grid from `cheatSheetsDefault()` and `delveGridDefault()` in
-  `renderer/src/web/removed-widgets.ts`. `DelveGridWidget` there is the type the `< 16` step reads.
+  `renderer/src/web/removed-widgets.ts`. `DelveGridWidget` there is the type the `< 16` step reads. The `< 30`
+  step takes its library widget from `libraryDefaultWithModOptions()` in
+  `renderer/src/web/library/saved-mod-options.ts`, the default of version 42, whose profile has the `modOpts`
+  that the `< 33` step sets. `LibraryWidgetWithModOptions` there is the type the `< 33` step reads.
 - `repairSavedConfig(config)` in `renderer/src/web/config-repair.ts` is what the `< 36` step runs. It sets
   `overlayAlwaysClose` to false when it is missing, since no step adds it to a config from Awakened PoE Trade. It
   keeps the first library widget, which the settings window and the hotkeys read, and removes the others: a v0.14.0
@@ -62,6 +65,9 @@ old one and keep that file, so a saved config must survive every update: this is
   runs. The item editor saved the martial weapon set of augments under `maritalWeapon`, while the price check reads
   `martialWeapon`. On each price check widget the step moves that set to `martialWeapon` and removes the old key.
   A `martialWeapon` set that is already there stays, since it is the one the price check applied.
+- `removeModOptions(config)` in `renderer/src/web/library/saved-mod-options.ts` is what the `< 43` step runs. It
+  deletes `modOpts`, mod options that no code read, from each profile of each library widget and keeps the other
+  profile fields. A library widget without profiles, and a profile that is not an object, stay as they are.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -73,7 +79,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
   version has, with the next free `wmId`, and logs `[config] Added the default widgets that the saved config
   lacks:` and their types to the console. A widget that a later step adds, such as the library to a config before
-  version 30, is left to that step. main sends only a JSON object, so `initConfig()` parses the text without a
+  version 30, is left to that step. To a config below version 33 it adds `libraryDefaultWithModOptions()`, since
+  the `< 33` step sets its `modOpts`. main sends only a JSON object, so `initConfig()` parses the text without a
   check.
 - `AppConfig()` returns the current config, and throws before `initConfig()` loads it. `AppConfig<T>(type)`
   returns the first widget config whose `wmType` is `type`, or `undefined`. `requireWidget(type, config)` in
@@ -134,8 +141,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 42, so the next step is `if (config.configVersion < 43)`, ending with
-  `config.configVersion = 43`, and `defaultConfig()` then returns 43. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 43, so the next step is `if (config.configVersion < 44)`, ending with
+  `config.configVersion = 44`, and `defaultConfig()` then returns 44. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -201,9 +208,14 @@ that no saved config keeps a Delve grid or the default `Cheat sheets` strip, tha
 grid with a hotkey, which strips keep their own images and which go, and that the step runs only at version 41.
 For the `< 42` step it checks that a version 41 config gets each saved `maritalWeapon` set, an empty one too, under
 `martialWeapon` on every price check widget, keeps a `martialWeapon` set already there, and skips a price check
-widget without saved augments. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
-saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
-instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
+widget without saved augments. For the `< 43` step it checks that a version 42 config loses `modOpts` from every
+profile of every library widget and keeps the other fields, that a config without a library widget, with
+`modOpts` on a widget of another type, or with missing or malformed profiles stays the same, and that a version 28
+or 32 config still gets `generation` from the `< 33` step before the `< 43` step removes `modOpts`. It runs the
+real `initConfig()` with a fake `Host.getConfig()` and checks that a saved config loads as `upgradeConfig()`
+returns it, that a config without the price check or another single instance widget gets the default one with a
+new `wmId` and a log line, that a version 32 config without a library widget gets the one with `modOpts`, and
+that a version 2 config without its map
 check widget and a version 15 config without its Delve grid still throw. It reads the `log-entry` events that
 `initConfig()` sends: a config one version above the current one, with a field and a widget the app does not have,
 loads unchanged and sends one warning with both numbers, and a saved or current config sends none. It takes the last step version from `defaultConfig()`, so a new step needs no change to

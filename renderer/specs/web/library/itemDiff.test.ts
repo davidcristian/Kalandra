@@ -101,14 +101,6 @@ const PROFILE: ColumnOpts = {
   addedMods: true,
   removedMods: true,
   keep: { explicit: true, implicit: false, enchant: false, augment: false },
-  modOpts: {
-    name: true,
-    tier: true,
-    roll: true,
-    ref: true,
-    type: true,
-    generation: true,
-  },
 };
 
 describe("the CSV row of a rerolled Waystone", () => {

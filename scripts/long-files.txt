@@ -6,7 +6,7 @@
 484 renderer/src/assets/data/index.ts
 1758 renderer/src/parser/Parser.ts
 372 renderer/src/parser/stat-translations.ts
-724 renderer/src/web/Config.ts
+730 renderer/src/web/Config.ts
 565 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue
 394 renderer/src/web/overlay/OverlayWindow.vue
