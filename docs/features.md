@@ -9,16 +9,16 @@ bar of the overlay and how to move, edit, hide and delete widgets.
 ## Price check
 
 Hover an item in the game and press `Ctrl + D`. Kalandra builds a search for the official trade site from the item's
-stats, searches at once and lists the matching items with their prices. For a rare item, tick the stats that matter
-and press **Search** to search again. For currency it lists bulk offers with their stock.
+stats and lists the matching items with their prices. For a rare item, it waits until you tick the stats that matter
+and press **Search**. For currency it lists bulk offers with their stock.
 
 For items in its price file, such as currency and uniques, the window also shows an estimated price and, when the file
 has one, its trend over the last 7 days. Kalandra reads that price from its own price service at
 `kalandra.ashoal.com`, which builds the price files from poe.ninja once an hour. Kalandra does not request prices from
 poe.ninja itself.
 
-Above the listings, an experimental [suggested price](/suggested-price) works out a price, a range and how reliable
-they are from the listings themselves, which also covers rare, magic and normal items.
+An experimental [suggested price](/suggested-price), which you turn on in Settings, works out a price, a range and
+how reliable they are from the listings themselves, which also covers rare, magic and normal items.
 
 To price check item text copied anywhere else, paste it into the **Price check (Ctrl + V)** box in the main button
 bar.

@@ -30,8 +30,8 @@ that the route needs ([main.md](main.md)).
   `apiToSatisfySearch` returns `trade` when a stat filter is enabled. For a divination card or a map with a stack
   size filter, it returns `bulk` when that filter is enabled. Otherwise it returns `bulk` for an item with a
   `tradeTag` and `trade` for the rest. The window searches at once when "Perform an auto search, when pressing"
-  is on for the key used (`smartInitialSearch`, `lockedInitialSearch`) and `searchesAtOnce` in `initial-search.ts`
-  returns true: for an item with a rarity, or of a category not in `CATEGORY_TO_TRADE_ID`, such as a gem.
+  is on for the key used and `searchesAtOnce` in `initial-search.ts` returns true: for a unique, unidentified or
+  veiled item, a charm, a category not in `CATEGORY_TO_TRADE_ID`, and with the suggested price on, any rarity.
   Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
   the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
   ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).
@@ -87,7 +87,7 @@ that the route needs ([main.md](main.md)).
 | `Cache.ts` | keeps a search, fetch or exchange result for 300 seconds (`CACHE_TTL`) from its last write, keyed by a SHA-1 of the request (`object-hash`); `requestResults` clears its cache and the pending deletions when the core currency changes |
 | `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message and a "Browser" button, which always opens the search in the built-in browser, since the trade requests use that browser's cookies |
 | `listing-markers.ts` | `listingMarkers(listing, showSeller)`: the "You", "in demand" and "Gone" markers of a listing, shown after its listed time, or after its seller when "Show seller" is set |
-| `suggested-price.ts`, `SuggestedPrice.vue` | `suggestPrice(listings)` for the "Experimental" suggested price line over the listing table: it counts each seller once at the cheapest listing, leaves out the user's listings and a listing that is not instant buyout below 40% of the median, and returns the 25th percentile, the 10th to 50th percentile as the range and a reliability (`high` from 8 sellers whose range top is at most 1.5 times its bottom, `medium` from 4 at 2.5, else `low`), or null for fewer than 2 sellers. `suggestedPriceText` writes it in Divine Orbs when the whole range is above one, else in the core currency. The line is hidden for a stackable item and while no rates are loaded |
+| `suggested-price.ts`, `SuggestedPrice.vue` | `suggestPrice(listings)` for the "Experimental" suggested price line over the listing table: it counts each seller once at the cheapest listing, leaves out the user's listings and a listing that is not instant buyout below 40% of the median, and returns the 25th percentile, the 10th to 50th percentile as the range and a reliability (`high` from 8 sellers whose range top is at most 1.5 times its bottom, `medium` from 4 at 2.5, else `low`), or null for fewer than 2 sellers. `suggestedPriceText` writes it in Divine Orbs when the whole range is above one, else in the core currency. The line shows only while `suggestedPriceEnabled()` in `price-check-config.ts` is true (`enableAlphas` on and `suggested-price` in `alphas`), and not for a stackable item or while no rates are loaded |
 | `TradeLinks.vue` | the "Trade" button, which opens the same search on the trade site with `window.open`; with "Enable builtin browser" (`builtinBrowser`) on, it opens the built-in browser and a second button opens the search outside |
 | `RateLimiterState.vue` | the "Rate limiting" button, which shows each limiter's use and queue (`showRateLimitState`) |
 

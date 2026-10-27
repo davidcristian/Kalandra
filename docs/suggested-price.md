@@ -5,20 +5,27 @@ title: Suggested price
 **Experimental.** Above the listings of a [price check](/price-check), the line **Suggested price:** shows one price
 for the item, a range and how reliable they are. Kalandra works them out from the listings the search already got, so
 the line sends no extra request to the trade site. It helps most with a rare, magic or normal item, which has no
-[price estimate](/price-check#price-estimate) from poe.ninja.
+[price estimate](/price-check#price-estimate) from poe.ninja. How Kalandra works out the price can change in later
+versions.
 
-The line starts with an **Experimental** tag. How Kalandra works out the price can change in later versions.
+## Turn it on
+
+In Settings, **General** page, check **Enable experimental features**, then **Suggested price in the price check**
+below it, and click **Save**. With it on, the price check also searches the trade site at once for a normal, magic or
+rare item, as it does for a unique, so the line has listings to work from. The two toggles under **Perform an auto
+search, when pressing** in the price check settings still turn that search off.
 
 ## What the line shows
 
-For example: **Suggested price:** `~ 6 ex (5 ~ 8 ex)` **high reliability**.
+For example: **Suggested price:** `~ 6 ex (5 ~ 8 ex)` **high reliability**, after a yellow exclamation mark.
 
 - The price after `~`, in your primary base currency, or in Divine Orbs when the whole range is above one Divine Orb.
 - The range in brackets: where most of the cheaper sellers ask.
 - The reliability: **high reliability**, **medium reliability** or **low reliability**.
 - **too few listings** when fewer than two sellers are left to count.
 
-Point at the price to see how many sellers it counts and how many it left out as likely price fixing.
+Point at the line to see that the feature is experimental, how many sellers the price counts and how many it left
+out as likely price fixing.
 
 ## How Kalandra works it out
 

@@ -1,32 +1,36 @@
 <template>
-  <div v-if="xchgRate" class="mb-2 flex items-baseline gap-x-2 pl-2">
-    <span class="rounded px-1 text-xs bg-yellow-900 text-yellow-300">{{
-      t(":experimental")
-    }}</span>
-    <span class="text-gray-500">{{ t(":suggested_price") }}</span>
-    <span v-if="loading" class="text-gray-600">...</span>
+  <div v-if="enabled && xchgRate" class="mb-2 pl-2 whitespace-nowrap">
     <ui-popover
-      v-else-if="text"
       :delay="[80, null]"
       placement="bottom-start"
       boundary="#price-window"
     >
       <template #target>
-        <span class="cursor-default whitespace-nowrap">
-          <span class="text-gray-600 font-sans">~ </span>{{ text.price }}
-          <span class="text-gray-500">({{ text.range }})</span>
-          <span class="ml-1" :class="text.reliabilityClass">{{
-            text.reliability
+        <span class="cursor-default">
+          <i class="fas fa-circle-exclamation text-yellow-500"></i>
+          <span class="ml-1 text-gray-500">{{ t(":suggested_price") }}</span>
+          <span v-if="loading" class="ml-2 text-gray-600">...</span>
+          <template v-else-if="text">
+            <span class="ml-2 text-gray-600 font-sans">~ </span>{{ text.price }}
+            <span class="text-gray-500">({{ text.range }})</span>
+            <span class="ml-1" :class="text.reliabilityClass">{{
+              text.reliability
+            }}</span>
+          </template>
+          <span v-else class="ml-2 text-gray-600">{{
+            t(":too_few_listings")
           }}</span>
         </span>
       </template>
       <template #content>
         <div class="p-2 bg-gray-800 text-gray-400" style="max-width: 18.5rem">
-          {{ t(":suggested_detail", [text.sellers, text.leftOut]) }}
+          <div class="text-yellow-500">{{ t(":experimental") }}</div>
+          <div v-if="text" class="mt-1">
+            {{ t(":suggested_detail", [text.sellers, text.leftOut]) }}
+          </div>
         </div>
       </template>
     </ui-popover>
-    <span v-else class="text-gray-600">{{ t(":too_few_listings") }}</span>
   </div>
 </template>
 
@@ -35,6 +39,7 @@ import { computed, defineComponent, PropType } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import UiPopover from "@/web/ui/Popover.vue";
 import { usePoeninja } from "@/web/background/Prices";
+import { suggestedPriceEnabled } from "@/web/price-check/price-check-config";
 import {
   PricedListing,
   Reliability,
@@ -82,7 +87,7 @@ export default defineComponent({
       };
     });
 
-    return { t, xchgRate, text };
+    return { t, enabled: computed(suggestedPriceEnabled), xchgRate, text };
   },
 });
 </script>

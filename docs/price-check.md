@@ -102,12 +102,12 @@ the filters Kalandra hid as less useful. With **Mods** on, pointing at a filter 
 
 ## Search
 
-The window searches the trade site by itself, with the filters Kalandra turns on, for a normal, magic, rare or
-unique item, and for an item without a trade site category, such as currency or a gem. The two toggles under
-**Perform an auto search, when pressing** in the settings turn this off for each hotkey.
+The window searches the trade site by itself for a unique, unidentified or veiled item, a charm, an item without a
+trade site category, such as currency or a relic, and, with the [suggested price](/suggested-price) on, a normal,
+magic or rare item. The two toggles under **Perform an auto search, when pressing** turn this off for each hotkey.
 
-To search with other filters, change them, then click **Search**, press `Enter` in a value field, or move the cursor
-from the filters straight onto **Search**. A change to any filter outside the listing menu brings back the **Search**
+For any other item, choose the filters, then click **Search**, press `Enter` in a value field, or move the cursor from
+the filters straight onto **Search**. A change to any filter outside the listing menu brings back the **Search**
 button, and a change in the listing menu searches again at once.
 
 **How often to show tips when price checking** (Help settings) sets how often a tip shows before a search.

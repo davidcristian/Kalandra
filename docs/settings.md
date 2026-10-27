@@ -63,7 +63,7 @@ This page lists the chat commands that Kalandra types into the game chat, each w
 | **Fully hide overlay when it loses focus instead of making it transparent.** | Off | When on, Kalandra hides the overlay window while the game is active and no widget is shown. When off, the window stays over the game and draws nothing. On or off, the overlay window hides while another program is active. The hint under it says this can improve performance on some systems and can cause flickering. |
 | **PoE window title** (Restart required) | `Path of Exile 2` | The title of the game window that Kalandra attaches the overlay to. A change takes effect after Kalandra restarts. |
 | **Allow reading of Client.txt file** | Off | Lets Kalandra read the game's log file to detect area changes and level ups. The [XP tracker](/xp-tracker) and the [Client log file](/client-log-parser) need it. Turning it on adds the XP tracker to the main button bar. Turning it off hides the XP tracker and removes it from the menu. |
-| **Enable experimental features** | Off | Shows the **Item Data Collection** checkbox. Checking it adds the Library widget, which writes items to a CSV file, to the main button bar. [Item data](/item-data) documents it. |
+| **Enable experimental features** | Off | Shows the **Item Data Collection** and **Suggested price in the price check** checkboxes. Checking **Item Data Collection** adds the Library widget, which writes items to a CSV file, to the main button bar. [Item data](/item-data) documents it. **Suggested price in the price check** adds the [suggested price](/suggested-price) line over the trade listings. |
 
 When **PoE log file** or **PoE config file** is empty, Kalandra looks for the file in these folders:
 

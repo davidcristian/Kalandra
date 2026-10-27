@@ -128,7 +128,7 @@ export interface Config {
   showAttachNotification: boolean;
   overlayAlwaysClose: boolean;
   enableAlphas: boolean;
-  alphas: Array<"library">;
+  alphas: Array<"library" | "suggested-price">;
   tipsFrequency: TipsFrequency;
   readClientLog: boolean;
 }

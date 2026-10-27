@@ -74,7 +74,7 @@ import Tip from "../help/Tip.vue";
 import { createTradeRequest } from "./trade/pathofexile-trade";
 import { searchesAtOnce } from "./initial-search";
 import { AppConfig } from "@/web/Config";
-import { priceCheckConfig } from "@/web/price-check/price-check-config";
+import { priceCheckConfig, suggestedPriceEnabled } from "./price-check-config";
 import { useLeagues } from "@/web/background/Leagues";
 import { createTipSchedule } from "../help/tips";
 
@@ -163,7 +163,7 @@ export default defineComponent({
         ) {
           doSearch.value = false;
         } else {
-          doSearch.value = searchesAtOnce(item);
+          doSearch.value = searchesAtOnce(item, suggestedPriceEnabled());
         }
 
         tradeAPI.value = apiToSatisfySearch(

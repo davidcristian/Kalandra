@@ -17,7 +17,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `overlayBackground`, `overlayBackgroundClose`, `overlayAlwaysClose`, `hideOverlayOnBlur`, `restoreClipboard`,
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
-  `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
+  `widgets`, `enableAlphas`, `alphas` (the experimental features turned on: `library` and `suggested-price`),
+  `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
 - `defaultConfig()` returns a new default config with `configVersion` 43. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.

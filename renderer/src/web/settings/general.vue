@@ -118,8 +118,11 @@
       <ui-checkbox class="mb-4" v-model="enableAlphas">{{
         t(":enable_alphas")
       }}</ui-checkbox>
-      <ui-checkbox v-model="libraryAlpha" v-if="enableAlphas">{{
+      <ui-checkbox class="mb-4" v-model="libraryAlpha" v-if="enableAlphas">{{
         t(":alpha_library")
+      }}</ui-checkbox>
+      <ui-checkbox v-model="suggestedPriceAlpha" v-if="enableAlphas">{{
+        t(":alpha_suggested_price")
       }}</ui-checkbox>
     </div>
   </div>
@@ -210,6 +213,10 @@ export default defineComponent({
       enableAlphas: configModelValue(() => props.config, "enableAlphas"),
       readClientLog: configModelValue(() => props.config, "readClientLog"),
       libraryAlpha: alphaModelValue(() => props.config, "library"),
+      suggestedPriceAlpha: alphaModelValue(
+        () => props.config,
+        "suggested-price",
+      ),
     };
   },
 });
