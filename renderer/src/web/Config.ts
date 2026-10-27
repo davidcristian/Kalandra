@@ -24,8 +24,9 @@ let _lastSavedConfig: Config | null = null;
 export function AppConfig(): Config;
 export function AppConfig<T extends widget.Widget>(type: string): T | undefined;
 export function AppConfig(type?: string) {
-  if (!type) return _config.value!;
-  return _config.value!.widgets.find((w) => w.wmType === type);
+  if (!_config.value) throw new Error("The config was read before it loaded");
+  if (!type) return _config.value;
+  return _config.value.widgets.find((w) => w.wmType === type);
 }
 
 export function updateConfig(updates: Config) {

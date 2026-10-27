@@ -3,11 +3,11 @@ import { ACCESSORY, ARMOUR, GEM, WEAPON } from "@/parser/meta";
 import { TRADE_TAG_TO_REF } from "@/assets/data";
 
 export function getCurrencyDetailsId(id: string) {
-  if (!TRADE_TAG_TO_REF.has(id)) {
+  const refName = TRADE_TAG_TO_REF.get(id);
+  if (refName === undefined) {
     // Names that no item has, so the price lookup finds nothing for an unknown currency
     return { ns: "nan ns", name: "nan item", variant: undefined };
   }
-  const refName = TRADE_TAG_TO_REF.get(id)!;
   return {
     ns: "ITEM",
     name: refName,

@@ -177,9 +177,8 @@ function getPoe2dbPath(item: ParsedItem) {
     return encodePoe2dbUri(refName);
   }
 
-  if (POE2DB_CONVERSIONS.has(refName)) {
-    return POE2DB_CONVERSIONS.get(refName)! + "#ModifiersCalc";
-  }
+  const refPage = POE2DB_CONVERSIONS.get(refName);
+  if (refPage !== undefined) return refPage + "#ModifiersCalc";
   const flask = category === ItemCategory.Flask && flaskPage(refName);
   if (flask) {
     return flask + "#ModifiersCalc";
@@ -189,11 +188,9 @@ function getPoe2dbPath(item: ParsedItem) {
     return encodePoe2dbUri(refName) + "#ModifiersCalc";
   }
   // an item without a category, or of a category with no modifiers page
-  if (!category || !POE2DB_CONVERSIONS.has(category)) {
-    return encodePoe2dbUri(refName);
-  }
+  let path = category && POE2DB_CONVERSIONS.get(category);
+  if (!category || path === undefined) return encodePoe2dbUri(refName);
 
-  let path = POE2DB_CONVERSIONS.get(category)!;
   if (
     ARMOUR.has(category) &&
     !(category === ItemCategory.Buckler || category === ItemCategory.Focus)

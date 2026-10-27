@@ -137,7 +137,7 @@ export function createTradeRequest(
     engine: "new",
     query: {
       have,
-      want: [tradeTag(item)!],
+      want: [tradeTag(item)].filter((tag) => tag !== undefined),
       status: {
         option: exchangeListingType(filters.trade.listingType),
       },

@@ -37,7 +37,7 @@ export function useTradeApi() {
       );
       if (existingRes) {
         if (existingRes.stackSize) {
-          existingRes.stackSize += result.stackSize!;
+          existingRes.stackSize += result.stackSize ?? 0;
         } else {
           existingRes.listedTimes += 1;
         }

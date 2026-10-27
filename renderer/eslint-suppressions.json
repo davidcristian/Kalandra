@@ -169,11 +169,6 @@
       "count": 3
     }
   },
-  "src/main.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "src/parser/Parser.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 3
@@ -181,17 +176,7 @@
   },
   "src/web/Config.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 28
-    }
-  },
-  "src/web/client-log/client-log.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/item-check/hotkeyable-actions.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
+      "count": 26
     }
   },
   "src/web/price-check/filters/FilterModifier.vue": {
@@ -259,29 +244,9 @@
       "count": 3
     }
   },
-  "src/web/price-check/trade/bulk-api.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
-  "src/web/price-check/trade/pathofexile-bulk.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "src/web/price-check/trade/pathofexile-trade.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 24
-    }
-  },
-  "src/web/price-check/trade/trade-api.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/trends/getDetailsId.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
     }
   }
 }

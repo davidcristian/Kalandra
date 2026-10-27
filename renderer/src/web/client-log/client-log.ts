@@ -35,9 +35,9 @@ export function createClientLog() {
   }
 
   function handleLine(line: string) {
-    const wholeLineMatch = line.match(LogRegex);
-    if (!wholeLineMatch) return;
-    const { text, datetime, millis } = wholeLineMatch.groups!;
+    const groups = line.match(LogRegex)?.groups;
+    if (!groups) return;
+    const { text, datetime, millis } = groups;
     const millisNum = Number.parseInt(millis, 10);
 
     const data = parseClientLogText(text, datetime, millisNum);

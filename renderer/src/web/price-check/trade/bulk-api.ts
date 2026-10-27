@@ -94,10 +94,9 @@ export function useBulkApi() {
     have: "divine" | "exalted" | "chaos",
     _searchId: number,
   ): BulkTab {
+    const preloadedResult = preloaded.find((res) => res?.haveTag === have);
     const _result = shallowRef(
-      preloaded.some((res) => res?.haveTag === have)
-        ? shallowReactive(preloaded.find((res) => res?.haveTag === have)!)
-        : null,
+      preloadedResult ? shallowReactive(preloadedResult) : null,
     );
     let requested: boolean = _result.value != null;
 
@@ -105,13 +104,11 @@ export function useBulkApi() {
       if (requested) return;
       requested = true;
       try {
-        _result.value = shallowReactive(
-          (
-            await execBulkSearch(item, filters, [have], {
-              accountName: AppConfig().accountName,
-            })
-          )[0]!,
-        );
+        const [loaded] = await execBulkSearch(item, filters, [have], {
+          accountName: AppConfig().accountName,
+        });
+        if (!loaded) return;
+        _result.value = shallowReactive(loaded);
         if (_searchId !== searchId) return;
         const otherHave =
           have === "divine"

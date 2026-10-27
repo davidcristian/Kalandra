@@ -50,7 +50,7 @@ function showStartupError(message: string) {
   box.className =
     "m-6 p-4 max-w-2xl rounded border border-red-400 bg-gray-900 text-base text-gray-100 whitespace-pre-wrap";
   box.textContent = message;
-  document.getElementById("app")!.replaceChildren(box);
+  document.getElementById("app")?.replaceChildren(box);
 }
 
 void startApp(start, showStartupError); // startApp() logs and shows a failed start
