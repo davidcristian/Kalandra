@@ -100,7 +100,12 @@ afterEach(() => {
 
 // Shortcuts registers the hotkeys on the tick after the game window becomes active
 async function registerOnFocus(actions: ShortcutAction[]) {
-  shortcuts.updateActions(actions, false, false, false);
+  shortcuts.updateActions({
+    shortcuts: actions,
+    stashScroll: false,
+    logKeys: false,
+    restoreClipboard: false,
+  });
   game.isActive = true;
   await new Promise((resolve) => setImmediate(resolve));
 }

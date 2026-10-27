@@ -99,17 +99,8 @@ void startWhenReady(
         eventPipe,
       );
       eventPipe.onEventAnyClient("CLIENT->MAIN::update-host-config", (cfg) => {
-        overlay.updateOpts(
-          cfg.overlayKey,
-          cfg.windowTitle,
-          cfg.hideOverlayOnBlur,
-        );
-        shortcuts.updateActions(
-          cfg.shortcuts,
-          cfg.stashScroll,
-          cfg.logKeys,
-          cfg.restoreClipboard,
-        );
+        overlay.updateOpts(cfg);
+        shortcuts.updateActions(cfg);
         shortcuts.updateDelay(cfg.initialDelay);
         gameLogWatcher
           .restart(cfg.clientLog ?? "", cfg.readClientLog)

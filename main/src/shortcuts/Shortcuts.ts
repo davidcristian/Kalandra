@@ -7,7 +7,7 @@ import { registrableActions } from "./registrable-actions";
 import { WidgetAreaTracker } from "../windowing/WidgetAreaTracker";
 import { HostClipboard, NoItemTextError } from "./HostClipboard";
 import { logKeyPresses } from "./key-log";
-import type { ShortcutAction } from "../../../ipc/types";
+import type { HostConfig, ShortcutAction } from "../../../ipc/types";
 import type { UnregisteredHotkey } from "../../../ipc/hotkeys";
 import type { Logger } from "../RemoteLogger";
 import type { OverlayWindow } from "../windowing/OverlayWindow";
@@ -16,6 +16,12 @@ import type { GameConfig } from "../host-files/GameConfig";
 import type { ServerEvents } from "../server";
 
 type UiohookKeyT = keyof typeof UiohookKey;
+
+/** The settings that `updateActions()` reads, by their names in `HostConfig`. */
+export type ShortcutSettings = Pick<
+  HostConfig,
+  "shortcuts" | "stashScroll" | "logKeys" | "restoreClipboard"
+>;
 
 export class Shortcuts {
   private actions: ShortcutAction[] = [];
@@ -73,17 +79,12 @@ export class Shortcuts {
     this.clipboard.updateDelay(delay);
   }
 
-  updateActions(
-    actions: ShortcutAction[],
-    stashScroll: boolean,
-    logKeys: boolean,
-    restoreClipboard: boolean,
-  ) {
-    this.stashScroll = stashScroll;
-    this.logKeys = logKeys;
-    this.clipboard.updateOptions(restoreClipboard);
+  updateActions(settings: ShortcutSettings) {
+    this.stashScroll = settings.stashScroll;
+    this.logKeys = settings.logKeys;
+    this.clipboard.updateOptions(settings.restoreClipboard);
     const registrable = registrableActions(
-      actions,
+      settings.shortcuts,
       this.gameConfig.showModsKey,
       this.logger,
     );

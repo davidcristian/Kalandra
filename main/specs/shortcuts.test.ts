@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ShortcutAction } from "../../ipc/types";
 import { GameConfig } from "../src/host-files/GameConfig";
 import { Logger } from "../src/RemoteLogger";
-import { Shortcuts } from "../src/shortcuts/Shortcuts";
+import { Shortcuts, type ShortcutSettings } from "../src/shortcuts/Shortcuts";
 import { GameWindow } from "../src/windowing/GameWindow";
 import { OverlayWindow } from "../src/windowing/OverlayWindow";
 import { globalShortcut } from "./fake-global-shortcut";
@@ -60,9 +60,21 @@ function trigger(shortcut: string): ShortcutAction {
   return { shortcut, action: { type: "trigger-event", target: shortcut } };
 }
 
+function settings(
+  actions: ShortcutAction[],
+  stashScroll = false,
+): ShortcutSettings {
+  return {
+    shortcuts: actions,
+    stashScroll,
+    logKeys: false,
+    restoreClipboard: false,
+  };
+}
+
 // Shortcuts registers the hotkeys on the tick after the game window becomes active
 async function registerOnFocus(actions: ShortcutAction[]) {
-  shortcuts.updateActions(actions, false, false, false);
+  shortcuts.updateActions(settings(actions));
   game.isActive = true;
   await new Promise((resolve) => setImmediate(resolve));
 }
@@ -112,7 +124,7 @@ describe("Shortcuts", () => {
   );
 
   it("registers no hotkey until the game window is active, and none after it loses the focus", async () => {
-    shortcuts.updateActions([trigger("F5")], false, false, false);
+    shortcuts.updateActions(settings([trigger("F5")]));
     expect(registered()).toEqual([]);
 
     await registerOnFocus([trigger("F5")]);
@@ -240,7 +252,7 @@ describe("the hotkeys main sends as not registered", () => {
     globalShortcut.taken.add("F6");
     await registerOnFocus([trigger("F6")]);
     await setGameActive(false);
-    shortcuts.updateActions([trigger("F6")], false, false, false);
+    shortcuts.updateActions(settings([trigger("F6")]));
 
     expect(unregisteredLists().at(-1)).toEqual([
       { shortcut: "F6", reason: "taken" },
@@ -251,7 +263,7 @@ describe("the hotkeys main sends as not registered", () => {
     globalShortcut.taken.add("F6");
     await registerOnFocus([trigger("F6")]);
     await setGameActive(false);
-    shortcuts.updateActions([trigger("F7")], false, false, false);
+    shortcuts.updateActions(settings([trigger("F7")]));
 
     expect(unregisteredLists().at(-1)).toEqual([]);
   });
@@ -279,7 +291,7 @@ describe("a hotkey press", () => {
 
 describe("Ctrl and the mouse wheel with stash scrolling on", () => {
   beforeEach(async () => {
-    shortcuts.updateActions([], true, false, false);
+    shortcuts.updateActions(settings([], true));
     game.isActive = true;
     await new Promise((resolve) => setImmediate(resolve));
   });
@@ -305,9 +317,9 @@ describe("Ctrl and the mouse wheel with stash scrolling on", () => {
 
   it("taps nothing without Ctrl, with stash scrolling off or while the game is not active", async () => {
     hook.wheel(1500, 700, 1);
-    shortcuts.updateActions([], false, false, false);
+    shortcuts.updateActions(settings([]));
     hook.wheel(1500, 700, 1, { ctrlKey: true });
-    shortcuts.updateActions([], true, false, false);
+    shortcuts.updateActions(settings([], true));
     game.isActive = false;
     hook.wheel(1500, 700, 1, { ctrlKey: true });
 

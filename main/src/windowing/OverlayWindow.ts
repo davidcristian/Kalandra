@@ -6,11 +6,18 @@ import {
 } from "electron-overlay-window";
 import { type ListenAddress, pageUrl } from "../listen-option";
 import { isTradeSiteUrl } from "../proxy";
+import type { HostConfig } from "../../../ipc/types";
 import type { ServerEvents } from "../server";
 import { type Logger, logRejection } from "../RemoteLogger";
 import type { GameWindow } from "./GameWindow";
 import { overlayKeyCommand } from "./overlay-keys";
 import { watchPage } from "./page-watch";
+
+/** The settings that `updateOpts()` reads, by their names in `HostConfig`. */
+export type OverlaySettings = Pick<
+  HostConfig,
+  "overlayKey" | "windowTitle" | "hideOverlayOnBlur"
+>;
 
 export class OverlayWindow {
   public isInteractable = false;
@@ -152,14 +159,10 @@ export class OverlayWindow {
     }
   };
 
-  updateOpts(
-    overlayKey: string,
-    windowTitle: string,
-    hideOverlayOnBlur: boolean,
-  ) {
-    this.overlayKey = overlayKey;
-    this.poeWindow.attach(this.window, windowTitle);
-    this.hideOverlayOnBlur = hideOverlayOnBlur;
+  updateOpts(settings: OverlaySettings) {
+    this.overlayKey = settings.overlayKey;
+    this.poeWindow.attach(this.window, settings.windowTitle);
+    this.hideOverlayOnBlur = settings.hideOverlayOnBlur;
   }
 
   private handleExtraCommands = (

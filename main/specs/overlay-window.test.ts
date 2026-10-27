@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { IpcEvent } from "../../ipc/types";
 import { Logger } from "../src/RemoteLogger";
 import { GameWindow } from "../src/windowing/GameWindow";
-import { OverlayWindow } from "../src/windowing/OverlayWindow";
+import {
+  OverlayWindow,
+  type OverlaySettings,
+} from "../src/windowing/OverlayWindow";
 import { FakeServer } from "./fake-server";
 
 // Stands in for the desktop: the overlay window main creates, the game window it follows, and every dialog,
@@ -135,6 +138,13 @@ let game: GameWindow;
 function createOverlay() {
   const overlay = new OverlayWindow(server, new Logger(server), game);
   return { overlay, shown: desktop.windows[desktop.windows.length - 1] };
+}
+
+function settings(
+  windowTitle: string,
+  hideOverlayOnBlur: boolean,
+): OverlaySettings {
+  return { overlayKey: "Shift + Space", windowTitle, hideOverlayOnBlur };
 }
 
 // The fakes reject at once, so the window has handled each rejection after the pending promise callbacks
@@ -351,8 +361,8 @@ describe("OverlayWindow", () => {
   it("attaches to the game window once, by the title from the settings", () => {
     const { overlay } = createOverlay();
 
-    overlay.updateOpts("Shift + Space", "Path of Exile 2", false);
-    overlay.updateOpts("Shift + Space", "Other title", false);
+    overlay.updateOpts(settings("Path of Exile 2", false));
+    overlay.updateOpts(settings("Other title", false));
 
     expect(desktop.attached).toHaveLength(1);
     expect(desktop.attached[0].title).toBe("Path of Exile 2");
@@ -373,7 +383,7 @@ describe("OverlayWindow", () => {
 
   it("follows the focus of the game window and tells the page", () => {
     const { overlay } = createOverlay();
-    overlay.updateOpts("Shift + Space", "Path of Exile 2", false);
+    overlay.updateOpts(settings("Path of Exile 2", false));
 
     overlay.assertOverlayActive();
     OverlayController.events.emit("focus");
@@ -400,7 +410,7 @@ describe("OverlayWindow", () => {
 
   it("handles the overlay key and Escape in the window and in a web view, on the next tick", async () => {
     const { overlay, shown } = createOverlay();
-    overlay.updateOpts("Shift + Space", "Path of Exile 2", false);
+    overlay.updateOpts(settings("Path of Exile 2", false));
     const webView = new EventEmitter();
     shown.contents.emit("did-attach-webview", {}, webView);
     const prevented: string[] = [];
@@ -442,7 +452,7 @@ describe("OverlayWindow", () => {
   describe("with Hide overlay on blur", () => {
     it("hides the window while the game and the overlay are inactive, and shows it on top again", () => {
       const { overlay, shown } = createOverlay();
-      overlay.updateOpts("Shift + Space", "Path of Exile 2", true);
+      overlay.updateOpts(settings("Path of Exile 2", true));
 
       OverlayController.events.emit("focus");
       OverlayController.events.emit("blur");
@@ -459,7 +469,7 @@ describe("OverlayWindow", () => {
 
     it("hides the window while the page has nothing to show", async () => {
       const { overlay, shown } = createOverlay();
-      overlay.updateOpts("Shift + Space", "Path of Exile 2", true);
+      overlay.updateOpts(settings("Path of Exile 2", true));
       OverlayController.events.emit("focus");
 
       await server.emit("OVERLAY->MAIN::render-state", { shouldShow: false });
@@ -471,7 +481,7 @@ describe("OverlayWindow", () => {
 
     it("never hides the window with the setting off", () => {
       const { overlay, shown } = createOverlay();
-      overlay.updateOpts("Shift + Space", "Path of Exile 2", false);
+      overlay.updateOpts(settings("Path of Exile 2", false));
 
       OverlayController.events.emit("focus");
       OverlayController.events.emit("blur");

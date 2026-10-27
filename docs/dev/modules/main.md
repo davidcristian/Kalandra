@@ -89,9 +89,10 @@ The entry, the server and the app services, in `main/src/`:
 `shortcuts/`:
 
 - `Shortcuts.ts`: `new Shortcuts(logger, overlay, poeWindow, gameConfig, server)` holds the hotkeys.
-  `updateActions(actions, stashScroll, logKeys, restoreClipboard)` replaces them, and `updateDelay(delay)` sets the
-  clipboard's first poll delay. Each hotkey is registered with Electron's `globalShortcut` only while the game window
-  is active. `registrableActions()` in `registrable-actions.ts` drops,
+  `updateActions(settings)` replaces them with the `shortcuts` field and reads `stashScroll`, `logKeys` and
+  `restoreClipboard` by name (`ShortcutSettings`), and `updateDelay(delay)` sets the clipboard's first poll delay.
+  Each hotkey is registered with Electron's `globalShortcut` only while the game window is active.
+  `registrableActions()` in `registrable-actions.ts` drops,
   with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a
   hotkey the game uses ([settings.md](../../settings.md#hotkeys) lists them) and a hotkey given to two actions, except
   that a `toggle-overlay` action keeps it. It broadcasts `MAIN->CLIENT::unregistered-hotkeys` with the first two kinds
@@ -148,7 +149,8 @@ The entry, the server and the app services, in `main/src/`:
   and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.
   While the overlay has focus the hotkeys are not registered, so the window's `before-input-event` handler checks each
   key press with `overlayKeyCommand()`: `Escape` and `Ctrl + W` return to the game, and the overlay key toggles the
-  focus. `updateOpts()` attaches the window to the game window. The library hides the window while neither the game
+  focus. `updateOpts(settings)` reads `overlayKey`, `windowTitle` and `hideOverlayOnBlur` by name
+  (`OverlaySettings`) and attaches the window to the game window. The library hides the window while neither the game
   nor the overlay has the focus. With `hideOverlayOnBlur` main also hides it while the overlay is not active and
   either the game is not active or the page sent `OVERLAY->MAIN::render-state` with `shouldShow` false. When the game
   has administrator rights that Kalandra lacks, it shows the error `PoE2 window: no access`. `watchPage()` in
