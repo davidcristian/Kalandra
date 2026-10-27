@@ -1,5 +1,5 @@
 import { autoUpdater } from "electron-updater";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { IpcEvent } from "../../ipc/types";
 import { AppUpdater } from "../src/AppUpdater";
 import { Logger } from "../src/RemoteLogger";
@@ -60,10 +60,28 @@ beforeEach(() => {
   check.emitsError = true;
 });
 
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+function createUpdater(platform: NodeJS.Platform) {
+  const server = new FakeServer();
+  const updater = new AppUpdater(server, new Logger(server), platform);
+  return { server, updater };
+}
+
+function withArgument<T>(argument: string, run: () => T): T {
+  process.argv.push(argument);
+  try {
+    return run();
+  } finally {
+    process.argv.splice(process.argv.indexOf(argument), 1);
+  }
+}
+
 describe("AppUpdater", () => {
   it("checks for updates when it is created, before a page sends its settings", () => {
-    const server = new FakeServer();
-    const updater = new AppUpdater(server, new Logger(server));
+    const { server, updater } = createUpdater("win32");
 
     expect(states(server.sent)).toEqual([
       "checking-for-update",
@@ -76,23 +94,55 @@ describe("AppUpdater", () => {
     });
   });
 
-  // macOS reports updates as not supported and ignores --no-updates
-  it.skipIf(process.platform === "darwin")(
-    "does not download in the first check with --no-updates",
-    () => {
-      process.argv.push("--no-updates");
-      try {
-        const server = new FakeServer();
-        const updater = new AppUpdater(server, new Logger(server));
+  it("does not download on macOS, whose build has no zip file for the update", () => {
+    const { server, updater } = createUpdater("darwin");
 
-        expect(updater.info).toEqual({
-          state: "update-available",
-          version: "9.9.9",
-          noDownloadReason: "disabled-by-flag",
-        });
-      } finally {
-        process.argv.splice(process.argv.indexOf("--no-updates"), 1);
-      }
+    expect(states(server.sent)).toEqual([
+      "checking-for-update",
+      "update-available",
+    ]);
+    expect(updater.info).toEqual({
+      state: "update-available",
+      version: "9.9.9",
+      noDownloadReason: "not-supported",
+    });
+  });
+
+  it("does not download in the portable Windows build", () => {
+    vi.stubEnv("PORTABLE_EXECUTABLE_DIR", "C:\\Users\\Player\\Kalandra");
+    const { server, updater } = createUpdater("win32");
+
+    expect(states(server.sent)).toEqual([
+      "checking-for-update",
+      "update-available",
+    ]);
+    expect(updater.info).toEqual({
+      state: "update-available",
+      version: "9.9.9",
+      noDownloadReason: "not-supported",
+    });
+  });
+
+  it.each([
+    ["win32", "disabled-by-flag"],
+    ["linux", "disabled-by-flag"],
+    ["darwin", "not-supported"],
+  ] as const)(
+    "does not download in the first check with --no-updates on %s",
+    (platform, reason) => {
+      const { server, updater } = withArgument("--no-updates", () =>
+        createUpdater(platform),
+      );
+
+      expect(states(server.sent)).toEqual([
+        "checking-for-update",
+        "update-available",
+      ]);
+      expect(updater.info).toEqual({
+        state: "update-available",
+        version: "9.9.9",
+        noDownloadReason: reason,
+      });
     },
   );
 
@@ -102,7 +152,7 @@ describe("AppUpdater", () => {
     );
     const server = new FakeServer();
     const logger = new Logger(server);
-    const updater = new AppUpdater(server, logger);
+    const updater = new AppUpdater(server, logger, "win32");
     await checkSettled();
 
     expect(loggedLines(logger)).toEqual([
@@ -117,7 +167,7 @@ describe("AppUpdater", () => {
     check.emitsError = false;
     const server = new FakeServer();
     const logger = new Logger(server);
-    const updater = new AppUpdater(server, logger);
+    const updater = new AppUpdater(server, logger, "win32");
     await checkSettled();
 
     expect(loggedLines(logger)).toEqual([

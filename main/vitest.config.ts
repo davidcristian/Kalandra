@@ -8,7 +8,7 @@ export default defineConfig({
       // The floor CI checks with --coverage; raise a number when the tests cover more
       thresholds: {
         statements: 91.9,
-        branches: 91.1,
+        branches: 91.3,
         functions: 94.4,
         lines: 91.8,
       },

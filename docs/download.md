@@ -66,9 +66,8 @@ Settings, About checks at once. What happens when a new version exists depends o
   quit Kalandra. Settings, About then shows "It will be installed automatically on exit" and an **Install now**
   button, which closes Kalandra and installs the update at once.
 - **Windows portable and macOS.** These downloads do not update themselves. Download the new version from the
-  releases page yourself: **Open the Downloads page** in Settings, About opens it. On the portable download, Settings,
-  About and the price check window show "Update available" with the version number and "You can download it from
-  GitHub".
+  releases page yourself: **Open the Downloads page** in Settings, About opens it. Settings, About and the price check
+  window show "Update available" with the version number and "You can download it from GitHub".
 
 The [`--no-updates` option](/cmd-flags) turns off the download on the installer and the AppImage. Kalandra still
 checks for updates and shows "You have disabled automatic updates download" when one exists.

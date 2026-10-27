@@ -168,3 +168,4 @@ layout and its reasons.
 - 104: [The data loader cannot read the stat group lines of Exiled Exchange 2's newer data](tasks/104-stat-group-lines.md)
 - 105: [No hook runs ESLint or Prettier on ipc/](tasks/105-no-lint-or-format-for-ipc.md)
 - 106: [Renderer errors other than a failed price file load reach only the browser console](tasks/106-other-renderer-errors-in-console.md)
+- 107: [No run on a Mac has checked updates, the Accessibility prompt or the game's file paths](tasks/107-macos-run-not-checked.md)

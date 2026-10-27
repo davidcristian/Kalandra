@@ -72,9 +72,10 @@ The entry, the server and the app services, in `main/src/`:
   from the unchecked payload ([ipc.md](ipc.md#public-contract)).
 - `AppUpdater.ts`: `AppUpdater` wraps electron-updater. Setting `info` broadcasts `MAIN->CLIENT::updater-state`. It
   checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not wait
-  for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is off for
-  the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and, on every platform but macOS, with `--no-updates`.
-  `noAutoUpdatesReason` is `not-supported` for the portable build and on macOS, and `disabled-by-flag` for the flag. An
+  for the page. It handles the `check-for-update` and `update-and-restart` user actions. `noAutoUpdatesReason` is
+  `not-supported` for the Windows portable build (`PORTABLE_EXECUTABLE_DIR` is set) and on macOS, whose dmg build has
+  no zip file for `MacUpdater`, and otherwise `disabled-by-flag` with `--no-updates`. Automatic download is off
+  whenever it is set. The constructor's optional `platform` defaults to `process.platform`, so a test can pass one. An
   `error` event logs `error [AppUpdater] Update failed:` and the first line of the error's message, since the next lines
   are response headers, which can contain cookies. A check that fails without an `error` event logs the same line.
 - `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a message

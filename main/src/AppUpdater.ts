@@ -27,6 +27,7 @@ export class AppUpdater {
   constructor(
     private server: ServerEvents,
     private logger: Logger,
+    platform: NodeJS.Platform = process.platform,
   ) {
     setInterval(this.check, 16 * 60 * 60 * 1000);
 
@@ -39,14 +40,13 @@ export class AppUpdater {
     });
 
     // https://www.electron.build/configuration/nsis.html#portable
-    autoUpdater.autoDownload = !process.env.PORTABLE_EXECUTABLE_DIR;
-
-    if (!autoUpdater.autoDownload || process.platform === "darwin") {
+    // The macOS build has no zip file, which MacUpdater needs to download an update
+    if (process.env.PORTABLE_EXECUTABLE_DIR || platform === "darwin") {
       this.noAutoUpdatesReason = "not-supported";
     } else if (process.argv.includes("--no-updates")) {
-      autoUpdater.autoDownload = false;
       this.noAutoUpdatesReason = "disabled-by-flag";
     }
+    autoUpdater.autoDownload = this.noAutoUpdatesReason === null;
 
     autoUpdater.on("checking-for-update", () => {
       this.info = { state: "checking-for-update" };

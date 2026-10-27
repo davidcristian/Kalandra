@@ -13,7 +13,8 @@ replaces it with `vi.mock("electron", ...)`.
 - `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry, Open in Browser
   also before the server listens, and sends `CLIENT->MAIN::user-action` messages.
 - `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails,
-  with or without an `error` event.
+  with or without an `error` event. The fake downloads only while `autoDownload` is on, and the test passes each
+  platform in, with and without `--no-updates`, and as the portable build.
 - `start-server.test.ts` calls `startServer()` with a fake updater, checks the address it resolves, reads `GET /config`
   before and after a `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of
   the overlay window, of a browser and with none, sends messages main cannot use, and sends client log entries from the

@@ -1,9 +1,9 @@
 # macOS reports updates as not supported but still downloads them
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** main
 **Origin:** [main/src/AppUpdater.ts](../../../../main/src/AppUpdater.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The `AppUpdater` constructor sets `autoUpdater.autoDownload = !process.env.PORTABLE_EXECUTABLE_DIR`,
 which is `true` on macOS. On `darwin` it then sets `noAutoUpdatesReason` to `"not-supported"` and
@@ -36,3 +36,7 @@ because [host/](../../host/index.md) holds only checks on Windows.
   docs/xp-tracker.md no longer lists it.
 - 2026-10-26: Kalandra has no default macOS paths since [092](092-macos-client-log-path.md)
   closed, so the Mac run finds the paths instead of checking them.
+- 2026-10-27: Done in `fix(main): stop downloading updates where they are not supported`.
+  `autoDownload` is off whenever `noAutoUpdatesReason` is set, which a test checks for each
+  platform through a fake electron-updater. The run on a Mac moved to
+  [107](107-macos-run-not-checked.md).
