@@ -101,7 +101,8 @@ these checks, and otherwise logs the failure and keeps the old copy:
   is a `stats` group without `id`, `label` or an `entries` list, or with an entry without `id`.
 
 It writes the new copy to `<name>.json.tmp` and then moves it over the old one, so a failed write also keeps the old
-copy, and its error ends the pull. The folder `data/json/fr/` is not in the repo, and the tool does not create it.
+copy, and its error ends the pull. Before the first request it creates the folder `data/json/<lang>/` when it is
+missing, as `data/json/fr/` is in a clone, since that folder has no `.gitkeep`.
 
 ## Image modes
 

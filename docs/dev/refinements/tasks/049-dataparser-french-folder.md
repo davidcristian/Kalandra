@@ -1,9 +1,9 @@
 # dataParser has no data/json/fr folder, so a French pull fails
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/providers/trade_api.py](../../../../dataParser/src/providers/trade_api.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `LANGUAGES` in `dataParser/src/constants/lang.py` includes `fr`. `TradeApiProvider.pull()` in
 `trade_api.py` opens `data/json/<lang>/<name>.json` for writing and never creates the folder. Git
@@ -25,3 +25,6 @@ runbook's table of errors and the `data/json/fr/` item from its list of what the
 
 - 2026-10-18: Found while the game data update runbook was written, by comparing `LANGUAGES` with
   the tracked folders.
+- 2026-10-27: Done in `fix(dataparser): create a missing trade data folder before a pull`.
+  `pull()` creates the folder, a unit test pulls into a missing one through the fake session, and
+  the runbook no longer lists the `fr` folder or its error.

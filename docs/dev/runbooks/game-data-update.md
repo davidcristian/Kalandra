@@ -26,7 +26,6 @@ This repo installs nothing below; each item names the file that expects it.
   [dataparser.md](../modules/dataparser.md#setup) says. The steps below write `python` for that Python.
 - The item image cache `dataParser/src/services/itemImageCache.json` from the last run. Without it, every icon that
   the trade site's `static.json` does not give becomes `%NOT_FOUND%`.
-- The folder `dataParser/data/json/fr/`, which git does not create. Create it before step 2.
 
 ## Before the run
 
@@ -138,7 +137,6 @@ On 18 Oct 2026 the last two print 445 and 16.
 | --- | --- | --- |
 | `FileNotFoundError` for `data/vendor/tables/<Language>/<Table>.json` | the export did not write that table | read the export's own output in step 1, and check the table and `translations` in `config.json` |
 | `FileNotFoundError` for `data/vendor/files/data@StatDescriptions@<name>.csd` | the export did not write that stat description file | check `files` in `config.json` against `STAT_DESCRIPTION_FILES` in `src/constants/filenames.py` |
-| `FileNotFoundError` for `data/json/fr/<name>.json.tmp` during `--pull` | the folder does not exist | create `dataParser/data/json/fr/` and run step 2 again |
 | `Rate limited 4 times, gave up on: <url>` during step 2 | the trade site returned 429 for the request and its three retries; that file kept its old copy | run step 2 again only after the seconds in the last `Waiting <seconds> seconds for the rate limit of: <url>` line have passed, and never in a loop |
 | `FileNotFoundError` for `data/json/<lang>/<name>.json` during a build | the trade data was never pulled for that language | run step 2 |
 | `KeyError` from `use_game_store` in `src/services/client_strings_builder.py` | the patch renamed or removed a `ClientStrings` id the tool reads | find the entry with that id in `src/constants/client_string_data.py` and change it to the new id |

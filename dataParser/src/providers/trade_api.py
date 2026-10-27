@@ -95,6 +95,7 @@ class TradeApiProvider:
 
     def pull(self) -> None:
         base_url = LANG_URLS[self.lang]
+        os.makedirs(self.output_dir, exist_ok=True)
 
         for relative_url in TRADE_QUERY_URLS:
             url = f"{base_url}{relative_url}"

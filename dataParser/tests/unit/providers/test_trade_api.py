@@ -66,6 +66,17 @@ def test_pull_saves_the_four_endpoints_with_a_pause_between_requests(
     assert read(tmp_path / "static.json") == {"result": []}
 
 
+def test_pull_creates_a_missing_output_folder(tmp_path: Path) -> None:
+    output_dir = tmp_path / "json" / "fr"
+
+    _ = pull(
+        output_dir, [ok(FILTERS), ok(STATS), ok({"result": []}), ok({"result": []})]
+    )
+
+    saved = sorted(path.name for path in output_dir.iterdir())
+    assert saved == ["filters.json", "items.json", "static.json", "stats.json"]
+
+
 def test_pull_sorts_the_stats_entries_by_id(tmp_path: Path) -> None:
     _ = pull(tmp_path, [ok(FILTERS), ok(STATS), ok({"result": []}), ok({"result": []})])
 
