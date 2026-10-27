@@ -45,7 +45,8 @@ that a saved config survives every update covers it ([config.md](config.md),
   percent of the screen), `moveHandles`, `readonly`, `removable`, `hideable` and `inlineEdit`. With `inlineEdit`
   false, "edit" opens the widget's page in the settings window.
 - [WidgetMenu.vue](../../../renderer/src/web/overlay/WidgetMenu.vue) shows a button for each widget without
-  `menu::skip`: only the hidden ones, unless "Show button for active widgets" (`alwaysShow`) is on. It offers the
+  `menu::skip`: only the hidden ones, unless "Show button for active widgets" (`alwaysShow`) is on. It shows no
+  button for the XP tracker while "Allow reading of Client.txt file" (`readClientLog`) is off. It offers the
   multi widgets under "add widget…". Its paste field ("Price check (Ctrl + V)") dispatches the pasted text to the
   price check as `MAIN->CLIENT::item-text` inside the renderer, with `Host.selfDispatch`.
 
@@ -68,10 +69,11 @@ https://davidcristian.github.io/Kalandra/ (each link opens the page's source).
 | `notepad` | `notepad/WidgetNotepad.vue` | `NotepadWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `library` | `library/WidgetLibrary.vue` | `LibraryWidget` (`library/widget.ts`) | single | [`/item-data`](../../item-data.md) |
 
-The menu, price check, item check and library start with `menu::skip`. The settings window removes
-and adds `menu::skip` on the XP tracker when "Allow reading of Client.txt file" turns on or off, and on the library
-when "Enable experimental features" together with "Item Data Collection" turns on or off (`enableWidget` and
-`disableWidget` in `settings/utils.ts`). Adding the flag also hides the widget. The price check is in
+The menu, price check, item check and library start with `menu::skip`. In the copy that the settings window edits,
+two widgets get the flag from a setting when the window opens and when the setting changes: the XP tracker has it
+while "Allow reading of Client.txt file" is off, and the library unless both "Enable experimental features" and
+"Item Data Collection" are on (`enableWidget` and `disableWidget` in `settings/utils.ts`). Adding the flag also hides
+the widget. The price check is in
 [renderer-price-check.md](renderer-price-check.md).
 
 ### Stash search presets
@@ -164,6 +166,8 @@ with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()
 the image strip uses to add an image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
+`specs/web/widget-menu.test.ts` (the widget buttons that `WidgetMenu.vue` draws for a new config, for one with
+`readClientLog` on and for configs upgraded from versions 28 and 36),
 `specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
 `specs/web/settings/utils.test.ts` (`settings/utils.ts`: the page props, the field models, `findWidget`, and
 `disableWidget` and `enableWidget`, which add `menu::skip` once and remove every copy),

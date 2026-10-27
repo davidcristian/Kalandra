@@ -26,8 +26,10 @@ The main button bar is the widget in the top left corner of the overlay.
 ![The main button bar with the cog, magnifier, XP, Map rolling, Dump sorting and Cheat sheets buttons](/reference-images/mainWidget.png)
 
 - **A button for each hidden widget.** Click it to show that widget. The button shows the widget title or an icon:
-  the cog opens the [Settings window](/settings), the magnifier shows Item search, and the book shows the Library
-  widget while the experimental Item Data Collection feature is on. A widget with no title shows `#` and a number.
+  the cog opens the [Settings window](/settings), the magnifier shows Item search, `XP` shows the
+  [XP tracker](/xp-tracker) while `Allow reading of Client.txt file` is checked in Settings, and the book shows the
+  Library widget while the experimental Item Data Collection feature is on. A widget with no title shows `#` and a
+  number.
 - **The three dots.** Hover over them to show the `add widget…` menu, then click a name to add a new widget of that
   type: `Stopwatch`, `Stash search`, `Image strip` or `Notepad`. You can add any number of each. The other widgets
   exist once and cannot be added.

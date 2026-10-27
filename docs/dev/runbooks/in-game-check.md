@@ -192,7 +192,8 @@ it.
 - **Press:** open the overlay and click XP in the main button bar. Enter a new area, then gain a level.
   Uncheck the setting, Save, check it again, Save, and enter another area. Then empty `Client.txt`
   in a text editor while the game runs, save it, and enter another area.
-- **See:** the widget shows the character level, `Exp` and `Over`. `Exp` and `Over` follow the
+- **See:** the main button bar has no XP button until the setting is on and saved, and none after it
+  is unchecked and saved. The widget shows the character level, `Exp` and `Over`. `Exp` and `Over` follow the
   area level, which changes when the game writes `Generating level <n> area "<id>" with seed <n>`
   for a new area. The character level changes when the game writes
   `<name> (<class>) is now level <n>`. Both patterns are `LOG_ZONE_GEN` and `LOG_LEVEL_UP` in

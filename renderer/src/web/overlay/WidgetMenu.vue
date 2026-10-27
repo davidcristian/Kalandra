@@ -79,6 +79,7 @@ import {
 } from "./interfaces";
 import { registry } from "./widget-registry";
 import { Host } from "@/web/background/IPC";
+import { AppConfig } from "@/web/Config";
 import Widget from "./Widget.vue";
 import { useI18nNs } from "@/web/i18n";
 
@@ -114,10 +115,13 @@ export default defineComponent({
     const wm = inject<WidgetManager>("wm")!;
 
     const widgets = computed(() => {
+      const { readClientLog } = AppConfig();
       return wm.widgets.value
         .filter(
           (widget) =>
             !widget.wmFlags.includes("menu::skip") &&
+            // The XP tracker updates only from the lines of Client.txt
+            (readClientLog || widget.wmType !== "experience-tracker") &&
             (props.config.alwaysShow || widget.wmWants === "hide"),
         )
         .map((widget) => {

@@ -20,9 +20,9 @@ default.
 
 ![The PoE log file field and the Allow reading of Client.txt file checkbox](/reference-images/LevelingSettings1.png)
 
-The same checkbox and the `PoE log file` field are also on the `General` page. A click on `Save` while
-`Allow reading of Client.txt file` is unchecked hides the widget and removes the `XP` button. Checking it and
-clicking `Save` adds the button back, and Kalandra reads the log again.
+The same checkbox and the `PoE log file` field are also on the `General` page. The `XP` button is in the main button
+bar only while `Allow reading of Client.txt file` is checked and saved. A click on `Save` while it is unchecked also
+hides the widget. Checking it again and clicking `Save` adds the button back, and Kalandra reads the log again.
 
 ### Find the log file
 

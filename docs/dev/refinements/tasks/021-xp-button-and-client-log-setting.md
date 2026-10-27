@@ -1,9 +1,9 @@
 # The XP button does not follow the Client.txt setting until a Save
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/settings/SettingsWindow.vue](../../../../renderer/src/web/settings/SettingsWindow.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The XP tracker reads the game's `Client.txt` log, and "Allow reading of Client.txt file"
 (`readClientLog`) is off in `defaultConfig()`. `initInstance()` in
@@ -28,3 +28,5 @@ config and a config with the setting on, and docs/xp-tracker.md changes in the s
 
 - 2026-10-18: Found while docs/xp-tracker.md and docs/widgets.md were rewritten, by reading
   `initInstance()` and the watch. Not reproduced in a running app.
+- 2026-10-27: fix(renderer): hide the XP button while Client.txt is not read. `WidgetMenu.vue`
+  reads `readClientLog`, so the default widget and the config steps stay as they were.
