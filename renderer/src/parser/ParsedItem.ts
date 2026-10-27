@@ -119,12 +119,6 @@ export interface ParsedItem {
   rawText: string;
 }
 
-// NOTE: should match option values on trade
-export enum IncursionRoom {
-  Open = 1,
-  Obstructed = 2,
-}
-
 export function createVirtualItem(
   props: Partial<ParsedItem> & Pick<ParsedItem, "info">,
 ): ParsedItem {

@@ -17,7 +17,6 @@ import {
 } from "./stat-translations";
 import { GEM, ItemCategory } from "./meta";
 import {
-  IncursionRoom,
   ParsedItem,
   ItemInfluence,
   ItemRarity,
@@ -31,7 +30,6 @@ import {
   ModifierInfo,
   ParsedModifier,
   ENCHANT_LINE,
-  IMPLICIT_LINE,
   AUGMENT_LINE,
   isModInfoLine,
   groupLinesByMod,
@@ -163,9 +161,6 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   parseHeistBlueprint,
   parseTrials,
   parseAreaLevel,
-  parseAtzoatlRooms,
-  parseMirroredTablet,
-  parseFilledCoffin,
   parseMirrored,
   parseSanctified,
   parseSentinelCharge,
@@ -293,8 +288,6 @@ function findInDatabase(item: ParserState) {
     info = ITEM_BY_REF("GEM", item.name);
   } else if (item.category === ItemCategory.MetamorphSample) {
     info = ITEM_BY_REF("ITEM", item.name);
-  } else if (item.category === ItemCategory.Voidstone) {
-    info = ITEM_BY_REF("ITEM", "Charged Compass");
   } else if (item.rarity === ItemRarity.Unique && !item.isUnidentified) {
     info = ITEM_BY_REF("UNIQUE", item.name);
   } else {
@@ -311,8 +304,6 @@ function findInDatabase(item: ParserState) {
       info = ITEM_BY_TRANSLATED("GEM", item.name);
     } else if (item.category === ItemCategory.MetamorphSample) {
       info = ITEM_BY_TRANSLATED("ITEM", item.name);
-    } else if (item.category === ItemCategory.Voidstone) {
-      info = ITEM_BY_TRANSLATED("ITEM", "Charged Compass");
     } else if (item.rarity === ItemRarity.Unique && !item.isUnidentified) {
       info = ITEM_BY_TRANSLATED("UNIQUE", item.name);
     } else {
@@ -672,14 +663,9 @@ function parseUnidentified(section: string[], item: ParsedItem) {
 }
 
 function parseItemLevel(section: string[], item: ParsedItem) {
-  let prefix = _$.ITEM_LEVEL;
-  if (item.info.refName === "Filled Coffin") {
-    prefix = _$.CORPSE_LEVEL;
-  }
-
   for (const line of section) {
-    if (line.startsWith(prefix)) {
-      item.itemLevel = Number(line.slice(prefix.length));
+    if (line.startsWith(_$.ITEM_LEVEL)) {
+      item.itemLevel = Number(line.slice(_$.ITEM_LEVEL.length));
       return "SECTION_PARSED";
     }
   }
@@ -1528,103 +1514,11 @@ function parseAreaLevelNested(section: string[], item: ParsedItem) {
 }
 
 function parseAreaLevel(section: string[], item: ParsedItem) {
-  if (
-    item.info.refName !== "Chronicle of Atzoatl" &&
-    item.info.refName !== "Expedition Logbook" &&
-    item.info.refName !== "Mirrored Tablet" &&
-    item.info.refName !== "Forbidden Tome"
-  )
-    return "PARSER_SKIPPED";
+  if (item.info.refName !== "Expedition Logbook") return "PARSER_SKIPPED";
 
   parseAreaLevelNested(section, item);
 
   return item.areaLevel ? "SECTION_PARSED" : "SECTION_SKIPPED";
-}
-
-function parseAtzoatlRooms(section: string[], item: ParsedItem) {
-  if (item.info.refName !== "Chronicle of Atzoatl") return "PARSER_SKIPPED";
-  if (section[0] !== _$.INCURSION_OPEN) return "SECTION_SKIPPED";
-
-  let state = IncursionRoom.Open;
-  for (const line of section.slice(1)) {
-    if (line === _$.INCURSION_OBSTRUCTED) {
-      state = IncursionRoom.Obstructed;
-      continue;
-    }
-
-    const found = STAT_BY_MATCH_STR(line)[0];
-    if (found) {
-      item.newMods.push({
-        info: { tags: [], type: ModifierType.Pseudo },
-        stats: [
-          {
-            stat: found.stat,
-            translation: {
-              string:
-                state === IncursionRoom.Open
-                  ? found.matcher.string
-                  : `${_$.INCURSION_OBSTRUCTED} ${found.matcher.string}`,
-            },
-            roll: {
-              value: state,
-              min: state,
-              max: state,
-              dp: false,
-              unscalable: true,
-            },
-          },
-        ],
-      });
-    } else {
-      item.unknownModifiers.push({
-        text: line,
-        type: ModifierType.Pseudo,
-      });
-    }
-  }
-
-  return "SECTION_PARSED";
-}
-
-function parseMirroredTablet(section: string[], item: ParsedItem) {
-  if (item.info.refName !== "Mirrored Tablet") return "PARSER_SKIPPED";
-  if (section.length < 8) return "SECTION_SKIPPED";
-
-  for (const line of section) {
-    const found = tryParseTranslation(
-      { string: line, unscalable: true },
-      ModifierType.Pseudo,
-      undefined,
-    );
-    if (found) {
-      item.newMods.push({
-        info: { tags: [], type: ModifierType.Pseudo },
-        stats: [found],
-      });
-    } else {
-      item.unknownModifiers.push({
-        text: line,
-        type: ModifierType.Pseudo,
-      });
-    }
-  }
-
-  return "SECTION_PARSED";
-}
-
-function parseFilledCoffin(section: string[], item: ParsedItem) {
-  if (item.info.refName !== "Filled Coffin") return "PARSER_SKIPPED";
-  if (!section.some((line) => line.endsWith(IMPLICIT_LINE)))
-    return "SECTION_SKIPPED";
-
-  const { lines } = parseModType(section);
-  const modInfo: ModifierInfo = {
-    type: ModifierType.Necropolis,
-    tags: [],
-  };
-  parseStatsFromMod(lines, item, { info: modInfo, stats: [] });
-
-  return "SECTION_PARSED";
 }
 
 function markupConditionParser(text: string) {

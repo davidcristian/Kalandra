@@ -153,7 +153,7 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
   parser reads which section, so the change comes with parser cases for the item kinds it affects.
-- **`Parser.ts` is 2015 lines** (2026-10-26, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+- **`Parser.ts` is 1896 lines** (2026-10-27, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
