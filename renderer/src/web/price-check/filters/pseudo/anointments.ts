@@ -38,7 +38,7 @@ export function applyAnointmentRules(filters: StatFilter[], item: ParsedItem) {
   if (item.talismanTier) {
     anointment.disabled = false;
   } else if (itemIsModifiable(item)) {
-    const oils = anointment.oils!;
+    const oils = anointment.oils ?? [];
     if (!oils.some((oil) => HARDCODED_HIGH_VALUE_OILS.has(oil))) {
       anointment.hidden = "filters.hide_anointment";
       anointment.disabled = true;

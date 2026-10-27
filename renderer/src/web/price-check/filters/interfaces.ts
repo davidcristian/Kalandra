@@ -98,6 +98,14 @@ export interface StatFilterRoll {
   isNegated: boolean;
 }
 
+/** A stat filter whose roll is set, as the filter UI and the trade query read it. */
+export type StatFilterWithRoll = StatFilter & { roll: StatFilterRoll };
+
+/** Returns whether the filter has a roll, and narrows its type when it has one. */
+export function hasRoll(filter: StatFilter): filter is StatFilterWithRoll {
+  return filter.roll !== undefined;
+}
+
 export interface StatFilter {
   tradeId: string[];
   statRef: string;

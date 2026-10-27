@@ -23,10 +23,11 @@ import {
 } from "../interfaces";
 
 export function filterItemProp(ctx: FiltersCreationContext) {
-  if (ARMOUR.has(ctx.item.category!)) {
+  const { category } = ctx.item;
+  if (category && ARMOUR.has(category)) {
     armourProps(ctx);
   }
-  if (WEAPON.has(ctx.item.category!)) {
+  if (category && WEAPON.has(category)) {
     weaponProps(ctx);
   }
   if (ctx.item.category === ItemCategory.Map) {
@@ -300,8 +301,8 @@ function weaponProps(ctx: FiltersCreationContext) {
       ctx,
     );
 
-    if (Object.keys(elementalInfo).length) {
-      elementalInfo[INTERNAL_TRADE_IDS[12]] = elementalFilter.roll!;
+    if (Object.keys(elementalInfo).length && elementalFilter.roll) {
+      elementalInfo[INTERNAL_TRADE_IDS[12]] = elementalFilter.roll;
       elementalFilter.additionalInfo = {
         elementalInfo,
       };

@@ -26,9 +26,10 @@ export default defineComponent({
   setup(props) {
     function select(value: ItemHasEmptyModifier) {
       const { filter } = props;
-      filter.option!.value = value;
+      const roll = filter.additionalInfo?.emptyModifierInfo?.[value];
+      if (!filter.option || roll === undefined) return;
+      filter.option.value = value;
       filter.disabled = false;
-      const roll = filter.additionalInfo!.emptyModifierInfo![value];
       filter.roll = {
         value: roll,
         min: roll,
@@ -50,11 +51,11 @@ export default defineComponent({
           [ItemHasEmptyModifier.Suffix, "item.has_empty_suffix"],
         ] as const
       )
-        .filter(([value]) => filter.additionalInfo!.emptyModifierInfo![value])
+        .filter(([value]) => filter.additionalInfo?.emptyModifierInfo?.[value])
         .map(([value, text]) => ({
           text,
           select: () => select(value),
-          isSelected: filter.option!.value === value,
+          isSelected: filter.option?.value === value,
         }));
     });
 

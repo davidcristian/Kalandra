@@ -229,19 +229,21 @@ export default defineComponent({
 
     const sliderValue = computed<Array<number | "" | undefined>>({
       get() {
-        const roll = props.filter.roll!;
-        return [roll.min, roll.max];
+        const roll = props.filter.roll;
+        return [roll?.min, roll?.max];
       },
       set(value) {
+        const roll = props.filter.roll;
+        if (!roll) return;
         if (typeof value[0] === "number") {
-          props.filter.roll!.min = value[0];
+          roll.min = value[0];
           void nextTick(() => {
-            inputMinEl.value!.focus();
+            inputMinEl.value?.focus();
           }); // Nothing waits for the focus to move
         } else if (typeof value[1] === "number") {
-          props.filter.roll!.max = value[1];
+          roll.max = value[1];
           void nextTick(() => {
-            inputMaxEl.value!.focus();
+            inputMaxEl.value?.focus();
           }); // Nothing waits for the focus to move
         }
         props.filter.disabled = false;
@@ -250,11 +252,12 @@ export default defineComponent({
 
     function inputFocus(e: FocusEvent, type: "min" | "max") {
       const target = e.target as HTMLInputElement;
-      if (target.value === "") {
+      const roll = props.filter.roll;
+      if (target.value === "" && roll) {
         if (type === "max") {
-          props.filter.roll!.max = props.filter.roll!.default.max;
+          roll.max = roll.default.max;
         } else if (type === "min") {
-          props.filter.roll!.min = props.filter.roll!.default.min;
+          roll.min = roll.default.min;
         }
         void nextTick(() => {
           target.select();
@@ -298,21 +301,19 @@ export default defineComponent({
     });
 
     const inputMin = computed({
-      // Returns undefined when the roll has no minimum
-      get(): number | "" {
-        return props.filter.roll!.min!;
+      get(): number | "" | undefined {
+        return props.filter.roll?.min;
       },
       set(value: "" | number) {
-        props.filter.roll!.min = value;
+        if (props.filter.roll) props.filter.roll.min = value;
       },
     });
     const inputMax = computed({
-      // Returns undefined when the roll has no maximum
-      get(): number | "" {
-        return props.filter.roll!.max!;
+      get(): number | "" | undefined {
+        return props.filter.roll?.max;
       },
       set(value: "" | number) {
-        props.filter.roll!.max = value;
+        if (props.filter.roll) props.filter.roll.max = value;
       },
     });
 
@@ -330,7 +331,7 @@ export default defineComponent({
       inputMin,
       inputMax,
       tag: computed(() => props.filter.tag),
-      changeStep: computed(() => (props.filter.roll!.dp ? 0.01 : 1)),
+      changeStep: computed(() => (props.filter.roll?.dp ? 0.01 : 1)),
       showInputs: computed(
         () => props.filter.roll != null && !props.filter.oils,
       ),
@@ -360,7 +361,9 @@ export default defineComponent({
       text,
       roll: computed(() => props.filter.roll),
       isHidden: computed(() => props.filter.hidden != null),
-      hiddenReason: computed(() => t(props.filter.hidden!)),
+      hiddenReason: computed(() =>
+        props.filter.hidden ? t(props.filter.hidden) : "",
+      ),
       showSourceInfo: computed(
         () =>
           props.showSources &&

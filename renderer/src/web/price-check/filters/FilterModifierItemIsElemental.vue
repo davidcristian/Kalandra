@@ -35,7 +35,8 @@ export default defineComponent({
   setup(props) {
     function select(value: ItemIsElementalModifier) {
       const { filter } = props;
-      filter.option!.value = value;
+      if (!filter.option) return;
+      filter.option.value = value;
       filter.disabled = false;
       if (!filter.additionalInfo?.elementalInfo) return;
       const selectedRoll =
@@ -44,7 +45,8 @@ export default defineComponent({
     }
     function selectRightClick(value: ItemIsElementalModifier) {
       const { filter } = props;
-      filter.option!.value = value;
+      if (!filter.option) return;
+      filter.option.value = value;
       filter.disabled = false;
       if (!filter.additionalInfo?.elementalInfo) return;
       const selectedRoll =
@@ -80,7 +82,7 @@ export default defineComponent({
           text,
           select: () => select(value),
           context: () => selectRightClick(value),
-          isSelected: filter.option!.value === value,
+          isSelected: filter.option?.value === value,
           tag,
         }));
     });

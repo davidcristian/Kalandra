@@ -97,11 +97,10 @@ function createMagebloodFilters(
   );
   // calculatedStatToFilter hides a unique's fixed roll, and this roll gets a range of 0 to 3 below
   dupFilter.hidden = undefined;
-  dupFilter.roll!.bounds = {
-    min: 0,
-    max: 3,
-  };
-  dupFilter.roll!.min = duplicates;
+  if (dupFilter.roll) {
+    dupFilter.roll.bounds = { min: 0, max: 3 };
+    dupFilter.roll.min = duplicates;
+  }
   ctx.filters.push(dupFilter);
 
   ctx.filters.push(

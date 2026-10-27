@@ -59,8 +59,10 @@ export default defineComponent({
       if (activeSearch.baseType) {
         return activeSearch.baseType;
       }
-      if (activeSearch.category) {
-        const tradeId = CATEGORY_TO_TRADE_ID.get(activeSearch.category)!;
+      const tradeId =
+        activeSearch.category &&
+        CATEGORY_TO_TRADE_ID.get(activeSearch.category);
+      if (tradeId) {
         return t("item_category.prop", [t(tradeCategoryKey(tradeId))]);
       }
 
@@ -81,10 +83,10 @@ export default defineComponent({
 
     const corrupted = computed<boolean>({
       get() {
-        return props.filters.corrupted!.value;
+        return props.filters.corrupted?.value ?? false;
       },
       set(value) {
-        props.filters.corrupted!.value = value;
+        if (props.filters.corrupted) props.filters.corrupted.value = value;
       },
     });
 

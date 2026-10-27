@@ -39,12 +39,12 @@ export default defineComponent({
       if (!props.filter.oils) return null;
 
       const oils = props.filter.oils.map(
-        (oilName) => ITEM_BY_REF("ITEM", oilName)![0],
+        (oilName) => ITEM_BY_REF("ITEM", oilName)?.[0],
       );
+      if (!oils.every((oil) => oil !== undefined)) return null;
 
       let totalDiv: number | undefined = 0;
       for (const oil of oils) {
-        if (!oil) return null;
         const price = findPriceByQuery({
           ns: "ITEM",
           name: oil.refName,
@@ -58,7 +58,7 @@ export default defineComponent({
       }
 
       return {
-        oils: oils.map((item) => ({ icon: item!.icon, name: item!.name })),
+        oils: oils.map((item) => ({ icon: item.icon, name: item.name })),
         price: totalDiv != null ? autoCurrency(totalDiv) : undefined,
       };
     });

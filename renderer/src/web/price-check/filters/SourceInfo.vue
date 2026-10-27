@@ -56,10 +56,10 @@ const stats = computed(() => {
   const { stat: contribStat } = props.source.stat;
 
   let contribution = props.source.contributes?.value;
-  if (contribution != null) {
-    const filter = props.filter.roll!;
-    contribution *= filter.isNegated ? -1 : 1;
-    contribution = roundRoll(contribution, filter.dp);
+  const filterRoll = props.filter.roll;
+  if (contribution != null && filterRoll) {
+    contribution *= filterRoll.isNegated ? -1 : 1;
+    contribution = roundRoll(contribution, filterRoll.dp);
   }
 
   return stats.map((parsed) => {
@@ -82,7 +82,7 @@ const stats = computed(() => {
     return {
       text: parsed.translation.string,
       roll: roundRoll(rollValue, parsed.roll.dp),
-      contribution: contribution!,
+      contribution,
       contributes: true,
     };
   });

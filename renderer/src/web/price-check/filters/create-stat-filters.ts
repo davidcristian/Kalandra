@@ -330,6 +330,7 @@ export function calculatedStatToFilter(
   const translation = translateStatWithRoll(calc, roll);
 
   if (stat.trade.option) {
+    const option = sources[0].contributes?.option;
     filter = {
       tradeId,
       statRef: stat.ref,
@@ -341,9 +342,7 @@ export function calculatedStatToFilter(
         type === ModifierType.Enchant ? FilterTag.Enchant : FilterTag.Variant,
       oils: decodeOils(calc),
       sources,
-      option: {
-        value: sources[0].contributes!.option!,
-      },
+      option: option === undefined ? undefined : { value: option },
       disabled: false,
     };
   }

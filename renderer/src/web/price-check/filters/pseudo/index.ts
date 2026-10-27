@@ -4,7 +4,7 @@ import {
   calculatedStatToFilter,
   FiltersCreationContext,
 } from "../create-stat-filters";
-import { type StatFilter } from "../interfaces";
+import { hasRoll, type StatFilter } from "../interfaces";
 import { percentRoll, roundRoll } from "../util";
 
 const RESISTANCES_INFO: Array<{
@@ -250,9 +250,11 @@ export function filterPseudo(ctx: FiltersCreationContext) {
       }
     }
 
+    const pseudoStat = STAT_BY_REF(rule.pseudo);
+    if (!pseudoStat) continue;
     const filter = calculatedStatToFilter(
       {
-        stat: STAT_BY_REF(rule.pseudo)!,
+        stat: pseudoStat,
         type: ModifierType.Pseudo,
         sources,
       },
@@ -289,9 +291,9 @@ export function filterPseudo(ctx: FiltersCreationContext) {
       ),
   );
 
-  const resFilters = filterByGroup.get("to_x_ele_res");
+  const resFilters = filterByGroup.get("to_x_ele_res")?.filter(hasRoll);
   if (resFilters) {
-    resFilters.sort((a, b) => b.roll!.value - a.roll!.value);
+    resFilters.sort((a, b) => b.roll.value - a.roll.value);
     const maxFilter =
       resFilters[0]?.roll?.value === resFilters[1]?.roll?.value
         ? undefined
@@ -302,31 +304,29 @@ export function filterPseudo(ctx: FiltersCreationContext) {
     }
 
     ctx.filters = ctx.filters.filter(
-      (filter) => !resFilters.includes(filter) || filter === maxFilter,
+      (filter) => !resFilters.some((f) => f === filter) || filter === maxFilter,
     );
   }
 
-  const attrFilters = filterByGroup.get("to_x_attr");
+  const attrFilters = filterByGroup.get("to_x_attr")?.filter(hasRoll);
   if (attrFilters) {
-    attrFilters.sort((a, b) => b.roll!.value - a.roll!.value);
+    attrFilters.sort((a, b) => b.roll.value - a.roll.value);
     if (attrFilters.length === 3) {
       const toAll = filterByGroup.get("to_all_attrs");
       if (
-        attrFilters.every(
-          (f) => f.roll!.value === attrFilters[0].roll!.value,
-        ) &&
+        attrFilters.every((f) => f.roll.value === attrFilters[0].roll.value) &&
         toAll != null
       ) {
         ctx.filters = ctx.filters.filter(
-          (filter) => !attrFilters.includes(filter),
+          (filter) => !attrFilters.some((f) => f === filter),
         );
       } else {
         if (toAll != null) {
           ctx.filters = ctx.filters.filter((filter) => !toAll.includes(filter));
         }
 
-        if (attrFilters[2].roll!.value / attrFilters[0].roll!.value < 0.3) {
-          if (attrFilters[1].roll!.value === attrFilters[2].roll!.value) {
+        if (attrFilters[2].roll.value / attrFilters[0].roll.value < 0.3) {
+          if (attrFilters[1].roll.value === attrFilters[2].roll.value) {
             attrFilters[1].hidden = "hide_attr_same_2nd_n_3rd";
             attrFilters[2].hidden = "hide_attr_same_2nd_n_3rd";
           } else {

@@ -49,7 +49,7 @@ export function hasCraftingValue(item: ParsedItem) {
       item.influences.length ||
       (item.category === ItemCategory.Jewel &&
         item.rarity === ItemRarity.Magic) ||
-      (itemLevelCap !== 1 && item.itemLevel! >= itemLevelCap - 15) ||
+      (itemLevelCap !== 1 && (item.itemLevel ?? 0) >= itemLevelCap - 15) ||
       (item.augmentSockets &&
         item.augmentSockets.current > item.augmentSockets.normal) ||
       (item.quality && item.quality > 20))
