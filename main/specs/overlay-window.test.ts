@@ -268,7 +268,9 @@ describe("OverlayWindow", () => {
   it("opens a link of the page in the browser instead of a new window", () => {
     const { shown } = createOverlay();
 
-    const result = shown.contents.openWindow!({ url: "https://example.com/" });
+    const openWindow = shown.contents.openWindow;
+    expect(openWindow).toBeDefined();
+    const result = openWindow?.({ url: "https://example.com/" });
 
     expect(result).toEqual({ action: "deny" });
     expect(desktop.opened).toEqual(["https://example.com/"]);

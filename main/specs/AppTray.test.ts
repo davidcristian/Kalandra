@@ -108,9 +108,9 @@ async function rejectionsHandled() {
 }
 
 function click(menu: MenuItem[], label: string) {
-  const item = menu.find((entry) => entry.label === label);
-  expect(item, label).toBeDefined();
-  item!.click!();
+  const onClick = menu.find((entry) => entry.label === label)?.click;
+  expect(onClick, label).toBeDefined();
+  onClick?.();
 }
 
 beforeEach(() => {

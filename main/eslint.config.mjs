@@ -4,12 +4,7 @@ import tseslint from "typescript-eslint";
 import prettier from "eslint-config-prettier";
 
 // The files that broke a rule when it was turned on, by rule. The lists only shrink: fix a file, then remove it.
-const existingOffenders = {
-  "@typescript-eslint/no-non-null-assertion": [
-    "specs/AppTray.test.ts",
-    "specs/overlay-window.test.ts",
-  ],
-};
+const existingOffenders = {};
 
 const castThroughUnknown = {
   selector:
