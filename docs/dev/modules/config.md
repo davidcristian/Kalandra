@@ -136,7 +136,8 @@ old one and keep that file, so a saved config must survive every update: this is
   a rename over a file that another program has open, so the rename is tried again for up to 750 ms. When the
   write or the rename fails, the file stays as it was, `error [ConfigStore] Failed to save the config: <message>`
   goes to the log and the app keeps running; the next save writes the whole config to the `.new` file again. In
-  development (`VITE_DEV_SERVER_URL` is set) it writes no save.
+  development (`VITE_DEV_SERVER_URL` is set) the file is `apt-data/config.dev.json`, and while it is missing,
+  `load()` returns the text of `config.json` when that is a JSON object, so a dev run never writes `config.json`.
 
 ## Invariants
 
@@ -233,7 +234,7 @@ the host `tradeHost()` returns for each language and realm. `main/specs/ConfigSt
 `ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
 that fails while another program has the file open, with the 750 ms of retries on a fake clock and the log line of
 each failed save, a
-run in development, a `config.json` that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
+dev run's own file and its copy of `config.json`, a `config.json` that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
 replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET /config` after a
 `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()` keeps the
 `ConfigProblem`.

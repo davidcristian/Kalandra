@@ -53,9 +53,11 @@ You should see:
 
 Three more facts about a dev run:
 
-- **The config is read and never written.** Main reads `apt-data/config.json` from Electron's
-  `userData` folder, but `ConfigStore` (`main/src/host-files/ConfigStore.ts`) does not save while
-  `VITE_DEV_SERVER_URL` is set. A setting changed in a dev run lasts until Electron restarts.
+- **The config is its own file.** While `VITE_DEV_SERVER_URL` is set, `ConfigStore`
+  (`main/src/host-files/ConfigStore.ts`) reads and writes `apt-data/config.dev.json` in Electron's
+  `userData` folder, so a dev run never changes the installed app's `config.json`. Until the first
+  save writes it, a dev run starts from a copy of `config.json`. Delete `config.dev.json` to start
+  again from `config.json`.
 - **The game data needs its index files.** `npm run make-index-files` writes the `*.index.bin`
   files into `renderer/public/data/<lang>/`, which git ignores. Run it again after any change to
   the data there. What the files hold, and the list of languages, is in

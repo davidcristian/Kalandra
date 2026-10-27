@@ -81,10 +81,13 @@ function backupPath(file: string): string {
 }
 
 export class ConfigStore {
+  // A dev run keeps its own file, which starts as a copy of config.json, so it never changes the user's config
+  private readonly devRun = Boolean(process.env.VITE_DEV_SERVER_URL);
+
   private readonly cfgPath = path.join(
     app.getPath("userData"),
     "apt-data",
-    "config.json",
+    this.devRun ? "config.dev.json" : "config.json",
   );
 
   // Set while the last read of the file failed, so the page has the defaults and a save would replace the file
@@ -118,7 +121,8 @@ export class ConfigStore {
       } catch (err) {
         if (isMissingFile(err)) {
           this.readFailed = false;
-          return { contents: null, problem: null };
+          const contents = this.devRun ? await this.readUserConfig() : null;
+          return { contents, problem: null };
         }
         return this.readFailure(err);
       }
@@ -128,6 +132,22 @@ export class ConfigStore {
       }
       return await this.moveAside();
     });
+  }
+
+  /** Returns config.json as the first config of a dev run, or null when it is missing, unreadable or not JSON. */
+  private async readUserConfig(): Promise<string | null> {
+    const file = path.join(path.dirname(this.cfgPath), "config.json");
+    try {
+      const contents = await this.files.readFile(file);
+      return isJsonObject(contents) ? contents : null;
+    } catch (err) {
+      if (!isMissingFile(err)) {
+        this.logger.write(
+          `warn [ConfigStore] Failed to read ${file} for the dev run, which starts from the default settings: ${errorMessage(err)}`,
+        );
+      }
+      return null;
+    }
   }
 
   private readFailure(err: unknown): LoadedConfig {
@@ -173,7 +193,6 @@ export class ConfigStore {
   }
 
   private async save(contents: string) {
-    if (process.env.VITE_DEV_SERVER_URL) return;
     if (this.readFailed) {
       this.logger.write(
         `warn [ConfigStore] Did not save the config, because the last read of ${this.cfgPath} failed`,

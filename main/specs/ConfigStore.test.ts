@@ -308,17 +308,60 @@ describe("ConfigStore", () => {
     );
   });
 
-  it("writes nothing in development, where Vite serves the page", async () => {
-    vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
-    await saveOnDisk(STEP_1);
-    const store = createStore();
+  describe("in a dev run, where Vite serves the page", () => {
+    beforeEach(() => {
+      vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
+    });
 
-    server.saveConfig(STEP_2);
+    it("starts from config.json and changes only config.dev.json", async () => {
+      await saveOnDisk(STEP_1);
+      const store = createStore();
 
-    expect((await store.load()).contents).toBe(STEP_1);
-    expect(server.sent).toEqual([
-      { name: "MAIN->CLIENT::config-changed", payload: { contents: STEP_2 } },
-    ]);
+      const first = await store.load();
+      server.saveConfig(STEP_2);
+      const afterSave = await store.load();
+
+      expect(first).toEqual({ contents: STEP_1, problem: null });
+      expect(afterSave.contents).toBe(STEP_2);
+      expect(await readOnDisk("config.json")).toBe(STEP_1);
+      expect(await readOnDisk("config.dev.json")).toBe(STEP_2);
+    });
+
+    it("keeps its saves after a restart", async () => {
+      await saveOnDisk(STEP_1);
+      const before = createStore();
+      server.saveConfig(STEP_2);
+      await before.load();
+
+      expect((await createStore().load()).contents).toBe(STEP_2);
+    });
+
+    it("starts from the defaults and leaves config.json in place when it is not JSON", async () => {
+      await saveOnDisk("a config that is not JSON");
+
+      expect(await createStore().load()).toEqual({
+        contents: null,
+        problem: null,
+      });
+      expect(await fs.readdir(configFolder())).toEqual(["config.json"]);
+    });
+
+    it("logs why it could not read config.json and starts from the defaults", async () => {
+      await saveOnDisk(STEP_1);
+      const files: ConfigFiles = {
+        ...busyFiles(0),
+        readFile: async (file) => {
+          if (path.basename(file) === "config.json") {
+            throw Object.assign(new Error(BUSY), { code: "EBUSY" });
+          }
+          return await readText(file);
+        },
+      };
+
+      expect((await createStore(files).load()).contents).toBeNull();
+      expect(logger.history).toContain("warn [ConfigStore] Failed to read");
+      expect(logger.history).toContain(BUSY);
+    });
   });
 
   it("returns the problem and logs it when config.json is a folder", async () => {

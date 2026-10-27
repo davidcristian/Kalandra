@@ -175,7 +175,7 @@ The entry, the server and the app services, in `main/src/`:
 
 `host-files/`:
 
-- `ConfigStore.ts`: `ConfigStore` reads and writes `apt-data/config.json` ([config.md](config.md)).
+- `ConfigStore.ts`: `ConfigStore` reads and writes `apt-data/config.json`, in a dev run `config.dev.json` ([config.md](config.md)).
 - `file-uploads.ts`: `addFileUploadRoutes(routes, logger)` adds the `/uploads/` routes, which store files in
   `apt-data/files/`. `POST` stores only a file whose URL path ends in an image extension that Chromium shows in an
   `<img>`, such as `.png` or `.jpg`, in any case, and returns 415 with a `warn [uploads]` log line otherwise. It closes

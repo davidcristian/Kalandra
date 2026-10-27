@@ -12,9 +12,9 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
 - **The game** runs in Windowed Fullscreen or Windowed mode, the modes the
   [download page](../../download.md) lists as supported.
 - **The build under test** is a dev run ([DEVELOPING.md](../../../DEVELOPING.md)) or a packaged
-  build. In a dev run main never writes `config.json` (`ConfigStore` in
-  `main/src/host-files/ConfigStore.ts` returns before writing when `VITE_DEV_SERVER_URL` is set),
-  so a setting changed during the check lasts only for that run.
+  build. A dev run keeps its settings in `config.dev.json` beside `config.json`, which it copies
+  the first time ([DEVELOPING.md](../../../DEVELOPING.md)), so a setting changed during the check
+  does not reach the installed app.
 - **The defaults** below are those of a new config. An existing config keeps its own keys. To check
   the defaults, quit Kalandra, move `%APPDATA%\kalandra\apt-data\config.json` aside and start it
   again. Put the file back afterwards.
