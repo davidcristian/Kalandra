@@ -5,6 +5,7 @@ import * as Data from "./assets/data";
 import { initConfig, AppConfig } from "./web/Config";
 import { connectParserSettings } from "./web/parser-settings";
 import { Host } from "./web/background/IPC";
+import { connectTradeLists } from "./web/background/TradeData";
 import { startApp } from "./web/startup";
 import { convertTextMarks } from "./web/map-check/saved-marks";
 import type { ItemCheckWidget } from "./web/item-check/widget";
@@ -20,6 +21,7 @@ function convertMapCheckMarks() {
 async function start() {
   await initConfig();
   connectParserSettings();
+  connectTradeLists();
   const i18nPlugin = await I18n.init(AppConfig().language);
   await Data.init(AppConfig().language);
   convertMapCheckMarks();

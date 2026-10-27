@@ -14,7 +14,7 @@ import { lineStartsByHash } from "./hash-index";
 import { markItemDataLoaded } from "./loads";
 import { statByRef } from "./stat-by-ref";
 import { type StatMatch, statsByMatcherText } from "./stats-by-matcher";
-import { useTradeData } from "@/web/background/TradeData";
+import { tradeLists } from "./trade-lists";
 import { GEM, ItemCategory } from "@/parser/meta";
 import { ItemRarity } from "@/parser/ParsedItem";
 
@@ -384,10 +384,10 @@ function groupAugments(augmentList: BaseType[]): AugmentGroup<BaseType> {
 }
 
 async function loadTradeData() {
-  const trade = useTradeData();
-  await trade.load(true);
-  if (trade.error.value) {
-    console.error("Failed to load trade data:", trade.error.value);
+  const trade = tradeLists();
+  const error = await trade.load();
+  if (error) {
+    console.error("Failed to load trade data:", error);
     return;
   }
 
@@ -402,7 +402,7 @@ async function loadTradeData() {
   ): BaseType[] | undefined {
     trade.expressInterest();
 
-    const items = trade.tradeItemData.value;
+    const items = trade.items;
 
     let base: BaseType | undefined;
     const { baseType, name, rarity, category } = itemQuery;
@@ -467,13 +467,13 @@ async function loadTradeData() {
   TRADE_STAT_BY_STAT_ID = function (tradeId: string) {
     trade.expressInterest();
 
-    return trade.tradeStatDataSet.value.has(tradeId);
+    return trade.statIds.has(tradeId);
   };
 
   TRADE_STAT_BY_MATCH_STR = function (name: string) {
     trade.expressInterest();
 
-    const statData = trade.tradeStatData.value;
+    const statData = trade.stats;
 
     const stat = statData.get(name);
     if (!stat) return;

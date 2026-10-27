@@ -1,9 +1,9 @@
 # The data loader imports the trade list loader from the web code
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/assets/data/index.ts](../../../../renderer/src/assets/data/index.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 `loadTradeData()` in `renderer/src/assets/data/index.ts` calls `useTradeData()` from
 `renderer/src/web/background/TradeData.ts`, which reads the trade site's item and stat lists through
@@ -26,3 +26,4 @@ or `TradeData.ts` and the code it needs move under `src/assets/data/`. The suite
 - 2026-10-22: Left open when the parser stopped importing web modules. A script that follows the
   imports of `renderer/src` found it as the only import left from the data loader or the parser
   into `src/web/`.
+- 2026-10-27: refactor(renderer): pass the trade lists to the data loader at start

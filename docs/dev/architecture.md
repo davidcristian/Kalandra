@@ -181,12 +181,13 @@ A saved config must survive every update: [the one hard rule](../../AGENTS.md#th
    `data/<lang>/`, which main serves with the page, the English client strings as `CLIENT_STRINGS_REF`, and the
    trade site's stat and item lists through the proxy. A change of language loads the other language's files
    (`loadForLang()`). A file that the server does not return fails the start with the file's name and status.
-4. `renderer/src/main.ts` runs the start steps (the config, the UI text, the game data and the `/events` socket)
-   through `startApp()` in `renderer/src/web/startup.ts`. When one fails, the page logs the error to the console
-   and shows `Kalandra cannot start` with the error and what to do in place of the app. The text is English only,
-   because `app_i18n.json` is one of the files whose load can fail. Only a browser tab shows it: main attaches the
-   overlay window to the game when the page sends `CLIENT->MAIN::update-host-config`, which a failed start never
-   sends.
+4. `renderer/src/main.ts` runs the start steps through `startApp()` in `renderer/src/web/startup.ts`: the config;
+   `connectParserSettings()` and `connectTradeLists()`, which pass the parser its settings and the data loader the
+   trade site's lists, since neither imports `src/web/`; the UI text; the game data; and the `/events` socket. When
+   one fails, the page logs the error to the console and shows `Kalandra cannot start` with the error and what to
+   do in place of the app. The text is English only, because `app_i18n.json` is one of the files whose load can
+   fail. Only a browser tab shows it: main attaches the overlay window to the game when the page sends
+   `CLIENT->MAIN::update-host-config`, which a failed start never sends.
 
 ## CI
 

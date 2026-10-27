@@ -2,6 +2,7 @@ import { readonly, shallowRef } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { Host } from "@/web/background/IPC";
 import { readTradeData } from "@/web/price-check/trade/trade-response";
+import { setTradeLists } from "@/assets/data/trade-lists";
 
 const RETRY_INTERVAL_MS = 30 * 60 * 1000;
 const UPDATE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -197,3 +198,26 @@ export const useTradeData = createGlobalState(() => {
     load,
   };
 });
+
+/** Makes the data loader read the current trade lists of `useTradeData` at each use. */
+export function connectTradeLists() {
+  setTradeLists({
+    async load() {
+      const trade = useTradeData();
+      await trade.load(true);
+      return trade.error.value;
+    },
+    expressInterest() {
+      useTradeData().expressInterest();
+    },
+    get items() {
+      return useTradeData().tradeItemData.value;
+    },
+    get stats() {
+      return useTradeData().tradeStatData.value;
+    },
+    get statIds() {
+      return useTradeData().tradeStatDataSet.value;
+    },
+  });
+}

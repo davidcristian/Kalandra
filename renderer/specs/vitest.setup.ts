@@ -4,6 +4,7 @@ import path from "path";
 import { Config, TipsFrequency } from "@/web/Config";
 import type { Widget } from "@/web/overlay/widgets";
 import { connectParserSettings } from "@/web/parser-settings";
+import { connectTradeLists } from "@/web/background/TradeData";
 
 vi.mock("@/web/Config", async () => {
   return {
@@ -27,6 +28,7 @@ vi.mock("@/web/Config", async () => {
 });
 let mockConfig: Config;
 connectParserSettings();
+connectTradeLists();
 export const setupClientStringLoaderMock = () => {
   vi.mock("@/assets/client-string-loader", () => ({
     loadClientStrings: vi.fn(async (lang) => {

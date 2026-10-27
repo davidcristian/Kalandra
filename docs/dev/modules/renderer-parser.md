@@ -79,10 +79,11 @@ for a key a language lacks, and the `:` keys of `useI18nNs(name)`, which read `n
   whole number of months and a `style` from 1 to 5, the tiers the Settings window shows.
 - `loadForLang(lang)` loads `CLIENT_STRINGS` from `data/<lang>/client_strings.js` (through
   `client-string-loader.ts`), the items and the stats, builds the rune, soul core and catalyst lookups
-  (`loadUltraLateItems`), and loads the trade site's item and stat lists through `useTradeData()` in
-  `web/background/TradeData.ts`. After the lookups it calls `markItemDataLoaded()` from `loads.ts`. The module
-  variables are not reactive, so code that builds lists from them uses `cachePerDataLoad(build)` from `loads.ts`:
-  it builds each key's value once per load, and a computed that calls it runs again after the next load.
+  (`loadUltraLateItems`), and downloads the trade site's item and stat lists through `tradeLists()` in
+  `trade-lists.ts`. A failed download is logged with `console.error` and keeps the trade lookups as they were.
+  After the lookups it calls `markItemDataLoaded()` from `loads.ts`. The module variables are not reactive, so code
+  that builds lists from them uses `cachePerDataLoad(build)` from `loads.ts`: it builds each key's value once per
+  load, and a computed that calls it runs again after the next load.
 - Lookups: `ITEM_BY_REF(namespace, refName)` and `ITEM_BY_TRANSLATED(namespace, name)` return `BaseType[]`, where
   the namespace is `ITEM`, `GEM`, `UNIQUE`, `DIVINATION_CARD` or `CAPTURED_BEAST`; `STAT_BY_REF(ref)` returns the
   `Stat` with that ref or `undefined`; `STAT_BY_MATCH_STR(text)` returns every `Stat` with a `StatMatcher` whose
@@ -161,8 +162,10 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
 and the price check's `savedAugments` in `augment-builder.ts`. At start, `connectParserSettings()` in
 `web/parser-settings.ts` makes both read the current config at each use, and `parserSettings()` throws before that.
 The data loader imports from the parser only `meta.ts` and `ParsedItem.ts`, which import no other parser file at
-runtime. It reads the trade site lists through the proxy with `useTradeData()` from `web/background/TradeData.ts`
-([renderer-price-check.md](renderer-price-check.md), [080](../refinements/tasks/080-data-loader-imports-trade-data.md)).
+runtime, and imports no module under `src/web/`. It reads the trade site lists through `tradeLists()` in
+`assets/data/trade-lists.ts`. At start, `connectTradeLists()` in `web/background/TradeData.ts` passes the data
+loader the lists that `useTradeData()` downloads through the proxy, which each lookup reads again
+([renderer-price-check.md](renderer-price-check.md)), and `tradeLists()` throws before that.
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
 the floor in `renderer/vitest.config.ts` (85.0% of the lines of the `.ts` files in `src/` on 26 Oct 2026). The parser
@@ -173,9 +176,9 @@ would replace them. `specs/Parser/whole-item.test.ts` parses whole items, such a
 corrupted ones and a waystone, and compares their properties, modifier counts and runes with their `TestItem`. The suites in `specs/data/` cover the loader and its lookups, and
 `specs/data/fetchData.test.ts` a data file that the server does not return.
 [specs/vitest.setup.ts](../../../renderer/specs/vitest.setup.ts) is the Vitest setup file. It replaces `@/web/Config`
-with a mock config, connects the parser settings to it, and replaces `Host` with a mock whose `proxy` returns the
-trade site's `data/stats` and `data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no
-test reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
+with a mock config, connects the parser settings to it, connects the data loader to the trade lists of
+`useTradeData()`, and replaces `Host` with a mock whose `proxy` returns the trade site's `data/stats` and
+`data/items` responses from `specs/data/stats.json` and `specs/data/items.json`, so no test reaches the trade site. A suite calls its `setupTests()`, which fills the mock config from `defaultConfigMock`
 and makes `fetch` read files from `renderer/public/`. `vitest.config.ts` adds the Vue plugin, so a test can import
 a `.vue` component, and keeps a template URL such as `/images/divine.png` a string. A parser fix adds the copied
 item text as a case (AGENTS.md, rule 5).
