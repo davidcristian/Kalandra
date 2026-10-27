@@ -320,7 +320,6 @@ export default defineComponent({
     const showUnknownMods = computed(
       () =>
         props.item.unknownModifiers.length &&
-        props.item.category !== ItemCategory.Sentinel &&
         !(
           props.item.category === ItemCategory.Map &&
           props.item.rarity === ItemRarity.Unique
@@ -369,10 +368,7 @@ export default defineComponent({
         ctx.emit("preset", id);
       },
       hiddenLabel: computed(() => {
-        if (
-          props.item.category === ItemCategory.Map ||
-          props.item.category === ItemCategory.Waystone
-        ) {
+        if (props.item.category === ItemCategory.Map) {
           return t("filters.hidden_explicit_toggle");
         } else {
           return t("filters.hidden_toggle");

@@ -47,7 +47,6 @@ export function hasCraftingValue(item: ParsedItem) {
     (item.isSynthesised ||
       item.isFractured ||
       item.influences.length ||
-      item.category === ItemCategory.ClusterJewel ||
       (item.category === ItemCategory.Jewel &&
         item.rarity === ItemRarity.Magic) ||
       (itemLevelCap !== 1 && item.itemLevel! >= itemLevelCap - 15) ||

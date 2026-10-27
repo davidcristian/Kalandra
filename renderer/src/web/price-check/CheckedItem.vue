@@ -180,8 +180,6 @@ export default defineComponent({
         } else {
           doSearch.value = Boolean(
             item.rarity === ItemRarity.Unique ||
-              item.category === ItemCategory.HeistBlueprint ||
-              item.category === ItemCategory.SanctumRelic ||
               item.category === ItemCategory.Charm ||
               !CATEGORY_TO_TRADE_ID.has(item.category!) ||
               item.isUnidentified ||

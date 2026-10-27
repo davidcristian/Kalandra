@@ -351,7 +351,7 @@
   },
   "src/web/price-check/filters/create-item-filters.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 12
+      "count": 11
     }
   },
   "src/web/price-check/filters/create-stat-filters.ts": {

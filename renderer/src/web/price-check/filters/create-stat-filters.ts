@@ -44,7 +44,7 @@ export function createExactStatFilters(
     searchInRange = 0;
   }
 
-  if (item.mapBlighted || item.category === ItemCategory.Invitation) return [];
+  if (item.mapBlighted) return [];
   if (
     item.isUnidentified &&
     item.rarity === ItemRarity.Unique &&
@@ -69,11 +69,7 @@ export function createExactStatFilters(
     ModifierType.Skill,
   ];
 
-  if (
-    !item.influences.length &&
-    !item.isFractured &&
-    item.category !== ItemCategory.Tincture
-  ) {
+  if (!item.influences.length && !item.isFractured) {
     keepByType.push(ModifierType.Implicit);
   }
 
@@ -81,11 +77,7 @@ export function createExactStatFilters(
     (item.rarity === ItemRarity.Magic ||
       (item.rarity === ItemRarity.Rare &&
         explicitModifierCount(item).total < 5)) &&
-    item.category !== ItemCategory.ClusterJewel &&
-    item.category !== ItemCategory.Map &&
-    item.category !== ItemCategory.HeistContract &&
-    item.category !== ItemCategory.HeistBlueprint &&
-    item.category !== ItemCategory.Sentinel
+    item.category !== ItemCategory.Map
   ) {
     keepByType.push(ModifierType.Explicit);
   }
@@ -181,13 +173,9 @@ export function createExactStatFilters(
     });
   }
 
-  if (item.category === ItemCategory.ClusterJewel) {
-    applyClusterJewelRules(ctx.filters);
-  } else if (item.category === ItemCategory.Flask) {
+  if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters);
   } else if (
-    item.category === ItemCategory.MemoryLine ||
-    item.category === ItemCategory.SanctumRelic ||
     item.category === ItemCategory.Charm ||
     item.category === ItemCategory.Relic
   ) {
@@ -577,12 +565,7 @@ function filterAdjustmentForNegate(roll: NonNullable<StatFilter["roll"]>) {
 export function finalFilterTweaks(ctx: FiltersCreationContext) {
   const { item } = ctx;
 
-  if (
-    item.category === ItemCategory.ClusterJewel &&
-    item.rarity !== ItemRarity.Unique
-  ) {
-    applyClusterJewelRules(ctx.filters);
-  } else if (item.category === ItemCategory.Flask) {
+  if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters);
   }
 
@@ -724,31 +707,6 @@ function hasModNamed(sources: StatFilter["sources"], names: string[]) {
   );
 }
 
-function applyClusterJewelRules(filters: StatFilter[]) {
-  for (const filter of filters) {
-    if (filter.statRef === "# Added Passive Skills are Jewel Sockets") {
-      filter.hidden = "filters.hide_const_roll";
-      filter.disabled = true;
-    }
-
-    // https://www.poewiki.net/wiki/Cluster_Jewel#Optimal_passive_skill_amounts
-    if (filter.statRef === "Adds # Passive Skills") {
-      filter.disabled = false;
-
-      const roll = filter.roll;
-      if (roll?.value === 4) {
-        roll.max = 5;
-      } else if (roll?.value === 5) {
-        roll.min = roll.default.min;
-      } else if (roll && [3, 6, 10, 11, 12].includes(roll.value)) {
-        roll.min = roll.default.min;
-        roll.max = undefined;
-      }
-      // Other values keep the range that calculatedStatToFilter set
-    }
-  }
-}
-
 function applyFlaskRules(filters: StatFilter[]) {
   for (const filter of filters) {
     if (filter.tag === FilterTag.Enchant) {
@@ -848,7 +806,6 @@ function itemBaseMaxModifiersOfType(
         case ItemCategory.Jewel:
         case ItemCategory.Tablet:
         case ItemCategory.Relic:
-        case ItemCategory.SanctumRelic:
           base = 2;
           break;
         default:

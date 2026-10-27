@@ -16,9 +16,8 @@ that the route needs ([main.md](main.md)).
 - [PriceCheckWindow.vue](../../../renderer/src/web/price-check/PriceCheckWindow.vue) is the widget: wmType
   `price-check`, one instance, `exclusive` z-order, flags `hide-on-blur` and `menu::skip`
   ([renderer-widgets.md](renderer-widgets.md)). It handles `MAIN->CLIENT::item-text` with target `price-check`.
-  It parses the text with `parseClipboard` unless the event has a ready `item`, as the item search widget sends,
-  and returns `item.unknown` for a heist contract or a sentinel that is not unique. When the item is valid, it
-  calls `queuePricesFetch()`.
+  It parses the text with `parseClipboard` unless the event has a ready `item`, as the item search widget sends.
+  When the item is valid, it calls `queuePricesFetch()`.
 - Its two hotkeys are in `initInstance`: `hotkeyHold` plus `hotkey`, `Ctrl` and `D` by default ("Auto-hide
   Mode"), and `hotkeyLocked`, `Ctrl + Alt + D` by default ("Open without auto-hide"). `shortcutActions()` sends
   both to main as `copy-item` actions with target `price-check`, the second with `focusOverlay: true`
@@ -32,7 +31,7 @@ that the route needs ([main.md](main.md)).
   size filter, it returns `bulk` when that filter is enabled. Otherwise it returns `bulk` for an item with a
   `tradeTag` and `trade` for the rest. The window searches at once when "Perform an auto search, when pressing"
   is on for the key used (`smartInitialSearch`, `lockedInitialSearch`) and the item is unique, unidentified,
-  veiled, a heist blueprint, a sanctum relic, a charm, or of a category not in `CATEGORY_TO_TRADE_ID`.
+  veiled, a charm, or of a category not in `CATEGORY_TO_TRADE_ID`, such as a relic.
   Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
   the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
   ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).

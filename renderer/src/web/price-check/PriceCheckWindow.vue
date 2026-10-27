@@ -139,7 +139,7 @@ import {
   provide,
   ref,
 } from "vue";
-import { Result, ok, err } from "neverthrow";
+import { Result, ok } from "neverthrow";
 import { useI18n } from "vue-i18n";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 import UiPopover from "@/web/ui/Popover.vue";
@@ -149,7 +149,7 @@ import { MainProcess, Host } from "@/web/background/IPC";
 import { usePoeninja } from "../background/Prices";
 import { useLeagues } from "@/web/background/Leagues";
 import { AppConfig } from "@/web/Config";
-import { ItemCategory, ItemRarity, parseClipboard, ParsedItem } from "@/parser";
+import { parseClipboard, ParsedItem } from "@/parser";
 import RelatedItems from "./related-items/RelatedItems.vue";
 import RateLimiterState from "./trade/RateLimiterState.vue";
 import UnidentifiedResolver from "./unidentified-resolver/UnidentifiedResolver.vue";
@@ -300,32 +300,25 @@ export default defineComponent({
     });
 
     function handleItemPaste(e: { clipboard: string; item: ParsedItem }) {
-      const newItem = (e.item ? ok(e.item) : parseClipboard(e.clipboard))
-        .andThen((item) =>
-          (item.category === ItemCategory.HeistContract &&
-            item.rarity !== ItemRarity.Unique) ||
-          (item.category === ItemCategory.Sentinel &&
-            item.rarity !== ItemRarity.Unique)
-            ? err("item.unknown")
-            : ok(item),
-        )
-        .mapErr((err) => {
-          if (err.startsWith("item.wrong_language")) {
-            const [errName, gameLang, eeLang] = err.split("|");
-            return {
-              name: `${errName}`,
-              message: `${errName}_help`,
-              rawText: e.clipboard,
-              format: [gameLang, eeLang],
-            };
-          }
-
+      const newItem = (
+        e.item ? ok(e.item) : parseClipboard(e.clipboard)
+      ).mapErr((err) => {
+        if (err.startsWith("item.wrong_language")) {
+          const [errName, gameLang, eeLang] = err.split("|");
           return {
-            name: `${err}`,
-            message: `${err}_help`,
+            name: `${errName}`,
+            message: `${errName}_help`,
             rawText: e.clipboard,
+            format: [gameLang, eeLang],
           };
-        });
+        }
+
+        return {
+          name: `${err}`,
+          message: `${err}_help`,
+          rawText: e.clipboard,
+        };
+      });
       return newItem;
     }
 

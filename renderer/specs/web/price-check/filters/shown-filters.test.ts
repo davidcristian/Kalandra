@@ -12,15 +12,10 @@ interface Toggle {
 
 const ITEMS: Array<[string, Partial<ParsedItem>]> = [
   [
-    "a sentinel with a charge",
-    { category: ItemCategory.Sentinel, sentinelCharge: 3 },
-  ],
-  [
-    "a heist blueprint with revealed wings",
+    "an Expedition Logbook with an area level",
     {
-      category: ItemCategory.HeistBlueprint,
+      info: { ...createTestItem().info, refName: "Expedition Logbook" },
       areaLevel: 83,
-      heist: { wingsRevealed: 2 },
     },
   ],
   [

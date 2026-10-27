@@ -94,11 +94,7 @@ function forUniqueItem(item: ParsedItem) {
   return {
     ns: item.info.namespace,
     name: item.info.refName,
-    variant: variant([
-      item.category === ItemCategory.SanctumRelic
-        ? "Relic"
-        : item.info.unique.base,
-    ]),
+    variant: variant([item.info.unique.base]),
   };
 }
 

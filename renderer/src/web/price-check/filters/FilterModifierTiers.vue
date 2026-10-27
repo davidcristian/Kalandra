@@ -52,9 +52,7 @@ export default defineComponent({
             filter.tag === FilterTag.Crafted ||
             filter.tag === FilterTag.Pseudo ||
             filter.tag === FilterTag.Property) &&
-          item.category !== ItemCategory.Jewel &&
-          item.category !== ItemCategory.ClusterJewel &&
-          item.category !== ItemCategory.MemoryLine
+          item.category !== ItemCategory.Jewel
         ) {
           if (tier === 1) out.push({ type: "tier-1", tier });
           else if (tier === 2) out.push({ type: "tier-2", tier });

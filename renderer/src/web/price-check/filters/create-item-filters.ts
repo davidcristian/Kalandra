@@ -10,7 +10,6 @@ import { maxUsefulItemLevel, uniqueBaseTradeName } from "./common";
 const CATEGORIES_WITH_USEFUL_QUALITY = new Set([
   ItemCategory.Flask,
   ItemCategory.Charm,
-  ItemCategory.Tincture,
   ...WEAPON,
   ...ARMOUR,
 ]);
@@ -74,13 +73,6 @@ export function createFilters(
       ),
     };
   }
-  if (item.category === ItemCategory.Invitation) {
-    filters.searchExact = {
-      baseType: item.info.name,
-      baseTypeTrade: t(opts, item.info),
-    };
-    return filters;
-  }
   if (item.category === ItemCategory.MetamorphSample) {
     filters.searchExact = {
       baseType: item.info.name,
@@ -134,20 +126,6 @@ export function createFilters(
       value: item.areaLevel!,
       disabled: false,
     };
-  } else if (item.category === ItemCategory.HeistBlueprint) {
-    filters.searchRelaxed = {
-      category: item.category,
-      disabled: true,
-    };
-    filters.searchExact = {
-      baseType: item.info.name,
-      baseTypeTrade: t(opts, item.info),
-    };
-
-    filters.areaLevel = {
-      value: item.areaLevel!,
-      disabled: false,
-    };
   } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
     filters.searchExact = {
       name: item.info.name,
@@ -160,18 +138,9 @@ export function createFilters(
       baseTypeTrade: t(opts, item.info),
     };
     if (item.category && CATEGORY_TO_TRADE_ID.has(item.category)) {
-      let disabled = opts.exact;
-      if (item.category === ItemCategory.ClusterJewel) {
-        disabled = true;
-      } else if (
-        item.category === ItemCategory.SanctumRelic ||
-        item.category === ItemCategory.Charm
-      ) {
-        disabled = false;
-      }
       filters.searchRelaxed = {
         category: item.category,
-        disabled,
+        disabled: item.category !== ItemCategory.Charm && opts.exact,
       };
     }
   }
@@ -230,8 +199,7 @@ export function createFilters(
   const forAdornedJewel =
     item.rarity === ItemRarity.Magic &&
     // item.isCorrupted is left out, so the buyer can corrupt the jewel
-    (item.category === ItemCategory.Jewel ||
-      item.category === ItemCategory.AbyssJewel);
+    item.category === ItemCategory.Jewel;
 
   if (
     !item.isUnmodifiable &&
@@ -301,26 +269,15 @@ export function createFilters(
       maxUsefulItemLevel(item.category) !== 1 &&
       item.rarity !== ItemRarity.Unique &&
       item.category !== ItemCategory.Map &&
-      item.category !== ItemCategory.HeistBlueprint &&
-      item.category !== ItemCategory.HeistContract &&
-      item.category !== ItemCategory.MemoryLine &&
       item.info.refName !== "Expedition Logbook"
     ) {
-      if (item.category === ItemCategory.ClusterJewel) {
-        filters.itemLevel = {
-          value: floorToBracket(item.itemLevel, [1, 50, 68, 75, 84]),
-          max: ceilToBracket(item.itemLevel, [100, 74, 67, 49]),
-          disabled: !opts.exact,
-        };
-      } else {
-        filters.itemLevel = {
-          value: Math.min(item.itemLevel, maxUsefulItemLevel(item.category)),
-          disabled:
-            !opts.exact ||
-            item.category === ItemCategory.Flask ||
-            item.category === ItemCategory.Charm,
-        };
-      }
+      filters.itemLevel = {
+        value: Math.min(item.itemLevel, maxUsefulItemLevel(item.category)),
+        disabled:
+          !opts.exact ||
+          item.category === ItemCategory.Flask ||
+          item.category === ItemCategory.Charm,
+      };
     }
   }
 
@@ -511,28 +468,4 @@ export function ascendancyPointsByAreaLevel(
 
 function t(opts: CreateOptions, info: BaseType) {
   return opts.useEn ? info.refName : info.name;
-}
-
-export function floorToBracket(value: number, brackets: readonly number[]) {
-  let prev = brackets[0];
-  for (const num of brackets) {
-    if (num > value) {
-      return prev;
-    } else {
-      prev = num;
-    }
-  }
-  return prev;
-}
-
-function ceilToBracket(value: number, brackets: readonly number[]) {
-  let prev = brackets[0];
-  for (const num of brackets) {
-    if (num < value) {
-      return prev;
-    } else {
-      prev = num;
-    }
-  }
-  return prev;
 }
