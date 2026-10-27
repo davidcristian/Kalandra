@@ -1029,6 +1029,15 @@ def test_add_trade_inverted_marks_inverted_correctly():
     )
 
 
+def test_add_trade_inverted_inverts_the_less_damage_of_flesh_crucible():
+    service = NdBuilderService("en", "noLookup")
+    df = pd.DataFrame([{"ref": "#% less Damage", "trade": {}, "hash": [1274947822]}])
+
+    result = service.add_trade_inverted(df)
+
+    assert result.at[0, "trade"] == {"inverted": True}
+
+
 def test_join_trade_and_descriptions_merges_and_groups_correctly():
     service = NdBuilderService("ru", "new")
     trade_stats_df = pd.DataFrame(
