@@ -1,6 +1,6 @@
 # dataParser's inputs and image cache are neither committed nor ignored
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/services/image_provider.py](../../../../dataParser/src/services/image_provider.py)
 **Verified:** 2026-10-27
@@ -34,3 +34,5 @@ the cache stays outside the repo, the cache. The `.gitkeep` files stay tracked.
 - 2026-10-27: The maintainer chose to keep the cache local to each machine. Left:
   `dataParser/.gitignore` ignores the cache, its backup, the game export and the trade data and
   keeps the `.gitkeep` files, and the game data update runbook says the cache is local.
+- 2026-10-27: chore(dataparser): ignore the inputs and image cache a run writes. The
+  game data update runbook says the cache is local to each machine.

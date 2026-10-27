@@ -24,8 +24,10 @@ This repo installs nothing below; each item names the file that expects it.
 - Node.js on the PATH, for `npx` in step 1 and for `cloudscraper` in `src/providers/trade_api.py`.
 - Python 3.12 and the packages in `dataParser/requirements.txt`, installed into `dataParser/.venv` as
   [dataparser.md](../modules/dataparser.md#setup) says. The steps below write `python` for that Python.
-- The item image cache `dataParser/src/services/itemImageCache.json` from the last run. Without it, every icon that
-  the trade site's `static.json` does not give becomes `%NOT_FOUND%`.
+- The item image cache `dataParser/src/services/itemImageCache.json` from this machine's last run. The cache is local
+  to each machine: the repo has no copy, and git ignores it and its backup `itemImageCache.old.json` next to it.
+  Without it, a `noLookup` run writes `%NOT_FOUND%` as the icon of every item that the trade site's `static.json`
+  has no image for.
 
 ## Before the run
 
@@ -51,7 +53,8 @@ On 18 Oct 2026 the last two print 445 and 16.
    npx -y pathofexile-dat@16.0.0
    ```
 
-   It writes `tables/<Language>/<Table>.json` and `files/data@StatDescriptions@<name>.csd` there.
+   It writes `tables/<Language>/<Table>.json` and `files/data@StatDescriptions@<name>.csd` there, which git
+   ignores. It first deletes the `files/` folder, so `git checkout -- files/.gitkeep` puts that tracked file back.
 
 2. **Pull the trade data** (ask first). From `dataParser/`:
 
@@ -128,8 +131,8 @@ On 18 Oct 2026 the last two print 445 and 16.
 
 9. **Commit** the data update as its own commit with the `data` scope, apart from any code change
    ([AGENTS.md](../../../AGENTS.md), Commits). It contains the changed files under `renderer/public/data/` and under
-   `dataParser/output/`, which `--push` made identical. The inputs in `dataParser/data/` and the image cache are not
-   committed.
+   `dataParser/output/`, which `--push` made identical. `dataParser/.gitignore` ignores the inputs in
+   `dataParser/data/` and the image cache, so they are not committed.
 
 ## When it fails
 

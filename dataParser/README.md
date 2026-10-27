@@ -42,6 +42,9 @@ that path.
 python ./src/main.py
 ```
 
+Each run reads and saves the item image cache `src/services/itemImageCache.json`, which is local to each machine.
+Git ignores the cache, the game export in `data/vendor/` and the trade data in `data/json/`.
+
 `--help` lists every option. An `--image-mode` other than `noLookup` sends a trade search and a fetch for each item
 it looks up, and waits for the trade site's rate limits between them, so a run is slow and network heavy. `--pull` also
 sends requests to the trade sites. Ask the maintainer before running either.

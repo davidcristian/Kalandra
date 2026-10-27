@@ -176,3 +176,14 @@ cython_debug/
 
 test_files_dump/
 typings/
+
+# What a run writes: the game export, the trade data and the item image cache, which stays on each
+# machine. The .gitkeep files keep the empty folders in git.
+/data/vendor/tables/*
+!/data/vendor/tables/.gitkeep
+/data/vendor/files/*
+!/data/vendor/files/.gitkeep
+/data/json/*/*
+!/data/json/*/.gitkeep
+/src/services/itemImageCache.json
+/src/services/itemImageCache.old.json

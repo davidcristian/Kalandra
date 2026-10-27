@@ -50,15 +50,15 @@ these styles.
 
 ## Inputs
 
-None of these is committed: git has only `data/vendor/config.json` and `.gitkeep` files that keep the empty folders.
-No `.gitignore` entry covers them either, so `git status` lists them after a run.
+None of these is committed, and `dataParser/.gitignore` ignores them, so `git status` does not list them after a run.
+Git has only `data/vendor/config.json` and the `.gitkeep` files that keep the empty folders.
 
 | Path | Contents | Written by |
 | --- | --- | --- |
 | `data/vendor/tables/<Language>/<Table>.json` | one JSON file per game table and language; the folder is the language's name in `translations` (`English`, `Traditional Chinese`) | the game export |
 | `data/vendor/files/data@StatDescriptions@<name>.csd` | the game's stat description files, the templates for mod text, UTF-16 with every language in one file | the game export |
 | `data/json/<lang>/{filters,stats,items,static}.json` | the trade site's `/api/trade2/data/` endpoints, one set per language | `--pull` |
-| `src/services/itemImageCache.json` | item icon URLs found by earlier image lookups | every build: `ImageProvider` creates it empty when it is missing and saves it after it sets the icons |
+| `src/services/itemImageCache.json` | item icon URLs found by earlier image lookups on this machine | every build: `ImageProvider` creates it empty when it is missing and saves it after it sets the icons |
 
 **The game export.** The export tool is the npm package `pathofexile-dat` from
 [SnosMe/poe-dat-viewer](https://github.com/SnosMe/poe-dat-viewer). Version 16.0.0 exported the current game on
@@ -131,8 +131,8 @@ Only the English build uses `--image-mode`. The other languages use `noLookup` a
 saved. Each run copies the cache to `src/services/itemImageCache.old.json` once, before the English build, so the
 copy keeps the cache from before the run's lookups. Where the trade site's `static.json` has an image for an item,
 that image replaces the icon (`src/services/static_items.py`). An entry without an image, such as a list separator,
-leaves the item's icon unchanged. The cache is not in this repo, so a `noLookup` run without it writes `%NOT_FOUND%`
-for every other icon.
+leaves the item's icon unchanged. The cache and its backup are local to each machine, and git ignores both, so a
+`noLookup` run without the cache writes `%NOT_FOUND%` for every other icon.
 
 ## Outputs
 
