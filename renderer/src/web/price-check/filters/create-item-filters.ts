@@ -75,10 +75,9 @@ export function createFilters(
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info),
     };
-    filters.itemLevel = {
-      value: item.itemLevel!,
-      disabled: false,
-    };
+    if (item.itemLevel !== undefined) {
+      filters.itemLevel = { value: item.itemLevel, disabled: false };
+    }
     return filters;
   }
   if (
@@ -110,19 +109,17 @@ export function createFilters(
       };
     }
 
-    filters.mapTier = {
-      value: item.mapTier!,
-      disabled: false,
-    };
+    if (item.mapTier !== undefined) {
+      filters.mapTier = { value: item.mapTier, disabled: false };
+    }
   } else if (item.info.refName === "Expedition Logbook") {
     filters.searchExact = {
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info),
     };
-    filters.areaLevel = {
-      value: item.areaLevel!,
-      disabled: false,
-    };
+    if (item.areaLevel !== undefined) {
+      filters.areaLevel = { value: item.areaLevel, disabled: false };
+    }
   } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
     filters.searchExact = {
       name: item.info.name,
@@ -341,10 +338,9 @@ function createGemFilters(
     };
   }
 
-  filters.gemLevel = {
-    value: item.gemLevel!,
-    disabled: item.gemLevel! < 19,
-  };
+  if (item.gemLevel !== undefined) {
+    filters.gemLevel = { value: item.gemLevel, disabled: item.gemLevel < 19 };
+  }
 
   return filters;
 }
@@ -359,17 +355,13 @@ export function createTrialsFilters(
     baseType: item.info.name,
     baseTypeTrade: t(opts, item.info),
   };
-  const fixedAreaLevel = ascendancyPointsByAreaLevel(refName, item.areaLevel!);
-
-  filters.awardedAscendancyPoints = {
-    value: fixedAreaLevel,
-    disabled: false,
-  };
-
-  filters.areaLevel = {
-    value: item.areaLevel!,
-    disabled: false,
-  };
+  if (item.areaLevel !== undefined) {
+    filters.awardedAscendancyPoints = {
+      value: ascendancyPointsByAreaLevel(refName, item.areaLevel),
+      disabled: false,
+    };
+    filters.areaLevel = { value: item.areaLevel, disabled: false };
+  }
 
   if (refName === "Inscribed Ultimatum" && item.trials?.ultimatumHint) {
     filters.ultimatumHint = {

@@ -16,7 +16,7 @@
 432 renderer/src/web/price-check/PriceCheckWindow.vue
 604 renderer/src/web/price-check/filters/FilterModifier.vue
 434 renderer/src/web/price-check/filters/FiltersBlock.vue
-444 renderer/src/web/price-check/filters/create-item-filters.ts
+436 renderer/src/web/price-check/filters/create-item-filters.ts
 850 renderer/src/web/price-check/filters/create-stat-filters.ts
 457 renderer/src/web/price-check/filters/pseudo/index.ts
 691 renderer/src/web/price-check/filters/pseudo/item-property.ts

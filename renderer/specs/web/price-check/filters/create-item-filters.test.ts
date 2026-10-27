@@ -1,3 +1,4 @@
+import { ItemCategory } from "@/parser/meta";
 import { ItemRarity, ParsedItem } from "@/parser/ParsedItem";
 import {
   areaLevelByAscendancyPoints,
@@ -135,4 +136,29 @@ describe("Ascendancy Points calcs", () => {
       expect(res).toBe(expected);
     },
   );
+});
+
+describe("filters of a value the item text did not have", () => {
+  it("leave out the level of a gem without a level", () => {
+    const gem: ParsedItem = { ...createTestItem(), category: ItemCategory.Gem };
+
+    expect(createFilters(gem, createTestCreateOptions()).gemLevel).toBe(
+      undefined,
+    );
+    expect(
+      createFilters({ ...gem, gemLevel: 20 }, createTestCreateOptions())
+        .gemLevel,
+    ).toEqual({ value: 20, disabled: false });
+  });
+
+  it("leave out the tier of a map without a tier", () => {
+    const map: ParsedItem = { ...createTestItem(), category: ItemCategory.Map };
+
+    expect(createFilters(map, createTestCreateOptions()).mapTier).toBe(
+      undefined,
+    );
+    expect(
+      createFilters({ ...map, mapTier: 15 }, createTestCreateOptions()).mapTier,
+    ).toEqual({ value: 15, disabled: false });
+  });
 });
