@@ -84,12 +84,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("VOIDSTONE_HELP", ["PrimordialWatchstoneDescriptionText"]),
     ClientString("CANNOT_USE_ITEM", ["ItemPopupCannotUseItem"]),
     ClientString("AREA_LEVEL", ["ItemDisplayHeistContractLevel"], "{0}: "),
-    ClientString("HEIST_WINGS_REVEALED", ["ItemDisplayHeistBlueprintWings"], "{0}: "),
-    ClientString("HEIST_TARGET", ["ItemDisplayHeistContractObjective"]),
-    ClientString("HEIST_BLUEPRINT_ENCHANTS", ["HeistBlueprintRewardBunker"]),
-    ClientString("HEIST_BLUEPRINT_TRINKETS", ["HeistBlueprintRewardMines"]),
-    ClientString("HEIST_BLUEPRINT_GEMS", ["HeistBlueprintRewardReliquary"]),
-    ClientString("HEIST_BLUEPRINT_REPLICAS", ["HeistBlueprintRewardLibrary"]),
     ClientString("MIRRORED", ["ItemPopupMirrored"]),
     ClientString(
         "PREFIX_MODIFIER",
@@ -138,7 +132,6 @@ CLIENT_STRING_KEY_VALUES: Sequence[BaseClientString] = [
     ClientString("ELDRITCH_MOD_R4", ["EldritchCurrencyTier4"]),
     ClientString("ELDRITCH_MOD_R5", ["EldritchCurrencyTier5"]),
     ClientString("ELDRITCH_MOD_R6", ["EldritchCurrencyTier6"]),
-    ClientString("SENTINEL_CHARGE", ["ItemDisplaySentinelDroneDurability"], "{0}: "),
     ClientString(
         "FOIL_UNIQUE",
         ["ItemPopupFoilUniqueVariant"],

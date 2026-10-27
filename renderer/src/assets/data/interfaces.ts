@@ -142,12 +142,6 @@ export interface TranslationDict {
   METAMORPH_LIVER: RegExp;
   CANNOT_USE_ITEM: string;
   AREA_LEVEL: string;
-  HEIST_WINGS_REVEALED: string;
-  HEIST_TARGET: string;
-  HEIST_BLUEPRINT_ENCHANTS: string;
-  HEIST_BLUEPRINT_TRINKETS: string;
-  HEIST_BLUEPRINT_GEMS: string;
-  HEIST_BLUEPRINT_REPLICAS: string;
   MIRRORED: string;
   MODIFIER_LINE: RegExp;
   PREFIX_MODIFIER: string;
@@ -166,7 +160,6 @@ export interface TranslationDict {
   ELDRITCH_MOD_R4: string;
   ELDRITCH_MOD_R5: string;
   ELDRITCH_MOD_R6: string;
-  SENTINEL_CHARGE: string;
   DELVE_MODS: string[];
   VEILED_MODS: string[];
   INCURSION_MODS: string[];
