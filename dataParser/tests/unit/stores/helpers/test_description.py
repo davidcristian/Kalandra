@@ -165,6 +165,32 @@ def test_parse_description_returns_correct_length_different_lang(
     assert len(parsed["matchers"]) == expected_count
 
 
+FACEBREAKER = '''5 local_unique_facebreaker_minimum_base_damage local_unique_facebreaker_maximum_base_damage local_unique_facebreaker_minimum_base_damage_per_broken_face local_unique_facebreaker_maximum_base_damage_per_broken_face local_unique_facebreaker_damage_is_fire
+2
+# # # # 0 "Has {0} to {1} [Physical|Physical] damage, {2:+d} to {3:+d} per [BrokenFace|Boss's Face Broken]"
+# # # # 1 "Has {0} to {1} [Fire|Fire] damage, {2:+d} to {3:+d} per [BrokenFace|Boss's Face Broken]"
+lang "German"
+2
+# # # # 0 "Verursacht {0} bis {1} [Physical|physischen] Schaden, {2:+d} bis {3:+d} pro [BrokenFace|zerbrochenem Gesicht des Bosses]"
+# # # # 1 "Verursacht {0} bis {1} [Fire|Feuer]schaden, {2:+d} bis {3:+d} pro [BrokenFace|zerbrochenem Gesicht des Bosses]"'''
+
+
+@pytest.mark.parametrize("lang", ["en", "de"])
+def test_parse_description_gives_facebreaker_damage_decimals(lang):
+    parsed = Description(lang, "dummy.csd").parse_description(FACEBREAKER)
+
+    assert parsed["hash"] == 1955786041
+    assert parsed.get("dp") is True
+
+
+def test_parse_description_gives_other_stats_no_decimals():
+    parsed = Description("en", "dummy.csd").parse_description(
+        '1 local_charm_slots\n1\n# "Has {0} Charm Slots"'
+    )
+
+    assert "dp" not in parsed
+
+
 def test_lang_splitting():
     desc = Description("en", "dummy.csd")
 

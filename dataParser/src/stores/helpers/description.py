@@ -10,6 +10,7 @@ from constants.filenames import STAT_DESCRIPTION_FILES_TYPE
 from constants.known_stats import (
     ACTUALLY_NEGATE_FLIPPED_IN_GAME,
     ALWAYS_POSITIVE,
+    AVERAGED_VALUES,
     BETTER_LOOKUP,
     MONSTER_EFFECTIVENESS,
     RECOVERY_APPLIED_INSTANTLY,
@@ -222,8 +223,8 @@ class Description:
             matchers.append(out)
 
         output["matchers"] = matchers
-        if dp:
-            output["dp"] = dp
+        if dp or id in AVERAGED_VALUES:
+            output["dp"] = True
         return output
 
     def parse_value(self, value_placeholders: tuple[str, ...], id: int) -> int | None:
