@@ -1,9 +1,9 @@
 # main recognizes copied item text with string literals
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** rules
 **Origin:** [main/src/shortcuts/HostClipboard.ts](../../../../main/src/shortcuts/HostClipboard.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The game text rule in [AGENTS.md](../../../../AGENTS.md#architecture-rules) says game text comes
 from the game data, never from string literals. `isPoeItem()` in `HostClipboard.ts` checks whether
@@ -31,3 +31,6 @@ item class line, since neither language has a `client_strings.js`.
 - 2026-10-27: The maintainer chose to allow the literals: language detection must recognize
   languages the app has no data for, so it cannot come from that data. Left: the exception in
   AGENTS.md and ADR-0007.
+- 2026-10-27: docs: allow the language detection literals in main and the parser. The parser's
+  `LANGUAGE_DETECTOR` has the same reason, so the exception names both; the parser lookup stays
+  open in [026](026-wrong-language-message.md).

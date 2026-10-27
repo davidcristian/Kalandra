@@ -131,6 +131,7 @@ function isPoeItem(text: string) {
   );
 }
 
+// Literals, not game data: this must also match item text in languages that have no game data (ADR-0007)
 const LANGUAGE_DETECTOR = [
   {
     lang: "en",

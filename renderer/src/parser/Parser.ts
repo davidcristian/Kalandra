@@ -53,6 +53,7 @@ import {
 /** The parser state before the item is found in the game data. */
 type NamePlateState = Omit<ParserState, "info" | "infoVariants">;
 
+// Literals, not game data: this must also match item text in languages that have no game data (ADR-0007)
 const LANGUAGE_DETECTOR = [
   {
     lang: "en",

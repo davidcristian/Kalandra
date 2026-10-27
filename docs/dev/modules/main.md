@@ -116,8 +116,8 @@ The entry, the server and the app services, in `main/src/`:
   read that leaves the marker, unless it is empty. `throttle(cb)` awaits `cb` and then 120 ms (`THROTTLE_TIME`), and
   until then drops another call to avoid the game's "Too many actions" disconnects. It leaves the text of `cb` on the
   clipboard, also with Restore clipboard on, since main cannot see when the game pastes. An error in `cb`, such as a
-  failed clipboard write, logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text,
-  and an uncut gem's rarity line, per game language as literals: main reads no game data.
+  failed clipboard write, logs `error [Clipboard] <message>`. `LANGUAGE_DETECTOR` holds the first line of item text
+  and an uncut gem's rarity line per language as literals ([ADR-0007](../adr/ADR-0007-game-text-from-game-data.md)).
 - `text-box.ts`: `typeInChat(text, send, clipboard)` runs inside `throttle()`. After its clipboard write ends, it
   presses `Enter`, then `Ctrl + A` unless the text starts with a channel prefix (`#`, `%`, `@`, `$`, `&` or `/`), and
   pastes the text. When the text is `@last` alone or starts with `@last` and a space, it removes `@last ` and presses

@@ -74,9 +74,9 @@ default instead, so its result stays the same. A setting that `main` needs also 
   `renderer/src/web/overlay/widgets.ts` or in a `widget.ts` in its own folder, and its defaults follow the hard rule
   above ([docs/dev/modules/renderer-widgets.md](docs/dev/modules/renderer-widgets.md)).
 - **Game text comes from the game data, never from string literals.** The app supports every language listed in
-  `renderer/src/assets/make-index-files.mjs`. The parser matches item text through `CLIENT_STRINGS`, loaded from
-  `client_strings.js`, and through the stat matchers in `stats.ndjson`, so matching new item text means a client
-  string, not an English regex.
+  `renderer/src/assets/make-index-files.mjs`. The parser matches item text through `CLIENT_STRINGS` from
+  `client_strings.js` and the stat matchers in `stats.ndjson`, so new item text needs a client string, not an English
+  regex. The exception is `LANGUAGE_DETECTOR` in main and the parser, which also lists languages without game data.
 - **Generated files are regenerated, not edited.** `stats.ndjson`, `items.ndjson` and `client_strings.js` under
   `renderer/public/data/<lang>/` are `dataParser` output: fix the generator or its inputs and run it again. If the
   copy here cannot produce the fix, stop and ask. The `*.index.bin` files are written by `npm run make-index-files`

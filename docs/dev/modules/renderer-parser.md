@@ -136,7 +136,8 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
   [runbooks/game-data-update.md](../runbooks/game-data-update.md)). The literals that match item text directly
   include the modifier suffix constants and separators in `advanced-mod-desc.ts`, the damage separator and the
   socket letter in `Parser.ts` ([refinement 074](../refinements/tasks/074-parser-separators-and-suffixes.md)), and
-  the `LANGUAGE_DETECTOR` table in `Parser.ts`. That table lists each language's item class and rarity prefix.
+  the `LANGUAGE_DETECTOR` table in `Parser.ts`. That table lists each language's item class and rarity prefix, as
+  literals that ADR-0007 allows (decision 5), since it also lists languages without game data.
   When the first line is not the app language's item class line and the next line starts with a rarity prefix
   from the table, the parse returns `item.wrong_language` with the display name of that prefix's language.
   Otherwise it passes the lines to `console.warn` and returns `item.parse_error`.
