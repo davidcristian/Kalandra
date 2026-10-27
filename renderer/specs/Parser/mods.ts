@@ -4,7 +4,7 @@ import { ModifierType } from "@/parser/modifiers";
 class TestModInfo implements ModifierInfo {
   rawText: string;
 
-  type: ModifierType = ModifierType.Necropolis;
+  type!: ModifierType;
   name?: string | undefined;
   tier?: number | undefined;
   rank?: number | undefined;

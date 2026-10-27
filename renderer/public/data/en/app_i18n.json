@@ -118,7 +118,6 @@
     "mod_rune": "Augment",
     "mod_desecrated": "Desecrated",
     "mod_enchant": "Enchant",
-    "mod_necropolis": "Necropolis",
     "mod_veiled": "Veiled",
     "mod_added_rune": "Augment",
     "mod_sanctum": "Sanctum",
@@ -255,7 +254,6 @@
     "tag_sanctum": "Sanctum",
     "tag_desecrated": "Desecrated",
     "tag_skill": "Skill",
-    "tag_necropolis": "Necropolis",
     "tag_veiled": "Veiled",
     "tag_mutated": "Mutated",
     "bug_report": "Bug Report"

@@ -65,7 +65,6 @@ export function createExactStatFilters(
     ModifierType.Desecrated,
     ModifierType.Crafted,
     ModifierType.Enchant,
-    ModifierType.Necropolis,
     ModifierType.Sanctum,
     ModifierType.Skill,
   ];
