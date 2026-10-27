@@ -38,6 +38,7 @@ import { buildCsvString, diffItem, LibraryWidget } from "./widget";
 import { ok } from "neverthrow";
 import { Host, MainProcess } from "@/web/background/IPC";
 import { AppConfig } from "../Config";
+import { requireWidget } from "@/web/settings/utils";
 
 export default defineComponent({
   name: "SingleItemSession",
@@ -59,7 +60,9 @@ export default defineComponent({
     }>({ added: [], removed: [] });
     const rollCount = shallowRef<number>(0);
     const errMessage = ref<string | null>(null);
-    const widget = computed(() => AppConfig<LibraryWidget>("library")!);
+    const widget = computed(() =>
+      requireWidget<LibraryWidget>("library", AppConfig()),
+    );
 
     watch(
       () => props.inSession,

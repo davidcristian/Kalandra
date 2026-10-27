@@ -1,7 +1,6 @@
 import { shallowReactive } from "vue";
 import type { ItemFilters, StatFilter } from "../filters/interfaces";
-import { AppConfig } from "@/web/Config";
-import type { PriceCheckWidget } from "@/web/overlay/interfaces";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { RateLimiter } from "./RateLimiter";
 import { ParsedItem, ItemCategory } from "@/parser";
 export { poeWebApi as getTradeEndpoint } from "@/web/Config";
@@ -99,8 +98,7 @@ export function adjustRateLimits(
 }
 
 function readRules(headers: Headers, rules: string) {
-  const extraWindow =
-    AppConfig<PriceCheckWidget>("price-check")!.apiLatencySeconds;
+  const extraWindow = priceCheckConfig().apiLatencySeconds;
   const serverLimits: ServerLimit[] = [];
   let readAllRules = true;
   for (const rule of rules.split(",")) {

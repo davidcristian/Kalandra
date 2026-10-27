@@ -33,7 +33,7 @@ import {
   configProp,
   configModelValue,
   _configModelValue,
-  findWidget,
+  requireWidget,
 } from "./utils";
 import { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { ItemCheckWidget } from "../item-check/widget.js";
@@ -44,14 +44,14 @@ import HotkeysGeneric, { HotkeySchema } from "../settings/HotkeysGeneric.vue";
 const props = defineProps(configProp());
 
 const hotkeys = computed<HotkeySchema[]>(() => {
-  const priceCheckWidget = findWidget<PriceCheckWidget>(
+  const priceCheckWidget = requireWidget<PriceCheckWidget>(
     "price-check",
     props.config,
-  )!;
-  const itemCheckWidget = findWidget<ItemCheckWidget>(
+  );
+  const itemCheckWidget = requireWidget<ItemCheckWidget>(
     "item-check",
     props.config,
-  )!;
+  );
   return [
     {
       translationKey: "price_check.name",

@@ -90,10 +90,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { inject, nextTick } from "vue";
+import { nextTick } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import { Host } from "@/web/background/IPC";
-import { WidgetManager } from "./interfaces";
 import { useImageImport } from "./image-import";
 
 import DndContainer from "vuedraggable";
@@ -106,7 +106,7 @@ const props = defineProps<{
 
 const { t } = useI18n();
 
-const wm = inject<WidgetManager>("wm")!;
+const wm = injectWidgetManager();
 
 if (props.config.wmFlags[0] === "uninitialized") {
   props.config.wmFlags = ["invisible-on-blur"];

@@ -18,7 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed } from "vue";
+import { injectShowBrowser } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import { useLeagues } from "@/web/background/Leagues";
 import { Host } from "@/web/background/IPC";
@@ -26,7 +27,7 @@ import { poeWebApi } from "@/web/Config";
 
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 
-const showBrowser = inject<(url: string) => void>("builtin-browser")!;
+const showBrowser = injectShowBrowser();
 
 const { t } = useI18n();
 

@@ -121,11 +121,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { inject, computed, watch } from "vue";
+import { computed, watch } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import { MainProcess } from "@/web/background/IPC";
 import { pushHostConfig } from "@/web/Config";
-import type { WidgetManager } from "../overlay/interfaces.js";
 import { newWidgetEntries } from "./widget.js";
 import { entrySearchText } from "./presets.js";
 
@@ -136,7 +136,7 @@ const props = defineProps<{
   config: StashSearchWidget;
 }>();
 
-const wm = inject<WidgetManager>("wm")!;
+const wm = injectWidgetManager();
 
 if (props.config.wmFlags[0] === "uninitialized") {
   props.config.wmFlags = ["invisible-on-blur"];

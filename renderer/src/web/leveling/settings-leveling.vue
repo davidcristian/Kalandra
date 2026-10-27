@@ -45,7 +45,11 @@
 import { defineComponent, computed } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
-import { configModelValue, configProp, findWidget } from "../settings/utils.js";
+import {
+  configModelValue,
+  configProp,
+  requireWidget,
+} from "../settings/utils.js";
 import { XpWidget } from "./widget.js";
 
 export default defineComponent({
@@ -53,8 +57,8 @@ export default defineComponent({
   components: { UiCheckbox },
   props: configProp(),
   setup(props) {
-    const configXpWidget = computed(
-      () => findWidget<XpWidget>("experience-tracker", props.config)!,
+    const configXpWidget = computed(() =>
+      requireWidget<XpWidget>("experience-tracker", props.config),
     );
 
     const { t } = useI18nNs("leveling");

@@ -31,15 +31,14 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { RATE_LIMIT_RULES } from "./common";
-import { PriceCheckWidget } from "@/web/overlay/interfaces";
-import { AppConfig } from "@/web/Config";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { useI18nNs } from "@/web/i18n";
 
 export default defineComponent({
   inheritAttrs: false,
   setup() {
     const { t } = useI18nNs("rate_limit");
-    const widget = computed(() => AppConfig<PriceCheckWidget>("price-check")!);
+    const widget = computed(() => priceCheckConfig());
 
     const limits = computed(() => {
       const LIMITS = [

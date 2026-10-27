@@ -73,7 +73,9 @@ old one and keep that file, so a saved config must survive every update: this is
   version 30, is left to that step. main sends only a JSON object, so `initConfig()` parses the text without a
   check.
 - `AppConfig()` returns the current config, and `AppConfig<T>(type)` returns the first widget config whose
-  `wmType` is `type`. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
+  `wmType` is `type`, or `undefined`. `requireWidget(type, config)` in `settings/utils.ts`, and
+  `priceCheckConfig()` in `price-check/price-check-config.ts`, throw instead when the config has no widget of the
+  type. The config is a deep `reactive` object in a `shallowRef`, and components change its fields
   in place. The settings window edits a deep copy. On Save, `saveSettings()` in `settings/save-settings.ts`
   applies it and hides the window before it calls `saveConfig()`, so the save is sent at once
   ([architecture.md](../architecture.md#the-config-from-file-to-settings)). `settings/draft.ts` holds the copy. While the window is open, Language and Preferred trade site also go into the

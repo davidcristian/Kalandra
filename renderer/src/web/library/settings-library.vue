@@ -19,7 +19,11 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import { configModelValue, configProp, findWidget } from "../settings/utils.js";
+import {
+  configModelValue,
+  configProp,
+  requireWidget,
+} from "../settings/utils.js";
 import { LibraryWidget } from "./widget.js";
 import HotkeyInput from "../settings/HotkeyInput.vue";
 import ProfileSettings from "./ProfileSettings.vue";
@@ -29,8 +33,8 @@ export default defineComponent({
   components: { HotkeyInput, ProfileSettings },
   props: configProp(),
   setup(props) {
-    const configLibraryWidget = computed(
-      () => findWidget<LibraryWidget>("library", props.config)!,
+    const configLibraryWidget = computed(() =>
+      requireWidget<LibraryWidget>("library", props.config),
     );
 
     const { t } = useI18nNs("library");

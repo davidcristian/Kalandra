@@ -149,8 +149,7 @@ import VueApexcharts from "vue3-apexcharts";
 import { ParsedItem } from "@/parser";
 import { artificialSlowdown } from "../trade/artificial-slowdown";
 import { ItemFilters } from "../filters/interfaces";
-import { AppConfig } from "@/web/Config";
-import { PriceCheckWidget } from "@/web/overlay/interfaces";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import UiItemImg from "@/web/ui/UiItemImg.vue";
 import CoreCurrencyImg from "@/web/ui/CoreCurrencyImg.vue";
 
@@ -177,9 +176,7 @@ export default defineComponent({
     const { t } = useI18nNs("trade_result");
     const { findPriceByQuery, autoCurrency } = usePoeninja();
 
-    const volumeSetting = computed(
-      () => AppConfig<PriceCheckWidget>("price-check")!.currencyVolume,
-    );
+    const volumeSetting = computed(() => priceCheckConfig().currencyVolume);
 
     watch(
       () => props.item,

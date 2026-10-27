@@ -117,6 +117,7 @@
 
 <script lang="ts">
 import { ref } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import {
   BaseType,
   ITEM_BY_TRANSLATED,
@@ -214,9 +215,8 @@ function findItems(opts: {
 </script>
 
 <script setup lang="ts">
-import { shallowRef, computed, nextTick, inject } from "vue";
+import { shallowRef, computed, nextTick } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import { WidgetManager } from "../overlay/interfaces";
 import { usePoeninja } from "@/web/background/Prices";
 import { Host } from "@/web/background/IPC";
 import { createVirtualItem, ItemRarity } from "@/parser/ParsedItem";
@@ -229,7 +229,7 @@ const props = defineProps<{
   config: ItemSearchWidget;
 }>();
 
-const wm = inject<WidgetManager>("wm")!;
+const wm = injectWidgetManager();
 const { t } = useI18nNs("item_search");
 const { findPriceByQuery, autoCurrency, queuePricesFetch } = usePoeninja();
 

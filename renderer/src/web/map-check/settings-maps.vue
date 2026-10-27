@@ -97,7 +97,7 @@ function findAllAreaMods(): StatMatcher[] {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import { configProp, findWidget, configModelValue } from "../settings/utils";
+import { configProp, requireWidget, configModelValue } from "../settings/utils";
 import type { ItemCheckWidget } from "../item-check/widget.js";
 
 import UiToggle from "@/web/ui/UiToggle.vue";
@@ -106,8 +106,8 @@ import SettingsMatcherEntry from "./SettingsMatcherEntry.vue";
 
 const props = defineProps(configProp());
 
-const widget = computed(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+const widget = computed(() =>
+  requireWidget<ItemCheckWidget>("item-check", props.config),
 );
 
 function isSelected(row: StatMatcher): boolean {

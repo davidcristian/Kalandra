@@ -65,6 +65,16 @@ export function findWidget<T extends Widget>(type: string, config: Config) {
   return config.widgets.find((w) => w.wmType === type) as T | undefined;
 }
 
+/** Returns the first widget of the type, and throws when the config has none. */
+export function requireWidget<T extends Widget>(
+  type: string,
+  config: Config,
+): T {
+  const widget = findWidget<T>(type, config);
+  if (!widget) throw new Error(`The config has no widget of type "${type}"`);
+  return widget;
+}
+
 export function disableWidget(widget: Widget) {
   widget.wmWants = "hide";
   if (!widget.wmFlags.includes("menu::skip")) {

@@ -107,13 +107,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, watch, PropType, inject } from "vue";
+import { defineComponent, computed, watch, PropType } from "vue";
+import { injectShowBrowser } from "@/web/overlay/injections";
 import { useI18nNs } from "@/web/i18n";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 import { createTradeRequest } from "./pathofexile-trade";
 import { getTradeEndpoint } from "./common";
-import { AppConfig } from "@/web/Config";
-import { PriceCheckWidget } from "@/web/overlay/interfaces";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { ItemFilters, StatFilter } from "../filters/interfaces";
 import { ParsedItem } from "@/parser";
 import { artificialSlowdown } from "./artificial-slowdown";
@@ -151,7 +151,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const widget = computed(() => AppConfig<PriceCheckWidget>("price-check")!);
+    const widget = computed(() => priceCheckConfig());
     watch(
       () => props.item,
       (item) => {
@@ -162,7 +162,7 @@ export default defineComponent({
 
     const { error, searchResult, groupedResults, search } = useTradeApi();
 
-    const showBrowser = inject<(url: string) => void>("builtin-browser")!;
+    const showBrowser = injectShowBrowser();
 
     const { t } = useI18nNs("trade_result");
 

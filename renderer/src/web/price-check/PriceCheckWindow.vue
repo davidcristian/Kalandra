@@ -130,7 +130,6 @@
 <script lang="ts">
 import {
   defineComponent,
-  inject,
   PropType,
   shallowRef,
   watch,
@@ -139,6 +138,7 @@ import {
   provide,
   ref,
 } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { Result, ok } from "neverthrow";
 import { useI18n } from "vue-i18n";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
@@ -156,11 +156,7 @@ import UnidentifiedResolver from "./unidentified-resolver/UnidentifiedResolver.v
 import CheckPositionCircle from "./CheckPositionCircle.vue";
 import AppTitleBar from "@/web/ui/AppTitlebar.vue";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
-import {
-  PriceCheckWidget,
-  WidgetManager,
-  WidgetSpec,
-} from "../overlay/interfaces";
+import { PriceCheckWidget, WidgetSpec } from "../overlay/interfaces";
 import { loadUltraLateItems } from "@/assets/data";
 import ReloadTradeData from "./fallback/ReloadTradeData.vue";
 
@@ -239,7 +235,7 @@ export default defineComponent({
       { immediate: true },
     );
 
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
     const {
       xchgRate,
       xchgRateCurrency,

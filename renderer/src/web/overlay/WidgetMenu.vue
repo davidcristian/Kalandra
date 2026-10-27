@@ -68,15 +68,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, inject } from "vue";
+import { defineComponent, PropType, computed } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import UiToggle from "@/web/ui/UiToggle.vue";
 import UiPopover from "@/web/ui/Popover.vue";
-import {
-  Widget as IWidget,
-  WidgetManager,
-  WidgetMenu,
-  WidgetSpec,
-} from "./interfaces";
+import { Widget as IWidget, WidgetMenu, WidgetSpec } from "./interfaces";
 import { registry } from "./widget-registry";
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
@@ -112,7 +108,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
 
     const widgets = computed(() => {
       const { readClientLog } = AppConfig();

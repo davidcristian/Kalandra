@@ -110,8 +110,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, inject, ref } from "vue";
-import { Widget, Anchor, WidgetManager } from "./interfaces";
+import { defineComponent, PropType, computed, ref } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
+import { Widget, Anchor } from "./interfaces";
 import { useI18n } from "vue-i18n";
 
 function useRemovable(remove: () => void) {
@@ -161,7 +162,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
 
     const moverPosition = computed(() => {
       const { anchor, wmZorder } = props.config;

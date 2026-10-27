@@ -85,8 +85,8 @@ import {
   createTradeRequest,
 } from "./trade/pathofexile-trade";
 import { AppConfig } from "@/web/Config";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { FilterPreset } from "./filters/interfaces";
-import { PriceCheckWidget } from "../overlay/interfaces";
 import { useLeagues } from "@/web/background/Leagues";
 import { createTipSchedule } from "../help/tips";
 
@@ -116,7 +116,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const widget = computed(() => AppConfig<PriceCheckWidget>("price-check")!);
+    const widget = computed(() => priceCheckConfig());
     const leagues = useLeagues();
 
     const presets = ref<{ active: string; presets: FilterPreset[] }>(null!);

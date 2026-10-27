@@ -108,18 +108,14 @@ import {
   Component,
   PropType,
   nextTick,
-  inject,
   watch,
 } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import { AppConfig } from "@/web/Config";
 import { APP_PATRONS } from "@/assets/data";
 import { Host } from "@/web/background/IPC";
-import type {
-  Widget,
-  WidgetManager,
-  WidgetSpec,
-} from "@/web/overlay/interfaces";
+import type { Widget, WidgetSpec } from "@/web/overlay/interfaces";
 import AppTitleBar from "@/web/ui/AppTitlebar.vue";
 import SettingsHotkeys from "./hotkeys.vue";
 import SettingsChat from "./chat.vue";
@@ -198,7 +194,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
     const { t } = useI18n();
 
     void nextTick(() => {

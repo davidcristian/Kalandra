@@ -116,7 +116,7 @@ import { useI18nNs } from "@/web/i18n";
 import { PriceCheckWidget } from "@/web/overlay/widgets";
 import tippy, { Instance } from "tippy.js";
 import "tippy.js/dist/tippy.css";
-import { AppConfig } from "@/web/Config";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import TooltipItem from "./TooltipItem.vue";
 import { GEM, GRANTS_REAL_SKILL } from "@/parser/meta";
 import { listingMarkers } from "./listing-markers";
@@ -152,9 +152,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const tooltipOption = computed(
-      () => AppConfig<PriceCheckWidget>("price-check")!.itemHoverTooltip,
-    );
+    const tooltipOption = computed(() => priceCheckConfig().itemHoverTooltip);
     const target = ref<HTMLElement>(null!);
     const content = ref<HTMLElement>(null!);
     const { t } = useI18nNs("trade_result");

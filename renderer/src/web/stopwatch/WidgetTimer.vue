@@ -30,16 +30,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, inject, onUnmounted } from "vue";
+import { defineComponent, PropType, onUnmounted } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import Widget from "../overlay/Widget.vue";
 import { MainProcess } from "@/web/background/IPC";
 import { useStopwatch } from "./stopwatch";
-import {
-  WidgetManager,
-  StopwatchWidget,
-  WidgetSpec,
-} from "../overlay/interfaces";
+import { StopwatchWidget, WidgetSpec } from "../overlay/interfaces";
 
 export default defineComponent({
   widget: {
@@ -55,7 +52,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
 
     if (props.config.wmFlags[0] === "uninitialized") {
       props.config.anchor = {

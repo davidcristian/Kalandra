@@ -237,7 +237,7 @@ import UiRadio from "@/web/ui/UiRadio.vue";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import UiToggle from "@/web/ui/UiToggle.vue";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
-import { configModelValue, configProp, findWidget } from "../settings/utils.js";
+import { configModelValue, configProp, requireWidget } from "../settings/utils";
 import type { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { useLeagues } from "../background/Leagues";
 import { usePoeninja } from "../background/Prices.js";
@@ -248,8 +248,8 @@ export default defineComponent({
   components: { UiRadio, UiCheckbox, UiToggle, UiErrorBox, UiItemImg },
   props: configProp(),
   setup(props) {
-    const configWidget = computed(
-      () => findWidget<PriceCheckWidget>("price-check", props.config)!,
+    const configWidget = computed(() =>
+      requireWidget<PriceCheckWidget>("price-check", props.config),
     );
 
     const leagues = useLeagues();

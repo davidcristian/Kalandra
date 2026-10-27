@@ -158,12 +158,11 @@ import UiTabs from "@/web/ui/UiTabs.vue";
 import AugmentsList from "./AugmentsList.vue";
 import { categoryAugments } from "./augment";
 import { augmentTabs } from "./augment-tabs";
-import { AppConfig } from "@/web/Config";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { EditorItem } from "@/parser/ParsedItem";
 import { buildEditorItems, useAugment } from "@/parser/augment-builder";
 import { AugmentSaveType, augmentSaveKey } from "./item-editor";
 import { useI18nNs } from "@/web/i18n";
-import { PriceCheckWidget } from "@/web/overlay/widgets";
 import { ARMOUR, MARTIAL_WEAPON } from "@/parser/meta";
 
 export default defineComponent({
@@ -197,9 +196,7 @@ export default defineComponent({
       props.item?.category ? categoryAugments(props.item.category) : null,
     );
     watch(displayGroups, resetSelectedAugment);
-    const savedConfig = computed(
-      () => AppConfig<PriceCheckWidget>("price-check")!.savedAugments,
-    );
+    const savedConfig = computed(() => priceCheckConfig().savedAugments);
 
     function handleSave() {
       const s = augmentSaveKey(saveType.value, props.item?.category);

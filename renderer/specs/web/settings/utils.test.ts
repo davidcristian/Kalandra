@@ -11,6 +11,7 @@ import {
   disableWidget,
   enableWidget,
   findWidget,
+  requireWidget,
 } from "@/web/settings/utils";
 
 function widget(wmId: number, wmType: string, wmFlags: string[] = []): Widget {
@@ -107,6 +108,22 @@ describe("findWidget", () => {
     const edited = config([widget(1, "menu")]);
 
     expect(findWidget("library", edited)).toBeUndefined();
+  });
+});
+
+describe("requireWidget", () => {
+  it("returns the first widget of the type", () => {
+    const edited = config([widget(1, "menu"), widget(5, "stash-search")]);
+
+    expect(requireWidget("stash-search", edited).wmId).toBe(5);
+  });
+
+  it("throws an error that names a type the config has no widget of", () => {
+    const edited = config([widget(1, "menu")]);
+
+    expect(() => requireWidget("library", edited)).toThrow(
+      'The config has no widget of type "library"',
+    );
   });
 });
 

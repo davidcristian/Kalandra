@@ -36,7 +36,11 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { configProp, configModelValue, findWidget } from "../settings/utils.js";
+import {
+  configProp,
+  configModelValue,
+  requireWidget,
+} from "../settings/utils.js";
 import type { ItemCheckWidget } from "./widget.js";
 import { offersCraftOfExile } from "./craft-of-exile";
 
@@ -48,27 +52,27 @@ const showCraftOfExile = computed(() =>
   offersCraftOfExile(props.config.language),
 );
 const wikiKey = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "wikiKey",
 );
 const poedbKey = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "poedbKey",
 );
 const craftOfExileKey = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "craftOfExileKey",
 );
 const stashSearchKey = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "stashSearchKey",
 );
 const samePricedKey = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "samePricedKey",
 );
 const samePricedType = configModelValue(
-  () => findWidget<ItemCheckWidget>("item-check", props.config)!,
+  () => requireWidget<ItemCheckWidget>("item-check", props.config),
   "samePricedType",
 );
 

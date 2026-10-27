@@ -2,8 +2,7 @@ import { shallowRef, watch, readonly, computed } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { Host } from "@/web/background/IPC";
 import { useLeagues } from "./Leagues";
-import { AppConfig } from "../Config";
-import { PriceCheckWidget } from "../overlay/widgets";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import {
   DropEntry,
   ITEM_BY_REF,
@@ -123,11 +122,11 @@ export const usePoeninja = createGlobalState(() => {
   const selectedCoreCurrencyId = computed<"exalted" | "chaos">({
     get() {
       return availableCoreCurrencies.value.length
-        ? AppConfig<PriceCheckWidget>("price-check")!.coreCurrency
+        ? priceCheckConfig().coreCurrency
         : "exalted";
     },
     set(id) {
-      AppConfig<PriceCheckWidget>("price-check")!.coreCurrency = id;
+      priceCheckConfig().coreCurrency = id;
     },
   });
 

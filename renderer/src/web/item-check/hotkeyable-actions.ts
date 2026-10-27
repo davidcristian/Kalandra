@@ -1,5 +1,6 @@
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
+import { requireWidget } from "@/web/settings/utils";
 import {
   ItemRarity,
   ParsedItem,
@@ -148,7 +149,8 @@ export function findSamePricedItems(item: ParsedItem) {
   const note = JSON.stringify(item.note);
   const name = JSON.stringify(item.info.name);
   const useName =
-    AppConfig<ItemCheckWidget>("item-check")!.samePricedType === "both";
+    requireWidget<ItemCheckWidget>("item-check", AppConfig()).samePricedType ===
+    "both";
 
   const text =
     useName && note.length + name.length < 51 ? `${note}${name}` : note;

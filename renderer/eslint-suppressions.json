@@ -216,7 +216,7 @@
   },
   "src/web/background/Prices.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 5
+      "count": 3
     }
   },
   "src/web/client-log/client-log.ts": {
@@ -224,47 +224,12 @@
       "count": 1
     }
   },
-  "src/web/item-check/WidgetItemCheck.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "src/web/item-check/hotkeyable-actions.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    }
-  },
-  "src/web/item-check/settings-item-check.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 6
-    }
-  },
-  "src/web/item-search/WidgetItemSearch.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
     }
   },
-  "src/web/leveling/settings-leveling.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/library/SingleItemSession.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/library/settings-library.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/map-check/settings-maps.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/notepad/WidgetNotepad.vue": {
+  "src/web/item-search/WidgetItemSearch.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
@@ -276,37 +241,27 @@
   },
   "src/web/overlay/Widget.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
+      "count": 1
     }
   },
   "src/web/overlay/WidgetImageStrip.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
+      "count": 1
     }
   },
   "src/web/overlay/WidgetMenu.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/web/parser-settings.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/BackgroundInfo.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
+      "count": 3
     }
   },
   "src/web/price-check/CheckedItem.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 7
+      "count": 6
     }
   },
   "src/web/price-check/PriceCheckWindow.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
+      "count": 2
     }
   },
   "src/web/price-check/filters/FilterModifier.vue": {
@@ -327,11 +282,6 @@
   "src/web/price-check/filters/FilterModifierItemIsElemental.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 3
-    }
-  },
-  "src/web/price-check/filters/FilterModifierTiers.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
     }
   },
   "src/web/price-check/filters/FilterName.vue": {
@@ -381,11 +331,6 @@
   },
   "src/web/price-check/item-editor/AugmentEditor.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
-  "src/web/price-check/settings-price-check.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
@@ -399,27 +344,7 @@
       "count": 1
     }
   },
-  "src/web/price-check/trade/RateLimiterState.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/trade/TradeBulk.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
   "src/web/price-check/trade/TradeItem.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    }
-  },
-  "src/web/price-check/trade/TradeLinks.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/trade/TradeListing.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
     }
@@ -427,11 +352,6 @@
   "src/web/price-check/trade/bulk-api.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
-    }
-  },
-  "src/web/price-check/trade/common.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
     }
   },
   "src/web/price-check/trade/pathofexile-bulk.ts": {
@@ -451,7 +371,7 @@
   },
   "src/web/price-check/trends/PriceTrend.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
+      "count": 1
     }
   },
   "src/web/price-check/trends/getDetailsId.ts": {
@@ -466,22 +386,7 @@
   },
   "src/web/settings/SettingsWindow.vue": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 6
-    }
-  },
-  "src/web/settings/hotkeys.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
-  "src/web/stash-search/WidgetStashSearch.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/stopwatch/WidgetTimer.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
+      "count": 5
     }
   },
   "src/web/ui/Popover.vue": {

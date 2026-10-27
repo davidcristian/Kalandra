@@ -14,8 +14,7 @@ import { defineComponent, PropType, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { ItemCategory, ParsedItem } from "@/parser";
 import { FilterTag, StatFilter } from "./interfaces";
-import { AppConfig } from "@/web/Config";
-import { PriceCheckWidget } from "@/web/overlay/widgets";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 
 export default defineComponent({
   props: {
@@ -29,9 +28,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const alwaysShowTier = computed(
-      () => AppConfig<PriceCheckWidget>("price-check")!.alwaysShowTier,
-    );
+    const alwaysShowTier = computed(() => priceCheckConfig().alwaysShowTier);
     const tags = computed(() => {
       const { filter, item } = props;
       if (

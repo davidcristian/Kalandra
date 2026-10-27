@@ -25,7 +25,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, inject, computed } from "vue";
+import { defineComponent, PropType, computed } from "vue";
+import { injectShowBrowser } from "@/web/overlay/injections";
 import { useI18n } from "vue-i18n";
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
@@ -43,7 +44,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const showBrowser = inject<(url: string) => void>("builtin-browser")!;
+    const showBrowser = injectShowBrowser();
     const { t } = useI18n();
 
     return {

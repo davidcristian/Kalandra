@@ -34,7 +34,8 @@ that a saved config survives every update covers it ([config.md](config.md),
 - [OverlayWindow.vue](../../../renderer/src/web/overlay/OverlayWindow.vue) renders the component of each entry in
   `AppConfig().widgets` with the entry as its `config` prop, and provides the `WidgetManager`
   ([interfaces.ts](../../../renderer/src/web/overlay/interfaces.ts)) as `wm`: `show`, `hide`, `remove`,
-  `bringToTop`, `create(wmType)`, `setFlag`, `widgets`, `active`, `size` and `poePanelWidth`. Showing a widget
+  `bringToTop`, `create(wmType)`, `setFlag`, `widgets`, `active`, `size` and `poePanelWidth`. A widget reads it
+  with `injectWidgetManager()` from `overlay/injections.ts`, which throws when nothing provides it. Showing a widget
   hides the `exclusive` widget that is shown, if any. It sends `OVERLAY->MAIN::render-state` with `shouldShow`
   whenever the overlay starts or stops having something to draw, saves the config when the window loses focus,
   and starts the background state: `usePoeninja()`, `useLeagues().load()` and `useClientLog()`, the shared
@@ -166,10 +167,12 @@ with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()
 the image strip uses to add an image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
 (`overlay/widget-component.ts`, which throws for a component without a `widget` option),
-`specs/web/widget-menu.test.ts` (the widget buttons that `WidgetMenu.vue` draws for a new config, for one with
+`specs/web/overlay-injections.test.ts` (`injectWidgetManager()` and `injectShowBrowser()`, which return what
+the app provides and throw when nothing does), `specs/web/widget-menu.test.ts` (the widget buttons that `WidgetMenu.vue` draws for a new config, for one with
 `readClientLog` on and for configs upgraded from versions 28 and 36),
 `specs/web/settings/menu.test.ts` (`settings/menu.ts`, the pages the Settings menu lists for each widget),
-`specs/web/settings/utils.test.ts` (`settings/utils.ts`: the page props, the field models, `findWidget`, and
+`specs/web/settings/utils.test.ts` (`settings/utils.ts`: the page props, the field models, `findWidget`, `requireWidget`, which throws for a type the config has no
+widget of, and
 `disableWidget` and `enableWidget`, which add `menu::skip` once and remove every copy),
 `specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
 share in the edited config, and the hint of a field for them and for each reason main gives), `specs/web/stash-search.test.ts` (`stash-search/widget.ts` and `presets.ts`: the search of a

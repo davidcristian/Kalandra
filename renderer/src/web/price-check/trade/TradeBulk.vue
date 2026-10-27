@@ -158,22 +158,15 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  PropType,
-  computed,
-  watch,
-  shallowRef,
-  inject,
-} from "vue";
+import { defineComponent, PropType, computed, watch, shallowRef } from "vue";
+import { injectShowBrowser } from "@/web/overlay/injections";
 import { useI18nNs } from "@/web/i18n";
 import UiErrorBox from "@/web/ui/UiErrorBox.vue";
 import { createTradeRequest } from "./pathofexile-bulk";
 import { getTradeEndpoint } from "./common";
-import { AppConfig } from "@/web/Config";
+import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { ItemFilters } from "../filters/interfaces";
 import { ParsedItem } from "@/parser";
-import { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { artificialSlowdown } from "./artificial-slowdown";
 import OnlineFilter from "./OnlineFilter.vue";
 import TradeLinks from "./TradeLinks.vue";
@@ -194,10 +187,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const widget = computed(() => AppConfig<PriceCheckWidget>("price-check")!);
+    const widget = computed(() => priceCheckConfig());
     const { error, result, search } = useBulkApi();
 
-    const showBrowser = inject<(url: string) => void>("builtin-browser")!;
+    const showBrowser = injectShowBrowser();
 
     const useExalts = computed(() => widget.value.coreCurrency === "exalted");
 

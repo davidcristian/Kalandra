@@ -51,13 +51,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, inject } from "vue";
+import { defineComponent, PropType } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import Widget from "@/web/overlay/Widget.vue";
-import {
-  WidgetManager,
-  WidgetSpec,
-  NotepadWidget,
-} from "@/web/overlay/interfaces";
+import { WidgetSpec, NotepadWidget } from "@/web/overlay/interfaces";
 import { useI18nNs } from "@/web/i18n";
 
 enum WidgetWidth {
@@ -80,7 +77,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const wm = inject<WidgetManager>("wm")!;
+    const wm = injectWidgetManager();
     const { t } = useI18nNs("notepad");
 
     if (props.config.wmFlags[0] === "uninitialized") {

@@ -52,11 +52,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
+import { computed, ref } from "vue";
+import { injectWidgetManager } from "@/web/overlay/injections";
 import { MainProcess } from "@/web/background/IPC";
 import { ItemCategory, ItemRarity, parseClipboard, ParsedItem } from "@/parser";
 import { registerActions } from "./hotkeyable-actions";
-import type { WidgetManager } from "../overlay/interfaces";
 
 import Widget from "../overlay/Widget.vue";
 import MapCheck from "../map-check/MapCheck.vue";
@@ -66,7 +66,7 @@ const props = defineProps<{
   config: ItemCheckWidget;
 }>();
 
-const wm = inject<WidgetManager>("wm")!;
+const wm = injectWidgetManager();
 
 const checkPosition = ref({ x: 1, y: 1 });
 const item = ref<ParsedItem | null>(null);
