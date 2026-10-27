@@ -115,7 +115,7 @@ export function statSourcesTotal(
       : (a: number, b: number) => Math.max(a, b);
   return sources.length === 1
     ? sources[0].contributes
-    : sources.reduce(
+    : sources.reduce<StatRoll>(
         (sum, { contributes }) => {
           contributes = contributes ?? { value: 1, min: 1, max: 1 };
           sum.value = fn(sum.value, contributes.value);
@@ -124,7 +124,7 @@ export function statSourcesTotal(
           sum.option = contributes.option;
           return sum;
         },
-        { value: 0, min: 0, max: 0, option: undefined } as StatRoll,
+        { value: 0, min: 0, max: 0, option: undefined },
       );
 }
 
