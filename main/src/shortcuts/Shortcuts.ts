@@ -193,10 +193,6 @@ export class Shortcuts {
         );
         taken.push(entry.shortcut);
       }
-
-      if (entry.action.type === "test-only") {
-        globalShortcut.unregister(shortcutToElectron(entry.shortcut));
-      }
     }
     if (taken.join("\n") !== this.taken.join("\n")) {
       this.taken = taken;

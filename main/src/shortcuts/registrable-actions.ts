@@ -21,12 +21,6 @@ export function registrableActions(
 ): RegistrableActions {
   const unregistered: UnregisteredHotkey[] = [];
   const copyItemShortcut = mergeTwoHotkeys("Ctrl + C", showModsKey);
-  if (copyItemShortcut !== "Ctrl + C") {
-    actions.push({
-      shortcut: copyItemShortcut,
-      action: { type: "test-only" },
-    });
-  }
   const known = withKnownKeys(actions, logger);
   for (const action of actions) {
     if (!known.includes(action)) {
@@ -50,10 +44,7 @@ export function registrableActions(
   ]);
 
   for (const action of actions) {
-    if (
-      allShortcuts.has(action.shortcut) &&
-      action.action.type !== "test-only"
-    ) {
+    if (allShortcuts.has(action.shortcut)) {
       logger.write(
         `error [Shortcuts] Hotkey "${action.shortcut}" reserved by the game will not be registered.`,
       );

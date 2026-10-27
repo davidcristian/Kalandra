@@ -38,9 +38,6 @@ export interface ShortcutAction {
         type: "paste-in-chat";
         text: string;
         send: boolean;
-      }
-    | {
-        type: "test-only";
       };
 }
 

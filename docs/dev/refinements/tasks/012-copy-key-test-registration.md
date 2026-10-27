@@ -1,6 +1,6 @@
 # The test registration of the copy keys never runs
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** main
 **Origin:** [main/src/shortcuts/Shortcuts.ts](../../../../main/src/shortcuts/Shortcuts.ts)
 **Verified:** 2026-10-27
@@ -32,3 +32,5 @@ and the two pages stop saying that the line can name the copy keys.
 - 2026-10-27: The maintainer chose to remove the `test-only` action. Checked again: the filter in
   `registrable-actions.ts` still removes it. Left: remove the action and correct
   docs/nothing-happens.md and docs/no-item-mods.md.
+- 2026-10-27: Closed by "fix: remove the copy keys check that the hotkey filter always
+  dropped". The two user pages now say that no log line shows a program that takes the copy keys.

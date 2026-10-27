@@ -230,16 +230,4 @@ describe("other hotkey actions", () => {
       'error [Shortcuts] Failed to register a shortcut "F5". It is already registered by another application.',
     );
   });
-
-  it("registers a test-only hotkey and removes it at once", async () => {
-    await registerOnFocus([
-      { shortcut: "F5", action: { type: "test-only" } },
-      {
-        shortcut: "Shift + F5",
-        action: { type: "trigger-event", target: "a" },
-      },
-    ]);
-
-    expect([...globalShortcut.registered.keys()]).toEqual(["Shift+F5"]);
-  });
 });

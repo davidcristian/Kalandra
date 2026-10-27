@@ -14,8 +14,8 @@ the copy keys include the advanced item descriptions key that the game has bound
 
 ## Causes
 
-Read the logs first, as [Where can I find the logs?](/faq#where-can-i-find-the-logs) describes. Each cause below
-names the log line that shows it.
+Read the logs first, as [Where can I find the logs?](/faq#where-can-i-find-the-logs) describes. Each cause below but
+the last names the log line that shows it.
 
 - **The advanced item descriptions key is a key Kalandra cannot press**, such as a mouse button. The log shows
   `error [GameConfig] Failed to read key: <value>.` Bind the key to a keyboard key in the game's options, then
@@ -31,8 +31,8 @@ names the log line that shows it.
   cannot read. Set the path of `poe2_production_Config.ini` in **PoE config file** on the **General** settings page.
   On Windows, Kalandra looks for the file in `Documents\My Games\Path of Exile 2`. Each click on **Save** reads the
   file again until a read succeeds, for example after the game has created the file at its first start.
-- **Another program uses the same keys**, so the game does not receive them. The log shows
-  `Failed to register a shortcut "<keys>". It is already registered by another application.`, or nothing.
+- **Another program uses the same keys**, so the game does not receive them. No log line shows this. Look for the
+  copy keys in the shortcut settings of the programs you run.
   [Another program takes the copy keys](/nothing-happens#another-program-takes-the-copy-keys) describes how to find
   the program.
 

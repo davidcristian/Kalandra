@@ -43,8 +43,9 @@ time. These lines name a problem and its fix:
 - `error [Shortcuts] Failed to register a shortcut "<keys>". It is already registered by another application.`
 
   Another program uses this key combination. Choose another hotkey on the **Hotkeys** settings page, or change the
-  shortcut in the other program. The settings window outlines the hotkey's field in red. When `<keys>` are the copy
-  keys, such as `Ctrl + Alt + C`, read [Another program takes the copy keys](#another-program-takes-the-copy-keys).
+  shortcut in the other program. The settings window outlines the hotkey's field in red. This line names only your
+  hotkeys and never the copy keys, such as `Ctrl + Alt + C`: for those, read
+  [Another program takes the copy keys](#another-program-takes-the-copy-keys).
 
 - `error [Shortcuts] Hotkey "<keys>" reserved by the game will not be registered.`
 
@@ -114,12 +115,12 @@ read the next section.
 ## Another program takes the copy keys
 
 Many programs use `Ctrl + Alt + C` as a global shortcut. When one of them has it, the game does not receive the key
-press and copies nothing. The log shows `Failed to register a shortcut "Ctrl + Alt + C"` only for a program that
-registers the shortcut with the operating system. A program that reads the keyboard directly leaves no line in the
-log.
+press and copies nothing. No log line shows this: Kalandra presses the copy keys but does not register them as a
+hotkey, so it does not find out that another program uses them.
 
-Close programs one at a time until the copy works, then change that program's shortcut. Players have reported these
-programs:
+Look for `Ctrl + Alt + C`, or your own copy keys, in the shortcut settings of the programs you run, and change it
+there. If you find none, close programs one at a time until the copy works, then change that program's shortcut.
+Players have reported these programs:
 
 - ASUS GPU Tweak II
 - Radeon™ Software

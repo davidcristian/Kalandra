@@ -160,6 +160,15 @@ describe("updateActions", () => {
     );
   });
 
+  it("registers nothing for the copy keys and adds no action to the config's hotkeys", async () => {
+    const actions = [trigger("F5")];
+
+    await registerOnFocus(actions);
+
+    expect(registered()).toEqual(["F5"]);
+    expect(actions).toEqual([trigger("F5")]);
+  });
+
   it("leaves out and logs a hotkey that two actions use", async () => {
     await registerOnFocus([
       trigger("F5"),

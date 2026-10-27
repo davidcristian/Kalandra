@@ -74,7 +74,6 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 | `stash-search` | `text` | types `text` into the stash search | the stash search widget's entries, when its hotkeys are on |
 | `toggle-overlay` | none | moves the focus between the overlay and the game | `overlayKey` |
 | `paste-in-chat` | `text`, `send` | types a chat command | each entry in `commands` with a hotkey |
-| `test-only` | none | nothing: `updateActions()` adds one for the copy keys, and its reserved-key filter removes it again | |
 
 - `UpdateInfo` is the updater's state, by `state`: `initial`, `checking-for-update`, `update-available` (with
   `version` and `noDownloadReason`: `not-supported`, `disabled-by-flag` or `null`), `update-downloaded` (with
