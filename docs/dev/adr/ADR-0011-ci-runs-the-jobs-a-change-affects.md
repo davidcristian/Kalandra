@@ -14,11 +14,11 @@ the script does not know.
 
 **1. `scripts/ci_paths.py` maps each changed path to the jobs it affects.** The Changed paths job of `test.yml`
 lists the paths with `git diff --name-only --no-renames`, from the merge base for a pull request and from the push's
-`before` commit for a push, and passes them to the script. Each of the Tests, Price service, Scripts and Docs jobs
-runs only when a path affects it. Reason: a change to the docs alone runs the docs build alone, and the rules are
-Python with a unit test, not a list inside the workflow that nothing checks. `--no-renames` lists a moved file under
-its old and its new path, because git otherwise prints only the new one, and a file moved out of `main/` must still
-run the main tests.
+`before` commit for a push, and passes them to the script. Each of the Tests, Price service, Scripts, Docs and Data
+tool jobs runs only when a path affects it. Reason: a change to the docs alone runs the docs build alone, and the
+rules are Python with a unit test, not a list inside the workflow that nothing checks. `--no-renames` lists a moved
+file under its old and its new path, because git otherwise prints only the new one, and a file moved out of `main/`
+must still run the main tests.
 
 **2. The first matching rule applies, and every job runs when no rule matches, no diff can be read or Changed paths
 fails.** A file rule comes before the rule for its folder, and `test_ci_paths.py` fails when an earlier rule hides a
@@ -48,7 +48,9 @@ do not show what an earlier push broke.
   `AGENTS.md` is the exception: it also runs Scripts, whose tests read its banned words table and its scope list.
   So does `docs/dev/refinements/index.md`, whose task template a Scripts test reads.
 - A new folder runs every job until a rule names it. A change to `ipc/` runs both halves of Tests, and a change to
-  `namespaceMap.json` or the price service's fixtures runs the renderer tests and the price service.
+  `namespaceMap.json` or the price service's fixtures runs the renderer tests and the price service. A change to
+  `renderer/src/assets/data/interfaces.ts` or `renderer/src/web/trade-host.ts` runs the renderer tests and the Data
+  tool, whose tests read both files.
 - The Build and Docs workflows keep their own `paths` filters ([architecture.md](../architecture.md#ci)).
 - A push to `master` that starts Build runs the jobs of `test.yml` twice: the affected ones in `test.yml`'s own run
   and all of them inside Build.

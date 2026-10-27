@@ -14,6 +14,9 @@ class ClassifyTest(unittest.TestCase):
             "renderer/public/data/namespaceMap.json": {"renderer", "price_service"},
             "priceService/tests/fixtures/price_file.json": {"renderer", "price_service"},
             "priceService/price_service/ninja.py": {"price_service"},
+            "dataParser/src/main.py": {"dataparser"},
+            "renderer/src/assets/data/interfaces.ts": {"renderer", "dataparser"},
+            "renderer/src/web/trade-host.ts": {"renderer", "dataparser"},
             "docs/faq.md": {"docs"},
             "docs/dev/index.md": set(),
             "docs/dev/refinements/index.md": {"scripts"},
@@ -42,5 +45,12 @@ class MainTest(unittest.TestCase):
             ci_paths.main(["main/src/main.ts\n", "\n", "docs/index.md\n"])
         self.assertEqual(
             output.getvalue().splitlines(),
-            ["renderer=false", "main=true", "price_service=false", "scripts=false", "docs=true"],
+            [
+                "renderer=false",
+                "main=true",
+                "price_service=false",
+                "scripts=false",
+                "docs=true",
+                "dataparser=false",
+            ],
         )

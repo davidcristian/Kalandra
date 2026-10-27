@@ -116,10 +116,13 @@ its `allowScripts` field against the lock's `packages` that have `"hasInstallScr
 
 The Changed paths job of `.github/workflows/test.yml` passes the changed paths on stdin to
 `python3 scripts/ci_paths.py`, with both the old and the new path of a moved file. The script prints `renderer=`,
-`main=`, `price_service=`, `scripts=` and `docs=` with `true` or `false` for `GITHUB_OUTPUT`. `RULES` maps a file,
-or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies. `AGENTS.md` affects the
-Scripts job, because `test_bannedwords.py` and `test_commitlint.py` read its banned words table and its scope list.
+`main=`, `price_service=`, `scripts=`, `docs=` and `dataparser=` with `true` or `false` for `GITHUB_OUTPUT`.
+`RULES` maps a file, or a folder ending in `/`, to the jobs it affects, and the first rule that matches applies.
+`AGENTS.md` affects the Scripts job, because `test_bannedwords.py` and `test_commitlint.py` read its banned words
+table and its scope list.
 `docs/dev/refinements/index.md` affects it too, because `test_backlogcheck.py` reads its task template.
+`renderer/src/assets/data/interfaces.ts` and `renderer/src/web/trade-host.ts` affect the Data tool job as well as the
+renderer, because `test_client_string_data.py` and `test_urls.py` in `dataParser/` read them.
 Any other markdown file at the repo root affects no job, and any other path that no rule matches affects every job
 ([ADR-0011](../adr/ADR-0011-ci-runs-the-jobs-a-change-affects.md)).
 

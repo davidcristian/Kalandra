@@ -219,9 +219,10 @@ and no `log.warn`) and Pyright in strict mode on `src/`. Pyright reads its setti
 packages from `dataParser/.venv`, which needs `pandas-stubs` for the pandas types. `stubs/cloudscraper/` declares the
 calls the tool makes to `cloudscraper`, which has no types. Run the hooks with
 `pre-commit run -c dataParser/.pre-commit-config.yaml --all-files` in the repo root. pre-commit runs every hook from
-the repo root, so the config's top-level `files: ^dataParser/` keeps them to this folder. CI runs neither:
-`.github/workflows/test.yml` has no job for `dataParser/`, and the root `.pre-commit-config.yaml` does not include
-these hooks.
+the repo root, so the config's top-level `files: ^dataParser/` keeps them to this folder. The Data tool job of
+`.github/workflows/test.yml` runs the tests and these hooks on Python 3.12 for a change under `dataParser/` or to
+the two renderer files its tests read ([architecture.md](../architecture.md#ci)). The root `.pre-commit-config.yaml`
+does not include these hooks, so Lint & Format does not run them.
 
 The tests that read inputs a clone does not have skip with a reason when the inputs are missing. `tests/inputs.py`
 gives the markers: `needs_game_export` skips when `data/vendor/tables/` and `data/vendor/files/` hold no file but

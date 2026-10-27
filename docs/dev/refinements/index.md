@@ -169,3 +169,4 @@ layout and its reasons.
 - 105: [No hook runs ESLint or Prettier on ipc/](tasks/105-no-lint-or-format-for-ipc.md)
 - 106: [Renderer errors other than a failed price file load reach only the browser console](tasks/106-other-renderer-errors-in-console.md)
 - 107: [No run on a Mac has checked updates, the Accessibility prompt or the game's file paths](tasks/107-macos-run-not-checked.md)
+- 108: [dataParser unit tests that build a ValueConverterService need the game export](tasks/108-dataparser-unit-tests-need-the-export.md)

@@ -1,9 +1,9 @@
 # dataParser tests need files the repo does not have, and CI does not run them
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/tests/](../../../../dataParser/tests/)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `tests/unit/stores/helpers/test_description.py` and
 `tests/integration/stores/helpers/test_description_i.py` read expected results from
@@ -25,3 +25,8 @@ hooks. Break one test and watch the job fail.
 ## History
 
 - 2026-10-18: Found while the dataParser module doc was written, by listing what the tests open.
+- 2026-10-27: Became "test(dataparser): skip tests that need the game export or trade data" and
+  "ci: run the data tool tests and hooks for changes to dataParser". The expected files were already
+  in the repo. The job's commands failed on Windows with a broken test and with a broken hook, and the
+  job itself has not run on GitHub yet. The unit tests that now skip without the export are
+  [108](108-dataparser-unit-tests-need-the-export.md).

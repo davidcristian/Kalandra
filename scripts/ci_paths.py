@@ -4,7 +4,7 @@ import sys
 from collections.abc import Iterable
 from typing import NamedTuple
 
-JOBS = ("renderer", "main", "price_service", "scripts", "docs")
+JOBS = ("renderer", "main", "price_service", "scripts", "docs", "dataparser")
 ALL = frozenset(JOBS)
 NONE: frozenset[str] = frozenset()
 
@@ -27,13 +27,16 @@ RULES = (
     Rule("renderer/public/data/namespaceMap.json", frozenset({"renderer", "price_service"})),
     Rule("priceService/tests/fixtures/", frozenset({"renderer", "price_service"})),
     Rule("priceService/", frozenset({"price_service"})),
+    # test_client_string_data.py and test_urls.py in dataParser/ read these two renderer files.
+    Rule("renderer/src/assets/data/interfaces.ts", frozenset({"renderer", "dataparser"})),
+    Rule("renderer/src/web/trade-host.ts", frozenset({"renderer", "dataparser"})),
     Rule("renderer/", frozenset({"renderer"})),
     Rule("main/", frozenset({"main"})),
     # test_backlogcheck.py reads the task template in the backlog index.
     Rule("docs/dev/refinements/index.md", frozenset({"scripts"})),
     Rule("docs/dev/", NONE),
     Rule("docs/", frozenset({"docs"})),
-    Rule("dataParser/", NONE),
+    Rule("dataParser/", frozenset({"dataparser"})),
     Rule(".github/", NONE),
     Rule("LICENSES/", NONE),
     Rule(".pre-commit-config.yaml", NONE),

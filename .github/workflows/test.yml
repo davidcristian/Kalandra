@@ -29,6 +29,7 @@ jobs:
       price_service: ${{ steps.paths.outputs.price_service }}
       scripts: ${{ steps.paths.outputs.scripts }}
       docs: ${{ steps.paths.outputs.docs }}
+      dataparser: ${{ steps.paths.outputs.dataparser }}
     steps:
     - uses: actions/checkout@v6
       with:
@@ -56,7 +57,7 @@ jobs:
           python3 scripts/ci_paths.py < changed.txt | tee -a "$GITHUB_OUTPUT"
         else
           echo "No diff range to read, or the caller asked for every job, so every job runs"
-          printf 'renderer=true\nmain=true\nprice_service=true\nscripts=true\ndocs=true\n' >> "$GITHUB_OUTPUT"
+          printf 'renderer=true\nmain=true\nprice_service=true\nscripts=true\ndocs=true\ndataparser=true\n' >> "$GITHUB_OUTPUT"
         fi
   lint-and-format:
     name: Lint & Format
@@ -153,3 +154,23 @@ jobs:
       working-directory: ./docs
     - run: npm run build
       working-directory: ./docs
+  dataparser:
+    name: Data tool
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.dataparser == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    # The Pyright hook reads the packages from dataParser/.venv, which dataParser/pyproject.toml names.
+    - run: python -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+      working-directory: ./dataParser
+    # The tests that read the game export or the trade data skip, since a checkout has neither.
+    - run: .venv/bin/python -m pytest -rs
+      working-directory: ./dataParser
+    - run: pip install pre-commit
+    - run: pre-commit run --config dataParser/.pre-commit-config.yaml --all-files --show-diff-on-failure
