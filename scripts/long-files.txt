@@ -8,11 +8,11 @@
 1759 renderer/src/parser/Parser.ts
 374 renderer/src/parser/stat-translations.ts
 721 renderer/src/web/Config.ts
-566 renderer/src/web/background/Prices.ts
+565 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue
 394 renderer/src/web/overlay/OverlayWindow.vue
 424 renderer/src/web/overlay/Widget.vue
-334 renderer/src/web/price-check/CheckedItem.vue
+333 renderer/src/web/price-check/CheckedItem.vue
 432 renderer/src/web/price-check/PriceCheckWindow.vue
 601 renderer/src/web/price-check/filters/FilterModifier.vue
 434 renderer/src/web/price-check/filters/FiltersBlock.vue

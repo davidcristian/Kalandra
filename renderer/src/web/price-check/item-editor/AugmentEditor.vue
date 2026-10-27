@@ -185,10 +185,13 @@ export default defineComponent({
 
     const selectedAugment = shallowRef<EditorItem | undefined>();
     function resetSelectedAugment() {
-      selectedAugment.value = buildEditorItems(
-        [ITEM_BY_REF("ITEM", "Greater Iron Rune")![0]],
-        props.item?.category ?? ItemCategory.Unknown,
-      )[0];
+      const rune = ITEM_BY_REF("ITEM", "Greater Iron Rune")?.[0];
+      selectedAugment.value = rune
+        ? buildEditorItems(
+            [rune],
+            props.item?.category ?? ItemCategory.Unknown,
+          )[0]
+        : undefined;
     }
     resetSelectedAugment();
 

@@ -153,8 +153,8 @@ export default defineComponent({
 
   setup(props) {
     const tooltipOption = computed(() => priceCheckConfig().itemHoverTooltip);
-    const target = ref<HTMLElement>(null!);
-    const content = ref<HTMLElement>(null!);
+    const target = ref<HTMLElement | null>(null);
+    const content = ref<HTMLElement | null>(null);
     const { t } = useI18nNs("trade_result");
     let instance: Instance;
 
@@ -178,6 +178,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (tooltipOption.value === "off") return;
+      if (!target.value || !content.value) return;
       if (tooltipOption.value === "keybind") {
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);

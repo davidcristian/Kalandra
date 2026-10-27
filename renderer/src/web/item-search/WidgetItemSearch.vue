@@ -250,7 +250,7 @@ function selectItem(item: BaseType, opts?: { unique?: true }) {
     price = findPriceByQuery({
       ns: item.namespace,
       name: item.refName,
-      variant: item.unique!.base,
+      variant: item.unique?.base,
     });
   } else {
     price = findPriceByQuery({

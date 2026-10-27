@@ -223,7 +223,7 @@ export default defineComponent({
       t,
       priceData,
       openNinja() {
-        window.open(priceData.value!.url);
+        if (priceData.value) window.open(priceData.value.url);
       },
       isValuableBasetype: computed(() => {
         return isValuableBasetype(props.item);

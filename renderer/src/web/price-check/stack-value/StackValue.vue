@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="show"
+    v-if="value"
     class="p-2 border-dashed border border-gray-600 rounded mt-2"
   >
     <div class="flex text-gray-400 leading-none">
@@ -42,27 +42,24 @@ export default defineComponent({
   setup(props) {
     const { findPriceByQuery, autoCurrency } = usePoeninja();
 
-    function getPriceFor(n: number) {
-      const one = findPriceByQuery(getDetailsId(props.item)!)!;
-
-      const price = autoCurrency(n * one.primaryValue);
-
-      return `${displayRounding(price.min)} ${price.currency}`;
-    }
-
     const { t } = useI18n();
 
     return {
       t,
-      show: computed(() => {
-        const id = getDetailsId(props.item);
-        return Boolean(props.filters.stackSize && id && findPriceByQuery(id));
-      }),
       value: computed(() => {
+        const id = getDetailsId(props.item);
+        const one = id ? findPriceByQuery(id) : null;
+        const stackSize = props.filters.stackSize;
+        if (!one || !stackSize) return null;
+
+        const getPriceFor = (n: number) => {
+          const price = autoCurrency(n * one.primaryValue);
+          return `${displayRounding(price.min)} ${price.currency}`;
+        };
         return {
           have: {
-            amount: props.filters.stackSize!.value,
-            price: getPriceFor(props.filters.stackSize!.value),
+            amount: stackSize.value,
+            price: getPriceFor(stackSize.value),
           },
           oneStack: props.item.stackSize
             ? {

@@ -88,14 +88,15 @@ export default defineComponent({
     );
 
     const firstResultValue = computed<CurrencyValue | null>(() => {
-      if (!props.firstResult || !props.firstResult.normalizedPrice) return null;
+      const currency = props.firstResult?.normalizedPriceCurrency;
+      if (!props.firstResult?.normalizedPrice || !currency) return null;
 
       const num = Number.parseFloat(props.firstResult.normalizedPrice);
       if (Number.isNaN(num)) return null;
       return {
         min: num,
         max: num,
-        currency: props.firstResult.normalizedPriceCurrency!.id,
+        currency: currency.id,
       };
     });
 

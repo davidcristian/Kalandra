@@ -173,7 +173,7 @@ export const usePoeninja = createGlobalState(() => {
       availableCoreCurrencies.value = getAvailableCoreCurrencies().map(
         (currency) => ({
           ...currency,
-          text: ITEM_BY_REF("ITEM", currency.ref)![0].name,
+          text: ITEM_BY_REF("ITEM", currency.ref)?.[0]?.name ?? currency.ref,
         }),
       );
       const haveCurrency = availableCoreCurrencies.value.some(
@@ -232,8 +232,7 @@ export const usePoeninja = createGlobalState(() => {
     void load(); // load() logs its own failure
   }
 
-  function selectedLeagueToUrl(): string {
-    const league = leagues.selectedId.value!;
+  function leagueToUrl(league: string): string {
     switch (league) {
       case "Standard":
         return "standard";
@@ -250,11 +249,12 @@ export const usePoeninja = createGlobalState(() => {
 
   function findPriceByQuery(query: DbQuery) {
     const found = findInDatabase(PRICES_DB, query);
-    if (!found) return null;
+    const league = leagues.selectedId.value;
+    if (!found || !league) return null;
     return {
       ...found.info,
       cx: found.cx,
-      url: `https://poe.ninja/poe2/economy/${selectedLeagueToUrl()}/${found.url}/${found.info.detailsId}`,
+      url: `https://poe.ninja/poe2/economy/${leagueToUrl(league)}/${found.url}/${found.info.detailsId}`,
     };
   }
 
@@ -316,9 +316,8 @@ export const usePoeninja = createGlobalState(() => {
   function cachedCurrencyByQuery(query: DbQuery, count: number) {
     // variant should always be undefined for currencies
     const key = `${query.ns}:${query.name}:${query.variant ?? ""}:${count}`;
-    if (priceCache.has(key)) {
-      return priceCache.get(key)!;
-    }
+    const cached = priceCache.get(key);
+    if (cached) return cached;
 
     const price = findPriceByQuery(query);
     if (!price) {

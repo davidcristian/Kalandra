@@ -175,8 +175,8 @@ otherwise the first. A failed load is logged with `console.warn` and its message
   the last hour. A response with an empty item or stat list keeps the loaded lists, and the timer tries again at its
   next run.
 - **Prices come only from the price file** ([ADR-0006](../adr/ADR-0006-own-price-service.md)). No code here
-  requests poe.ninja. `findPriceByQuery` builds a link to the item's poe.ninja page, which the price trend opens
-  with `window.open` when the user clicks it.
+  requests poe.ninja. `findPriceByQuery` links the item to its poe.ninja page in the selected league, which the
+  price trend opens with `window.open` on a click, and finds no price while no league is selected.
 - **The price file's key order and file names are shared with `priceService/`**: see
   [why the key order is a format](price-service.md#why-the-key-order-is-a-format) and
   [the files](price-service.md#the-files).
@@ -234,8 +234,8 @@ and checks the order and the totals per currency, the seller states and the cach
 filters that `createTradeRequest` sends for them, with a maximum the user sets, and the elements an elemental damage
 filter leaves out.
 `specs/web/prices.test.ts` reads the price service's fixtures, a file without rates, a namespace map of another
-schema version and an overview type that the map does not list, and `specs/web/prices-load.test.ts` loads the price
-file from a fake host. `specs/web/display-rounding.test.ts` writes prices as `displayRounding` shows them.
+schema version and an overview type that the map does not list. `specs/web/prices-load.test.ts` and
+`prices-league.test.ts` load the price file from a fake host. `specs/web/display-rounding.test.ts` writes prices as `displayRounding` shows them.
 `specs/web/trade-data.test.ts` loads the trade site's item and stat lists from a fake site with fake timers.
 `specs/web/host-proxy.test.ts` checks the URL and header `Host.proxy` sends, and that it takes only a string path.
 `specs/web/price-check/trade/rate-limits.test.ts` reads hand-written rate limit headers into limiter sets with

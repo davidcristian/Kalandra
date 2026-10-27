@@ -214,11 +214,6 @@
       "count": 28
     }
   },
-  "src/web/background/Prices.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    }
-  },
   "src/web/client-log/client-log.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
@@ -227,16 +222,6 @@
   "src/web/item-check/hotkeyable-actions.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
-    }
-  },
-  "src/web/item-search/WidgetItemSearch.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/CheckedItem.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 6
     }
   },
   "src/web/price-check/filters/FilterModifier.vue": {
@@ -304,26 +289,6 @@
       "count": 3
     }
   },
-  "src/web/price-check/item-editor/AugmentEditor.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/stack-value/StackValue.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/web/price-check/trade/ExtractionValue.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/trade/TradeItem.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
   "src/web/price-check/trade/bulk-api.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
@@ -344,27 +309,7 @@
       "count": 1
     }
   },
-  "src/web/price-check/trends/PriceTrend.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "src/web/price-check/trends/getDetailsId.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/price-check/unidentified-resolver/UnidentifiedResolver.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/web/ui/Popover.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
-  "src/web/ui/StatRollSlider.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }

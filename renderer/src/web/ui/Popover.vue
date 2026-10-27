@@ -51,11 +51,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const target = ref<HTMLElement>(null!);
-    const content = ref<HTMLElement>(null!);
-    let instance: Instance;
+    const target = ref<HTMLElement | null>(null);
+    const content = ref<HTMLElement | null>(null);
+    let instance: Instance | undefined;
 
     onMounted(() => {
+      if (!target.value || !content.value) return;
       instance = tippy(target.value, {
         content: content.value,
         interactive: true,
@@ -83,7 +84,7 @@ export default defineComponent({
     });
 
     onBeforeUnmount(() => {
-      instance.destroy();
+      instance?.destroy();
     });
 
     return {

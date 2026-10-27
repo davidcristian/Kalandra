@@ -40,10 +40,11 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const identifiedVariants = computed(() => {
-      const baseType = props.item!.info.refName;
       const possible: BaseType[] = [];
+      if (!props.item) return possible;
+      const baseType = props.item.info.refName;
       for (const match of ITEMS_ITERATOR(JSON.stringify(baseType))) {
-        if (match.namespace === "UNIQUE" && match.unique!.base === baseType) {
+        if (match.namespace === "UNIQUE" && match.unique?.base === baseType) {
           // A unique with variants is listed once
           if (!possible.some((unique) => unique.refName === match.refName)) {
             possible.push(match);
@@ -68,8 +69,9 @@ export default defineComponent({
     });
 
     function select(info: BaseType) {
+      if (!props.item) return;
       const newItem: ParsedItem = {
-        ...props.item!,
+        ...props.item,
         info,
       };
       ctx.emit("identify", newItem);
@@ -81,7 +83,7 @@ export default defineComponent({
       t,
       identifiedVariants,
       show,
-      baseType: computed(() => props.item!.info.name),
+      baseType: computed(() => props.item?.info.name),
       select,
     };
   },

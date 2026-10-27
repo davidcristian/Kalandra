@@ -56,7 +56,7 @@ export default defineComponent({
     },
   },
   setup(props, ctx) {
-    const rootEl = shallowRef<HTMLDivElement>(null!);
+    const rootEl = shallowRef<HTMLDivElement | null>(null);
 
     const dirty = shallowRef<(typeof props)["modelValue"] | null>(null);
 
@@ -93,6 +93,7 @@ export default defineComponent({
     function handleMousemove(e: MouseEvent) {
       e.preventDefault();
       const { bounds, dp } = props;
+      if (!rootEl.value) return;
       const rect = rootEl.value.getBoundingClientRect();
       const k = Math.max(0, Math.min((e.clientX - rect.x) / rect.width, 1));
       const value = (bounds.max - bounds.min) * k + bounds.min;

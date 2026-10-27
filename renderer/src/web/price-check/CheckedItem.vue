@@ -86,7 +86,6 @@ import {
 } from "./trade/pathofexile-trade";
 import { AppConfig } from "@/web/Config";
 import { priceCheckConfig } from "@/web/price-check/price-check-config";
-import { FilterPreset } from "./filters/interfaces";
 import { useLeagues } from "@/web/background/Leagues";
 import { createTipSchedule } from "../help/tips";
 
@@ -119,26 +118,23 @@ export default defineComponent({
     const widget = computed(() => priceCheckConfig());
     const leagues = useLeagues();
 
-    const presets = ref<{ active: string; presets: FilterPreset[] }>(null!);
-    const itemFilters = computed(
-      () =>
-        presets.value.presets.find(
-          (preset) => preset.id === presets.value.active,
-        )!.filters,
-    );
-    const itemStats = computed(
-      () =>
-        presets.value.presets.find(
-          (preset) => preset.id === presets.value.active,
-        )!.stats,
-    );
+    const presets = ref<ReturnType<typeof createPresets> | null>(null);
+    const activePreset = computed(() => {
+      const preset = presets.value?.presets.find(
+        (preset) => preset.id === presets.value?.active,
+      );
+      if (!preset) throw new Error("The item has no active filter preset");
+      return preset;
+    });
+    const itemFilters = computed(() => activePreset.value.filters);
+    const itemStats = computed(() => activePreset.value.stats);
     const doSearch = ref(false);
     const tradeAPI = ref<"trade" | "bulk">("bulk");
 
     // TradeListing.vue OR TradeBulk.vue
     const tradeService = ref<{ execSearch(): void } | null>(null);
     // FiltersBlock.vue
-    const filtersComponent = ref<ComponentPublicInstance>(null!);
+    const filtersComponent = ref<ComponentPublicInstance | null>(null);
 
     watch(
       () => props.item,
@@ -151,7 +147,7 @@ export default defineComponent({
             : undefined;
 
         presets.value = createPresets(item, {
-          league: leagues.selectedId.value!,
+          league: leagues.selectedId.value ?? "",
           collapseListings: widget.value.collapseListings,
           activateStockFilter: widget.value.activateStockFilter,
           searchStatRange: widget.value.searchStatRange,
@@ -181,7 +177,8 @@ export default defineComponent({
           doSearch.value = Boolean(
             item.rarity === ItemRarity.Unique ||
               item.category === ItemCategory.Charm ||
-              !CATEGORY_TO_TRADE_ID.has(item.category!) ||
+              item.category === undefined ||
+              !CATEGORY_TO_TRADE_ID.has(item.category) ||
               item.isUnidentified ||
               item.isVeiled,
           );
@@ -264,6 +261,7 @@ export default defineComponent({
 
     function handleSearchMouseenter(e: MouseEvent) {
       if (
+        filtersComponent.value &&
         (filtersComponent.value.$el as HTMLElement).contains(
           e.relatedTarget as HTMLElement,
         )
@@ -316,14 +314,15 @@ export default defineComponent({
       noUniqueSelection,
       handleSearchMouseenter,
       showSupportLinks,
-      presets: computed(() =>
-        presets.value.presets.map((preset) => ({
-          id: preset.id,
-          active: preset.id === presets.value.active,
-        })),
+      presets: computed(
+        () =>
+          presets.value?.presets.map((preset) => ({
+            id: preset.id,
+            active: preset.id === presets.value?.active,
+          })) ?? [],
       ),
       selectPreset(id: string) {
-        presets.value.active = id;
+        if (presets.value) presets.value.active = id;
       },
       makeTradeLink() {
         return `https://${getTradeEndpoint()}/trade2/search/poe2/${itemFilters.value.trade.league}?q=${JSON.stringify(createTradeRequest(itemFilters.value, itemStats.value, props.item))}`;
