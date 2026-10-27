@@ -35,7 +35,6 @@ import {
   groupLinesByMod,
   parseModInfoLine,
 } from "./advanced-mod-desc";
-import { calcPropPercentile, QUALITY_STATS } from "./calc-q20";
 import { parserSettings } from "./settings";
 import {
   buildEditorItems,
@@ -178,7 +177,6 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   { virtual: applyAugmentSockets },
   { virtual: applyElementalAdded },
   { virtual: pickCorrectVariant },
-  { virtual: calcBasePercentile },
 ];
 
 export function parseClipboard(clipboard: string): Result<ParsedItem, string> {
@@ -1040,45 +1038,8 @@ function parseLogbookArea(section: string[], item: ParsedItem) {
   if (item.info.refName !== "Expedition Logbook") return "PARSER_SKIPPED";
   if (section.length < 3) return "SECTION_SKIPPED";
 
-  // skip Area, parse Faction
-  const faction = STAT_BY_MATCH_STR(section[1])[0];
-  if (!faction) return "SECTION_SKIPPED";
-
-  const areaMods: ParsedModifier[] = [
-    {
-      info: { tags: [], type: ModifierType.Pseudo },
-      stats: [
-        {
-          stat: faction.stat,
-          translation: faction.matcher,
-        },
-      ],
-    },
-  ];
-
-  const { modType, lines } = parseModType(section.slice(2));
-  for (const line of lines) {
-    const found = tryParseTranslation(
-      { string: line, unscalable: false },
-      modType,
-      undefined,
-    );
-    if (found) {
-      areaMods.push({
-        info: { tags: [], type: modType },
-        stats: [found],
-      });
-    }
-  }
-
-  areaMods.shift();
-  if (areaMods.length) {
-    if (!item.logbookAreaMods) {
-      item.logbookAreaMods = [areaMods];
-    } else {
-      item.logbookAreaMods.push(areaMods);
-    }
-  }
+  // The second line of an area section names its faction, which stats.ndjson has as a stat
+  if (!STAT_BY_MATCH_STR(section[1]).length) return "SECTION_SKIPPED";
 
   return "SECTION_PARSED";
 }
@@ -1626,41 +1587,6 @@ function applyElementalAdded(item: ParsedItem) {
   }
 }
 
-function calcBasePercentile(item: ParsedItem) {
-  // use ref since we have ref from unique.base
-  const info = item.info.unique
-    ? ITEM_BY_REF("ITEM", item.info.unique.base)?.[0]?.armour
-    : item.info.armour;
-  if (!info) return;
-
-  // Base percentile is the same for all defences.
-  // Using `AR/EV -> ES` order to improve accuracy
-  // of calculation (larger rolls = more precise).
-  if (item.armourAR && info.ar) {
-    item.basePercentile = calcPropPercentile(
-      item.armourAR,
-      info.ar,
-      QUALITY_STATS.ARMOUR,
-      item,
-    );
-  } else if (item.armourEV && info.ev) {
-    item.basePercentile = calcPropPercentile(
-      item.armourEV,
-      info.ev,
-      QUALITY_STATS.EVASION,
-      item,
-    );
-  } else if (item.armourES && info.es) {
-    item.basePercentile = calcPropPercentile(
-      item.armourES,
-      info.es,
-      QUALITY_STATS.ENERGY_SHIELD,
-      item,
-    );
-  }
-  // no ward since base percent isn't used anymore
-}
-
 export function removeLinesEnding(
   lines: readonly string[],
   ending: string,
@@ -1888,6 +1814,7 @@ export const __testExports = {
   parseFractured,
   parseUnidentified,
   parseTrials,
+  parseLogbookArea,
   parseJewelery,
   determineAugments,
   modifiedBfs,

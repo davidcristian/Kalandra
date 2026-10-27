@@ -38,7 +38,6 @@ export interface ParsedItem {
   armourES?: number;
   armourRW?: number;
   armourBLOCK?: number;
-  basePercentile?: number;
   weaponCRIT?: number;
   weaponAS?: number;
   weaponPHYSICAL?: number;
@@ -86,7 +85,6 @@ export interface ParsedItem {
   isMirrored?: boolean;
   isSanctified?: boolean;
   influences: ItemInfluence[];
-  logbookAreaMods?: ParsedModifier[][];
   sentinelCharge?: number;
   isSynthesised?: boolean;
   isFractured?: boolean;

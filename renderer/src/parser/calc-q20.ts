@@ -144,19 +144,6 @@ export function calcPropBounds(
   };
 }
 
-export function calcPropPercentile(
-  total: number,
-  bounds: [min: number, max: number],
-  statRefs: { flat: string[]; incr: string[] },
-  item: ParsedItem,
-): number {
-  const { incr, flat } = calcPropBase(statRefs, item);
-  const roll = calcFlat(total, incr.value, item.quality ?? 0) - flat.value;
-  const [min, max] = bounds;
-  const result = Math.round(((roll - min) / (max - min)) * 100);
-  return Math.min(Math.max(result, 0), 100);
-}
-
 export function calcPropBase(
   statRefs: { flat: string[]; incr: string[] },
   item: ParsedItem,

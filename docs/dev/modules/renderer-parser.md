@@ -54,7 +54,7 @@ The other files, each called from `Parser.ts` or from the price check:
 | `match-stats.ts` | `statMatchForLine` picks the stat of a line among the stats that share its text: one that `statFitsModifier` accepts for the modifier type (it has a trade id of the type, or grants a skill), then one with no other advanced text, because the app copies items with advanced descriptions, else the first in the data ([refinement 064](../refinements/tasks/064-shared-stat-texts.md)) |
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others. `ItemCategory` has a member for each `craftable.category` of the item data, and `specs/data/item-categories.test.ts` checks that, and that each other member is listed there with its reason |
 | `jewellery-quality.ts` | `parseJewelleryQuality` reads the quality line of a ring, amulet, belt or jewel, such as `Quality (Attribute Modifiers): +20% (augmented)`, into `quality`, and sets `qualityType` to the catalyst whose modifier tag in `CATALYST_TO_TAG` the line names. The item editor and the stat filters read `qualityType` |
-| `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality, the base value without modifiers, and the base percentile; `recalculateItemProperties` is called by the item editor in the price check |
+| `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality and the base value without modifiers; `recalculateItemProperties` is called by the item editor in the price check |
 | `augment-builder.ts` | `buildEditorItems` turns rune and soul core records into item editor entries with the effect for the item's category. Each effect line takes its numbers from its own `values` array, because the data scales a number, such as Life regeneration per minute to per second, only for the line that shows it; `getSavedAugments` reads the augments saved per item category in the price check's `savedAugments` setting; `useAugment` puts an entry in a socket and recomputes the item's stats and properties, for the item editor and for the saved augments |
 | `utils.ts` | `combinations` and `avg`, used by `Parser.ts` |
 | `settings.ts` | `parserSettings` returns the user settings the parser reads, the language and the saved augments, from the object the app passes to `setParserSettings` |
@@ -151,9 +151,11 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
   parts that did not match.
 - **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
-  implicit, granted skill, explicit), and `parseLogbookArea` three times. Adding or moving an entry changes which
-  parser reads which section, so the change comes with parser cases for the item kinds it affects.
-- **`Parser.ts` is 1896 lines** (2026-10-27, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+  implicit, granted skill, explicit), and `parseLogbookArea` three times, once per area section of an Expedition
+  Logbook: the area name, a faction line that matches a stat, then the area's modifiers, which it takes without
+  reading them. Adding or moving an entry changes which parser reads which section, so the change comes with parser
+  cases for the item kinds it affects.
+- **`Parser.ts` is 1823 lines** (2026-10-27, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from

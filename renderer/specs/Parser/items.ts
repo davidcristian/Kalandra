@@ -12,7 +12,6 @@ export class TestItem implements ParsedItem {
   armourEV?: number | undefined;
   armourES?: number | undefined;
   armourBLOCK?: number | undefined;
-  basePercentile?: number | undefined;
   weaponCRIT?: number | undefined;
   weaponAS?: number | undefined;
   weaponPHYSICAL?: number | undefined;
@@ -54,7 +53,6 @@ export class TestItem implements ParsedItem {
   isUnmodifiable?: boolean | undefined;
   isMirrored?: boolean | undefined;
   influences: ItemInfluence[] = [];
-  logbookAreaMods?: ParsedModifier[][] | undefined;
   sentinelCharge?: number | undefined;
   isSynthesised?: boolean | undefined;
   isFractured?: boolean | undefined;

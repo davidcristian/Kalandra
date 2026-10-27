@@ -2,7 +2,11 @@ import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
-import { createTestItem, createTestParserState } from "@specs/helper";
+import {
+  createTestItem,
+  createTestItemWithInfo,
+  createTestParserState,
+} from "@specs/helper";
 import { ParsedItem } from "@/parser";
 
 describe("Parse Unidentified Sections", () => {
@@ -129,5 +133,42 @@ describe("parseTrials", () => {
     expect(res).toBe("PARSER_SKIPPED");
     expect(parsedItem.areaLevel).toBeUndefined();
     expect(parsedItem.trials).toBeUndefined();
+  });
+});
+
+// Lines of the first area of the Expedition Logbook listing in specs/docs/fetchResponses.json
+const LOGBOOK_AREA = [
+  "Frigid Bluffs",
+  "Druids of the Broken Circle",
+  "Area contains 12 additional Chest Markers",
+  "Area contains 35% increased number of Monster Markers",
+];
+
+describe("Parse Expedition Logbook area sections", () => {
+  beforeEach(async () => {
+    setupTests();
+    await init("en");
+  });
+
+  it.each([
+    ["SECTION_PARSED", "an area section", LOGBOOK_AREA],
+    [
+      "SECTION_SKIPPED",
+      "a section without a faction line",
+      [LOGBOOK_AREA[0], ...LOGBOOK_AREA.slice(2)],
+    ],
+    ["SECTION_SKIPPED", "a section of two lines", LOGBOOK_AREA.slice(0, 2)],
+  ])("returns %s for %s and adds no modifier", (result, _section, lines) => {
+    const item = createTestItemWithInfo({ refName: "Expedition Logbook" });
+
+    expect(__testExports.parseLogbookArea(lines, item)).toBe(result);
+    expect(item.newMods).toEqual([]);
+    expect(item.unknownModifiers).toEqual([]);
+  });
+
+  it("skips the parser for an item that is not an Expedition Logbook", () => {
+    expect(__testExports.parseLogbookArea(LOGBOOK_AREA, createTestItem())).toBe(
+      "PARSER_SKIPPED",
+    );
   });
 });
