@@ -17,12 +17,11 @@ The entry, the server and the app services, in `main/src/`:
   also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `Logger`,
   `AppTray`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
   `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on Linux,
-  because the window is black instead of transparent otherwise, and 0 elsewhere. Its `CLIENT->MAIN::update-host-config`
-  handler passes each `HostConfig` field to the object that uses it, and logs a failed `GameLogWatcher` restart as
-  `error [GameLogWatcher] Cannot restart`. It then starts `uIOhook`, calls `startServer()` and
-  loads the page. When `startServer()` rejects, it shows the error box `Kalandra cannot start` and quits, and any other
-  failure there logs `error [main] Cannot start the overlay:` with the stack. In development it also installs Vue
-  Devtools. `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
+  because the window is black instead of transparent otherwise, and 0 elsewhere. It passes the services to
+  `passHostConfig()`, then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects,
+  it shows the error box `Kalandra cannot start` and quits, and any other failure there logs
+  `error [main] Cannot start the overlay:` with the stack. In development it also installs Vue Devtools.
+  `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
   `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
@@ -70,6 +69,8 @@ The entry, the server and the app services, in `main/src/`:
   returns a `.catch()` handler that writes `error [<source>] Cannot <action>: <message>`. Callers start a message with
   its level (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
   `GameLogWatcher` writes after its `Found 2 log files` error have no level. The Debug settings page shows the log.
+- `host-config.ts`: `passHostConfig(server, services)` passes each `HostConfig` field to the service that uses it
+  ([ipc.md](ipc.md#public-contract)), and logs a failed `GameLogWatcher` restart as `error [GameLogWatcher] Cannot ...`.
 - `renderer-log.ts`: `logRendererEntries(server, logger)`, which `main.ts` calls after it creates the `Logger`, writes
   each `CLIENT->MAIN::log-entry` a page sends as `<level> [renderer] <message>`. `rendererLogLine()` makes the line
   from the unchecked payload ([ipc.md](ipc.md#public-contract)).
@@ -90,21 +91,20 @@ The entry, the server and the app services, in `main/src/`:
 
 - `Shortcuts.ts`: `new Shortcuts(logger, overlay, poeWindow, gameConfig, server)` holds the hotkeys.
   `updateActions(settings)` replaces them with the `shortcuts` field and reads `stashScroll`, `logKeys` and
-  `restoreClipboard` by name (`ShortcutSettings`), and `updateDelay(delay)` sets the clipboard's first poll delay.
-  Each hotkey is registered with Electron's `globalShortcut` only while the game window is active.
-  `registrableActions()` in `registrable-actions.ts` drops,
-  with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron` lacks (`accelerator.ts`), a
-  hotkey the game uses ([settings.md](../../settings.md#hotkeys) lists them) and a hotkey given to two actions, except
-  that a `toggle-overlay` action keeps it. It broadcasts `MAIN->CLIENT::unregistered-hotkeys` with the first two kinds
-  and the hotkeys `globalShortcut` refused, after each `updateActions()` and when `register()` finds other keys taken.
-  On a press it releases the hotkey's keys through `uiohook-napi` (all but the modifiers when `keepModKeys` is set)
-  and runs the action: `toggle-overlay`, `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`),
-  `stash-search` or `copy-item` (presses the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to
-  the last active client and, with `focusOverlay`, makes the overlay active when it was the last active client; it
-  logs each error but `NoItemTextError` as `error [Shortcuts] Failed to copy the item text: <message>`). With
-  `logKeys` it logs each key while the game window is active (`key-log.ts`). With `stashScroll` (the Stash tab
-  scrolling setting) it taps `ArrowLeft` or `ArrowRight` for `Ctrl` and the mouse wheel while the game is active,
-  except over the area `isStashArea()` computes.
+  `restoreClipboard` by name (`ShortcutSettings`), and `updateDelay(delay)` sets the clipboard's first poll delay. Each
+  hotkey is registered with Electron's `globalShortcut` only while the game window is active. `registrableActions()` in
+  `registrable-actions.ts` drops, with an `error [Shortcuts]` log line, a hotkey with a key name that `KeyToElectron`
+  lacks (`accelerator.ts`), a hotkey the game uses ([settings.md](../../settings.md#hotkeys) lists them) and a hotkey
+  given to two actions, except that a `toggle-overlay` action keeps it. It broadcasts
+  `MAIN->CLIENT::unregistered-hotkeys` with the first two kinds and the hotkeys `globalShortcut` refused, after each
+  `updateActions()` and when `register()` finds other keys taken. On a press it releases the hotkey's keys through
+  `uiohook-napi` (all but the modifiers when `keepModKeys` is set) and runs the action: `toggle-overlay`,
+  `paste-in-chat`, `trigger-event` (broadcasts `MAIN->CLIENT::widget-action`), `stash-search` or `copy-item` (presses
+  the copy keys through `readItemText()`, sends `MAIN->CLIENT::item-text` to the last active client and, with
+  `focusOverlay`, makes the overlay active when it was the last active client; it logs each error but `NoItemTextError`
+  as `error [Shortcuts] Failed to copy the item text: <message>`). With `logKeys` it logs each key while the game window
+  is active (`key-log.ts`). With `stashScroll` (the Stash tab scrolling setting) it taps `ArrowLeft` or `ArrowRight` for
+  `Ctrl` and the mouse wheel while the game is active, except over the area `isStashArea()` computes.
 - `HostClipboard.ts`: Electron's clipboard reads and writes return promises, and each one ends before main presses a
   key. `readItemText(pressCopyKeys)` clears the clipboard when it holds item text and then calls `pressCopyKeys`, so a
   write that ends late cannot replace the copied text. It polls every 48 ms (`POLL_DELAY`) after the first delay, for
@@ -242,7 +242,7 @@ releases. The `electron` package has no install script. `require("electron")` do
 time it runs, which `npm run dev` does, and electron-builder downloads its own copy to package the app.
 
 **Tests.** `npm test` in `main/` runs Vitest over `main/specs/`, and the Tests job in `test.yml` runs it with
-`--coverage`, which fails below the floor in `main/vitest.config.ts` (91.8% of the lines of `src/` on 26 Oct 2026).
+`--coverage`, which fails below the floor in `main/vitest.config.ts` (93.1% of the lines of `src/` on 27 Oct 2026).
 [main-tests.md](main-tests.md) says what each test file checks. `npm run build` in `main/` runs `tsc --noEmit` and the
 production bundle, and `npm run lint` runs ESLint 9 on `src/`, `specs/` and `build/` with the rules in
 `eslint.config.mjs`; the Build workflow packages main on all three platforms. Hotkeys, overlay focus and clipboard

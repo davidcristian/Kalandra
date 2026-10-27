@@ -37,6 +37,9 @@ replaces it with `vi.mock("electron", ...)`.
   `logRejection()`.
 - `renderer-log.test.ts` sends `CLIENT->MAIN::log-entry` payloads through `FakeServer` and reads the lines main's log
   broadcasts: one with line breaks, one over the length limit, and payloads without a known level or a text message.
+- `host-config.test.ts` sends `CLIENT->MAIN::update-host-config` through `FakeServer` to fake services that keep
+  the settings they are given. Every text in its config differs, and each switch is turned on alone, so a field
+  passed to the wrong service fails. It also sends empty paths and a log watcher restart that fails.
 - `uncaught-errors.test.ts` emits uncaught errors and unhandled rejections of each kind of value from an `EventEmitter`
   in place of `process`.
 

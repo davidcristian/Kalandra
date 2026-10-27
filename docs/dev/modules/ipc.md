@@ -25,7 +25,7 @@ type check covers the files it imports. The routes that move the messages are in
 | Event | Payload | Sent by | Handled by |
 | --- | --- | --- | --- |
 | `CLIENT->MAIN::save-config` | `contents` | `saveConfig()` in `Config.ts` | `ConfigStore` |
-| `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
+| `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `passHostConfig()` in `host-config.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus; `server.ts`, for the one client left after a close | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
 | `CLIENT->MAIN::log-entry` | `level`: `error`, `warn` or `info`; `message` | `logToMain()` in `log-to-main.ts`, called by `load()` in `Prices.ts` when a price file load fails | `logRendererEntries()` in `renderer-log.ts`, which writes the line through `Logger` |
@@ -49,7 +49,7 @@ type check covers the files it imports. The routes that move the messages are in
 Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sent to every client.
 
 - `HostConfig` holds the settings main reads. `getConfigForHost()` in `renderer/src/web/Config.ts` builds it, and
-  the `CLIENT->MAIN::update-host-config` handler in `main/src/main.ts` passes each field on:
+  `passHostConfig()` in `main/src/host-config.ts` passes each field of `CLIENT->MAIN::update-host-config` on:
 
 | Field | Built from | Used by |
 | --- | --- | --- |
@@ -155,8 +155,9 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   no handler for, and logs a handler that throws; `IPC.ts` passes the untyped result of `JSON.parse()` to
   `selfDispatch()`. main serves the renderer files it was packaged with, so both ends come from one build.
 - A new `HostConfig` field is set in `getConfigForHost()` and in the expected payload of
-  `renderer/specs/web/host-config.test.ts`, whose types make `tsc` fail until it is, and is read in the `main.ts`
-  handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
+  `renderer/specs/web/host-config.test.ts`, whose types make `tsc` fail until it is, and is read in
+  `passHostConfig()`. A new switch also goes into `SWITCHES` in `main/specs/host-config.test.ts`, whose type makes
+  `tsc` fail until it does. A setting main needs follows the hard rule as well ([config.md](config.md)).
 - Saved configs store hotkeys as `hotkeyToString()` writes them, so renaming a key in these tables changes what a
   saved hotkey means.
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates

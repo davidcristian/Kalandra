@@ -5,8 +5,9 @@ import { uIOhook } from "uiohook-napi";
 import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
 import { type ListenAddress, pageUrl } from "./listen-option";
-import { Logger, logRejection } from "./RemoteLogger";
+import { Logger } from "./RemoteLogger";
 import { logRendererEntries } from "./renderer-log";
+import { passHostConfig } from "./host-config";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
 import { GameConfig } from "./host-files/GameConfig";
@@ -98,16 +99,14 @@ void startWhenReady(
         gameConfig,
         eventPipe,
       );
-      eventPipe.onEventAnyClient("CLIENT->MAIN::update-host-config", (cfg) => {
-        overlay.updateOpts(cfg);
-        shortcuts.updateActions(cfg);
-        shortcuts.updateDelay(cfg.initialDelay);
-        gameLogWatcher
-          .restart(cfg.clientLog ?? "", cfg.readClientLog)
-          .catch(logRejection(logger, "GameLogWatcher", "restart"));
-        void gameConfig.readConfig(cfg.gameConfig ?? ""); // logs a failed read
-        tray.overlayKey = cfg.overlayKey;
-        void fileWriter.restart(cfg.libraryAlpha, cfg.libraryOutputPath); // logs a failed write
+      passHostConfig(eventPipe, {
+        overlay,
+        shortcuts,
+        gameLogWatcher,
+        gameConfig,
+        tray,
+        fileWriter,
+        logger,
       });
       uIOhook.start();
       let address: ListenAddress;

@@ -11,7 +11,7 @@ No file in `main/specs/` or `renderer/specs/` imports these `.ts` files of `main
 
 | Module | Lines covered | Why a spec of its own matters or not |
 | --- | --- | --- |
-| `main/src/main.ts` | 0% | The entry point. It creates every service at import and passes `CLIENT->MAIN::update-host-config` to them. `startup.test.ts` checks the startup order in `startup.ts`. A spec needs the passing of settings moved into a function that takes the services. It matters because `updateActions()` takes three booleans in a row and `updateOpts()` two strings, so `tsc` does not notice two of them swapped. |
+| `main/src/main.ts` | 0% | The entry point. It creates every service at import. `startup.test.ts` checks the startup order in `startup.ts`, and `host-config.test.ts` checks `passHostConfig()` in `host-config.ts`, which passes each `HostConfig` field to the service that uses it. `updateActions()` and `updateOpts()` read their fields by name, so `tsc` fails on two swapped. The rest of `main.ts` creates the Electron objects, which a spec would replace with fakes. |
 | `main/src/host-files/utils.ts` | 100% | `GameConfig.test.ts` and `GameLogWatcher.test.ts` cover `guessFileLocation()` through their default paths. No spec of its own is needed. |
 | `renderer/src/web/client-log/client-log-parser.ts` | 85.6% | `client-log.test.ts` covers it with `FullCampaign.txt`. The lines left name the skill point types other than Passive, Weapon Set and Abyss Atlas. Nothing reads `pointType` yet, so a test with copied log lines can wait until something does. |
 | `renderer/src/web/item-search/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
@@ -40,3 +40,5 @@ History line that says why the code stays.
   names nine modules.
 - 2026-10-26: The four `vision/` modules left the table when the Heist gem OCR was removed
   ([031](031-path-of-exile-1-features.md)), so the title names five modules.
+- 2026-10-27: The settings of `CLIENT->MAIN::update-host-config` pass through `passHostConfig()`,
+  which `host-config.test.ts` checks with fakes.
