@@ -69,7 +69,5 @@ of the current profile, which is the profile last selected in the Map check wind
   by the English text of the modifier, or by the saved text of a mark from an earlier version.
 - The three columns set the warning (orange triangle), danger (red skull) and good (green check) mark. On a row with
   no mark they show when you point at the row.
-- The x button on a marked row removes its mark. In this version it also removes the marks of that modifier in the
-  profiles after the current one. To remove a mark from one profile only, click the modifier in the Map check window
-  until it has no mark.
+- The x button on a marked row removes its mark from the current profile. The other profiles keep their marks.
 - On an **outdated** row, the red trash button deletes the mark.

@@ -3,6 +3,7 @@ import {
   decisionCreate,
   decisionHasColor,
   nextDecision,
+  removeMark,
 } from "@/web/map-check/common";
 
 describe("a click on a Map check modifier", () => {
@@ -38,5 +39,28 @@ describe("the marks of the three profiles", () => {
     expect(
       [1, 2, 3].map((profile) => decisionHasColor("s-w", profile)),
     ).toEqual([false, false, true]);
+  });
+});
+
+describe("the x button of a marked row in Settings, Map check", () => {
+  it("removes the mark of profile II and keeps the marks of profiles I and III", () => {
+    const stat = { matcher: "#% maximum Player Resistances", decision: "wdg" };
+
+    removeMark(stat, 2);
+
+    expect(stat.decision).toBe("w-g");
+    expect(
+      [1, 2, 3].map((profile) => decisionHasColor(stat.decision, profile)),
+    ).toEqual([true, false, true]);
+  });
+
+  it("removes only the character of the profile it is pressed in", () => {
+    const removed = [1, 2, 3].map((profile) => {
+      const stat = { decision: "wdg" };
+      removeMark(stat, profile);
+      return stat.decision;
+    });
+
+    expect(removed).toEqual(["-dg", "w-g", "wd-"]);
   });
 });

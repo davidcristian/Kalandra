@@ -56,6 +56,7 @@ import {
   StatTag,
   decisionHasColor,
   decisionCreate,
+  removeMark,
   MapCheckStat,
 } from "./common.js";
 import { findMark, newMark } from "./mark-target";
@@ -105,9 +106,7 @@ export default defineComponent({
     });
 
     function remove() {
-      if (entry.value) {
-        decision.value = "---";
-      }
+      if (entry.value) removeMark(entry.value, props.profile);
     }
 
     return {

@@ -64,6 +64,11 @@ export function decisionCreate(
   return split.join("");
 }
 
+/** Removes the mark of one profile from a modifier and keeps the marks of the other profiles. */
+export function removeMark(stat: MapCheckStat, profileName: number): void {
+  stat.decision = decisionCreate("-", profileName, stat.decision);
+}
+
 export function isOutdated(profileName: number, stat: MapCheckStat): boolean {
   if (!decisionHasColor(stat.decision, profileName)) return false;
   if (stat.ref != null) {

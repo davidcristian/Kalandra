@@ -1,9 +1,9 @@
 # The Map check remove button also clears the marks of later profiles
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/map-check/SettingsMatcherEntry.vue](../../../../renderer/src/web/map-check/SettingsMatcherEntry.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Map check keeps the marks of one modifier for its three profiles in one string, `decision`, with one
 character per profile: `-` for no mark, and `w`, `d`, `g` or `s` (`decisionHasColor` in
@@ -27,3 +27,6 @@ them as three characters, under the hard rule in
 
 - 2026-10-18: Found while docs/map-check.md was rewritten, by reading `remove()` and
   `decisionCreate()` and computing the strings above by hand.
+- 2026-10-27: fix(renderer): stop the map check x button clearing later profiles. No upgrade
+  step: every reader uses only the character of its profile, and a saved string does not show
+  which profile a remove cleared, so the lost marks cannot be restored.

@@ -157,8 +157,9 @@ session inactive until main opens its file), `specs/web/client-log.test.ts` (the
 tracker reads, with `FullCampaign.txt`, and a line that fails), `specs/web/xp-formula.test.ts`
 (`leveling/xp-formula.ts`, the XP tracker's safe zone, multiplier, Over and star, with the examples of the user
 page), `specs/web/map-check-marks.test.ts` (the Map check marks in English and German, before and after a
-conversion), `specs/web/map-check-decisions.test.ts` (the mark each click sets in one profile, and the marks that
-have a color), `specs/web/map-check-stats.test.ts` (the rows `prepareMapStats()` lists for a Waystone and a Tablet,
+conversion), `specs/web/map-check-decisions.test.ts` (the mark each click sets in one profile, the marks that
+have a color, and `removeMark()`, which the x button in Settings calls and which keeps the marks of the other
+profiles), `specs/web/map-check-stats.test.ts` (the rows `prepareMapStats()` lists for a Waystone and a Tablet,
 with their rolls and keys), `specs/web/host-uploads.test.ts` (`Host.importFile()`, which
 the image strip uses to add an image), `specs/web/image-import.test.ts` (`overlay/image-import.ts`, which adds the stored image to the strip, or
 shows the strip's red message when main does not store it), `specs/web/widget-component.test.ts`
