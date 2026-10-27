@@ -818,38 +818,40 @@ export function createTradeRequest(
   // Meta internal stuff, crafting as empty and setting dps/pdps/edps
   for (const stat of stats) {
     if (stat.tradeId[0] === "item.has_empty_modifier") {
-      const TARGET_ID = {
-        EMPTY_MODIFIERS: STAT_BY_REF(
-          TOTAL_MODS_TEXT.EMPTY_MODIFIERS[stat.option!.value],
-        )!.trade.ids![ModifierType.Pseudo][0],
-      };
-      const emptyRoll = stat.roll!;
-      query.stats.push({
-        type: "count",
-        value: { min: 1, max: 1 },
-        disabled: stat.disabled,
-        filters: [
-          {
-            id: TARGET_ID.EMPTY_MODIFIERS,
-            value: { ...getMinMax(emptyRoll) },
-            disabled: stat.disabled,
-          },
-        ],
-      });
+      const emptyStat =
+        stat.option &&
+        STAT_BY_REF(TOTAL_MODS_TEXT.EMPTY_MODIFIERS[stat.option.value]);
+      const emptyId = emptyStat?.trade.ids?.[ModifierType.Pseudo][0];
+      if (emptyId && stat.roll) {
+        query.stats.push({
+          type: "count",
+          value: { min: 1, max: 1 },
+          disabled: stat.disabled,
+          filters: [
+            {
+              id: emptyId,
+              value: { ...getMinMax(stat.roll) },
+              disabled: stat.disabled,
+            },
+          ],
+        });
+      }
     } else if (
       // https://github.com/SnosMe/awakened-poe-trade/issues/758
       item.category === ItemCategory.Flask &&
       stat.statRef === "#% increased Charge Recovery" &&
       !stats.some((s) => s.statRef === "#% increased effect")
     ) {
-      const reducedEffectId = STAT_BY_REF("#% increased effect")!.trade.ids![
+      const reducedEffectId = STAT_BY_REF("#% increased effect")?.trade.ids?.[
         ModifierType.Explicit
       ][0];
-      query.stats.push({
-        type: "not",
-        disabled: stat.disabled,
-        filters: [{ id: reducedEffectId, disabled: stat.disabled }],
-      });
+      if (reducedEffectId) {
+        query.stats.push({
+          type: "not",
+          disabled: stat.disabled,
+          filters: [{ id: reducedEffectId, disabled: stat.disabled }],
+        });
+      }
     }
 
     if (stat.disabled) continue;
@@ -859,17 +861,18 @@ export function createTradeRequest(
         console.error("Elemental damage filter applied to non-elemental dps");
         return;
       }
-      const mapIds = (ids: Stat["trade"]["ids"]) =>
+      const mapIds = (ids: Stat["trade"]["ids"] | undefined) =>
         Object.values(ids ?? {})
           .flat()
           .map((id) => ({ id }));
-      const fireIds = mapIds(STAT_BY_REF("Adds # to # Fire Damage")!.trade.ids);
-      const coldIds = mapIds(STAT_BY_REF("Adds # to # Cold Damage")!.trade.ids);
+      const fireIds = mapIds(STAT_BY_REF("Adds # to # Fire Damage")?.trade.ids);
+      const coldIds = mapIds(STAT_BY_REF("Adds # to # Cold Damage")?.trade.ids);
       const lightningIds = mapIds(
-        STAT_BY_REF("Adds # to # Lightning Damage")!.trade.ids,
+        STAT_BY_REF("Adds # to # Lightning Damage")?.trade.ids,
       );
 
-      const selectedType = stat.option!.value as ItemIsElementalModifier;
+      const selectedType = (stat.option?.value ??
+        ItemIsElementalModifier.Any) as ItemIsElementalModifier;
       const notGroup: Array<{ id: string }> = [];
       switch (selectedType) {
         case ItemIsElementalModifier.Any:
@@ -895,152 +898,67 @@ export function createTradeRequest(
       }
     }
 
-    const input = stat.roll!;
+    const rollMin =
+      typeof stat.roll?.min === "number" ? stat.roll.min : undefined;
+    const rollMax =
+      typeof stat.roll?.max === "number" ? stat.roll.max : undefined;
     const tradeId = stat.tradeId[0] as InternalTradeId;
     switch (tradeId) {
       case "item.armour":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ar.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ar.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.ar.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.ar.max", rollMax);
         break;
       case "item.evasion_rating":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ev.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ev.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.ev.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.ev.max", rollMax);
         break;
       case "item.energy_shield":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.es.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.es.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.es.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.es.max", rollMax);
         break;
       case "item.runic_ward":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ward.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.ward.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.ward.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.ward.max", rollMax);
         break;
       case "item.block":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.block.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.block.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.block.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.block.max", rollMax);
         break;
       case "item.total_dps":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.dps.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.dps.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.dps.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.dps.max", rollMax);
         break;
       case "item.physical_dps":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.pdps.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.pdps.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.pdps.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.pdps.max", rollMax);
         break;
       case "item.elemental_dps":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.edps.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.edps.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.edps.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.edps.max", rollMax);
         applyElementalDamageLogicalFilter();
         break;
       case "item.crit":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.crit.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.crit.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.crit.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.crit.max", rollMax);
         break;
       case "item.aps":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.aps.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.aps.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.aps.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.aps.max", rollMax);
         break;
       case "item.spirit":
-        propSet(
-          query.filters,
-          "equipment_filters.filters.spirit.min",
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          "equipment_filters.filters.spirit.max",
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, "equipment_filters.filters.spirit.min", rollMin);
+        propSet(query.filters, "equipment_filters.filters.spirit.max", rollMax);
         break;
       case "item.reload_time":
         propSet(
           query.filters,
           "equipment_filters.filters.reload_time.min",
-          typeof input.min === "number" ? input.min : undefined,
+          rollMin,
         );
         propSet(
           query.filters,
           "equipment_filters.filters.reload_time.max",
-          typeof input.max === "number" ? input.max : undefined,
+          rollMax,
         );
         break;
       case "item.rarity_magic":
@@ -1055,16 +973,8 @@ export function createTradeRequest(
       case "item.map_item_rarity":
       case "item.map_gold": {
         const key = MAP_PROPERTY_FILTERS[tradeId];
-        propSet(
-          query.filters,
-          `map_filters.filters.${key}.min`,
-          typeof input.min === "number" ? input.min : undefined,
-        );
-        propSet(
-          query.filters,
-          `map_filters.filters.${key}.max`,
-          typeof input.max === "number" ? input.max : undefined,
-        );
+        propSet(query.filters, `map_filters.filters.${key}.min`, rollMin);
+        propSet(query.filters, `map_filters.filters.${key}.max`, rollMax);
         break;
       }
       case "item.duplicates":
@@ -1095,8 +1005,9 @@ export function createTradeRequest(
   const qAnd = query.stats[0];
   for (const stat of stats) {
     if (stat.statRef === "Only affects Passives in # Ring") {
-      const metaSource = stat.roll!;
-      const metamorphosisCount = metaSource.bounds!.max;
+      const metaSource = stat.roll;
+      if (!metaSource?.bounds) continue;
+      const metamorphosisCount = metaSource.bounds.max;
       const metamorphosisCurrent = metaSource.min as number;
       const builtTradeFilter = Array.from(
         { length: metamorphosisCount },
@@ -1253,8 +1164,8 @@ export async function requestResults(
       gemSockets: result.item.gemSockets?.length
         ? result.item.gemSockets?.length
         : result.item.socketedItems
-            ?.filter((s) => s.gemSockets)
-            .map((s) => s.gemSockets!)
+            ?.map((s) => s.gemSockets)
+            .filter((sockets) => sockets != null)
             .toSorted((a, b) => b.length - a.length)[0]?.length,
       relativeDate:
         DateTime.fromISO(result.listing.indexed).toRelative({
@@ -1539,7 +1450,7 @@ function buildNameBlock(
         case TradePropType.WeaponPhysicalDamage:
           block.push({
             text: "item.physical_dps",
-            value: extended.pdps!,
+            value: extended.pdps ?? "",
             color: useColor(extended.pdps_aug),
           });
           hasDamage = true;
@@ -1547,7 +1458,7 @@ function buildNameBlock(
         case TradePropType.WeaponElementalDamage:
           block.push({
             text: "item.elemental_dps",
-            value: extended.edps!,
+            value: extended.edps ?? "",
             color: useColor(extended.edps_aug),
           });
           hasDamage = true;
@@ -1556,21 +1467,21 @@ function buildNameBlock(
         case TradePropType.ArmourReduction:
           block.push({
             text: "item.armour",
-            value: extended.ar!,
+            value: extended.ar ?? "",
             color: useColor(extended.ar_aug) || values[0][1],
           });
           continue;
         case TradePropType.ArmourEvasion:
           block.push({
             text: "item.evasion_rating",
-            value: extended.ev!,
+            value: extended.ev ?? "",
             color: useColor(extended.ev_aug) || values[0][1],
           });
           continue;
         case TradePropType.ArmourEnergyShield:
           block.push({
             text: "item.energy_shield",
-            value: extended.es!,
+            value: extended.es ?? "",
             color: useColor(extended.es_aug) || values[0][1],
           });
           continue;
@@ -1578,7 +1489,7 @@ function buildNameBlock(
         case TradePropType.ArmourWard:
           block.push({
             text: "item.runic_ward",
-            value: extended.ward!,
+            value: extended.ward ?? "",
             color: useColor(extended.ward_aug) || values[0][1],
           });
           continue;
@@ -1640,7 +1551,7 @@ function buildNameBlock(
       const dpsIndex = block.findIndex((line) => line.text.includes("dps"));
       block.splice(dpsIndex, 0, {
         text: "item.total_dps",
-        value: extended.dps!,
+        value: extended.dps ?? "",
         color: useColor(extended.dps_aug),
       });
     }
@@ -1785,7 +1696,9 @@ function buildMageBloodNotFilter(
 
   const knownCount = legacyOfStats.filter((s) => !s.disabled).length;
   const dupCount =
-    (duplicateStat.roll!.min as number) ?? duplicateStat.roll!.value;
+    (duplicateStat.roll?.min as number | undefined) ??
+    duplicateStat.roll?.value;
+  if (dupCount === undefined) return;
   if (dupCount + knownCount > 4) {
     throw new Error(
       "not valid Mageblood, reduce duplicates or unselect a Legacy",
@@ -1835,7 +1748,8 @@ function buildMageBloodNotFilter(
       qAnd.filters.push(
         ...legacyOfStats.map((s) => buildFilterWithValue(s, undefined)),
       );
-      const dupFilter = EASY_LEGACY_DUPLICATE_TO_FILTER.get(dupCount)!;
+      const dupFilter = EASY_LEGACY_DUPLICATE_TO_FILTER.get(dupCount);
+      if (!dupFilter) return;
       countFilter.value = {
         min: dupFilter.count,
       };
