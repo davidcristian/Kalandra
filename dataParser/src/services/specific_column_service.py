@@ -4,10 +4,12 @@ import pandas as pd
 
 from constants.filenames import (
     ARMOUR_TYPES,
+    BASE_ITEM_TYPES,
 )
 from constants.lang import ENGLISH, LANG
 from services.agg import make_list_agg
 from services.augment_builder import AugmentBuilder
+from services.map_tiers import add_map_column
 from stores.game_store import GameStore
 
 
@@ -20,7 +22,8 @@ class SpecificColumnService:
         self, items: pd.DataFrame, stats: pd.DataFrame
     ) -> pd.DataFrame:
         plus_ar = self.apply_armour_column(items)
-        plus_augment = self.apply_augment_column(plus_ar, stats)
+        plus_map = add_map_column(plus_ar, self.ref_game_store.get(BASE_ITEM_TYPES))
+        plus_augment = self.apply_augment_column(plus_map, stats)
         return plus_augment
 
     def apply_armour_column(self, items: pd.DataFrame) -> pd.DataFrame:

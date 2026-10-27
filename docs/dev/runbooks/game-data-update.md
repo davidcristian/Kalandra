@@ -103,8 +103,8 @@ On 18 Oct 2026 the last two print 445 and 16.
    - a language has fewer lines in `stats.ndjson` or `items.ndjson` than before, and the patch removed nothing that
      explains it;
    - the `%NOT_FOUND%` count went up;
-   - the `"map"` count fell, since this copy of the tool writes no `map` field
-     ([dataparser.md](../modules/dataparser.md#outputs));
+   - the `"map"` count is not the number of Waystone tiers, 16 on 27 Oct 2026, since the parser reads a Waystone's
+     tier from that field ([dataparser.md](../modules/dataparser.md#outputs));
    - `git diff renderer/public/data/*/client_strings.js` shows a removed key, or a value in another language that
      is now English text.
 

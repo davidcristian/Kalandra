@@ -152,10 +152,11 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   listed 5915 of the 8229 stat ids of `www.pathofexile.com`, so 33 Traditional Chinese stats, such as the `Bonded:` rune
   stats, have no matchers.
 - `items.ndjson`, one line per item: `name` (this language), `refName` (English), `namespace`, `icon`, `tags`, `w`,
-  `h`, and `craftable`, `unique`, `tradeTag`, `armour` and `augment` where they apply. A unique's `refName`
-  is its name on the English trade site, and its `name` is the `Text2` of the game's `Words` row whose English
-  `Text2` is that name (`src/services/unique_names.py`). `Text` is the game's internal name, which keeps an old name
-  after a rename. A unique without such a row is left out and logged as `No unique named <name> ...`.
+  `h`, and `craftable`, `unique`, `tradeTag`, `armour`, `map` and `augment` where they apply. `map` is a Waystone's
+  `tier`, the number in its `BaseItemTypes` id such as `MapKeyTier12` (`src/services/map_tiers.py`). A unique's
+  `refName` is its name on the English trade site, and its `name` is the `Text2` of the game's `Words` row whose
+  English `Text2` is that name (`src/services/unique_names.py`). `Text` is the game's internal name, which keeps an
+  old name after a rename. A unique without such a row is left out and logged as `No unique named <name> ...`.
 - `client_strings.js`, a JavaScript module whose default export maps app keys such as `RARITY_NORMAL` to the game's
   text in this language, as a string, an array or a regular expression. `TranslationDict` in
   `renderer/src/assets/data/interfaces.ts` types it. A client string is a piece of text from the game's
@@ -170,8 +171,7 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
 
 `dataParser/output/` is tracked by git, and `--push` copies from it. On 18 Oct 2026 the app's data is newer than this
 output: `wc -l` gives 1936 lines for `dataParser/output/en/stats.ndjson` and 2526 for
-`renderer/public/data/en/stats.ndjson`, and `grep -c '"map"' renderer/public/data/en/items.ndjson` gives 16 Waystone
-lines with a `map` field, which this copy of the tool does not write.
+`renderer/public/data/en/stats.ndjson`.
 
 `--push` writes only the three files per language. The other files in `renderer/public/data/` (`namespaceMap.json`,
 `item-drop.json`, `item-drop.jsonc`, `patrons.json` and each `app_i18n.json`) are not this tool's output. After a

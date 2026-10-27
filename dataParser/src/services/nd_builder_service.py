@@ -324,6 +324,7 @@ class NdBuilderService:
                 "w",
                 "h",
                 "armour",
+                "map",
                 "augment",
             ]
         ]
