@@ -12,6 +12,9 @@ import Sockette from "sockette";
 /** The number of lines of main's log that `Host.logs` keeps for Settings, Debug. */
 export const LOG_LINES = 1000;
 
+/** The number of events that `Host.sendEvent()` keeps while the socket to main is not open. */
+export const QUEUED_EVENTS = 100;
+
 function keepLastLines(text: string, count: number): string {
   let cut = text.length - 1;
   for (let i = 0; i < count; i++) {
@@ -24,6 +27,8 @@ function keepLastLines(text: string, count: number): string {
 class HostTransport {
   private evBus = new EventTarget();
   private socket!: Sockette;
+  private isOpen = false;
+  private queue: Array<{ name: IpcEvent["name"]; text: string }> = [];
   logs = shallowRef("");
   version = shallowRef("0.0.00000");
   updateInfo = shallowRef<UpdateInfo>({ state: "initial" });
@@ -53,7 +58,14 @@ class HostTransport {
         onopen: (e) => {
           // main sends its whole log history first on each connection, including one after a reconnect
           this.logs.value = "";
+          this.isOpen = true;
+          for (const { text } of this.queue.splice(0)) {
+            this.socket.send(text);
+          }
           resolve(e);
+        },
+        onclose: () => {
+          this.isOpen = false;
         },
       });
     });
@@ -71,7 +83,19 @@ class HostTransport {
     if (!this.isElectron && event.name.startsWith("OVERLAY->MAIN")) {
       return;
     }
-    this.socket.send(JSON.stringify(event));
+    const text = JSON.stringify(event);
+    if (this.isOpen) {
+      this.socket.send(text);
+      return;
+    }
+    // A closed socket drops the text without an error, and a connecting one throws
+    if (this.queue.length >= QUEUED_EVENTS) {
+      const [dropped] = this.queue.splice(0, 1);
+      console.warn(
+        `Dropped ${dropped.name}: ${QUEUED_EVENTS} newer events wait for the socket to main to open`,
+      );
+    }
+    this.queue.push({ name: event.name, text });
   }
 
   onEvent<Name extends IpcEvent["name"]>(

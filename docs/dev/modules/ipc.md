@@ -129,10 +129,15 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   on those of one client only: the newest overlay window, or the last active client when no overlay window is
   connected (`clientLogWriter()` in `main/src/client-log-writer.ts`).
 - Sockette in `IPC.ts` opens the socket again one second after it closes with a code other than 1000, 1001 or
-  1005, and main treats the reopened socket as a new client and the last active one. The page sends nothing again:
-  main keeps the `HostConfig` for its whole run, and a main that starts again opens a new page, which sends its own.
-  The page clears `Host.logs` when the socket opens, so the history main sends to the new client replaces the
-  page's copy rather than repeating it.
+  1005, and main treats the reopened socket as a new client and the last active one. The page does not send its
+  `HostConfig` again: main keeps it for its whole run, and a main that starts again opens a new page, which sends
+  its own. The page clears `Host.logs` when the socket opens, so the history main sends to the new client replaces
+  the page's copy rather than repeating it.
+- `Host.sendEvent()` keeps the events sent before `init()` or after the socket's close event, and sends them in
+  order when the socket opens. It keeps at most `QUEUED_EVENTS` (100) and drops the oldest past that with a console
+  warning. After a close with code 1000, 1001 or 1005, which Sockette does not reopen, no event reaches main. An
+  event sent after main starts to close the socket but before the page's close event is lost, since Sockette does
+  not expose the socket's state.
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
 - Neither end checks a payload. `server.ts` ignores and logs a message that is not JSON, has no string `name` or

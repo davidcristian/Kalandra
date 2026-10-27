@@ -179,6 +179,8 @@ and the `< 39` and `< 40` config steps) and
 browser tab, `Host.logs`, which keeps the last 1000 lines of main's log for Settings, Debug and starts again
 from the history main sends after a reconnect, `Host.onEvent()`, which passes each message from the fake socket to
 the listeners of its name until their controller aborts and passes no `MAIN->OVERLAY::` event in a browser tab,
-`Host.unregisteredHotkeys`, `Host.updateInfo` and `Host.getConfig()`). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
+`Host.unregisteredHotkeys`, `Host.updateInfo` and `Host.getConfig()`) and `specs/web/host-send-queue.test.ts`
+(`Host.sendEvent()` before `init()`, while the socket is closed and while it connects again, with a fake socket
+that throws and drops text as the browser's does, and the limit of kept events). In `FullCampaign.txt`, other players' names and all whisper and guild chat text are placeholders.
 Overlay focus, hiding on blur and the hotkeys need the game:
 [runbooks/in-game-check.md](../runbooks/in-game-check.md).

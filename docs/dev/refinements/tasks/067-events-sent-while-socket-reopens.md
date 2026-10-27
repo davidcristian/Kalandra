@@ -1,9 +1,9 @@
 # An event the page sends while the events socket reopens is lost
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/background/IPC.ts](../../../../renderer/src/web/background/IPC.ts)
-**Verified:** 2026-10-20
+**Verified:** 2026-10-27
 
 `Host.sendEvent()` in `renderer/src/web/background/IPC.ts` calls `send()` on the Sockette socket without checking
 its state. After the socket closes, Sockette waits one second and opens a new one. During the wait the browser
@@ -21,3 +21,6 @@ one while it connects.
 ## History
 
 - 2026-10-20: Found while the page was changed to clear its copy of main's log when the socket opens again.
+- 2026-10-27: The path before `Host.init()` no longer sends anything, since the temporary save of
+  [002](002-unparsable-config-stops-renderer.md) was removed. Done in `fix(renderer): keep events sent while the
+  socket to main is not open`, which also covers a send before `init()`.
