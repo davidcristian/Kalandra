@@ -1,7 +1,1 @@
-{
-  "src/web/Config.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 26
-    }
-  }
-}
+{}

@@ -207,7 +207,7 @@ export const defaultConfig = (): Config => ({
 });
 
 export function upgradeConfig(_config: Config): Config {
-  /* eslint-disable @typescript-eslint/no-explicit-any -- the old steps read fields that Config no longer has */
+  /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion -- the old steps read fields that Config no longer has, and they never change */
   const config = _config as Omit<Config, "widgets"> & {
     widgets: Array<Record<string, any>>;
   };

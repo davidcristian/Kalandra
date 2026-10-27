@@ -1,6 +1,6 @@
 # Existing code in main and the renderer uses non-null assertions
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** rules
 **Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
 **Verified:** 2026-10-27
@@ -40,3 +40,7 @@ count.
 - 2026-10-27: The maintainer chose to add the rule to the `eslint-disable` line at the top of
   `upgradeConfig()`, whose old steps never change. Left: that line with its reason, and
   `--prune-suppressions` to empty `eslint-suppressions.json`.
+- 2026-10-27: Done in `chore(renderer): allow non-null assertions in old config steps`. The
+  `eslint-disable` line at the top of `upgradeConfig()` names the rule, and
+  `eslint-suppressions.json` is empty. The file stays as the renderer's list for a rule turned on
+  after code broke it, as the empty `existingOffenders` does in main.
