@@ -71,6 +71,11 @@ async function sendSessionStart(name: string) {
   });
 }
 
+/** A start event with only the given fields, which the IPC type does not allow but a page can send. */
+function incompleteStart(fields: Partial<StartPayload>): StartPayload {
+  return fields as StartPayload;
+}
+
 async function sendRow(text: string) {
   await server.emit("CLIENT->MAIN::write-data", { action: "log-item", text });
 }
@@ -275,8 +280,8 @@ describe("a Library session start", () => {
   });
 
   it.each([
-    { action: "session", start: true, header: "a header" } as StartPayload,
-    { action: "session", start: true, name: "rolls" } as StartPayload,
+    incompleteStart({ action: "session", start: true, header: "a header" }),
+    incompleteStart({ action: "session", start: true, name: "rolls" }),
   ])("replies that it failed to a start without a field: %j", async (e) => {
     await writer.restart(true, folder);
     await server.emit("CLIENT->MAIN::write-data", e);
