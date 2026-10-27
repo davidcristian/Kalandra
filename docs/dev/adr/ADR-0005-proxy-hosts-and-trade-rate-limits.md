@@ -1,6 +1,6 @@
 # ADR-0005: Other hosts only through the proxy list, trade searches through the rate limiters
 
-**Status:** Accepted (2026-10-26)
+**Status:** Accepted (2026-10-27)
 
 ## Context
 
@@ -46,12 +46,31 @@ client did not.
 `Retry after N seconds` when the wait would be 1.5 seconds or more. Reason: the user sees how long to wait, and price
 checks do not wait in a queue for the limiter.
 
+**6. The league, stat and item list requests use no rate limiter.** `load()` in
+`renderer/src/web/background/Leagues.ts` requests `/api/trade2/data/leagues`, and `load()` in
+`renderer/src/web/background/TradeData.ts` requests `/api/trade2/data/stats` and `/api/trade2/data/items` together.
+They go out only at these times:
+
+- The league list: when the overlay window starts, and on each click of Refresh in the price check settings or of
+  Retry under "Failed to load leagues". A call while a league list load runs returns without a request.
+- The stat and item lists: at start and on each change of the Language setting, from `loadTradeData()` in
+  `renderer/src/assets/data/index.ts`, and on each click of "Reload fallback data", which the price check hides while
+  a load runs. A timer also calls `load()` every 30 minutes (`RETRY_INTERVAL_MS`). It loads only when the last
+  successful load is at least 2 hours old (`UPDATE_INTERVAL_MS`) and the parser looked up an item or a stat in the
+  lists in the last hour (`INTEREST_SPAN_MS`). The timer therefore sends nothing for 2 hours after a successful load,
+  and one stat and one item request every 30 minutes at most after a failed one.
+
+Reason: after start, without a click or a setting change, the app sends at most two of these requests in 30
+minutes, far fewer than the one request per 5 seconds that each limiter set allows before the server sends its
+rules. A click starts one load and no second one while it runs, so the rest of the rate is the speed of the user's
+own clicks.
+
 ## Consequences
 
 - Search, exchange and fetch results are cached for 300 seconds (`CACHE_TTL` in
   `renderer/src/web/price-check/trade/Cache.ts`), so the same query repeated within that time sends no new request.
-- The league list and the trade stat and item data (`/api/trade2/data/...`) are fetched without a rate limiter, one
-  request each time the app loads them.
+- A change that sends the league, stat or item list requests more often than decision 6 lists updates that decision
+  or makes the requests wait on a limiter set.
 - The built-in browser (a `<webview>`) and links the user opens in the system browser load pages directly. They do
   not go through `/proxy`.
 - The item icons load directly from `web.poecdn.com`, the game's image server, outside `/proxy` and `PROXY_HOSTS`. The
@@ -66,6 +85,8 @@ checks do not wait in a queue for the limiter.
   the set of hosts the app contacts would no longer be one list in `main`.
 - **A fixed client limit without the server's headers.** The server states its rules for each endpoint in its
   response headers, and `adjustRateLimits` follows what they state; a fixed limit would not.
+- **A limiter set for the league, stat and item list requests.** In a set shared with searches or fetches, a price
+  check would wait behind a list load, and decision 6 already limits these requests to a few known times.
 
 ## Related
 

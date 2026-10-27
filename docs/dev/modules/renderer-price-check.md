@@ -170,10 +170,10 @@ otherwise the first. A failed load is logged with `console.warn` and `logToMain(
   delay it by 1.5 seconds or more. A new trade site request uses one of these sets or adds a new one.
 - **Three trade site requests do not use the sets**: the league list (`/api/trade2/data/leagues`), and the item
   and stat lists in `web/background/TradeData.ts` (`/api/trade2/data/items` and `/data/stats` on
-  `www.pathofexile.com`). The league list loads at start, on Refresh and on Retry. The two lists load with the
-  game data, on "Reload fallback data", and from a 30 minute timer at most every 2 hours when they were used in
-  the last hour. A response with an empty item or stat list keeps the loaded lists, and the timer tries again at its
-  next run.
+  `www.pathofexile.com`). The league list loads at start, on Refresh and on Retry. The two lists load with the game
+  data, on "Reload fallback data", and from a 30 minute timer when the last successful load is 2 hours old and the
+  parser used them in the last hour. A response with an empty item or stat list keeps the loaded lists, and the timer
+  tries again at its next run. Decision 6 of [ADR-0005](../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md) says why.
 - **Prices come only from the price file** ([ADR-0006](../adr/ADR-0006-own-price-service.md)). No code here
   requests poe.ninja. `findPriceByQuery` links the item to its poe.ninja page in the selected league, which the
   price trend opens with `window.open` on a click, and finds no price while no league is selected.

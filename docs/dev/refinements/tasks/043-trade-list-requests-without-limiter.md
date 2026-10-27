@@ -1,6 +1,6 @@
 # The league, stat and item list requests use no rate limiter
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** trade
 **Origin:** [AGENTS.md](../../../../AGENTS.md#architecture-rules)
 **Verified:** 2026-10-27
@@ -30,3 +30,7 @@ Done looks like: a decision for the maintainer. Either the three requests wait o
   load when the app starts or changes language, then at most every 2 hours and only after a price
   check in the last hour. The league list loads when the overlay starts and on each Retry. Left:
   that reason, and `load()` in `Leagues.ts` returns while a load runs, with a test.
+- 2026-10-27: Done. Decision 6 of ADR-0005 gives each time the three requests go out and why they
+  need no limiter, and `load()` in `Leagues.ts` returns without a request while a load runs ("skip
+  a league list load while another one runs"). The check showed that after a failed load the timer
+  tries again every 30 minutes while the lists are in use, so the ADR states that limit.
