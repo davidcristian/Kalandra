@@ -80,7 +80,8 @@ the PATH or a failed export is logged as `Game data export failed: <error>`, and
 
 **The trade data.** `TradeApiProvider` (`src/providers/trade_api.py`) requests the four endpoints for each language
 from the host in `LANG_URLS` (`src/constants/urls.py`), 36 requests one at a time through one `RequestPacer`
-(`src/services/request_pacer.py`):
+(`src/services/request_pacer.py`). Each language's host is one that `tradeHost()` in `renderer/src/web/trade-host.ts`
+returns for it, which `tests/unit/constants/test_urls.py` checks. The requests:
 
 - Each request starts at least 5 seconds after the one before, as the app's trade requests do until the trade site
   sends its limits.

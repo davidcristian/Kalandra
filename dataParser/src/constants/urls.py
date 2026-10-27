@@ -13,7 +13,7 @@ from constants.lang import (
 LANG_URLS = {
     ENGLISH: "https://www.pathofexile.com",
     RUSSIAN: "https://ru.pathofexile.com",
-    KOREAN: "https://poe.game.daum.net",
+    KOREAN: "https://poe.kakaogames.com",
     CHINESE: "https://pathofexile.tw",
     JAPANESE: "https://jp.pathofexile.com",
     GERMAN: "https://de.pathofexile.com",

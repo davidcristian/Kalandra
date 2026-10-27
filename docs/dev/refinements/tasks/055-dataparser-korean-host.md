@@ -1,9 +1,9 @@
 # dataParser uses a different Korean trade host from the app
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/constants/urls.py](../../../../dataParser/src/constants/urls.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `LANG_URLS` in `dataParser/src/constants/urls.py` sends the Korean trade data requests to
 `https://poe.game.daum.net`. The app uses `poe.kakaogames.com` for Korean: `tradeHost()` in
@@ -21,3 +21,6 @@ the app uses. The maintainer checks the Korean files the next time a `--pull` ru
 
 - 2026-10-18: Found while the dataParser module doc was written, by comparing the hosts in the tool
   and the app.
+- 2026-10-27: Done in `fix(dataparser): pull the Korean trade data from poe.kakaogames.com`. A
+  unit test checks each language's host against `tradeHost()` in the app. No request was sent, so
+  the maintainer checks the Korean files in `data/json/ko/` at the next `--pull`.
