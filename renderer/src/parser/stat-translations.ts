@@ -120,6 +120,7 @@ function* _statPlaceholderGenerator(stat: string) {
           max = min;
         }
 
+        const bounds = { min: Number(min), max: Number(max) };
         const captured: (typeof matches)[number] = {
           roll: Number(roll),
           rollStr: roll,
@@ -128,14 +129,11 @@ function* _statPlaceholderGenerator(stat: string) {
             min?.includes(".") ||
             max?.includes(".") ||
             false,
-          bounds: { min: Number(min), max: Number(max) },
+          bounds,
         };
         matches.push(captured);
 
-        if (
-          Number.isNaN(captured.bounds!.min) ||
-          Number.isNaN(captured.bounds!.max)
-        ) {
+        if (Number.isNaN(bounds.min) || Number.isNaN(bounds.max)) {
           captured.bounds = undefined;
           return min != null ? `#(${min}-${max})` : "#";
         } else {
@@ -209,10 +207,10 @@ export function tryParseTranslation(
       roll,
     };
   }
-  if (backupParsedStat) {
+  if (backupParsedStat && backupParsedCombination) {
     backupParsedStat.roll = parseRoll(
       { stat: backupParsedStat.stat, matcher: backupParsedStat.translation },
-      backupParsedCombination!,
+      backupParsedCombination,
       stat,
     );
     return backupParsedStat;

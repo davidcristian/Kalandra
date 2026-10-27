@@ -160,7 +160,7 @@ export function translateStatWithRoll(
   const dp = roll
     ? calc.stat.dp ||
       calc.sources.some(
-        (s) => s.stat.stat.ref === calc.stat.ref && s.stat.roll!.dp,
+        (s) => s.stat.stat.ref === calc.stat.ref && s.stat.roll?.dp,
       )
     : undefined;
 

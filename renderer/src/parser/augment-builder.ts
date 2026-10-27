@@ -92,8 +92,9 @@ export function getSavedAugments(item: ParsedItem): Array<BaseType | null> {
   const lookup = parserSettings().savedAugments;
 
   let refNames: Array<string | null> = [];
-  if (item.category && lookup[item.category]?.length) {
-    refNames = lookup[item.category]!;
+  const savedForCategory = item.category ? lookup[item.category] : undefined;
+  if (savedForCategory?.length) {
+    refNames = savedForCategory;
   } else if (
     item.category &&
     MARTIAL_WEAPON.has(item.category) &&
@@ -145,9 +146,9 @@ export function useAugment(
   );
 
   // add augment
-  item.augmentSockets!.augments[index] = augment;
+  item.augmentSockets.augments[index] = augment;
   // add augment stat to item
-  for (const thisAugment of item.augmentSockets!.augments) {
+  for (const thisAugment of item.augmentSockets.augments) {
     if (!thisAugment) continue;
     const modInfo = {
       // need to keep pre-existing ones marked as non-added

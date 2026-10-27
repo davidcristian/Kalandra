@@ -512,7 +512,7 @@ function parseNamePlate(section: string[]) {
       );
       if (langFound) {
         return err(
-          `item.wrong_language|${langFound.displayLang}|${LANGUAGE_DETECTOR.find(({ lang }) => lang === parserSettings().language)!.displayLang}`,
+          `item.wrong_language|${langFound.displayLang}|${LANGUAGE_DETECTOR.find(({ lang }) => lang === parserSettings().language)?.displayLang}`,
         );
       }
 
@@ -1303,13 +1303,13 @@ function parseSynthesised(section: string[], item: ParserState) {
         if (!baseTypeReg || baseTypeReg.length < 2) {
           baseTypeReg = _$.ITEM_SYNTHESISED.exec(item.baseType);
         }
-        item.baseType = baseTypeReg![1];
+        item.baseType = baseTypeReg?.[1] ?? item.baseType;
       } else {
         let nameReg = _$REF.ITEM_SYNTHESISED.exec(item.name);
         if (!nameReg || nameReg.length < 2) {
           nameReg = _$.ITEM_SYNTHESISED.exec(item.name);
         }
-        item.name = nameReg![1];
+        item.name = nameReg?.[1] ?? item.name;
       }
       return "SECTION_PARSED";
     }

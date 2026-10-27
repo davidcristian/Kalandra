@@ -169,42 +169,12 @@
       "count": 3
     }
   },
-  "src/assets/data/index.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/assets/data/loads.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "src/main.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
   "src/parser/Parser.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 6
-    }
-  },
-  "src/parser/augment-builder.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    }
-  },
-  "src/parser/calc-q20.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 4
-    }
-  },
-  "src/parser/modifiers.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/parser/stat-translations.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 3
     }

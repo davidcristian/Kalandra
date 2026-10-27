@@ -177,7 +177,9 @@ async function loadItems(language: string) {
 
   TRADE_TAG_TO_REF = new Map<string, string>();
   for (const item of ITEMS_ITERATOR('"tradeTag":')) {
-    TRADE_TAG_TO_REF.set(item.tradeTag!, item.refName);
+    if (item.tradeTag !== undefined) {
+      TRADE_TAG_TO_REF.set(item.tradeTag, item.refName);
+    }
   }
 }
 
@@ -243,7 +245,7 @@ export function loadUltraLateItems() {
   const b = a.filter((r) => r.augment && r.augment.some((s) => s.tradeId));
   const augmentList = b.map((r) => ({
     ...r,
-    augment: r.augment!.filter((s) => s.tradeId),
+    augment: r.augment?.filter((s) => s.tradeId),
   }));
 
   AUGMENT_DATA_BY_TRADE_ID = augmentsToLookupTradeId(augmentList);
@@ -292,10 +294,7 @@ function augmentsToLookupTradeId(
     for (const augmentStat of augment.augment) {
       const { categories, string: text, values, tradeId } = augmentStat;
       if (!tradeId) continue;
-      if (!augmentDataByAugment[tradeId[0]]) {
-        augmentDataByAugment[tradeId[0]] = [];
-      }
-      augmentDataByAugment[tradeId[0]]!.push({
+      (augmentDataByAugment[tradeId[0]] ??= []).push({
         refName: augment.refName,
         augment: augment.name,
         baseStat: text,
@@ -419,7 +418,7 @@ async function loadTradeData() {
         };
       }
     } else if (rarity === ItemRarity.Unique) {
-      if (name && items.has(`${name} ${baseType}`)) {
+      if (name && baseType && items.has(`${name} ${baseType}`)) {
         base = {
           name: name,
           refName: name,
@@ -427,7 +426,7 @@ async function loadTradeData() {
           icon: "%NOT_FOUND%",
           tags: [],
           unique: {
-            base: baseType!,
+            base: baseType,
           },
         };
       }

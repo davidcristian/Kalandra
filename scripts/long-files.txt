@@ -4,9 +4,9 @@
 360 dataParser/src/constants/css_rules.py
 517 dataParser/src/services/nd_builder_service.py
 325 ipc/types.ts
-486 renderer/src/assets/data/index.ts
+485 renderer/src/assets/data/index.ts
 1759 renderer/src/parser/Parser.ts
-374 renderer/src/parser/stat-translations.ts
+372 renderer/src/parser/stat-translations.ts
 721 renderer/src/web/Config.ts
 565 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue

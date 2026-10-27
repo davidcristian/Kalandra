@@ -134,10 +134,10 @@ export function calcPropBounds(
         : statRefs.incr.length
           ? sources.map((source) => ({
               ...source,
-              contributes: {
-                value: (base * source.contributes!.value) / 100,
-                min: (base * source.contributes!.min) / 100,
-                max: (base * source.contributes!.max) / 100,
+              contributes: source.contributes && {
+                value: (base * source.contributes.value) / 100,
+                min: (base * source.contributes.min) / 100,
+                max: (base * source.contributes.max) / 100,
               },
             }))
           : sources,
@@ -161,7 +161,8 @@ export function calcPropBase(
     } else {
       continue;
     }
-    const roll = statSourcesTotal(calc.sources)!;
+    const roll = statSourcesTotal(calc.sources);
+    if (!roll) continue;
     total.value += roll.value;
     total.min += roll.min;
     total.max += roll.max;

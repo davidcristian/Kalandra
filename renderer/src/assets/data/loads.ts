@@ -10,13 +10,17 @@ export function markItemDataLoaded(): void {
 /** Returns a function that builds the value of a key once per item data load; a computed that calls it runs again after the next load. */
 export function cachePerDataLoad<K, V>(build: (key: K) => V): (key: K) => V {
   let builtFor = -1;
-  const cache = new Map<K, V>();
+  const cache = new Map<K, { value: V }>();
   return (key) => {
     if (builtFor !== loads.value) {
       cache.clear();
       builtFor = loads.value;
     }
-    if (!cache.has(key)) cache.set(key, build(key));
-    return cache.get(key)!;
+    let entry = cache.get(key);
+    if (!entry) {
+      entry = { value: build(key) };
+      cache.set(key, entry);
+    }
+    return entry.value;
   };
 }
