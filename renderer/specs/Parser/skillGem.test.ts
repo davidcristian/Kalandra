@@ -9,7 +9,6 @@ import {
   UncutSupportGem,
 } from "./items";
 import { init } from "@/assets/data";
-import { createFilters } from "@/web/price-check/filters/create-item-filters";
 
 describe("isItemMissingItemClass", () => {
   beforeEach(async () => {
@@ -32,24 +31,22 @@ describe("Uncut gems parse correctly", () => {
     setupTests();
     await init("en");
   });
-  it("should parse uncut skill gem", () => {
-    const result = parseClipboard(UncutSkillGem.rawText).unwrapOr(null);
-    expect(result).not.toBeNull();
-    expect(result!.category).toBe(UncutSkillGem.category);
-    expect(result!.gemLevel).toBeUndefined();
-  });
-  it("should parse uncut spirit gem", () => {
-    const result = parseClipboard(UncutSpiritGem.rawText).unwrapOr(null);
-    expect(result).not.toBeNull();
-    expect(result!.category).toBe(UncutSpiritGem.category);
-    expect(result!.gemLevel).toBeUndefined();
-  });
-  it("should parse uncut support gem", () => {
-    const result = parseClipboard(UncutSupportGem.rawText).unwrapOr(null);
-    expect(result).not.toBeNull();
-    expect(result!.category).toBe(UncutSupportGem.category);
-    expect(result!.gemLevel).toBeUndefined();
-  });
+  it.each([
+    ["skill", UncutSkillGem],
+    ["spirit", UncutSpiritGem],
+    ["support", UncutSupportGem],
+  ])(
+    "finds the record of an uncut %s gem's level, without a gem level",
+    (_, gem) => {
+      const result = parseClipboard(gem.rawText)._unsafeUnwrap();
+
+      expect(result.category).toBe(gem.category);
+      expect(result.info.refName).toBe(gem.info.refName);
+      expect(result.info.tradeTag).toBe(gem.info.tradeTag);
+      expect(result.info.craftable).toEqual(gem.info.craftable);
+      expect(result.gemLevel).toBeUndefined();
+    },
+  );
 });
 
 describe("Skill gems parse correctly", () => {
@@ -63,33 +60,5 @@ describe("Skill gems parse correctly", () => {
     expect(result).not.toBeNull();
     expect(result!.category).toBe(MetaSkillGem.category);
     expect(result!.gemLevel).toBe(MetaSkillGem.gemLevel);
-  });
-});
-
-describe("Create Filter for uncut gems", () => {
-  beforeEach(async () => {
-    setupTests();
-    await init("en");
-  });
-  it.each([
-    { gem: UncutSkillGem },
-    { gem: UncutSpiritGem },
-    { gem: UncutSupportGem },
-  ])("createFilters should call createUncutGemFilters, %#", async ({ gem }) => {
-    const opts = {
-      league: "Standard",
-      currency: "exalt",
-      listingType: undefined,
-      collapseListings: "app" as const,
-      activateStockFilter: true,
-      exact: true,
-      useEn: true,
-      autoFillEmptyAugmentSockets: false as const,
-    };
-
-    const result = createFilters(gem, opts);
-
-    expect(result.searchExact).toBeTruthy();
-    expect(result.gemLevel).toBeUndefined();
   });
 });

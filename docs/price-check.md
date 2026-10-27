@@ -127,7 +127,7 @@ next to it (a clock icon with **Instant**, **Online** or **Offline**) opens when
 The menu turns orange when a currency or a listed time of a week or less is set, and names a league other than yours.
 
 The table lists up to 20 listings, cheapest first. Columns: **Price**, **Stock** for stackable items, **iLvl** when
-the item level filter exists, **Level** for gems and uncut gems, **Sockets** for gems and for a staff, wand or sceptre
+the item level filter exists, **Level** for gems, **Sockets** for gems and for a staff, wand or sceptre
 (most of any socketed gem), **Quality** for gems or when the quality filter is on, **Listed**, and **Seller** when
 **Show seller** is set.
 
@@ -153,8 +153,9 @@ The **Trade** button opens the same search on the trade site. See [Built-in brow
 
 ## Bulk exchange
 
-For currency and other items sold on the trade site's bulk exchange, the window shows exchange offers instead of
-listings. It does this when no stat filter is on and Kalandra's item data has a bulk exchange ID for the item.
+For currency and other items sold on the trade site's bulk exchange, such as each level of an uncut gem, the window
+shows exchange offers instead of listings. It does this when no stat filter is on and Kalandra's item data has a bulk
+exchange ID for the item.
 
 - **Matched:** has three buttons, Exalted Orb, Chaos Orb and Divine Orb, each with the number of offers asking for
   that currency. Click one to see its offers. The window first shows the one with more offers out of Divine Orb and

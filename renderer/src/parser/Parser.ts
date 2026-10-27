@@ -704,23 +704,14 @@ function parseTalismanTier(section: string[], item: ParsedItem) {
 function parseGem(section: string[], item: ParsedItem) {
   if (
     item.category !== ItemCategory.Gem &&
-    item.category !== ItemCategory.MetaGem &&
-    item.category !== ItemCategory.UncutGem
+    item.category !== ItemCategory.MetaGem
   ) {
     return "PARSER_SKIPPED";
   }
 
-  const gemLevelLineNumber =
-    item.category === ItemCategory.Gem || item.category === ItemCategory.MetaGem
-      ? 1
-      : 0;
-
-  if (section[gemLevelLineNumber]?.startsWith(_$.GEM_LEVEL)) {
+  if (section[1]?.startsWith(_$.GEM_LEVEL)) {
     // "Level: 20 (Max)"
-    item.gemLevel = parseInt(
-      section[gemLevelLineNumber].slice(_$.GEM_LEVEL.length),
-      10,
-    );
+    item.gemLevel = parseInt(section[1].slice(_$.GEM_LEVEL.length), 10);
 
     parseQualityNested(section, item);
 

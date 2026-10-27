@@ -33,10 +33,7 @@
     <td v-if="itemLevel" class="px-2 whitespace-nowrap text-right">
       {{ result.itemLevel }}
     </td>
-    <td
-      v-if="isGem || item.category === ItemCategory.UncutGem"
-      class="pl-2 whitespace-nowrap"
-    >
+    <td v-if="isGem" class="pl-2 whitespace-nowrap">
       {{ result.level }}
     </td>
     <td v-if="isGem || grantsSkill" class="pl-2 whitespace-nowrap">
@@ -120,7 +117,6 @@ import { PriceCheckWidget } from "@/web/overlay/widgets";
 import tippy, { Instance } from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import { AppConfig } from "@/web/Config";
-import { ItemCategory } from "@/parser";
 import TooltipItem from "./TooltipItem.vue";
 import { GEM, GRANTS_REAL_SKILL } from "@/parser/meta";
 import { listingMarkers } from "./listing-markers";
@@ -217,7 +213,6 @@ export default defineComponent({
       target,
       content,
       isHovered,
-      ItemCategory,
       markers: computed(() => listingMarkers(props.result, props.showSeller)),
       isGem: computed(
         () => props.item.category && GEM.has(props.item.category),

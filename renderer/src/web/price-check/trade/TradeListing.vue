@@ -29,10 +29,7 @@
             <th v-if="filters.itemLevel" class="trade-table-heading">
               <div class="px-2">{{ t(":item_level") }}</div>
             </th>
-            <th
-              v-if="isGem || item.category === ItemCategory.UncutGem"
-              class="trade-table-heading"
-            >
+            <th v-if="isGem" class="trade-table-heading">
               <div class="px-2">{{ t(":gem_level") }}</div>
             </th>
             <th v-if="isGem || grantsSkill" class="trade-table-heading">
@@ -118,7 +115,7 @@ import { getTradeEndpoint } from "./common";
 import { AppConfig } from "@/web/Config";
 import { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { ItemFilters, StatFilter } from "../filters/interfaces";
-import { ItemCategory, ParsedItem } from "@/parser";
+import { ParsedItem } from "@/parser";
 import { artificialSlowdown } from "./artificial-slowdown";
 import OnlineFilter from "./OnlineFilter.vue";
 import TradeLinks from "./TradeLinks.vue";
@@ -209,7 +206,6 @@ export default defineComponent({
       openTradeLink() {
         showBrowser(makeTradeLink());
       },
-      ItemCategory,
       isGem: computed(
         () => props.item.category && GEM.has(props.item.category),
       ),

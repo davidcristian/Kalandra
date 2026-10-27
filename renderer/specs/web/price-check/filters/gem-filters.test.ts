@@ -11,7 +11,10 @@ import type { TestItem } from "@specs/Parser/items";
 import { init } from "@/assets/data";
 import { parseClipboard } from "@/parser";
 import { createFilters } from "@/web/price-check/filters/create-item-filters";
+import { createPresets } from "@/web/price-check/filters/create-presets";
 import type { ItemFilters } from "@/web/price-check/filters/interfaces";
+import { apiToSatisfySearch } from "@/web/price-check/trade/common";
+import { createTradeRequest as createExchangeRequest } from "@/web/price-check/trade/pathofexile-bulk";
 import { createTradeRequest } from "@/web/price-check/trade/pathofexile-trade";
 
 function filtersOf(item: TestItem) {
@@ -70,5 +73,25 @@ describe("the filters of a gem", () => {
     expect(filters.stackSize).toEqual({ value: 1, disabled: true });
     expect(filters.gemLevel).toBeUndefined();
     expect(query().type).toBe(name);
+  });
+
+  it.each([
+    ["uncut-skill-gem-19", UncutSkillGem],
+    ["uncut-spirit-gem-16", UncutSpiritGem],
+    ["uncut-support-gem-5", UncutSupportGem],
+  ])("searches the exchange for the trade tag %s", (tag, item) => {
+    const parsed = parseClipboard(item.rawText)._unsafeUnwrap();
+    const { presets, active } = createPresets(
+      parsed,
+      createTestCreateOptions(),
+    );
+    const [preset] = presets.filter((entry) => entry.id === active);
+
+    expect(apiToSatisfySearch(parsed, preset.stats, preset.filters)).toBe(
+      "bulk",
+    );
+    expect(
+      createExchangeRequest(preset.filters, parsed, ["exalted"]).query,
+    ).toMatchObject({ have: ["exalted"], want: [tag] });
   });
 });

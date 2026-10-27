@@ -216,7 +216,7 @@ Legacy kinds, once from a reactive item whose stats must stay unchanged. It chec
 count of Legacy rolls that `createTradeRequest` sends, and that its "and" group has each Legacy kind once.
 `pseudo/anointments.test.ts` there names the oils of a real anointed amulet from the oil names in `stats.ndjson`,
 names none for an unknown oil, and checks when its anointment filter is left out of the search.
-`gem-filters.test.ts` there makes the filters and the search of a real skill gem and of three uncut gems.
+`gem-filters.test.ts` there makes the search of a real skill gem, and the item and exchange searches of 3 uncut gems.
 `specs/web/price-check/item-editor/` checks which editor `getItemEditorType` opens for real copied items, the
 catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`

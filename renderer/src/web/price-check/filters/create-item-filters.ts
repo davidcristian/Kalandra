@@ -2,7 +2,7 @@ import type { ItemFilters } from "./interfaces";
 import { ParsedItem, ItemCategory, ItemRarity } from "@/parser";
 import { searchListingType, tradeTag } from "../trade/common";
 import { ModifierType } from "@/parser/modifiers";
-import { BaseType, ITEM_BY_REF } from "@/assets/data";
+import type { BaseType } from "@/assets/data";
 import { CATEGORY_TO_TRADE_ID } from "../trade/pathofexile-trade";
 import { ARMOUR, GEM, WEAPON } from "@/parser/meta";
 import { maxUsefulItemLevel, uniqueBaseTradeName } from "./common";
@@ -49,9 +49,6 @@ export function createFilters(
 
   if (item.category && GEM.has(item.category) && !tradeTag(item)) {
     return createGemFilters(item, filters, opts);
-  }
-  if (item.category === ItemCategory.UncutGem) {
-    return createUncutGemFilters(item, filters, opts);
   }
   if (item.category === ItemCategory.Currency && item.trials) {
     return createTrialsFilters(item, filters, opts);
@@ -348,30 +345,6 @@ function createGemFilters(
     value: item.gemLevel!,
     disabled: item.gemLevel! < 19,
   };
-
-  return filters;
-}
-
-export function createUncutGemFilters(
-  item: ParsedItem,
-  filters: ItemFilters,
-  opts: CreateOptions,
-) {
-  const normalGem = ITEM_BY_REF("ITEM", item.info.refName)![0];
-  filters.searchExact = {
-    baseType: item.info.name,
-    baseTypeTrade: t(opts, normalGem),
-  };
-  const range =
-    item.gemLevel! < 18 && item.info.refName !== "Uncut Support Gem" ? 1 : 0;
-
-  filters.gemLevel = {
-    value: item.gemLevel! - range,
-    disabled: false,
-  };
-  if (range) {
-    filters.gemLevel.max = item.gemLevel! + range;
-  }
 
   return filters;
 }

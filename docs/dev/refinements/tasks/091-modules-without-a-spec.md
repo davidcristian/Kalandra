@@ -1,9 +1,9 @@
 # Five modules in main and the renderer have no spec that imports them
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** repo
 **Origin:** [docs/dev/modules/main-tests.md](../../modules/main-tests.md)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 No file in `main/specs/` or `renderer/specs/` imports these `.ts` files of `main/src/` and
 `renderer/src/web/`. A `vi.mock` of a path does not count as an import. The share of lines is from
@@ -17,12 +17,14 @@ No file in `main/specs/` or `renderer/specs/` imports these `.ts` files of `main
 | `renderer/src/web/item-search/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 | `renderer/src/web/leveling/widget.ts` | no code | A config type. `widget-registry.test.ts` checks the defaults. |
 
-One thing the new specs showed, not yet checked against the trade site:
+One thing the new specs showed:
 
-- `createUncutGemFilters()` in `create-item-filters.ts` never runs. The parser gives a copied uncut
-  gem the Currency category and no `gemLevel`, although the `UncutSkillGem` case in
-  `renderer/specs/Parser/items.ts` expects level 19, and the price check searches it in the exchange
-  by its trade tag, which names the level.
+- `createUncutGemFilters()` in `create-item-filters.ts` never ran. A copied uncut gem has the
+  Currency rarity line, so the parser gives it the Currency category, and its level is part of its
+  name, not a `Level:` line. Each level is its own record in the item data with its own trade tag,
+  which the price check searches in the exchange. The filter and the other branches of the
+  `UncutSkillGem` category are removed, the `UncutSkillGem` case expects the record of its level,
+  and `gem-filters.test.ts` checks the exchange search.
 
 Done looks like: a spec for `main.ts` once its settings pass through a function, and a result for
 the point above: a `fix` commit with a test, or a
@@ -42,3 +44,5 @@ History line that says why the code stays.
   ([031](031-path-of-exile-1-features.md)), so the title names five modules.
 - 2026-10-27: The settings of `CLIENT->MAIN::update-host-config` pass through `passHostConfig()`,
   which `host-config.test.ts` checks with fakes.
+- 2026-10-27: refactor(renderer): remove the uncut gem branches no copied gem reaches. The other
+  rows need no spec now, so the task is done.
