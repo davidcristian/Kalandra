@@ -176,11 +176,13 @@ export default defineComponent({
       if (topmostWidget.wmZorder === "exclusive") {
         hide(topmostWidget.wmId);
       }
-      widgets.value.find((_) => _.wmId === wmId)!.wmWants = "show";
+      const widget = widgets.value.find((_) => _.wmId === wmId);
+      if (widget) widget.wmWants = "show";
     }
 
     function hide(wmId: WMID) {
-      widgets.value.find((_) => _.wmId === wmId)!.wmWants = "hide";
+      const widget = widgets.value.find((_) => _.wmId === wmId);
+      if (widget) widget.wmWants = "hide";
     }
 
     function remove(wmId: WMID) {
@@ -192,7 +194,8 @@ export default defineComponent({
       flag: Widget["wmFlags"][number],
       state: boolean,
     ) {
-      const widget = AppConfig().widgets.find((_) => _.wmId === wmId)!;
+      const widget = AppConfig().widgets.find((_) => _.wmId === wmId);
+      if (!widget) return false;
       const hasFlag = widget.wmFlags.includes(flag);
       if (state === false && hasFlag === true) {
         widget.wmFlags = widget.wmFlags.filter((_) => _ !== flag);
@@ -208,8 +211,8 @@ export default defineComponent({
     function bringToTop(wmId: WMID) {
       if (wmId === topmostWidget.value.wmId) return;
 
-      const widget = AppConfig().widgets.find((_) => _.wmId === wmId)!;
-      if (widget.wmZorder !== "exclusive") {
+      const widget = AppConfig().widgets.find((_) => _.wmId === wmId);
+      if (widget && widget.wmZorder !== "exclusive") {
         widget.wmZorder = (topmostWidget.value.wmZorder as number) + 1;
       }
     }
@@ -349,7 +352,7 @@ export default defineComponent({
     });
 
     function isVisible(wmId: Widget["wmId"]): boolean {
-      return visibilityState.value.find((_) => _.wmId === wmId)!.isVisible;
+      return !!visibilityState.value.find((_) => _.wmId === wmId)?.isVisible;
     }
 
     document.addEventListener("click", (e) => {

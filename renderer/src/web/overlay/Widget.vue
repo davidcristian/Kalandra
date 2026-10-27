@@ -321,7 +321,8 @@ export default defineComponent({
         } else {
           const settings = wm.widgets.value.find(
             (w) => w.wmType === "settings",
-          )!;
+          );
+          if (!settings) return;
           wm.setFlag(
             settings.wmId,
             `settings::widget=${props.config.wmId}`,

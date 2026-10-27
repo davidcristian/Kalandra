@@ -127,7 +127,8 @@ const { failed, addImage } = useImageImport(props.config, (file) =>
 
 async function handleFile(e: Event) {
   const target = (e as InputEvent).target as HTMLInputElement;
-  await addImage(target.files![0]);
+  const file = target.files?.[0];
+  if (file) await addImage(file);
   target.value = "";
 }
 

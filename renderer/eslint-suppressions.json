@@ -234,34 +234,9 @@
       "count": 1
     }
   },
-  "src/web/overlay/OverlayWindow.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 5
-    }
-  },
-  "src/web/overlay/Widget.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/overlay/WidgetImageStrip.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
-  "src/web/overlay/WidgetMenu.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    }
-  },
   "src/web/price-check/CheckedItem.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 6
-    }
-  },
-  "src/web/price-check/PriceCheckWindow.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
     }
   },
   "src/web/price-check/filters/FilterModifier.vue": {
@@ -382,11 +357,6 @@
   "src/web/price-check/unidentified-resolver/UnidentifiedResolver.vue": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 4
-    }
-  },
-  "src/web/settings/SettingsWindow.vue": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 5
     }
   },
   "src/web/ui/Popover.vue": {

@@ -128,9 +128,9 @@ export default defineComponent({
             wmId: widget.wmId,
             wmWants: widget.wmWants,
             title:
-              regexMatch?.groups!.title ||
-              (!regexMatch?.groups!.icon ? `#${widget.wmId}` : undefined),
-            icon: regexMatch?.groups!.icon,
+              regexMatch?.groups?.title ||
+              (!regexMatch?.groups?.icon ? `#${widget.wmId}` : undefined),
+            icon: regexMatch?.groups?.icon,
           };
         });
     });

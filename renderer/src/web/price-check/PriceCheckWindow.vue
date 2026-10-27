@@ -385,7 +385,8 @@ export default defineComponent({
     }
 
     function openLeagueSelection() {
-      const settings = wm.widgets.value.find((w) => w.wmType === "settings")!;
+      const settings = wm.widgets.value.find((w) => w.wmType === "settings");
+      if (!settings) return;
       wm.setFlag(settings.wmId, `settings::widget=${props.config.wmId}`, true);
       wm.show(settings.wmId);
     }
@@ -395,7 +396,7 @@ export default defineComponent({
     function showBrowser(url: string) {
       wm.setFlag(props.config.wmId, "has-browser", true);
       void nextTick(() => {
-        iframeEl.value!.src = url;
+        if (iframeEl.value) iframeEl.value.src = url;
       }); // Nothing waits for the page to open
     }
 

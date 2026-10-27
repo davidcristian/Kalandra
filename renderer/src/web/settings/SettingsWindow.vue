@@ -239,9 +239,9 @@ export default defineComponent({
         );
         if (flagStr) {
           const _wmId = Number(flagStr.split("=")[1]);
-          const _widget = wm.widgets.value.find((w) => w.wmId === _wmId)!;
+          const _widget = wm.widgets.value.find((w) => w.wmId === _wmId);
           selectedWmId.value = _wmId;
-          selectedComponent.value = menuByType(_widget.wmType)[0][0];
+          selectedComponent.value = menuByType(_widget?.wmType)[0][0];
           wm.setFlag(props.config.wmId, flagStr, false);
         }
       },
@@ -252,8 +252,8 @@ export default defineComponent({
       // any widget that requires client log
       () => configClone.value?.readClientLog,
       (curr, prev) => {
-        if (curr === prev || curr === undefined) return;
-        const xpTracker = findWidget("experience-tracker", configClone.value!);
+        if (curr === prev || curr === undefined || !configClone.value) return;
+        const xpTracker = findWidget("experience-tracker", configClone.value);
         if (curr) {
           // Show widgets requiring this setting
           if (xpTracker) {
@@ -273,8 +273,8 @@ export default defineComponent({
         configClone.value?.enableAlphas &&
         configClone.value?.alphas.includes("library"),
       (curr) => {
-        if (curr === undefined) return;
-        const library = findWidget("library", configClone.value!);
+        if (curr === undefined || !configClone.value) return;
+        const library = findWidget("library", configClone.value);
         if (!library) return;
 
         if (curr) {
@@ -289,7 +289,7 @@ export default defineComponent({
       flatJoin(
         menuByType(configWidget.value?.wmType).map((group) =>
           group.map((component) => ({
-            name: t(component.name!),
+            name: t(component.name ?? ""),
             select() {
               selectedComponent.value = component;
             },
@@ -304,7 +304,8 @@ export default defineComponent({
     return {
       t,
       save() {
-        saveSettings(configClone.value!, () => wm.hide(props.config.wmId));
+        if (!configClone.value) return;
+        saveSettings(configClone.value, () => wm.hide(props.config.wmId));
       },
       cancel() {
         wm.hide(props.config.wmId);
