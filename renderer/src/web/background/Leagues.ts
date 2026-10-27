@@ -36,6 +36,7 @@ export const useLeagues = createGlobalState(() => {
   });
 
   async function load() {
+    if (isLoading.value) return;
     isLoading.value = true;
     error.value = null;
 

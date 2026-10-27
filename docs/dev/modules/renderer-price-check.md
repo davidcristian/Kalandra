@@ -147,8 +147,8 @@ that the route needs ([main.md](main.md)).
 
 `useLeagues()` returns `load()`, `selectedId` (the `leagueId` setting), `selected` (id, realm and `isPopular`),
 `list`, `isLoading` and `error`. `load()` requests `<trade host>/api/trade2/data/leagues`. The overlay window calls
-it at start. The "Refresh" button next to the league list in the price check settings and the "Retry" button
-under "Failed to load leagues" call it again. A league whose id ends in `(PL<number>)` counts as private.
+it at start, and "Refresh" in the price check settings and "Retry" under "Failed to load leagues" call it again. A
+call while a load runs returns without a request. A league whose id ends in `(PL<number>)` counts as private.
 `isPopular` is true for a listed league that is not private, and no price file is read for any other. When the saved
 league is not in the list and is not private, `load()` selects the third league when the list has more than two,
 otherwise the first. A failed load is logged with `console.warn` and `logToMain()`, and its message kept in `error`.
@@ -246,5 +246,5 @@ reads hand-written responses with `readTradeData` and answers each trade site re
 `prop-set.test.ts` checks the paths `propSet` accepts with `expectTypeOf`, which `tsc` checks.
 `artificial-slowdown.test.ts` there checks with fake timers when a result list stops waiting after a reset.
 `specs/web/watch-order.test.ts` mounts a component with a fake renderer and checks that Vue runs its watchers in
-the order they are defined. No test calls a live site. `specs/web/leagues.test.ts` loads leagues from a fake trade
-site and checks the league `load()` selects, `isPopular` and the line a failed load sends to main.
+the order they are defined. No test calls a live site. `specs/web/leagues.test.ts` checks the league `load()` selects,
+`isPopular`, the line a failed load sends to main, and that a call during a load sends no request to its fake site.

@@ -3,19 +3,25 @@ import { setupTests } from "@specs/vitest.setup";
 import { AppConfig } from "@/web/Config";
 import type * as Leagues from "@/web/background/Leagues";
 import type { IpcEvent } from "@ipc/types";
+import { HeldRequests, settle } from "./held-requests";
 
 const LEAGUES = ["Standard", "Hardcore", "Rise of the Abyssal", "HC Abyssal"];
 
-/** Answers the league list request with the leagues in `ids`, as the trade site sends them, or with a web page while `down` is set. */
+/**
+ * Answers the league list request with the leagues in `ids`, as the trade site sends them, or with a web page while
+ * `down` is set. While `held` is set, the leagues arrive only on its release().
+ */
 class FakeTradeSite {
   ids: string[] = LEAGUES;
   requests: string[] = [];
   down = false;
+  held: HeldRequests | undefined;
 
   proxy = async (hostAndPath: string) => {
     this.requests.push(hostAndPath);
     if (this.down) return new Response("<html></html>", { status: 503 });
     const result = this.ids.map((id) => ({ id, realm: "poe2", text: id }));
+    if (this.held) return await this.held.answer(JSON.stringify({ result }));
     return new Response(JSON.stringify({ result }));
   };
 }
@@ -58,6 +64,26 @@ describe("useLeagues", () => {
       isPopular: true,
     });
     expect(leagues.error.value).toBeNull();
+  });
+
+  it("sends one request for calls during a running load, and another for a call after it", async () => {
+    setupTests({ leagueId: "Hardcore" });
+    site.held = new HeldRequests();
+    const running = leagues.load();
+    const repeated = leagues.load();
+    await settle();
+
+    expect(site.requests).toHaveLength(1);
+    expect(leagues.isLoading.value).toBe(true);
+
+    site.held.release();
+    await Promise.all([running, repeated]);
+    expect(leagues.isLoading.value).toBe(false);
+    expect(leagues.list.value).toHaveLength(LEAGUES.length);
+
+    site.held = undefined;
+    await leagues.load();
+    expect(site.requests).toHaveLength(2);
   });
 
   it("selects the third league in place of a saved league the site no longer lists", async () => {
