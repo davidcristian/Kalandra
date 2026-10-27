@@ -105,7 +105,6 @@ export interface TranslationDict {
   RARITY: string;
   ITEM_CLASS: string;
   ITEM_LEVEL: string;
-  CORPSE_LEVEL: string;
   TALISMAN_TIER: string;
   GEM_LEVEL: string;
   STACK_SIZE: string;
@@ -163,8 +162,6 @@ export interface TranslationDict {
   UNSCALABLE_VALUE: string;
   CORRUPTED_IMPLICIT: string;
   MODIFIER_INCREASED: RegExp;
-  INCURSION_OPEN: string;
-  INCURSION_OBSTRUCTED: string;
   EATER_IMPLICIT: RegExp;
   EXARCH_IMPLICIT: RegExp;
   ELDRITCH_MOD_R1: string;
