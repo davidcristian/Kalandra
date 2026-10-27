@@ -17,7 +17,7 @@ import { setupTests } from "@specs/vitest.setup";
 const OPTS = {
   searchStatRange: 10,
   defaultAllSelected: false,
-  highTierSelected: false,
+  valuableSelected: false,
 };
 
 // Real lines: the crafted suffix of the Obliterator Bow and the implicit of the crossbow in specs/Parser/items.ts

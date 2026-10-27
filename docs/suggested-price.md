@@ -15,8 +15,10 @@ below it, and click **Save**. With it on, the price check also searches the trad
 rare item, as it does for a unique, so the line has listings to work from. The two toggles under **Perform an auto
 search, when pressing** in the price check settings still turn that search off.
 
-For a rare item, it also turns on the stat filters of the item's tier 1 and tier 2 modifiers, the ones the window marks
-with their tier, so the search finds items with the same strong rolls. A jewel keeps its filters off.
+For a rare item, it also turns on the filters of the stats that set most of an item's price, at any tier: skill
+levels, Critical Hit Chance and Critical Damage Bonus, Spell Damage, elemental and attack damage, Attack and Cast
+Speed, Spirit and Rarity of Items found. Stats that add little to the price, such as stun threshold, ailment durations
+on you or mana per kill, stay off, so the search finds items that sell for the same reasons as yours.
 
 ## What the line shows
 

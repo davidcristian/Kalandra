@@ -17,7 +17,7 @@ const TYPES = [ModifierType.Explicit, ModifierType.Crafted];
 const OPTS = {
   searchStatRange: 10,
   defaultAllSelected: true,
-  highTierSelected: false,
+  valuableSelected: false,
 };
 
 function withEmptyIds(calc: StatCalculated): StatCalculated {

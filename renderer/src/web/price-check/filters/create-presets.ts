@@ -25,7 +25,7 @@ export function createPresets(
     searchStatRange: number;
     useEn: boolean;
     defaultAllSelected: boolean;
-    highTierSelected: boolean;
+    valuableSelected: boolean;
   },
 ): { presets: FilterPreset[]; active: string } {
   if (

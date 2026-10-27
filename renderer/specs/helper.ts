@@ -33,7 +33,7 @@ export function createTestCreateOptions(): {
   exact: boolean;
   useEn: boolean;
   defaultAllSelected: boolean;
-  highTierSelected: boolean;
+  valuableSelected: boolean;
 } {
   return {
     league: "Standard",
@@ -45,7 +45,7 @@ export function createTestCreateOptions(): {
     exact: false,
     useEn: true,
     defaultAllSelected: false,
-    highTierSelected: false,
+    valuableSelected: false,
   };
 }
 
