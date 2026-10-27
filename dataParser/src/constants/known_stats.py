@@ -52,6 +52,8 @@ ULTIMATUM_WAGER_TYPE = 3076483222
 UNIQUE_JEWEL_PLUS_LEVEL = 448592698
 DISCONNECTED_PASSIVES_AROUND_KEYSTONE = 2422708892
 TIME_LOST_HISTORIC_JEWEL = 3418580811
+MAGES_LEGACY = 264262054
+VIVISECTION_KEYSTONE = 3831171903
 
 # The `better` in stats.ndjson of the stats where a lower value is better (-1) or values
 # cannot be compared (0). Every other stat gets 1.
@@ -103,6 +105,8 @@ VALUE_TO_DESCRIPTION_ID: dict[int, str] = {
     UNIQUE_JEWEL_PLUS_LEVEL: "unique_jewel_specific_skill_level_+_level",
     DISCONNECTED_PASSIVES_AROUND_KEYSTONE: "local_unique_jewel_disconnected_passives_can_be_allocated_around_keystone_hash",
     TIME_LOST_HISTORIC_JEWEL: "local_unique_jewel_alternate_tree_seed",
+    MAGES_LEGACY: "local_unique_mages_legacy_1",
+    VIVISECTION_KEYSTONE: "local_vivisection_random_keystone_index",
 }
 
 VALUE_TO_REF: dict[int, str] = {
@@ -113,6 +117,8 @@ VALUE_TO_REF: dict[int, str] = {
     UNIQUE_JEWEL_PLUS_LEVEL: "# to Level of all # Skills",
     DISCONNECTED_PASSIVES_AROUND_KEYSTONE: "Passives in Radius of # can be Allocated\nwithout being connected to your tree",
     TIME_LOST_HISTORIC_JEWEL: "Remembrancing # songworthy deeds by the line of #\nPassives in radius are Conquered by the Kalguur",
+    MAGES_LEGACY: "Legacy of #",
+    VIVISECTION_KEYSTONE: "#(Ancestral Bond-Zealot's Oath)",
 }
 
 SUPPORTED_VALUES: set[int] = {
@@ -122,7 +128,12 @@ SUPPORTED_VALUES: set[int] = {
     TIME_LOST_HISTORIC_JEWEL,
     DISCONNECTED_PASSIVES_AROUND_KEYSTONE,
     UNIQUE_JEWEL_PLUS_LEVEL,
+    MAGES_LEGACY,
+    VIVISECTION_KEYSTONE,
 }
+
+# Stats whose values each name one thing, so each matcher also gets the range of names
+NAMED_VALUES: set[int] = {MAGES_LEGACY, VIVISECTION_KEYSTONE}
 
 UNIQUE_ITEMS_FIXED_STATS: dict[str, list[str]] = {
     "Darkness Enthroned": ["#% increased effect of Socketed Items", "Has # Charm Slot"],

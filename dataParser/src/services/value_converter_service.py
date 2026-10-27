@@ -14,6 +14,7 @@ from constants.filenames import (
     BLIGHT_CRAFTING_RECIPES,
     BLIGHT_CRAFTING_RESULTS,
     PASSIVE_SKILLS,
+    STAT_DESCRIPTIONS,
 )
 from constants.known_stats import (
     ALLOCATES_NOTABLE,
@@ -21,6 +22,7 @@ from constants.known_stats import (
     DISCONNECTED_PASSIVES_AROUND_KEYSTONE,
     JEWEL_RADIUS_CHANGE,
     JEWEL_RING_RADIUS,
+    NAMED_VALUES,
     SUPPORTED_VALUES,
     TIME_LOST_HISTORIC_JEWEL,
     UNIQUE_JEWEL_PLUS_LEVEL,
@@ -55,6 +57,12 @@ def group_hash(in_df: pd.DataFrame) -> int:
 
 def hash_list(stat_hash: int) -> list[int]:
     return [int(stat_hash)]
+
+
+def placeholder_text(template: str, text: str) -> str:
+    """Returns the part of text that the # of template stands for, or all of it when they differ."""
+    match = re.fullmatch("(.+)".join(map(re.escape, template.split("#"))), text)
+    return match.group(1) if match else text
 
 
 def oil_ref_names(ref_store: GameStore) -> dict[int, str]:
@@ -128,6 +136,8 @@ class ValueConverterService:
             return self.simple_agg(in_df)
         elif hash == UNIQUE_JEWEL_PLUS_LEVEL:
             return self.simple_agg(in_df)
+        elif hash in NAMED_VALUES:
+            return self.named_values_agg(in_df)
 
         return in_df
 
@@ -161,6 +171,22 @@ class ValueConverterService:
         out["matchers"] = matchers
 
         return pd.DataFrame([out])
+
+    def named_values_agg(self, in_df: pd.DataFrame) -> pd.DataFrame:
+        """Returns simple_agg's stat with the first and last names after each matcher."""
+        out = self.simple_agg(in_df)
+        matchers = cast(list[dict[str, str | int]], out.at[0, "matchers"])
+        descriptions = GameStore(self.lang).get_description(STAT_DESCRIPTIONS)
+        description = descriptions.loc[
+            descriptions["id"] == VALUE_TO_DESCRIPTION_ID[group_hash(in_df)]
+        ]
+        template = str(description["matchers"].iloc[0][0]["string"])
+        first, last = (
+            placeholder_text(template, str(matchers[i]["string"])) for i in (0, -1)
+        )
+        for matcher in matchers:
+            matcher["advanced"] = f"{matcher['string']}({first}-{last})"
+        return out
 
     def historic_agg(self, in_df: pd.DataFrame) -> pd.DataFrame:
         advanced_desc = GameStore(self.lang).get_description(

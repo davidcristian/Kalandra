@@ -10,6 +10,7 @@ from constants.filenames import (
     BLIGHT_CRAFTING_RECIPES,
     BLIGHT_CRAFTING_RESULTS,
     PASSIVE_SKILLS,
+    STAT_DESCRIPTIONS,
 )
 from constants.known_stats import (
     ALLOCATES_NOTABLE,
@@ -17,14 +18,16 @@ from constants.known_stats import (
     DISCONNECTED_PASSIVES_AROUND_KEYSTONE,
     JEWEL_RADIUS_CHANGE,
     JEWEL_RING_RADIUS,
+    MAGES_LEGACY,
     SUPPORTED_VALUES,
     TIME_LOST_HISTORIC_JEWEL,
     UNIQUE_JEWEL_PLUS_LEVEL,
     VALUE_TO_DESCRIPTION_ID,
     VALUE_TO_REF,
+    VIVISECTION_KEYSTONE,
 )
 from constants.lang import ENGLISH, GERMAN
-from services.value_converter_service import ValueConverterService
+from services.value_converter_service import ValueConverterService, placeholder_text
 
 
 def make_service() -> ValueConverterService:
@@ -664,4 +667,99 @@ def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_co
     ] == [
         (ref, [f"explicit.stat_3418580811|{value}"], text)
         for value, (ref, text) in enumerate(GERMAN_HISTORIC_JEWELS, start=21)
+    ]
+
+
+def test_placeholder_text_returns_the_part_that_the_template_names():
+    assert placeholder_text("Legacy of #", "Legacy of Gold") == "Gold"
+    assert placeholder_text("#の遺産", "アメジストの遺産") == "アメジスト"
+    assert placeholder_text("#", "Ancestral Bond") == "Ancestral Bond"
+    assert placeholder_text("Legacy of #", "Héritage de Or") == "Héritage de Or"
+
+
+def named_value_rows(stat_hash: int, texts: dict[int, str]) -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "hash": stat_hash,
+                "text": text,
+                "value": str(value),
+                "type": "explicit",
+                "id": f"explicit.stat_{stat_hash}",
+            }
+            for value, text in texts.items()
+        ]
+    )
+
+
+def test_named_values_get_the_range_of_names_of_the_language(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    descriptions = pd.DataFrame(
+        [
+            {
+                "id": "local_unique_mages_legacy_1",
+                "matchers": [{"string": "Vermächtnis von #"}],
+            },
+            {
+                "id": "local_vivisection_random_keystone_index",
+                "matchers": [{"string": "#"}],
+            },
+        ]
+    )
+    FakeGameStore.exports = {GERMAN: {STAT_DESCRIPTIONS: descriptions}}
+    monkeypatch.setattr("services.value_converter_service.GameStore", FakeGameStore)
+    service = ValueConverterService(GERMAN)
+    service.blight = {}
+    rows = pd.concat(
+        [
+            named_value_rows(
+                MAGES_LEGACY,
+                {
+                    14: "Vermächtnis von Topas",
+                    1: "Vermächtnis von Amethyst",
+                    5: "Vermächtnis von Gold",
+                },
+            ),
+            named_value_rows(
+                VIVISECTION_KEYSTONE, {33: "Zealot's Oath", 1: "Ancestral Bond"}
+            ),
+        ]
+    )
+
+    stats = service.convert_value_stats_to_trade(rows).set_index("ref")
+
+    assert stats.at["Legacy of #", "id"] == "local_unique_mages_legacy_1"
+    assert stats.at["Legacy of #", "trade"] == {
+        "ids": {"explicit": [f"explicit.stat_{MAGES_LEGACY}"]},
+        "option": True,
+    }
+    assert stats.at["Legacy of #", "matchers"] == [
+        {
+            "string": "Vermächtnis von Amethyst",
+            "value": 1,
+            "advanced": "Vermächtnis von Amethyst(Amethyst-Topas)",
+        },
+        {
+            "string": "Vermächtnis von Gold",
+            "value": 5,
+            "advanced": "Vermächtnis von Gold(Amethyst-Topas)",
+        },
+        {
+            "string": "Vermächtnis von Topas",
+            "value": 14,
+            "advanced": "Vermächtnis von Topas(Amethyst-Topas)",
+        },
+    ]
+    assert stats.at["#(Ancestral Bond-Zealot's Oath)", "matchers"] == [
+        {
+            "string": "Ancestral Bond",
+            "value": 1,
+            "advanced": "Ancestral Bond(Ancestral Bond-Zealot's Oath)",
+        },
+        {
+            "string": "Zealot's Oath",
+            "value": 33,
+            "advanced": "Zealot's Oath(Ancestral Bond-Zealot's Oath)",
+        },
     ]
