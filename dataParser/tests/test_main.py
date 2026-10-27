@@ -66,6 +66,17 @@ def test_main_writes_the_stats_and_items_of_each_language(build: Path, lang: str
 
 @needs_game_export
 @needs_trade_data
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_main_writes_the_gems_without_a_gem_field(build: Path, lang: str):
+    items = read_ndjson(build / "output" / lang / "items.ndjson")
+    gems = [item for item in items if item["namespace"] == "GEM"]
+
+    assert len(gems) > 100
+    assert [gem["refName"] for gem in gems if "gem" in gem] == []
+
+
+@needs_game_export
+@needs_trade_data
 def test_main_matches_a_trade_stat_to_its_english_text(build: Path):
     stats = read_ndjson(build / "output" / ENGLISH / "stats.ndjson")
 

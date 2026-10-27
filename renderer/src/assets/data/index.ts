@@ -414,7 +414,6 @@ async function loadTradeData() {
           namespace: "GEM",
           icon: "%NOT_FOUND%",
           tags: [],
-          gem: {},
         };
       }
     } else if (rarity === ItemRarity.Unique) {

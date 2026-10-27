@@ -20,8 +20,7 @@ class SpecificColumnService:
         self, items: pd.DataFrame, stats: pd.DataFrame
     ) -> pd.DataFrame:
         plus_ar = self.apply_armour_column(items)
-        plus_gem = self.apply_gem_column(plus_ar)
-        plus_augment = self.apply_augment_column(plus_gem, stats)
+        plus_augment = self.apply_augment_column(plus_ar, stats)
         return plus_augment
 
     def apply_armour_column(self, items: pd.DataFrame) -> pd.DataFrame:
@@ -43,19 +42,6 @@ class SpecificColumnService:
         return items.merge(
             armour, left_on="internal_index", right_on="BaseItemType", how="left"
         ).drop("BaseItemType", axis=1)
-
-    def apply_gem_column(self, items: pd.DataFrame) -> pd.DataFrame:
-        gem = items.copy()
-
-        def create_gem_dict(namespace_col: str) -> dict[str, bool] | None:
-            return (
-                {"awakened": False, "transfigured": False}
-                if namespace_col == "GEM"
-                else None
-            )
-
-        gem["gem"] = gem["namespace"].apply(create_gem_dict)
-        return gem
 
     def apply_augment_column(
         self, items: pd.DataFrame, stats: pd.DataFrame

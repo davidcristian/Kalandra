@@ -286,7 +286,7 @@ class NdBuilderService:
         logger.info("Getting non-unique items")
         non_unique_items = self.non_unique_items()
 
-        logger.info("Applying gem and armour columns")
+        logger.info("Applying armour and augment columns")
         col_added = self.specific_column_service.apply_item_specific_columns(
             non_unique_items, self.stats
         )
@@ -324,7 +324,6 @@ class NdBuilderService:
                 "w",
                 "h",
                 "armour",
-                "gem",
                 "augment",
             ]
         ]

@@ -69,9 +69,6 @@ export interface BaseType {
     screenshot?: string;
     tier?: number;
   };
-  gem?: {
-    vaal?: true;
-  };
   armour?: {
     ar?: [min: number, max: number];
     ev?: [min: number, max: number];

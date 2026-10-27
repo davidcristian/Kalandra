@@ -1,6 +1,6 @@
 # Nothing reads the gem field of the item data
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/services/specific_column_service.py](../../../../dataParser/src/services/specific_column_service.py)
 **Verified:** 2026-10-27
@@ -20,3 +20,6 @@ the committed data loses it at the next data build, which
 
 - 2026-10-27: Found when the transfigured and awakened gem filters were removed
   ([082](082-checks-for-item-names-the-data-lacks.md)).
+- 2026-10-27: refactor: remove the unread gem field of the item data. The
+  committed `items.ndjson` keeps the field until the next data build
+  ([052](052-dataparser-older-than-committed-data.md)).
