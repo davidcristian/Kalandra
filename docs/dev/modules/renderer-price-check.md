@@ -62,8 +62,9 @@ that the route needs ([main.md](main.md)).
   (`filterPseudo` and its `PSEUDO_RULES`), and the item property filters (`filterItemProp`). The types are in
   `filters/interfaces.ts`.
 - `text-keys.ts` builds the `app_i18n.json` key that names a modifier type (`item.mod_added_rune`) or a trade
-  category (`item_category.weapon_bow`). `FilterModifier.vue` names a tag by `filters.tag_<tag>`, and a stat
-  filter's tag can be any `ModifierType`.
+  category (`item_category.weapon_bow`). The English file has a category text for each trade id in
+  `CATEGORY_TO_TRADE_ID` and for no other, which `specs/web/price-check/filters/text-keys.test.ts` checks.
+  `FilterModifier.vue` names a tag by `filters.tag_<tag>`, and a stat filter's tag can be any `ModifierType`.
 - The item editor applies its changes in `item-editor/`: `useAugment` from the parser's `augment-builder.ts` puts a
   rune or soul core in a socket, and `applyCatalyst` in `item-editor.ts` applies a catalyst and its quality. Both
   change the item and recompute its properties through `recalculateItemProperties` from the parser. The parser also
@@ -191,7 +192,7 @@ otherwise the first. A failed load is logged with `console.warn` and its message
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 1923 lines** (2026-10-27,
+- **`pathofexile-trade.ts` is 1898 lines** (2026-10-27,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 

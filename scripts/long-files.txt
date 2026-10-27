@@ -22,5 +22,5 @@
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 367 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
-1912 renderer/src/web/price-check/trade/pathofexile-trade.ts
+1898 renderer/src/web/price-check/trade/pathofexile-trade.ts
 527 renderer/src/web/settings/SettingsWindow.vue

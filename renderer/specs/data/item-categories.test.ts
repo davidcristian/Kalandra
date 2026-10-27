@@ -6,9 +6,6 @@ import { ItemCategory } from "@/parser/meta";
 
 const ITEMS_FILE = path.resolve(__dirname, "../../public/data/en/items.ndjson");
 
-const PATH_OF_EXILE_1 =
-  "a Path of Exile 1 category that code still checks, which refinement task 022 covers";
-
 // Each category that no item data entry has, and where the parser gets it instead
 const NOT_IN_ITEM_DATA = new Map<ItemCategory, string>([
   [ItemCategory.Unknown, "set when the item data names no category"],
@@ -18,23 +15,6 @@ const NOT_IN_ITEM_DATA = new Map<ItemCategory, string>([
   [ItemCategory.MetamorphSample, "set from the help text"],
   [ItemCategory.Voidstone, "set from the help text"],
   [ItemCategory.Claw, "a category of the augment lines in the item data"],
-  [ItemCategory.Waystone, "the item data gives a waystone the category Map"],
-  [ItemCategory.AbyssJewel, PATH_OF_EXILE_1],
-  [ItemCategory.FishingRod, PATH_OF_EXILE_1],
-  [ItemCategory.RuneDagger, PATH_OF_EXILE_1],
-  [ItemCategory.ClusterJewel, PATH_OF_EXILE_1],
-  [ItemCategory.HeistBlueprint, PATH_OF_EXILE_1],
-  [ItemCategory.HeistContract, PATH_OF_EXILE_1],
-  [ItemCategory.HeistTool, PATH_OF_EXILE_1],
-  [ItemCategory.HeistBrooch, PATH_OF_EXILE_1],
-  [ItemCategory.HeistGear, PATH_OF_EXILE_1],
-  [ItemCategory.HeistCloak, PATH_OF_EXILE_1],
-  [ItemCategory.Trinket, PATH_OF_EXILE_1],
-  [ItemCategory.Invitation, PATH_OF_EXILE_1],
-  [ItemCategory.Sentinel, PATH_OF_EXILE_1],
-  [ItemCategory.MemoryLine, PATH_OF_EXILE_1],
-  [ItemCategory.SanctumRelic, PATH_OF_EXILE_1],
-  [ItemCategory.Tincture, PATH_OF_EXILE_1],
 ]);
 
 function craftableCategories(): Set<string> {

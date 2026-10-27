@@ -1,9 +1,9 @@
 # Category checks for item kinds the Path of Exile 2 data does not have
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/item-check/WidgetItemCheck.vue](../../../../renderer/src/web/item-check/WidgetItemCheck.vue)
-**Verified:** 2026-10-21
+**Verified:** 2026-10-27
 
 The parser sets an item's category from `craftable.category` of its entry in `items.ndjson`, or of
 its base item for a unique (`renderer/src/parser/Parser.ts`). The other assignments in `Parser.ts`
@@ -44,3 +44,13 @@ checks the items in the game.
   the automatic search, so the question of adding `Relic` to the condition was removed.
 - 2026-10-21: Widened to the other Path of Exile 1 categories and `Waystone`, when a test started to
   list the categories that the data does not have.
+- 2026-10-27: Checked again: each language's `items.ndjson` has the same categories, none of them
+  `Waystone` or one of the 16 Path of Exile 1 categories that `item-categories.test.ts` listed.
+  Each check of them was removed, with their `ItemCategory` members, trade ids and category texts,
+  by refactor(trade): remove price check branches of categories no item has, refactor(parser):
+  remove the sentinel and heist blueprint parsers, refactor(dataparser): stop writing the heist
+  and sentinel client strings, refactor(renderer): open Map check only for waystones and logbooks
+  and refactor(parser): remove the item categories that no item has. A saved config names a
+  category only as a `savedAugments` key, which only an item of that category reads. The trade
+  site lists `weapon.rod`, `map.waystone` and `sanctum.relic`, but no item gets the removed
+  categories, so a waystone keeps the trade id `map` and a relic its search by base type.

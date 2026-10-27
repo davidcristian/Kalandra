@@ -35,7 +35,6 @@ import { areaLevelByAscendancyPoints } from "../filters/create-item-filters";
 
 export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Map, "map"],
-  [ItemCategory.AbyssJewel, "jewel.abyss"],
   [ItemCategory.Amulet, "accessory.amulet"],
   [ItemCategory.Belt, "accessory.belt"],
   [ItemCategory.BodyArmour, "armour.chest"],
@@ -43,7 +42,6 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Bow, "weapon.bow"],
   [ItemCategory.Claw, "weapon.claw"],
   [ItemCategory.Dagger, "weapon.dagger"],
-  [ItemCategory.FishingRod, "weapon.rod"],
   [ItemCategory.Flask, "flask"],
   [ItemCategory.Gloves, "armour.gloves"],
   [ItemCategory.Helmet, "armour.helmet"],
@@ -53,7 +51,6 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.OneHandedSword, "weapon.onesword"],
   [ItemCategory.Quiver, "armour.quiver"],
   [ItemCategory.Ring, "accessory.ring"],
-  [ItemCategory.RuneDagger, "weapon.runedagger"],
   [ItemCategory.Sceptre, "weapon.sceptre"],
   [ItemCategory.Shield, "armour.shield"],
   [ItemCategory.Staff, "weapon.staff"],
@@ -62,16 +59,6 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.TwoHandedSword, "weapon.twosword"],
   [ItemCategory.Wand, "weapon.wand"],
   [ItemCategory.Warstaff, "weapon.warstaff"],
-  [ItemCategory.ClusterJewel, "jewel.cluster"],
-  [ItemCategory.HeistBlueprint, "heistmission.blueprint"],
-  [ItemCategory.HeistContract, "heistmission.contract"],
-  [ItemCategory.HeistTool, "heistequipment.heisttool"],
-  [ItemCategory.HeistBrooch, "heistequipment.heistreward"],
-  [ItemCategory.HeistGear, "heistequipment.heistweapon"],
-  [ItemCategory.HeistCloak, "heistequipment.heistutility"],
-  [ItemCategory.Trinket, "accessory.trinket"],
-  [ItemCategory.SanctumRelic, "sanctum.relic"],
-  [ItemCategory.Tincture, "tincture"],
   [ItemCategory.Charm, "flask.charm"],
   [ItemCategory.Crossbow, "weapon.crossbow"],
   [ItemCategory.SkillGem, "gem.activegem"],
@@ -84,7 +71,6 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Tablet, "map.tablet"],
   [ItemCategory.MapFragment, "map.fragment"],
   [ItemCategory.Talisman, "weapon.talisman"],
-  [ItemCategory.Waystone, "map.waystone"],
 ]);
 
 const TOTAL_MODS_TEXT = {

@@ -25,6 +25,18 @@ describe("the UI text keys built from item values", () => {
     expect(undefinedKeys(keys)).toEqual([]);
   });
 
+  it("have a category text only for a trade site category that the search sends", () => {
+    // item_category.prop is the label that names the category
+    const used = new Set([
+      "item_category.prop",
+      ...[...CATEGORY_TO_TRADE_ID.values()].map(tradeCategoryKey),
+    ]);
+    const unused = [...english.keys()].filter(
+      (key) => key.startsWith("item_category.") && !used.has(key),
+    );
+    expect(unused).toEqual([]);
+  });
+
   it("name each filter tag with a text of the English file", () => {
     // FilterModifier.vue builds this key, and a stat filter's tag can be any modifier type
     const tags: string[] = [
