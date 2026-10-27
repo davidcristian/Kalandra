@@ -23,3 +23,5 @@ reading the tables only when a method needs them. Then the marker leaves them.
   ([051](051-dataparser-tests-and-ci.md)).
 - 2026-10-27: test(dataparser): run the stat builder tests without the game export. With the
   export and trade data hidden, 269 tests pass and 280 skip, where 227 passed and 321 skipped.
+- 2026-10-27: The byte for byte comparison of two full builds found
+  [112](112-dataparser-output-depends-on-hash-seed.md).

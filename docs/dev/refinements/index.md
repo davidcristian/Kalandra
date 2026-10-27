@@ -173,3 +173,4 @@ layout and its reasons.
 - 109: [No copied Expedition Logbook text shows what the logbook parsers do](tasks/109-expedition-logbook-parser-case.md)
 - 110: [The base percentile trade id and its texts remain without a filter](tasks/110-base-percentile-trade-id.md)
 - 111: [Nothing reads the gem field of the item data](tasks/111-unread-gem-field.md)
+- 112: [Two data builds write different stats files when Python's hash seed differs](tasks/112-dataparser-output-depends-on-hash-seed.md)
