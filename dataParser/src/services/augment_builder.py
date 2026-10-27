@@ -12,6 +12,7 @@ from constants.filenames import (
     STATS,
 )
 from constants.lang import ENGLISH
+from services.value_divisors import divided_values, value_divisors
 from stores.game_store import GameStore
 from stores.trade_store import TradeStore
 
@@ -110,17 +111,36 @@ class AugmentBuilder:
         logger.debug(soul_core_item)
         return soul_core_item
 
-    def get_stats(self, nd_stats: pd.DataFrame) -> pd.DataFrame:
+    def get_stats(
+        self, nd_stats: pd.DataFrame, divisors: dict[str, int] | None = None
+    ) -> pd.DataFrame:
         soul_core_stats = self.ref_game_store.get(SOUL_CORE_STATS).drop(
             columns=["_index"]
         )
         stats = self.ref_game_store.get(STATS).drop(columns=["_index"])
 
-        exploded_joined = soul_core_stats.explode("Stats").merge(
+        exploded = soul_core_stats.explode("Stats")
+        exploded["position"] = exploded.groupby(level=0).cumcount()
+        exploded_joined = exploded.merge(
             stats, how="inner", left_on="Stats", right_index=True
-        )[["SoulCore", "StatCategory", "Id", "StatsValues"]]
+        )[["SoulCore", "StatCategory", "Id", "StatsValues", "position"]]
         with_id = exploded_joined.dropna(subset=["Id"]).reset_index(drop=True)
         joined = with_id.merge(nd_stats, left_on="Id", right_on="id", how="inner")
+        divisor_of = value_divisors() if divisors is None else divisors
+        joined["StatsValues"] = [
+            divided_values(
+                values,
+                position,
+                divisor_of.get(stat_id),
+                {matcher.get("value") for matcher in matchers},
+            )
+            for values, position, stat_id, matchers in zip(
+                joined["StatsValues"],
+                joined["position"],
+                joined["Id"],
+                joined["matchers"],
+            )
+        ]
 
         joined["matcher"] = joined["matchers"].apply(self.first_non_negated)
         joined["rune_id"] = joined["trade"].apply(self.rune_stat_id)

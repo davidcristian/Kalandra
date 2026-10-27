@@ -153,7 +153,7 @@ def test_get_stats_writes_a_line_for_each_stat_of_a_soul_core():
         ]
     )
 
-    lines = builder.get_stats(nd_stats).to_dict(orient="records")
+    lines = builder.get_stats(nd_stats, divisors={}).to_dict(orient="records")
 
     assert lines == [
         {
@@ -185,3 +185,20 @@ def test_get_stats_writes_a_line_for_each_stat_of_a_soul_core():
             "tradeId": ["rune.stat_2480498143"],
         },
     ]
+
+
+def test_get_stats_divides_the_value_of_each_line_s_own_stat():
+    builder = AugmentBuilder(pd.DataFrame())
+    builder.ref_game_store = FakeGameStore()
+    nd_stats = pd.DataFrame(
+        [
+            nd_stat("local_minimum_added_fire_damage", "Adds # to # Fire", 709508406),
+            nd_stat("mana_cost_%_as_life_cost", "#% of Mana as Life", 2480498143),
+        ]
+    )
+
+    lines = builder.get_stats(
+        nd_stats, divisors={"local_minimum_added_fire_damage": 100}
+    )
+
+    assert lines["values"].tolist() == [[0.13, 16, 15], [13, 16, 15]]

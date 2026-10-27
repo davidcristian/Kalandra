@@ -162,7 +162,9 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   refs of the stats that every copy has, so the price check tags its other stats as a variant. `augment` has a line
   for each stat of a rune or soul core's `SoulCoreStats` rows, with all the values of its row, and the item
   categories: the `ItemClasses` ids that its `SoulCoreStatCategories` row targets, or for a row that targets none,
-  such as `Martial Weapon`, those in `SOUL_CORE_CLASS_MAPPINGS` (`src/services/augment_builder.py`). A unique's `refName` is its name on the English trade site, and its `name` is
+  such as `Martial Weapon`, those in `SOUL_CORE_CLASS_MAPPINGS` (`src/services/augment_builder.py`). The value of
+  the line's own stat is divided as the game shows it, by 100 or 60 for a `divide_by_one_hundred` or
+  `per_minute_to_per_second` handler, unless a matcher names that value (`src/services/value_divisors.py`). A unique's `refName` is its name on the English trade site, and its `name` is
   the `Text2` of the game's `Words` row whose English `Text2` is that name (`src/services/unique_names.py`). `Text` is
   the game's internal name, which keeps an old name after a rename. A unique without such a row is left out and
   logged as `No unique named <name> ...`.
