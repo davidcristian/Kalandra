@@ -94,8 +94,9 @@ main returns on `/config`. The pre-commit hook runs `versioncheck.py` when a `.j
    the parts changed since the last release, and `pre-commit run --all-files` for the bump itself.
 5. **Commit the bump on its own**, for example `chore: set the version to X.Y.Z`.
 6. **Push to master.** You should see:
-   - a Build run, whose `tests` jobs pass, whose three `package` jobs each log `uploading` once per
-     file, and whose Hash step prints a `latest*.yml` with `version: X.Y.Z`;
+   - a Build run, which the bump starts because it changes `main/package.json`, whose `tests` jobs
+     pass, whose three `package` jobs each log `uploading` once per file, and whose Hash step prints
+     a `latest*.yml` with `version: X.Y.Z`;
    - a run of the Docs workflow (`pages.yml`), because the bump changes
      `docs/.vitepress/config.js`. The site then links to the `vX.Y.Z` files, which return 404
      until step 8, so do not wait long between the push and publishing.
@@ -127,8 +128,11 @@ Build run on `master` in the Actions tab and choose Re-run all jobs.
   Exiled Exchange 2 or from an earlier release, and a release made now would point at its commit.
   Set a version whose tag does not exist.
 - **The `package` jobs are skipped.** A job under `tests` failed on that commit, so nothing was
-  uploaded. Its log names the failed step. Fix the cause on `master` and push, and the new Build
-  run uploads.
+  uploaded. Its log names the failed step. Fix the cause on `master` and push. Build starts again
+  only for a push that changes `main/`, `renderer/`, `ipc/`, `main.yml` or `test.yml`, and Re-run
+  all jobs builds the same commit again, so a fix outside them uploads nothing until the next push
+  that changes one of them
+  ([refinement 113](../refinements/tasks/113-build-not-started-by-a-fix-outside-the-app.md)).
 - **`skipped publishing` although the draft exists.** The draft's tag is not `vX.Y.Z` for the
   version in `main/package.json`, or the token cannot see drafts: GitHub lists draft releases only
   to a token with write access, which `permissions: contents: write` on the `package` job in

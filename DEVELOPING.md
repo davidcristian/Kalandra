@@ -139,8 +139,10 @@ part alone:
 
 [docs/dev/architecture.md](docs/dev/architecture.md#ci) lists what each CI workflow runs and on
 which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pull request, and
-`check.py` does, so run it before opening one. Behavior inside the game is checked by hand on
-Windows, following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
+Build runs both only on a push to `master` that changes `main/`, `renderer/`, `ipc/`, `main.yml`
+or `test.yml`. `check.py` runs both, so run it before opening a pull request. Behavior inside the
+game is checked by hand on Windows, following
+[docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
 
 `npm run format` in `main/` or `renderer/` runs Prettier alone, which the pre-commit hooks also run.
 A hook also runs it on `ipc/` with `main/.prettierrc`. It keeps the line endings it finds

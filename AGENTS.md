@@ -214,9 +214,9 @@ the dash and banned-word rules; read your own diff for the rest.
 ## Safety
 
 - **Ask before anything outward-facing.** Pushing, opening a PR, tagging and releasing need the user's go-ahead. A
-  push to `master` that changes a file outside `docs/` and the root `README.md` runs the Build workflow, which
-  packages the app on three platforms and uploads it to the draft GitHub release for the current version if one
-  exists. Never force-push a published branch.
+  push to `master` that changes `main/`, `renderer/`, `ipc/`, `main.yml` or `test.yml`, as a version bump does, runs
+  the Build workflow, which packages the app on three platforms and uploads it to the draft GitHub release for the
+  current version if one exists. Never force-push a published branch.
 - **No secrets and no user files in the repo or the logs.** Never commit a `config.json`, a client log or anything
   from `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides. No log line contains a cookie, a token or
   a session ID.

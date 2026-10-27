@@ -15,9 +15,8 @@ reduced to what a forked Electron app with one maintainer needs.
 **1. Developer docs live in `docs/dev/`.** The folder holds `index.md` (the entry point, listing every developer
 doc), `architecture.md` (the components and the data flow), `adr/` (these records), `modules/` (one contract doc per
 part of the code), `runbooks/` (procedures), `refinements/` (deferred work anyone can pick up) and `host/` (checks
-that need Path of Exile 2 running on Windows). Reason: a push that changes only `docs/` does not run the Build
-workflow (see Alternatives rejected), and one folder gives [AGENTS.md](../../../AGENTS.md) and the README one place
-to link to.
+that need Path of Exile 2 running on Windows). Reason: one folder gives [AGENTS.md](../../../AGENTS.md) and the
+README one place to link to.
 
 **2. The site leaves them out.** `docs/.vitepress/config.js` sets `srcExclude: ['dev/**']`, so VitePress does not
 build them, and they are read on GitHub. Reason: on GitHub a relative link to a source file or to `AGENTS.md` opens
@@ -62,9 +61,6 @@ figures, so a directory of measurement records would hold few files, and a gener
 ## Alternatives rejected
 
 - **A developer section in the site's sidebar.** The reasons are in decision 2.
-- **A top-level folder outside `docs/`.** `main.yml` ignores only `docs/**` and `README.md`, so a doc-only push to
-  `master` would run the Build workflow, which packages the app on three platforms and uploads it to the draft
-  release for the current version if one exists.
 - **Cortex's readings directory and generated indexes.** The reasons are in decision 7.
 
 ## Related

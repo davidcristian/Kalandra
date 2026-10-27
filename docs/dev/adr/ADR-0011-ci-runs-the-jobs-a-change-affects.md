@@ -62,7 +62,7 @@ do not show what an earlier push broke.
 - **A `paths` filter on the whole workflow.** A workflow that does not run leaves its required checks waiting, so a
   pull request could not merge.
 - **Starting Build with `workflow_run` when `test.yml` completes.** Build would run the workflow file of the default
-  branch, check out the tested commit by hand and lose its `paths-ignore` filter.
+  branch, check out the tested commit by hand and lose its `paths` filter.
 - **Copying the test steps into Build.** Two copies of the same steps can differ after a later change.
 - **A last job that fails when a job it needs failed.** The required checks would have to change to its name, in the
   repository settings, which the repo files do not show.

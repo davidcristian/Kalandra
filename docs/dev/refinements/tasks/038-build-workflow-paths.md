@@ -1,6 +1,6 @@
 # The Build workflow runs for pushes that change no file of the app
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** ci
 **Origin:** [.github/workflows/main.yml](../../../../.github/workflows/main.yml)
 **Verified:** 2026-10-27
@@ -31,3 +31,6 @@ change with it: the CI table in [architecture.md](../../architecture.md),
 - 2026-10-27: The maintainer chose to run Build only for changes to the app: a `paths` list of
   `main/**`, `renderer/**`, `ipc/**` and the `main.yml` and `test.yml` workflows replaces
   `paths-ignore`. Packaging reads nothing outside `main/` and `renderer/dist`.
+- 2026-10-27: Done in `ci: run the Build workflow only for changes to the app`. After the `tests`
+  job of a Build run fails, a fix outside those paths does not start Build again, which is
+  [113](113-build-not-started-by-a-fix-outside-the-app.md).

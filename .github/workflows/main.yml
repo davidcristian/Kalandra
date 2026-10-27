@@ -6,9 +6,13 @@ on:
       - 'master'
     tags-ignore:
       - '**'
-    paths-ignore:
-      - 'docs/**'
-      - README.md
+    # Packaging reads only main/, renderer/ and ipc/, so a new input of a build or package step goes on this list.
+    paths:
+      - 'main/**'
+      - 'renderer/**'
+      - 'ipc/**'
+      - '.github/workflows/main.yml'
+      - '.github/workflows/test.yml'
 
 permissions:
   contents: read
