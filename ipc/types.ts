@@ -235,10 +235,10 @@ export type ClientLogEvent =
   | MapNavEvent
   | AfkEvent;
 
-type BaseLogEvent = {
+interface BaseLogEvent {
   ts: number;
   ms: number;
-};
+}
 
 export type GeneralLogEvent = BaseLogEvent & {
   type: "log" | "game-start";

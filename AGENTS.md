@@ -96,9 +96,9 @@ gives each step's own command. CI runs the same steps on Node 24, each job only 
 except the renderer and main builds, which run only on a push to `master`.
 
 1. **The pre-commit hooks** (`pre-commit run --all-files`) check whitespace, YAML, workflows, file sizes, ESLint,
-   Prettier and `tsc` on `main/` and `renderer/`, Ruff and strict Pyright on `priceService/` and `scripts/`, and the
-   checks of the version, line limits, dashes, prose, links, backlog indexes and allowScripts entries. The fixers
-   rewrite files, so stage the result and run again until it passes. Never pass `--no-verify` unless the user asks.
+   Prettier and `tsc` on `main/`, `renderer/` and `ipc/`, Ruff and strict Pyright on `priceService/` and `scripts/`,
+   and the version, line limit, dash, prose, link, backlog index and allowScripts checks. The fixers rewrite files, so
+   stage the result and run again until it passes. Never pass `--no-verify` unless the user asks.
 2. **The renderer**: lint, Vitest and the build, after `npm run make-index-files` writes the index files they need.
    Write them again after any data change.
 3. **The main process**: Vitest and the build. CI packages it on Windows, Linux and macOS, so platform-specific code

@@ -2,9 +2,10 @@
 
 **Purpose.** `ipc/` holds the TypeScript types and key tables that main and the renderer both import, so both
 ends of every message are checked against one definition ([ADR-0004](../adr/ADR-0004-process-boundary.md)). It
-has no `package.json` or `tsconfig.json` of its own. main imports it by relative path (`../../ipc/types`), the
-renderer through the `@ipc/*` alias in `renderer/tsconfig.json` and `renderer/vite.config.mts`, and each process's
-type check covers the files it imports. The routes that move the messages are in
+has no `package.json`. main imports it by relative path (`../../ipc/types`), the renderer through the `@ipc/*`
+alias in `renderer/tsconfig.json` and `renderer/vite.config.mts`, and each process's type check covers the files it
+imports. `ipc/tsconfig.json` extends `main/tsconfig.json` and gives ESLint's typed rules a project for `ipc/`;
+neither process's type check reads it. The routes that move the messages are in
 [architecture.md](../architecture.md#the-boundary-between-the-processes), and the code on each end is in
 [main.md](main.md) and `renderer/src/web/background/IPC.ts`.
 
@@ -174,4 +175,7 @@ the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `H
 `main/specs/renderer-log.test.ts` sends `log-entry` payloads, valid and not, through a fake server and reads main's
 log, and `renderer/specs/web/prices-selection.test.ts` reads the `log-entry` that a missing price file sends. The
 type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs
-both pre-commit type check hooks. No hook runs ESLint or Prettier on `ipc/`, locally or in CI.
+both pre-commit type check hooks. It also runs `lint-fix-ipc`, which runs ESLint with main's config, and
+`format-ipc`, which runs Prettier with the `.prettierrc` that main and the renderer share. Both run from the repo
+root, since ESLint skips a file outside the folder it runs from, and CI runs them over all files. main's config
+applies because `ipc/` holds plain TypeScript and no Vue.

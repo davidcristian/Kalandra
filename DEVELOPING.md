@@ -108,7 +108,8 @@ part alone:
   `scripts/`. Vitest counts every `.ts` file under `src/`, so a `.ts` file no test loads counts
   as uncovered. The renderer's `.vue` components are not counted.
 - `npm run lint` in `renderer/` or `main/` runs ESLint on `src/` and `specs/`, and in `main/`
-  on `build/script.mjs` too. The pre-commit hooks run the same files with `--fix`.
+  on `build/script.mjs` too. The pre-commit hooks run the same files with `--fix`, and run main's
+  config on `ipc/` from the repo root with the project in `ipc/tsconfig.json`.
 - Both processes run ESLint 9 from their `devDependencies`, with the flat config in their
   `eslint.config.mjs`. Each config adds the `strict` rules of typescript-eslint to a Standard
   style base: `neostandard` in `main/` and `@vue/eslint-config-standard-with-typescript` in
@@ -142,9 +143,10 @@ which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pu
 Windows, following [docs/dev/runbooks/in-game-check.md](docs/dev/runbooks/in-game-check.md).
 
 `npm run format` in `main/` or `renderer/` runs Prettier alone, which the pre-commit hooks also run.
-It keeps the line endings it finds (`"endOfLine": "auto"` in each `.prettierrc`). Git for Windows
-checks files out with CRLF (`core.autocrlf=true`) and counts a file rewritten with LF as modified,
-even when `git diff` shows nothing.
+A hook also runs it on `ipc/` with `main/.prettierrc`. It keeps the line endings it finds
+(`"endOfLine": "auto"` in each `.prettierrc`). Git for Windows checks files out with CRLF
+(`core.autocrlf=true`) and counts a file rewritten with LF as modified, even when `git diff` shows
+nothing.
 
 ## Package locally
 

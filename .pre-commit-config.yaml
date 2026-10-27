@@ -36,6 +36,15 @@ repos:
         pass_filenames: false
         files: ^renderer/.*\.(ts|js|jsx|tsx|vue)$
 
+    # ipc/ has no package.json, so its hooks run main's tools from the repo root: ESLint skips a
+    # file outside the folder it runs from. ipc/tsconfig.json gives the typed rules a project.
+    -   id: lint-fix-ipc
+        name: Lint Fix IPC Types
+        entry: node main/node_modules/eslint/bin/eslint.js -c main/eslint.config.mjs --fix ipc
+        language: system
+        pass_filenames: false
+        files: ^ipc/.*\.(ts|json)$
+
     -   id: format-main
         name: Format Main Project
         entry: npm run format --prefix ./main
@@ -49,6 +58,13 @@ repos:
         language: system
         pass_filenames: false
         files: ^renderer/.*\.(ts|js|jsx|tsx|vue|json|md)$
+
+    -   id: format-ipc
+        name: Format IPC Types
+        entry: node main/node_modules/prettier/bin/prettier.cjs --config main/.prettierrc --write ipc
+        language: system
+        pass_filenames: false
+        files: ^ipc/.*\.(ts|json|md)$
 
     # Both processes import ipc/, so a change there type checks both.
     -   id: type-check-main

@@ -1,6 +1,6 @@
 # No hook runs ESLint or Prettier on ipc/
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** ci
 **Origin:** [.pre-commit-config.yaml](../../../../.pre-commit-config.yaml)
 **Verified:** 2026-10-27
@@ -28,3 +28,6 @@ alone.
 
 - 2026-10-27: Split from [037](037-type-check-hooks-skip-ipc.md) when the type check hooks started
   to run for a change in `ipc/`.
+- 2026-10-27: Done in `chore(ipc): format KeyToCode.ts with the shared prettier config` and
+  `build: run eslint and prettier on ipc/ in the pre-commit hooks`, which uses main's ESLint config
+  and makes `BaseLogEvent` in `types.ts` an interface for its `consistent-type-definitions` rule.
