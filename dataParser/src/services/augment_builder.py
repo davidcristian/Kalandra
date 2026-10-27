@@ -14,6 +14,7 @@ from constants.filenames import (
 from constants.lang import ENGLISH
 from services.value_divisors import divided_values, value_divisors
 from stores.game_store import GameStore
+from stores.helpers.hash_computer import HashComputer
 from stores.trade_store import TradeStore
 
 # The item classes of the soul core stat categories whose TargetItemClasses is empty
@@ -74,6 +75,29 @@ SOUL_CORE_CLASS_MAPPINGS = {
 logger = logging.getLogger(__name__)
 
 
+def stat_rows(nd_stats: pd.DataFrame) -> dict[str, int]:
+    """Returns the position of the first stat that has each game stat id, then each trade stat hash."""
+    rows: dict[str, int] = {}
+    for row, stat_id in enumerate(nd_stats["id"]):
+        if isinstance(stat_id, str):
+            _ = rows.setdefault(stat_id, row)
+    for row, trade in enumerate(nd_stats["trade"]):
+        ids = cast(dict[str, list[str]] | None, trade.get("ids"))
+        for trade_ids in (ids or {}).values():
+            for trade_id in trade_ids:
+                number = trade_id.split("_")[-1]
+                if number.isdigit():
+                    _ = rows.setdefault(number, row)
+    return rows
+
+
+def stat_row(rows: dict[str, int], stat_id: str) -> int | None:
+    """Returns the stat of a game stat id, or of its hash when another stat id names the stat."""
+    if stat_id in rows:
+        return rows[stat_id]
+    return rows.get(str(HashComputer().compute_hash([stat_id])))
+
+
 class AugmentBuilder:
     def __init__(self, nd_stats: pd.DataFrame) -> None:
         self.ref_trade_store: TradeStore = TradeStore(ENGLISH)
@@ -125,7 +149,11 @@ class AugmentBuilder:
             stats, how="inner", left_on="Stats", right_index=True
         )[["SoulCore", "StatCategory", "Id", "StatsValues", "position"]]
         with_id = exploded_joined.dropna(subset=["Id"]).reset_index(drop=True)
-        joined = with_id.merge(nd_stats, left_on="Id", right_on="id", how="inner")
+        rows = stat_rows(nd_stats)
+        with_id["row"] = [stat_row(rows, stat_id) for stat_id in with_id["Id"]]
+        joined = with_id.dropna(subset=["row"]).merge(
+            nd_stats.reset_index(drop=True), left_on="row", right_index=True
+        )
         divisor_of = value_divisors() if divisors is None else divisors
         joined["StatsValues"] = [
             divided_values(

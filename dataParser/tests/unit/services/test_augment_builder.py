@@ -7,7 +7,8 @@ from constants.filenames import (
     SOUL_CORE_STATS,
     STATS,
 )
-from services.augment_builder import AugmentBuilder
+from services.augment_builder import AugmentBuilder, stat_row, stat_rows
+from stores.helpers.hash_computer import HashComputer
 
 
 def test_first_non_negated_uses_the_value_text_of_a_stat_with_only_value_matchers():
@@ -202,3 +203,54 @@ def test_get_stats_divides_the_value_of_each_line_s_own_stat():
     )
 
     assert lines["values"].tolist() == [[0.13, 16, 15], [13, 16, 15]]
+
+
+MOVEMENT_SPEED = {
+    "id": "map_players_movement_speed_+%",
+    "matchers": [{"string": "#% increased Movement Speed"}],
+    "trade": {
+        "ids": {
+            "explicit": ["explicit.stat_2250533757"],
+            "sanctum": ["sanctum.stat_1416455556"],
+            "pseudo": ["pseudo.pseudo_increased_movement_speed"],
+        }
+    },
+}
+ATTACK_SPEED = {
+    "id": "local_attack_speed_+%",
+    "matchers": [{"string": "#% increased Attack Speed"}],
+    "trade": {"ids": {"rune": ["rune.stat_210067635", "rune.stat_681332047"]}},
+}
+
+
+def test_stat_row_finds_a_stat_by_its_id_or_by_the_hash_of_another_id():
+    rows = stat_rows(pd.DataFrame([MOVEMENT_SPEED, ATTACK_SPEED]))
+
+    assert stat_row(rows, "map_players_movement_speed_+%") == 0
+    # The trade site's stat hash of each game stat id names the stat that merged it
+    assert stat_row(rows, "base_movement_velocity_+%") == 0
+    assert stat_row(rows, "attack_speed_+%") == 1
+    assert stat_row(rows, "local_attack_speed_+%") == 1
+    assert stat_row(rows, "base_spirit") is None
+
+
+def test_stat_row_prefers_the_stat_whose_id_it_is():
+    other = {**ATTACK_SPEED, "id": "attack_speed_+%", "trade": {"ids": None}}
+
+    rows = stat_rows(pd.DataFrame([ATTACK_SPEED, other]))
+
+    assert stat_row(rows, "attack_speed_+%") == 1
+
+
+def test_get_stats_finds_a_soul_core_stat_that_another_stat_id_merged():
+    builder = AugmentBuilder(pd.DataFrame())
+    builder.ref_game_store = FakeGameStore()
+    ignite_hash = HashComputer().compute_hash(["base_avoid_ignite_%"])
+    nd_stats = pd.DataFrame(
+        [nd_stat("cannot_be_ignited_from_map", "Cannot be Ignited", ignite_hash)]
+    )
+
+    lines = builder.get_stats(nd_stats, divisors={})
+
+    assert lines["string"].tolist() == ["Cannot be Ignited"]
+    assert lines["tradeId"].tolist() == [[f"rune.stat_{ignite_hash}"]]
