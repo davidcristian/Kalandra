@@ -15,6 +15,11 @@
       <div class="flex-1"></div>
       <trade-links v-if="list" :get-link="makeTradeLink" />
     </div>
+    <suggested-price
+      v-if="!item.stackSize"
+      :listings="listings"
+      :loading="listingsLoading"
+    />
 
     <div class="layout-column overflow-y-auto overflow-x-hidden">
       <table class="table-stripped w-full">
@@ -123,6 +128,7 @@ import TradeItem from "./TradeItem.vue";
 import { useTradeApi } from "./trade-api";
 import { GEM, GRANTS_REAL_SKILL } from "@/parser/meta";
 import ExtractionValue from "./ExtractionValue.vue";
+import SuggestedPrice from "./SuggestedPrice.vue";
 
 const slowdown = artificialSlowdown(900);
 
@@ -132,6 +138,7 @@ export default defineComponent({
   components: {
     ExtractionValue,
     OnlineFilter,
+    SuggestedPrice,
     TradeLinks,
     TradeItem,
     UiErrorBox,
@@ -175,6 +182,14 @@ export default defineComponent({
     return {
       t,
       list: searchResult,
+      listings: groupedResults,
+      listingsLoading: computed(
+        () =>
+          !slowdown.isReady.value ||
+          !searchResult.value ||
+          (searchResult.value.result.length > 0 &&
+            groupedResults.value.length === 0),
+      ),
       groupedResults: computed(() => {
         if (!slowdown.isReady.value) {
           return Array<undefined>(SHOW_RESULTS);

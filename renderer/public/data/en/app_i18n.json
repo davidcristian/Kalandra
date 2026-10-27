@@ -350,7 +350,14 @@
     "filter_exalt_divine": "Filter by Exalt/Divine",
     "highest_volume": "Highest volume:",
     "error_detail": "Error: {0}",
-    "per_hour": "/hr"
+    "per_hour": "/hr",
+    "experimental": "Experimental",
+    "suggested_price": "Suggested price:",
+    "reliability_high": "high reliability",
+    "reliability_medium": "medium reliability",
+    "reliability_low": "low reliability",
+    "too_few_listings": "too few listings",
+    "suggested_detail": "Counts the cheapest listing of {0} sellers. Left out as likely price fixing: {1}. These are asking prices on the trade site, not sales, and they depend on the filters you search with."
   },
   "rate_limit": {
     "title": "Rate limiting",

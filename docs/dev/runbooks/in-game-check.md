@@ -146,7 +146,9 @@ General, sets another path), and uses Alt when the file does not set it
   filters and the trade results. For an item the price file lists, such as a currency or a unique,
   it also shows the estimate from `https://kalandra.ashoal.com/prices/<league>.json`. How the
   league id becomes that file name is in [price-service.md](../modules/price-service.md#the-files).
-  The file's categories are in `renderer/public/data/namespaceMap.json`. Keep Ctrl held and move
+  The file's categories are in `renderer/public/data/namespaceMap.json`. Above the listings, the
+  line "Suggested price:" with its "Experimental" tag shows a price, a range and a reliability, or
+  "too few listings" ([suggested-price.md](../../suggested-price.md)). Keep Ctrl held and move
   the cursor into the window: it takes focus, and Ctrl can be released. Release Ctrl and move the
   cursor away from the item instead: the window closes (`main/src/windowing/WidgetAreaTracker.ts`).
   With Ctrl + Alt + D the window opens with focus and stays until you press Escape or return to

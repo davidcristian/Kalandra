@@ -36,6 +36,8 @@ issue on [GitHub](https://github.com/davidcristian/Kalandra/issues).
 
 - [Price check](/price-check): the price check window, its filters and trade search, and where its price estimates come
   from.
+- [Suggested price](/suggested-price): an experimental price, range and reliability worked out from the trade
+  listings of a price check.
 - [Item info](/item-info): a summary of an item, such as weapon DPS, with buttons that open it on the wiki, PoEDB or
   Craft of Exile.
 - [Map check](/map-check): marks the waystone mods you set as dangerous, warning or good.

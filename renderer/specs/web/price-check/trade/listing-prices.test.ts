@@ -11,6 +11,11 @@ import {
   PricingResult,
   requestResults,
 } from "@/web/price-check/trade/pathofexile-trade";
+import {
+  SuggestedPrice,
+  suggestedPriceText,
+  suggestPrice,
+} from "@/web/price-check/trade/suggested-price";
 
 vi.mock("@/web/background/Leagues", async () => {
   const { computed, shallowRef } = await import("vue");
@@ -59,17 +64,26 @@ function priceFileWithGreaterChaosOrb(): string {
   return JSON.stringify(file);
 }
 
-/** Two saved listings, one priced in Orbs of Alchemy and one changed to 3 Greater Chaos Orbs. */
-function fetchResponse(): string {
+/** The 21 saved listings, with the one priced in 3 Exalted Orbs changed to 3 Greater Chaos Orbs. */
+function savedListings(): SavedListing[] {
   const saved: { result: SavedListing[] } = JSON.parse(
     readFixture("../../../docs/fetchResponses.json"),
   );
-  const byId = (prefix: string) =>
-    present(saved.result.find((result) => result.id.startsWith(prefix)));
-  const alchemy = byId("00d17082eb");
-  const greaterChaos = byId("03d4465694");
+  const greaterChaos = present(
+    saved.result.find((result) => result.id.startsWith("03d4465694")),
+  );
   greaterChaos.listing.price.currency = "greater-chaos-orb";
-  return JSON.stringify({ result: [alchemy, greaterChaos] });
+  return saved.result;
+}
+
+/** The fetch response for the listings whose ids start with the requested ones. */
+function fetchResponse(listings: SavedListing[], request: string): string {
+  const ids = request.split("?")[0].split(",");
+  return JSON.stringify({
+    result: ids.map((id) =>
+      present(listings.find((listing) => listing.id.startsWith(id))),
+    ),
+  });
 }
 
 function prices(results: PricingResult[]) {
@@ -91,15 +105,16 @@ describe("requestResults prices", () => {
     await init("en");
     fetches = [];
     const priceFile = priceFileWithGreaterChaosOrb();
-    const listings = fetchResponse();
+    const listings = savedListings();
     vi.mocked(Host.proxy).mockImplementation(async (input) => {
       const url = String(input);
       if (url.startsWith(`${PRICE_HOST}/prices/`)) {
         return new Response(priceFile);
       }
       if (!url.startsWith(FETCH_URL)) throw new Error(`No fake for ${url}`);
-      fetches.push(url.slice(FETCH_URL.length));
-      return new Response(listings);
+      const request = url.slice(FETCH_URL.length);
+      fetches.push(request);
+      return new Response(fetchResponse(listings, request));
     });
     const poeninja = usePoeninja();
     poeninja.queuePricesFetch();
@@ -133,5 +148,50 @@ describe("requestResults prices", () => {
     ];
     expect(prices(fresh)).toEqual(expected);
     expect(prices(cached)).toEqual(expected);
+  });
+
+  it("values the saved listings in Divine Orbs and suggests a price from them", async () => {
+    const ids = savedListings().map((listing) => listing.id);
+
+    const results = await requestResults("query", ids, { accountName: "" });
+
+    const byId = (prefix: string) =>
+      present(results.find((result) => result.id.startsWith(prefix)));
+    expect(byId("00d17082eb").priceDivines).toBe(0.002835);
+    expect(byId("03d4465694").priceDivines).toBeCloseTo(0.15);
+    expect(byId("2fa2f1ee71").priceDivines).toBe(3);
+    expect(byId("65c7c4e8e6").priceDivines).toBeUndefined();
+    expect(suggestPrice(results)).toEqual({
+      price: 0.002835,
+      low: 0.002835,
+      high: 0.002835,
+      reliability: "high",
+      sellers: 14,
+      leftOut: 0,
+    });
+  });
+
+  it("writes the suggested price in Exalted Orbs, or in Divine Orbs when the whole range is above one", () => {
+    const suggested = (price: number, low: number, high: number) => {
+      const value: SuggestedPrice = {
+        price,
+        low,
+        high,
+        reliability: "low",
+        sellers: 2,
+        leftOut: 0,
+      };
+      return suggestedPriceText(value);
+    };
+
+    expect(suggested(0.01, 0.005, 0.02)).toEqual({
+      price: "5 . 4 ex",
+      range: "2 . 7 ~ 11 ex",
+    });
+    expect(suggested(3, 2, 4)).toEqual({ price: "3 div", range: "2 ~ 4 div" });
+    expect(suggested(1.2, 0.5, 2)).toEqual({
+      price: "650 ex",
+      range: "271 ~ 1083 ex",
+    });
   });
 });

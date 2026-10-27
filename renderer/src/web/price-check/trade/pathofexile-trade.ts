@@ -31,6 +31,7 @@ import {
   usePoeninja,
 } from "@/web/background/Prices";
 import { getCurrencyDetailsId } from "../trends/getDetailsId";
+import { inDivines } from "./suggested-price";
 import { areaLevelByAscendancyPoints } from "../filters/create-item-filters";
 
 export const CATEGORY_TO_TRADE_ID = new Map([
@@ -531,6 +532,7 @@ export interface PricingResult {
   priceCurrency: string;
   normalizedPrice?: string;
   normalizedPriceCurrency?: CoreCurrency;
+  priceDivines?: number;
   isMine: boolean;
   hasNote: boolean;
   isInstantBuyout: boolean;
@@ -1107,7 +1109,8 @@ export async function requestResults(
   resultIds: string[],
   opts: { accountName: string },
 ): Promise<PricingResult[]> {
-  const { cachedCurrencyByQuery, xchgRateCurrency } = usePoeninja();
+  const { cachedCurrencyByQuery, xchgRateCurrency, findPriceByQuery } =
+    usePoeninja();
   // Solves cached results showing random incorrect values
   cache.purgeIfDifferentCurrency(xchgRateCurrency.value?.id);
 
@@ -1177,6 +1180,7 @@ export async function requestResults(
         : currency,
       normalizedPrice,
       normalizedPriceCurrency,
+      priceDivines: inDivines(result.listing.price, findPriceByQuery(query)),
       hasNote: result.item.note != null,
       isMine: result.listing.account.name === opts.accountName,
       isInstantBuyout: result.listing.fee != null,

@@ -44,6 +44,7 @@ export default defineConfig({
         text: 'Price check',
         items: [
           { text: 'Price check', link: '/price-check' },
+          { text: 'Suggested price', link: '/suggested-price' },
           { text: 'Item info', link: '/item-info' },
           { text: 'Map check', link: '/map-check' },
           { text: 'Private leagues', link: '/private-leagues' }

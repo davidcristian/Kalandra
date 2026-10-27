@@ -3,9 +3,9 @@ title: Price check
 ---
 
 A price check reads the item under your cursor in Path of Exile 2 and opens a window with a price estimate, filters
-built from the item's stats, and matching listings from the official trade site. The window opens next to the game's
-side panel on the side of the screen where the item is: beside the inventory for an item on the right, beside the
-stash for an item on the left. It does not cover that panel.
+built from the item's stats, and matching listings from the official trade site with an experimental [suggested
+price](/suggested-price). The window opens next to the game's side panel on the side of the screen where the item is:
+beside the inventory for an item on the right, beside the stash for an item on the left. It does not cover that panel.
 
 ![Price check of rare boots](/reference-images/RareCheck.png)
 

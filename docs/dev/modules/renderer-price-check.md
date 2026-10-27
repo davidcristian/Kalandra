@@ -78,7 +78,7 @@ that the route needs ([main.md](main.md)).
 
 | File | What it does |
 | --- | --- |
-| `pathofexile-trade.ts` | `createTradeRequest(filters, stats, item)` builds the search body without changing the filters; `requestTradeResultList(body, leagueId)` posts it to `/api/trade2/search/<league>`; `requestResults(queryId, ids, opts)` gets the listings from `/api/trade2/fetch/<ids>?query=<queryId>`, values each price by its currency's trade tag, and returns a short label such as `G. chaos` for a greater or perfect orb (`CONVERT_CURRENCY`) without changing the cached listing |
+| `pathofexile-trade.ts` | `createTradeRequest(filters, stats, item)` builds the search body without changing the filters; `requestTradeResultList(body, leagueId)` posts it to `/api/trade2/search/<league>`; `requestResults(queryId, ids, opts)` gets the listings from `/api/trade2/fetch/<ids>?query=<queryId>`, values each price by its currency's trade tag, also in Divine Orbs (`priceDivines`, from `inDivines`), and returns a short label such as `G. chaos` for a greater or perfect orb (`CONVERT_CURRENCY`) without changing the cached listing |
 | `prop-set.ts` | `propSet(object, path, value)` sets the value at a dot path, such as `misc_filters.filters.corrupted.option`. Its types accept only a path of the object's type and a value of that path's type, so `createTradeRequest` sets only the filters that its `TradeRequest` type declares |
 | `trade-api.ts` | `useTradeApi()`: one search, then the listings 10 ids per request, the first two requests at once and the rest one by one until the grouped list has 10 rows (`MIN_GROUPED`) with 7 of them listed at most twice (`MIN_NOT_GROUPED`), or until 100 results or all of them are read |
 | `pathofexile-bulk.ts`, `bulk-api.ts` | `execBulkSearch` posts one exchange request to `/api/trade2/exchange/<league>` and keeps at most 8 offers per currency; `useBulkApi()` searches once with Divine, Exalted and Chaos Orbs as the payment currencies (without the item's own currency). A tab's `load()` searches again for its currency when the first response did not include it. Its total is then subtracted from the estimated total of the Divine Orb tab (of the Exalted Orb tab when the Divine Orb tab loads), if that tab has a result. `useShownRows(result, selected, ready)` returns the 8 rows of the selected tab once the results show, and calls its `load()` after the window updates |
@@ -87,6 +87,7 @@ that the route needs ([main.md](main.md)).
 | `Cache.ts` | keeps a search, fetch or exchange result for 300 seconds (`CACHE_TTL`) from its last write, keyed by a SHA-1 of the request (`object-hash`); `requestResults` clears its cache and the pending deletions when the core currency changes |
 | `TradeListing.vue`, `TradeBulk.vue` | the result lists; an error from the trade site is shown with its message and a "Browser" button, which always opens the search in the built-in browser, since the trade requests use that browser's cookies |
 | `listing-markers.ts` | `listingMarkers(listing, showSeller)`: the "You", "in demand" and "Gone" markers of a listing, shown after its listed time, or after its seller when "Show seller" is set |
+| `suggested-price.ts`, `SuggestedPrice.vue` | `suggestPrice(listings)` for the "Experimental" suggested price line over the listing table: it counts each seller once at the cheapest listing, leaves out the user's listings and a listing that is not instant buyout below 40% of the median, and returns the 25th percentile, the 10th to 50th percentile as the range and a reliability (`high` from 8 sellers whose range top is at most 1.5 times its bottom, `medium` from 4 at 2.5, else `low`), or null for fewer than 2 sellers. `suggestedPriceText` writes it in Divine Orbs when the whole range is above one, else in the core currency. The line is hidden for a stackable item and while no rates are loaded |
 | `TradeLinks.vue` | the "Trade" button, which opens the same search on the trade site with `window.open`; with "Enable builtin browser" (`builtinBrowser`) on, it opens the built-in browser and a second button opens the search outside |
 | `RateLimiterState.vue` | the "Rate limiting" button, which shows each limiter's use and queue (`showRateLimitState`) |
 
@@ -191,7 +192,7 @@ otherwise the first. A failed load is logged with `console.warn` and `logToMain(
 - **Only the newest search sets the result and the error.** `useTradeApi` and `useBulkApi` number each search. A
   search that a newer one replaced, and a currency tab that it loads later, change neither the shown result nor its
   error when they end.
-- **`pathofexile-trade.ts` is 1898 lines** (2026-10-27,
+- **`pathofexile-trade.ts` is 1816 lines** (2026-10-27,
   `wc -l renderer/src/web/price-check/trade/pathofexile-trade.ts`). New, separable code goes in a new file and is
   called from it (AGENTS.md, rule 6).
 
@@ -220,12 +221,12 @@ names none for an unknown oil, and checks when its anointment filter is left out
 catalyst quality, the catalyst price, the augment tabs and the lists after a language change.
 `specs/web/price-check/trade/pathofexile-trade.test.ts` parses saved listings from `specs/docs/fetchResponses.json`
 into their titles, name blocks, tags and affix tiers, and gets a listing it cannot read from a fake trade site,
-and `listing-prices.test.ts` beside it gets saved listings from a fake trade site and values them with the price
-file fixture. Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
+and `listing-prices.test.ts` beside it gets saved listings from a fake trade site, values them with the price
+file fixture and suggests a price from them. `suggested-price.test.ts` there checks the suggested price limits.
+Saved listings name their sellers `Seller01#0001` and up, and their `hideout_token` values are fake.
 `specs/web/useTradeApi.test.ts` drives `useTradeApi` with `pathofexile-trade.ts` replaced by a fake trade site that
 returns the saved listings, and checks the grouped rows and how many listings it reads.
-`specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` that answers when
-the test says.
+`specs/web/useBulkApi.test.ts` drives `useBulkApi` and `useShownRows` with a fake `execBulkSearch` the test answers.
 `bulk-search.test.ts` in `specs/web/price-check/trade/` runs `execBulkSearch` on hand-written exchange responses
 and checks the order and the totals per currency, the seller states and the cache.
 `bulk-error-browser.test.ts` there checks that the Browser button of `TradeBulk.vue` opens the built-in browser.

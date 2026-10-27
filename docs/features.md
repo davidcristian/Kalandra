@@ -17,6 +17,9 @@ has one, its trend over the last 7 days. Kalandra reads that price from its own 
 `kalandra.ashoal.com`, which builds the price files from poe.ninja once an hour. Kalandra does not request prices from
 poe.ninja itself.
 
+Above the listings, an experimental [suggested price](/suggested-price) works out a price, a range and how reliable
+they are from the listings themselves, which also covers rare, magic and normal items.
+
 To price check item text copied anywhere else, paste it into the **Price check (Ctrl + V)** box in the main button
 bar.
 
