@@ -105,9 +105,6 @@ describe("the tip schedule of the price check", () => {
 // Game options that a tip names, which the app does not show
 const GAME_OPTIONS = ["Mousewheel Zoom"];
 
-// The names that docs/dev/refinements/tasks/088-tips-name-labels-the-app-does-not-show.md lists
-const LISTED_MISMATCHES = ["Auto-hide off", "Online filter", "Exalted only"];
-
 function tipTexts(lang: string): string[] {
   return [...readMessages(lang)]
     .filter(([key]) => key.startsWith("tips."))
@@ -136,18 +133,16 @@ describe("the names that the English tips quote", () => {
     expect(names).toContain("Find in Stash");
   });
 
-  it("are UI texts, game options or listed names, so no tip names a control the app does not have", () => {
+  it("are UI texts or game options, so no tip names a control the app does not have", () => {
     const unknown = names.filter(
       (name) =>
-        !uiTexts.has(name.toLowerCase()) &&
-        !GAME_OPTIONS.includes(name) &&
-        !LISTED_MISMATCHES.includes(name),
+        !uiTexts.has(name.toLowerCase()) && !GAME_OPTIONS.includes(name),
     );
     expect(unknown).toEqual([]);
   });
 
-  it("include each listed name, which no UI text has", () => {
-    const outdated = [...GAME_OPTIONS, ...LISTED_MISMATCHES].filter(
+  it("include each game option, which no UI text has", () => {
+    const outdated = GAME_OPTIONS.filter(
       (name) => !names.includes(name) || uiTexts.has(name.toLowerCase()),
     );
     expect(outdated).toEqual([]);

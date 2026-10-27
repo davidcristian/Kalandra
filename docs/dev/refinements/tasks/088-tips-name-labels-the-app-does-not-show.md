@@ -1,9 +1,9 @@
 # Two tips name controls by labels the app does not show
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/public/data/en/app_i18n.json](../../../../renderer/public/data/en/app_i18n.json)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-27
 
 The English tips quote the labels of the controls they describe, so the user can look for them.
 Two tips quote labels that no UI text of the app has:
@@ -24,3 +24,5 @@ Done looks like: both English tips name the labels the app shows, the three name
 ## History
 
 - 2026-10-25: Found when a test compared the names the English tips quote with the UI text.
+- 2026-10-27: fix(renderer): quote the labels the app shows in two tips. The translations of both
+  tips were removed, so each language shows the English tip until someone who speaks it adds one.
