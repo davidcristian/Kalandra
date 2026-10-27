@@ -1,7 +1,7 @@
 {
   "src/parser/Parser.ts": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
+      "count": 2
     }
   },
   "src/web/Config.ts": {

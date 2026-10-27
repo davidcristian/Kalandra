@@ -186,11 +186,10 @@ export function parseClipboard(clipboard: string): Result<ParsedItem, string> {
       sections[1].unshift(...sections[0]); // prepend item class & rarity into second section
       sections.shift(); // remove first section where CANNOT_USE_ITEM line was
     }
-    const parsed = parseNamePlate(sections[0]);
+    const parsed = parseNamePlate(sections[0], clipboard);
     if (!parsed.isOk()) return parsed;
 
     sections.shift();
-    parsed.value.rawText = clipboard;
 
     // each section can be parsed at most by one parser
     // and each parser can only be used to parse one section
@@ -496,7 +495,7 @@ function pickCorrectVariant(item: ParserState) {
   // i.e. corrupted implicit on Two-Stone Ring
 }
 
-function parseNamePlate(section: string[]) {
+function parseNamePlate(section: string[], rawText: string) {
   let line = section.shift();
 
   let missingItemClass = false;
@@ -551,7 +550,7 @@ function parseNamePlate(section: string[]) {
     influences: [],
     info: undefined!,
     infoVariants: undefined!,
-    rawText: undefined!,
+    rawText,
   };
 
   switch (rarityText) {

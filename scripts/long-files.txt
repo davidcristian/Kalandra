@@ -5,7 +5,7 @@
 517 dataParser/src/services/nd_builder_service.py
 325 ipc/types.ts
 485 renderer/src/assets/data/index.ts
-1759 renderer/src/parser/Parser.ts
+1758 renderer/src/parser/Parser.ts
 372 renderer/src/parser/stat-translations.ts
 722 renderer/src/web/Config.ts
 565 renderer/src/web/background/Prices.ts
