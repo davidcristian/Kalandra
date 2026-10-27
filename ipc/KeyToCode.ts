@@ -103,154 +103,154 @@ export const KeyToCode = {
   BracketLeft: 219,
   Backslash: 220,
   BracketRight: 221,
-  Quote: 222
-}
+  Quote: 222,
+};
 
 export const CodeToKey = Object.fromEntries(
-  Object.entries(KeyToCode).map(([key, code]) => [code, key])
-)
+  Object.entries(KeyToCode).map(([key, code]) => [code, key]),
+);
 
 export const KeyToElectron = {
-  Backspace: 'Backspace',
-  Tab: 'Tab',
-  Enter: 'Enter',
-  CapsLock: 'CapsLock',
-  Escape: 'Escape',
-  Space: 'Space',
-  PageUp: 'PageUp',
-  PageDown: 'PageDown',
-  End: 'End',
-  Home: 'Home',
-  ArrowLeft: 'Left',
-  ArrowUp: 'Up',
-  ArrowRight: 'Right',
-  ArrowDown: 'Down',
-  Insert: 'Insert',
-  Delete: 'Delete',
-  0: '0',
-  1: '1',
-  2: '2',
-  3: '3',
-  4: '4',
-  5: '5',
-  6: '6',
-  7: '7',
-  8: '8',
-  9: '9',
-  A: 'A',
-  B: 'B',
-  C: 'C',
-  D: 'D',
-  E: 'E',
-  F: 'F',
-  G: 'G',
-  H: 'H',
-  I: 'I',
-  J: 'J',
-  K: 'K',
-  L: 'L',
-  M: 'M',
-  N: 'N',
-  O: 'O',
-  P: 'P',
-  Q: 'Q',
-  R: 'R',
-  S: 'S',
-  T: 'T',
-  U: 'U',
-  V: 'V',
-  W: 'W',
-  X: 'X',
-  Y: 'Y',
-  Z: 'Z',
-  Numpad0: 'num0',
-  Numpad1: 'num1',
-  Numpad2: 'num2',
-  Numpad3: 'num3',
-  Numpad4: 'num4',
-  Numpad5: 'num5',
-  Numpad6: 'num6',
-  Numpad7: 'num7',
-  Numpad8: 'num8',
-  Numpad9: 'num9',
-  NumpadMultiply: 'nummult',
-  NumpadAdd: 'numadd',
-  NumpadSubtract: 'numsub',
-  NumpadDecimal: 'numdec',
-  NumpadDivide: 'numdiv',
-  F1: 'F1',
-  F2: 'F2',
-  F3: 'F3',
-  F4: 'F4',
-  F5: 'F5',
-  F6: 'F6',
-  F7: 'F7',
-  F8: 'F8',
-  F9: 'F9',
-  F10: 'F10',
-  F11: 'F11',
-  F12: 'F12',
-  F13: 'F13',
-  F14: 'F14',
-  F15: 'F15',
-  F16: 'F16',
-  F17: 'F17',
-  F18: 'F18',
-  F19: 'F19',
-  F20: 'F20',
-  F21: 'F21',
-  F22: 'F22',
-  F23: 'F23',
-  F24: 'F24',
-  Semicolon: ';',
-  Equal: '=',
-  Comma: ',',
-  Minus: '-',
-  Period: '.',
-  Slash: '/',
-  Backquote: '`',
-  BracketLeft: '[',
-  Backslash: '\\',
-  BracketRight: ']',
+  Backspace: "Backspace",
+  Tab: "Tab",
+  Enter: "Enter",
+  CapsLock: "CapsLock",
+  Escape: "Escape",
+  Space: "Space",
+  PageUp: "PageUp",
+  PageDown: "PageDown",
+  End: "End",
+  Home: "Home",
+  ArrowLeft: "Left",
+  ArrowUp: "Up",
+  ArrowRight: "Right",
+  ArrowDown: "Down",
+  Insert: "Insert",
+  Delete: "Delete",
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "3",
+  4: "4",
+  5: "5",
+  6: "6",
+  7: "7",
+  8: "8",
+  9: "9",
+  A: "A",
+  B: "B",
+  C: "C",
+  D: "D",
+  E: "E",
+  F: "F",
+  G: "G",
+  H: "H",
+  I: "I",
+  J: "J",
+  K: "K",
+  L: "L",
+  M: "M",
+  N: "N",
+  O: "O",
+  P: "P",
+  Q: "Q",
+  R: "R",
+  S: "S",
+  T: "T",
+  U: "U",
+  V: "V",
+  W: "W",
+  X: "X",
+  Y: "Y",
+  Z: "Z",
+  Numpad0: "num0",
+  Numpad1: "num1",
+  Numpad2: "num2",
+  Numpad3: "num3",
+  Numpad4: "num4",
+  Numpad5: "num5",
+  Numpad6: "num6",
+  Numpad7: "num7",
+  Numpad8: "num8",
+  Numpad9: "num9",
+  NumpadMultiply: "nummult",
+  NumpadAdd: "numadd",
+  NumpadSubtract: "numsub",
+  NumpadDecimal: "numdec",
+  NumpadDivide: "numdiv",
+  F1: "F1",
+  F2: "F2",
+  F3: "F3",
+  F4: "F4",
+  F5: "F5",
+  F6: "F6",
+  F7: "F7",
+  F8: "F8",
+  F9: "F9",
+  F10: "F10",
+  F11: "F11",
+  F12: "F12",
+  F13: "F13",
+  F14: "F14",
+  F15: "F15",
+  F16: "F16",
+  F17: "F17",
+  F18: "F18",
+  F19: "F19",
+  F20: "F20",
+  F21: "F21",
+  F22: "F22",
+  F23: "F23",
+  F24: "F24",
+  Semicolon: ";",
+  Equal: "=",
+  Comma: ",",
+  Minus: "-",
+  Period: ".",
+  Slash: "/",
+  Backquote: "`",
+  BracketLeft: "[",
+  Backslash: "\\",
+  BracketRight: "]",
   Quote: "'",
   // Do not change Ctrl to CmdOrCtrl. It causes registered shortcuts to
   // often not work on Mac for unknown reasons.
-  Ctrl: 'Ctrl',
-  Alt: 'Alt',
-  Shift: 'Shift'
+  Ctrl: "Ctrl",
+  Alt: "Alt",
+  Shift: "Shift",
+};
+
+export function hotkeyToString(
+  keys: string[],
+  ctrl = false,
+  shift = false,
+  alt = false,
+): string {
+  if (keys.includes("Ctrl")) ctrl = true;
+  if (keys.includes("Shift")) shift = true;
+  if (keys.includes("Alt")) alt = true;
+  keys = keys.filter((key) => !isModKey(key));
+
+  let mod = "";
+  if (ctrl && shift && alt) mod = "Ctrl + Shift + Alt";
+  else if (shift && alt) mod = "Shift + Alt";
+  else if (ctrl && shift) mod = "Ctrl + Shift";
+  else if (ctrl && alt) mod = "Ctrl + Alt";
+  else if (alt) mod = "Alt";
+  else if (ctrl) mod = "Ctrl";
+  else if (shift) mod = "Shift";
+
+  return mod && keys.length
+    ? `${mod} + ${keys.join(" + ")}`
+    : keys.join(" + ") || mod;
 }
 
-export function hotkeyToString (keys: string[], ctrl = false, shift = false, alt = false): string {
-  if (keys.includes('Ctrl')) ctrl = true
-  if (keys.includes('Shift')) shift = true
-  if (keys.includes('Alt')) alt = true
-  keys = keys.filter(key => !isModKey(key))
-
-  let mod = ''
-  if (ctrl && shift && alt) mod = 'Ctrl + Shift + Alt'
-  else if (shift && alt) mod = 'Shift + Alt'
-  else if (ctrl && shift) mod = 'Ctrl + Shift'
-  else if (ctrl && alt) mod = 'Ctrl + Alt'
-  else if (alt) mod = 'Alt'
-  else if (ctrl) mod = 'Ctrl'
-  else if (shift) mod = 'Shift'
-
-  return (mod && keys.length)
-    ? `${mod} + ${keys.join(' + ')}`
-    : (keys.join(' + ') || mod)
+export function mergeTwoHotkeys(str1: string, str2: string): string {
+  return hotkeyToString(
+    Array.from(new Set([...str1.split(" + "), ...str2.split(" + ")])),
+  );
 }
 
-export function mergeTwoHotkeys (str1: string, str2: string): string {
-  return hotkeyToString(Array.from(new Set([
-    ...str1.split(' + '),
-    ...str2.split(' + ')
-  ])))
-}
-
-export function isModKey (key: string) {
-  return (
-    key === 'Ctrl' ||
-    key === 'Shift' ||
-    key === 'Alt'
-  )
+export function isModKey(key: string) {
+  return key === "Ctrl" || key === "Shift" || key === "Alt";
 }
