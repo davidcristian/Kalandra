@@ -34,12 +34,6 @@
           :filter="{ disabled: false }"
           text="Normal"
         />
-        <filter-btn-logical
-          v-if="filters.discriminator?.value"
-          readonly
-          :filter="{ disabled: false }"
-          :text="filters.discriminator.value"
-        />
         <filter-btn-numeric
           v-if="filters.itemLevel"
           :filter="filters.itemLevel"

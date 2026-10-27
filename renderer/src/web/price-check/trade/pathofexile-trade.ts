@@ -256,8 +256,8 @@ interface FilterRange {
 interface TradeRequest {
   query: {
     status: { option: "available" | "securable" | "online" | "any" };
-    name?: string | { discriminator: string; option: string };
-    type?: string | { discriminator: string; option: string };
+    name?: string;
+    type?: string;
     stats: Array<{
       type: "and" | "if" | "count" | "not";
       value?: FilterRange;
@@ -613,15 +613,15 @@ export function createTradeRequest(
       : filters.searchExact;
 
   if (activeSearch.nameTrade) {
-    query.name = nameToQuery(activeSearch.nameTrade, filters);
+    query.name = activeSearch.nameTrade;
   } else if (activeSearch.name) {
-    query.name = nameToQuery(activeSearch.name, filters);
+    query.name = activeSearch.name;
   }
 
   if (activeSearch.baseTypeTrade) {
-    query.type = nameToQuery(activeSearch.baseTypeTrade, filters);
+    query.type = activeSearch.baseTypeTrade;
   } else if (activeSearch.baseType) {
-    query.type = nameToQuery(activeSearch.baseType, filters);
+    query.type = activeSearch.baseType;
   }
 
   // TYPE FILTERS
@@ -1323,17 +1323,6 @@ function tradeIdToQuery(id: string, stat: StatFilter) {
     },
     disabled: stat.disabled,
   };
-}
-
-function nameToQuery(name: string, filters: ItemFilters) {
-  if (!filters.discriminator) {
-    return name;
-  } else {
-    return {
-      discriminator: filters.discriminator.trade,
-      option: name,
-    };
-  }
 }
 
 /**

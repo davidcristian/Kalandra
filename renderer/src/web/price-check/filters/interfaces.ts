@@ -19,10 +19,6 @@ interface SearchFilter {
 export interface ItemFilters {
   searchExact: SearchFilter;
   searchRelaxed?: SearchFilter & { disabled: boolean };
-  discriminator?: {
-    value?: string;
-    trade: string;
-  };
   rarity?: {
     value: "normal" | "magic" | "nonunique";
   };

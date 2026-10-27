@@ -170,3 +170,6 @@ layout and its reasons.
 - 106: [Renderer errors other than a failed price file load reach only the browser console](tasks/106-other-renderer-errors-in-console.md)
 - 107: [No run on a Mac has checked updates, the Accessibility prompt or the game's file paths](tasks/107-macos-run-not-checked.md)
 - 108: [dataParser unit tests that build a ValueConverterService need the game export](tasks/108-dataparser-unit-tests-need-the-export.md)
+- 109: [No copied Expedition Logbook text shows what the logbook parsers do](tasks/109-expedition-logbook-parser-case.md)
+- 110: [The base percentile trade id and its texts remain without a filter](tasks/110-base-percentile-trade-id.md)
+- 111: [Nothing reads the gem field of the item data](tasks/111-unread-gem-field.md)

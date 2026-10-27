@@ -46,7 +46,6 @@ export interface BaseType {
   w?: number;
   h?: number;
   tradeTag?: string;
-  tradeDisc?: string;
   disc?: {
     propAR?: true;
     propEV?: true;
@@ -72,9 +71,6 @@ export interface BaseType {
   };
   gem?: {
     vaal?: true;
-    awakened?: true;
-    transfigured?: true;
-    normalVariant?: BaseType["refName"];
   };
   armour?: {
     ar?: [min: number, max: number];

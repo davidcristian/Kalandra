@@ -15,12 +15,12 @@
 336 renderer/src/web/price-check/CheckedItem.vue
 442 renderer/src/web/price-check/PriceCheckWindow.vue
 601 renderer/src/web/price-check/filters/FilterModifier.vue
-444 renderer/src/web/price-check/filters/FiltersBlock.vue
-565 renderer/src/web/price-check/filters/create-item-filters.ts
+438 renderer/src/web/price-check/filters/FiltersBlock.vue
+538 renderer/src/web/price-check/filters/create-item-filters.ts
 894 renderer/src/web/price-check/filters/create-stat-filters.ts
 457 renderer/src/web/price-check/filters/pseudo/index.ts
 690 renderer/src/web/price-check/filters/pseudo/item-property.ts
 367 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
-1923 renderer/src/web/price-check/trade/pathofexile-trade.ts
+1912 renderer/src/web/price-check/trade/pathofexile-trade.ts
 527 renderer/src/web/settings/SettingsWindow.vue

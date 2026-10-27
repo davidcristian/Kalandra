@@ -1,9 +1,9 @@
 # Code still checks item names and fields that the Path of Exile 2 data does not have
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** parser
 **Origin:** [renderer/src/parser/Parser.ts](../../../../renderer/src/parser/Parser.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 On 2026-10-22 no `items.ndjson` of any language has an item named `Charged Compass`,
 `Chronicle of Atzoatl`, `Mirrored Tablet`, `Forbidden Tome` or `Filled Coffin`, and neither does
@@ -37,3 +37,12 @@ cluster jewel rules in `create-stat-filters.ts`.
   parsed.
 - 2026-10-22: The `Filled Coffin` branch of `getDetailsId` and the commented-out code of
   `forSkillGem` were removed, so the list no longer names `getDetailsId.ts`.
+- 2026-10-27: Checked again: no `items.ndjson` and not `specs/data/items.json` has the five
+  names, and each of the 870 gems per language has `"awakened": false, "transfigured": false` and
+  no `normalVariant`. Done by refactor(parser): remove the parsers of items the game data lacks,
+  refactor(parser): stop writing basePercentile and logbookAreaMods, refactor(dataparser): stop
+  writing three client strings nothing reads, refactor(renderer): remove the Necropolis modifier
+  type and refactor(trade): remove the transfigured and awakened gem filters. `parseLogbookArea`
+  takes the same sections as before. [109](109-expedition-logbook-parser-case.md) covers its copied
+  case, [110](110-base-percentile-trade-id.md) the base percentile trade id and
+  [111](111-unread-gem-field.md) the gem field of the item data.

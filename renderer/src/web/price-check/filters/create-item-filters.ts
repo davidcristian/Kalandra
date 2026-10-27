@@ -364,41 +364,14 @@ function createGemFilters(
   filters: ItemFilters,
   opts: CreateOptions,
 ) {
-  if (!item.info.gem?.transfigured) {
-    filters.searchExact = {
-      baseType: item.info.name,
-      baseTypeTrade: t(opts, item.info),
-    };
-  } else {
-    const normalGem = ITEM_BY_REF("GEM", item.info.gem!.normalVariant!)![0];
-    filters.searchExact = {
-      baseType: item.info.name,
-      baseTypeTrade: t(opts, normalGem),
-    };
-    filters.discriminator = {
-      trade: item.info.tradeDisc!,
-    };
-  }
+  filters.searchExact = {
+    baseType: item.info.name,
+    baseTypeTrade: t(opts, item.info),
+  };
 
   filters.corrupted = {
     value: item.isCorrupted,
   };
-
-  if (item.info.gem?.awakened) {
-    filters.gemLevel = {
-      value: item.gemLevel!,
-      disabled: item.gemLevel! < 5,
-    };
-
-    if (item.isCorrupted && item.quality) {
-      filters.quality = {
-        value: item.quality,
-        disabled: item.quality < 20,
-      };
-    }
-
-    return filters;
-  }
 
   if (item.gemSockets) {
     filters.socketNumber = {
