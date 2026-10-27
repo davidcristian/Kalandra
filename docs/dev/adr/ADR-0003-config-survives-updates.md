@@ -1,6 +1,6 @@
 # ADR-0003: A user's saved config survives every update
 
-**Status:** Accepted (2026-10-26)
+**Status:** Accepted (2026-10-27)
 
 ## Context
 
@@ -12,7 +12,8 @@ which is `%APPDATA%\kalandra\apt-data\config.json` on Windows. The main process 
 
 Users install a new version over the old one and keep the file, and a user can skip any number of versions. On start
 the renderer reads the file from `GET /config`, and `initConfig()` passes it to `upgradeConfig()`, which brings it to
-the current shape. The mechanism comes from Awakened PoE Trade, and Exiled Exchange 2 added steps to it.
+the current shape. The mechanism comes from Awakened PoE Trade, and Exiled Exchange 2 added steps to it. A user can
+also install an older version over a newer one, which leaves a file whose `configVersion` is above the app's.
 [AGENTS.md](../../../AGENTS.md), section The one hard rule, states the rule this record gives the reasons for.
 
 ## Decision
@@ -53,6 +54,12 @@ so `tsc` fails while a required top-level field is missing from it.
 and saves the file as a string and parses it only to check that it is a JSON object, so `main` sees a setting
 only through that message ([ADR-0004](ADR-0004-process-boundary.md)).
 
+**8. An older version uses a config from a newer version as it is.** When the stored `configVersion` is above
+`defaultConfig().configVersion`, `initConfig()` runs no upgrade step, uses the file as it is and writes a warning with
+both version numbers to main's log, which Settings, Debug shows. Reason: the user keeps every setting, and the fields
+the older version does not have stay in each save, so the newer version finds them when the user installs it again.
+The log line names the cause when a setting behaves differently in the older version.
+
 ## Consequences
 
 - The current `configVersion`, the next step, the gaps in the step numbers, the checks that run on every start and
@@ -70,6 +77,10 @@ only through that message ([ADR-0004](ADR-0004-process-boundary.md)).
 - **Fixing a mistake inside an old step.** The users who already ran it never run it again. A fix is a new step.
 - **Keeping a removed widget in `defaultConfig()` so old steps can still copy it.** New installs would get the
   widget, and a later step would have to remove it again.
+- **Stopping with a message when the file is from a newer version.** The user has no overlay until they install the
+  newer version again.
+- **Starting a newer version's file from the defaults and moving the file aside**, as main does with a file that is
+  not JSON. The user loses every setting while the older version runs, and its first save replaces `config.json`.
 
 ## Related
 

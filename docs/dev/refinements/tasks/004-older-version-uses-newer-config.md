@@ -1,9 +1,9 @@
 # An older Kalandra uses a config written by a newer version without a check
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** config
 **Origin:** [renderer/src/web/Config.ts](../../../../renderer/src/web/Config.ts)
-**Verified:** 2026-10-22
+**Verified:** 2026-10-27
 
 `upgradeConfig()` runs every step whose number is above the stored `configVersion`. A user can
 install an older version over a newer one that added upgrade steps. The stored `configVersion` is
@@ -33,3 +33,4 @@ Done looks like: the maintainer's choice is in the History and in
   file that does not parse.
 - 2026-10-27: The maintainer chose to use the newer file as it is and log a warning. Left: the
   warning, a test with a `configVersion` above the current one, and the rule in ADR-0003.
+- 2026-10-27: feat(renderer): log a warning for a config from a newer version

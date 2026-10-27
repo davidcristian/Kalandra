@@ -10,6 +10,7 @@ import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
 import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
 import { addMissingWidgets } from "./missing-widgets";
+import { warnIfNewerConfig } from "./newer-config";
 import * as removed from "./removed-widgets";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
@@ -77,6 +78,7 @@ export async function initConfig() {
 
   // main sends only a JSON object, and moves a file that is not one aside
   const config: Config = JSON.parse(contents);
+  warnIfNewerConfig(config.configVersion, defaultConfig().configVersion);
   addMissingWidgets(config, defaultConfig().widgets);
   updateConfig(upgradeConfig(config));
 }

@@ -518,21 +518,28 @@ describe("upgradeConfig", () => {
   });
 });
 
-/** Runs the real initConfig() on `config` as the saved file, and returns the config it loads and the lines it logs. */
+/** Runs the real initConfig() on `config` as the saved file, and returns the config it loads, the lines it logs and the lines it sends to main's log. */
 async function load(config: Config) {
   const warnings: string[] = [];
+  const mainLog: string[] = [];
   const warn = vi
     .spyOn(console, "warn")
     .mockImplementation((...args: unknown[]) => {
       warnings.push(args.join(" "));
     });
+  vi.mocked(Host.sendEvent).mockImplementation((event) => {
+    if (event.name === "CLIENT->MAIN::log-entry") {
+      mainLog.push(`${event.payload.level} ${event.payload.message}`);
+    }
+  });
   vi.mocked(Host.getConfig).mockResolvedValueOnce(JSON.stringify(config));
   try {
     await actual.initConfig();
   } finally {
     warn.mockRestore();
+    vi.mocked(Host.sendEvent).mockReset();
   }
-  return { loaded: asSaved(actual.AppConfig()), warnings };
+  return { loaded: asSaved(actual.AppConfig()), warnings, mainLog };
 }
 
 /** Returns each single instance widget type that `config` does not have exactly once. */
@@ -598,6 +605,44 @@ describe("initConfig", () => {
       ]);
     },
   );
+
+  it.each([...VERSIONS, CURRENT])(
+    "sends no line to main's log for a version %i config, which is not newer than the app",
+    async (version) => {
+      const config =
+        version === CURRENT
+          ? asSaved(actual.defaultConfig())
+          : readSaved(version);
+
+      const { mainLog } = await load(config);
+
+      expect(mainLog).toEqual([]);
+    },
+  );
+
+  it("uses a config from a newer version as it is, and warns in main's log with both versions", async () => {
+    const config = asSaved(actual.defaultConfig());
+    config.configVersion = CURRENT + 1;
+    config.overlayKey = "Alt + Space";
+    priceCheckOf(config).rememberCurrency = true;
+    Object.assign(config, { settingOfANewerVersion: { enabled: true } });
+    config.widgets.push({
+      wmId: 900,
+      wmType: "widget-of-a-newer-version",
+      wmTitle: "",
+      wmWants: "hide",
+      wmZorder: null,
+      wmFlags: [],
+    });
+
+    const { loaded, warnings, mainLog } = await load(asSaved(config));
+
+    expect(loaded).toEqual(config);
+    expect(warnings).toEqual([]);
+    expect(mainLog).toEqual([
+      `warn config.json is from a newer version of Kalandra: its config version is ${CURRENT + 1}, above this version's ${CURRENT}. Kalandra uses it as it is and runs no upgrade step.`,
+    ]);
+  });
 
   // defaultConfig() has no map check widget, which the steps below version 7 read
   it("still stops at a version 2 config without a map check widget", async () => {

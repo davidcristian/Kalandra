@@ -72,7 +72,8 @@ Settings, About checks at once. What happens when a new version exists depends o
 The [`--no-updates` option](/cmd-flags) turns off the download on the installer and the AppImage. Kalandra still
 checks for updates and shows "You have disabled automatic updates download" when one exists.
 
-An update keeps your settings.
+An update keeps your settings. An older version installed over a newer one uses the newer version's `config.json` as
+it is, and writes a warning with both config versions to the [log](/faq#where-can-i-find-the-logs).
 
 ## Where Kalandra keeps your settings
 

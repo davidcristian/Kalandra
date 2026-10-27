@@ -66,7 +66,10 @@ old one and keep that file, so a saved config must survive every update: this is
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
   when the overlay first attaches to the game, for 20 seconds and even when that banner is turned off in
-  Settings. Before the steps, `addMissingWidgets()` in
+  Settings. Before the steps, `warnIfNewerConfig()` in `newer-config.ts` compares the file's `configVersion` with
+  `defaultConfig().configVersion`, and when the file's is higher it sends `warn config.json is from a newer version
+  of Kalandra: its config version is <saved>, above this version's <current>. Kalandra uses it as it is and runs no
+  upgrade step.` to main's log through `logToMain()`. Then `addMissingWidgets()` in
   `missing-widgets.ts` adds the default of each single instance widget that the file lacks and a config of its
   version has, with the next free `wmId`, and logs `[config] Added the default widgets that the saved config
   lacks:` and their types to the console. A widget that a later step adds, such as the library to a config before
@@ -163,16 +166,18 @@ old one and keep that file, so a saved config must survive every update: this is
   `< 30` steps do for `experience-tracker` and `library`. Without one, `AppConfig(type)` returns `undefined` for a
   user whose saved config is older than the widget. A single instance type also gets that step's version in
   `SAVED_SINCE` in `missing-widgets.ts`, and the config upgrade spec fails for a type missing there.
-- A saved config with a higher `configVersion` than the app's, from a newer version, runs no step, only the code
-  between the `< 21` and `< 22` steps, and is used as it is. Nothing compares the stored `configVersion` with the
-  app's ([refinement 004](../refinements/tasks/004-older-version-uses-newer-config.md)).
+- A saved config with a higher `configVersion` than the app's, from a newer version, runs no step, only
+  `addMissingWidgets()` and the code between the `< 21` and `< 22` steps, and is used as it is: its `configVersion`
+  stays, and the fields and widgets the app does not have stay in every save. `initConfig()` writes a warning with
+  both numbers to main's log ([ADR-0003](../adr/ADR-0003-config-survives-updates.md), decision 8).
 - main reads no setting from the config: it parses the text only to check that it is a JSON object, stores it,
   and reads only `HostConfig`. A setting main needs goes through
   `getConfigForHost()` into `HostConfig` ([ipc.md](ipc.md)).
 - No `config.json` is committed to the repo ([AGENTS.md](../../../AGENTS.md#safety)).
 
 **Dependencies.** `HostConfig` and `ShortcutAction` from `ipc/types.ts`, `Host` from
-`renderer/src/web/background/IPC.ts`, the widget registry for the default widgets, `vue` and `fast-deep-equal`.
+`renderer/src/web/background/IPC.ts`, `logToMain()` from `background/log-to-main.ts`, the widget registry for the
+default widgets, `vue` and `fast-deep-equal`.
 `ConfigStore` uses Electron's `app` and Node's `fs/promises`, and takes `ServerEvents` from `main/src/server.ts` and
 the `Logger` from `main/src/RemoteLogger.ts`. Its tests also pass the file functions (`ConfigFiles`) and the wait
 between rename retries.
@@ -199,7 +204,9 @@ For the `< 42` step it checks that a version 41 config gets each saved `maritalW
 widget without saved augments. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
 saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
 instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
-check widget and a version 15 config without its Delve grid still throw. It takes the last step version from `defaultConfig()`, so a new step needs no change to
+check widget and a version 15 config without its Delve grid still throw. It reads the `log-entry` events that
+`initConfig()` sends: a config one version above the current one, with a field and a widget the app does not have,
+loads unchanged and sends one warning with both numbers, and a saved or current config sends none. It takes the last step version from `defaultConfig()`, so a new step needs no change to
 the spec. `renderer/specs/web/host-config.test.ts` sets configs with the real `updateConfig()` and checks the
 `HostConfig` that `pushHostConfig()` sends: each field, from the config and its price check and library widgets, and
 `libraryAlpha`, which is true only when `enableAlphas` is on and `alphas` includes `library`.
