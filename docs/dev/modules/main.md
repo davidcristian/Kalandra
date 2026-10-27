@@ -14,13 +14,15 @@ The entry, the server and the app services, in `main/src/`:
 - `main.ts`, bundled into `dist/main.js`, takes Electron's single instance lock, turns off hardware acceleration except
   on macOS and turns on Electron's sandbox. It passes the startup to `startWhenReady()` in `startup.ts`, which on macOS
   waits up to 15 seconds for the accessibility permission and quits without it. It then awaits `app.whenReady()`, which
-  also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `AppTray`,
-  `Logger`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
+  also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `Logger`,
+  `AppTray`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
   `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on Linux,
   because the window is black instead of transparent otherwise, and 0 elsewhere. Its `CLIENT->MAIN::update-host-config`
-  handler passes each `HostConfig` field to the object that uses it. It then starts `uIOhook`, calls `startServer()` and
-  loads the page. When `startServer()` rejects, it shows the error box `Kalandra cannot start` and quits. In development
-  it also installs Vue Devtools. `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
+  handler passes each `HostConfig` field to the object that uses it, and logs a failed `GameLogWatcher` restart as
+  `error [GameLogWatcher] Cannot restart`. It then starts `uIOhook`, calls `startServer()` and
+  loads the page. When `startServer()` rejects, it shows the error box `Kalandra cannot start` and quits, and any other
+  failure there logs `error [main] Cannot start the overlay:` with the stack. In development it also installs Vue
+  Devtools. `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
 - `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
   `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
@@ -64,8 +66,9 @@ The entry, the server and the app services, in `main/src/`:
   `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and `net.request`
   cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
 - `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the last
-  1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start a message with its level
-  (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
+  1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. `logRejection(logger, source, action)`
+  returns a `.catch()` handler that writes `error [<source>] Cannot <action>: <message>`. Callers start a message with
+  its level (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
   `GameLogWatcher` writes after its `Found 2 log files` error have no level. The Debug settings page shows the log.
 - `renderer-log.ts`: `logRendererEntries(server, logger)`, which `main.ts` calls after it creates the `Logger`, writes
   each `CLIENT->MAIN::log-entry` a page sends as `<level> [renderer] <message>`. `rendererLogLine()` makes the line
@@ -80,7 +83,8 @@ The entry, the server and the app services, in `main/src/`:
   are response headers, which can contain cookies. A check that fails without an `error` event logs the same line.
 - `AppTray.ts`: `AppTray` shows the tray icon (tooltip `Kalandra v<version>`) and its menu: Settings/League, a message
   box that says to press the overlay key; Open in Browser, which opens `pageUrl` once `main.ts` sets it after the server
-  listens; Open config folder (`apt-data`); and Quit.
+  listens; Open config folder (`apt-data`); and Quit. A message box, page or folder that fails to open logs
+  `error [AppTray] Cannot ...`.
 
 `shortcuts/`:
 
@@ -137,7 +141,8 @@ The entry, the server and the app services, in `main/src/`:
   [in-game check](../runbooks/in-game-check.md#where-the-logs-are) uses in a packaged build, and `reload` only in a dev
   run, since a reload drops the overlay's state. `roundedCorners` is false on Linux, where Electron otherwise rounds a
   frameless window. `loadAppPage(address)` loads `http://localhost:<port>/index.html`, or the Vite dev server in
-  development, or with `--no-overlay` opens `pageUrl()` in the browser. `assertOverlayActive()`, `assertGameActive()`
+  development, or with `--no-overlay` opens `pageUrl()` in the browser. A load or a link that fails logs
+  `error [Overlay] Cannot ...`. `assertOverlayActive()`, `assertGameActive()`
   and `toggleActiveState()` move the focus between the overlay and the game, and `isInteractable` is true while the
   overlay has it. `focusGameFor(action)` calls `assertGameActive()` and returns whether the game window has the focus,
   and logs `warn [Overlay] Skipped <action>` when it does not, since keys go to the focused window, such as a browser.
@@ -204,7 +209,7 @@ The entry, the server and the app services, in `main/src/`:
   entry opens in the new folder, and leaves a session file open in the folder it started in until the session stops.
   Each event and `restart` starts after the one before it ends, so an entry that comes while its file opens is written
   once the file is open, and lines keep the order of their events. A failed open or write is logged, and the next
-  event still runs.
+  event still runs. `idle()` resolves once the events and restarts before it are handled.
 - `utils.ts`: `guessFileLocation(entries, onUnreadable)` returns the one readable path, `null` when more than one is
   readable, or `undefined` when none is, and passes each error but `ENOENT` to `onUnreadable`, which logs a `warn`.
 

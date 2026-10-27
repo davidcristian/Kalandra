@@ -8,7 +8,7 @@ import { OverlayWindow } from "../src/windowing/OverlayWindow";
 import { FakeServer } from "./fake-server";
 
 // Stands in for the desktop: the overlay window main creates, the game window it follows, and every dialog,
-// link and focus change
+// link and focus change. With failure set, each page load and link rejects with it.
 const desktop = vi.hoisted(() => ({
   windows: [] as Array<{
     options: Record<string, unknown>;
@@ -26,6 +26,7 @@ const desktop = vi.hoisted(() => ({
   errors: [] as string[],
   focus: [] as string[],
   attached: [] as Array<{ window: unknown; title: string }>,
+  failure: null as Error | null,
 }));
 
 vi.mock("electron", async () => {
@@ -68,8 +69,9 @@ vi.mock("electron", async () => {
       this.state.menu = menu;
     }
 
-    loadURL(url: string) {
+    async loadURL(url: string) {
       this.state.loaded.push(url);
+      if (desktop.failure) throw desktop.failure;
     }
 
     isVisible() {
@@ -93,6 +95,7 @@ vi.mock("electron", async () => {
     Menu: { buildFromTemplate: (template: unknown) => template },
     shell: {
       openExternal: async (url: string) => {
+        if (desktop.failure) throw desktop.failure;
         desktop.opened.push(url);
       },
     },
@@ -132,6 +135,11 @@ let game: GameWindow;
 function createOverlay() {
   const overlay = new OverlayWindow(server, new Logger(server), game);
   return { overlay, shown: desktop.windows[desktop.windows.length - 1] };
+}
+
+// The fakes reject at once, so the window has handled each rejection after the pending promise callbacks
+async function rejectionsHandled() {
+  await new Promise((resolve) => setImmediate(resolve));
 }
 
 function sent(name: IpcEvent["name"]) {
@@ -175,6 +183,7 @@ beforeEach(() => {
   desktop.errors = [];
   desktop.focus = [];
   desktop.attached = [];
+  desktop.failure = null;
 });
 
 afterEach(() => {
@@ -253,6 +262,47 @@ describe("OverlayWindow", () => {
 
     expect(result).toEqual({ action: "deny" });
     expect(desktop.opened).toEqual(["https://example.com/"]);
+  });
+
+  it("logs a page load and a link of the page that fail", async () => {
+    desktop.failure = new Error("ERR_CONNECTION_REFUSED (-102)");
+    const { overlay, shown } = createOverlay();
+
+    overlay.loadAppPage({ host: "0.0.0.0", port: 4321 });
+    vi.stubEnv("VITE_DEV_SERVER_URL", "http://localhost:5173");
+    overlay.loadAppPage({ host: "0.0.0.0", port: 4321 });
+    shown.contents.openWindow?.({ url: "https://example.com/" });
+    await rejectionsHandled();
+
+    expect(server.logEntries()).toEqual([
+      expect.stringContaining(
+        "error [Overlay] Cannot load the page: ERR_CONNECTION_REFUSED (-102)\n",
+      ),
+      expect.stringContaining(
+        "error [Overlay] Cannot load the page: ERR_CONNECTION_REFUSED (-102)\n",
+      ),
+      expect.stringContaining(
+        "error [Overlay] Cannot open a link: ERR_CONNECTION_REFUSED (-102)\n",
+      ),
+    ]);
+  });
+
+  it("logs an app page that the browser fails to open without the overlay window", async () => {
+    desktop.failure = new Error("no browser is set");
+    process.argv.push("--no-overlay");
+    try {
+      const { overlay } = createOverlay();
+      overlay.loadAppPage({ host: "192.168.1.20", port: 4321 });
+    } finally {
+      process.argv.pop();
+    }
+    await rejectionsHandled();
+
+    expect(server.logEntries()).toEqual([
+      expect.stringContaining(
+        "error [Overlay] Cannot open http://192.168.1.20:4321/index.html: no browser is set\n",
+      ),
+    ]);
   });
 
   it("lets a web view open the trade site, with no preload, no Node.js and an isolated context", () => {

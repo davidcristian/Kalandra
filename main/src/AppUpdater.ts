@@ -29,11 +29,16 @@ export class AppUpdater {
     private logger: Logger,
     platform: NodeJS.Platform = process.platform,
   ) {
-    setInterval(this.check, 16 * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        void this.check(); // check() logs a failed check
+      },
+      16 * 60 * 60 * 1000,
+    );
 
     this.server.onEventAnyClient("CLIENT->MAIN::user-action", ({ action }) => {
       if (action === "check-for-update") {
-        this.check();
+        void this.check(); // check() logs a failed check
       } else if (action === "update-and-restart") {
         autoUpdater.quitAndInstall(false);
       }
@@ -68,7 +73,7 @@ export class AppUpdater {
     // on('download-progress') https://github.com/electron-userland/electron-builder/issues/2521
 
     // After autoDownload is set above, so the first check follows --no-updates
-    this.check();
+    void this.check(); // check() logs a failed check
   }
 
   private check = async () => {

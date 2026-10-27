@@ -5,7 +5,7 @@ import { uIOhook } from "uiohook-napi";
 import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
 import { type ListenAddress, pageUrl } from "./listen-option";
-import { Logger } from "./RemoteLogger";
+import { Logger, logRejection } from "./RemoteLogger";
 import { logRendererEntries } from "./renderer-log";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
@@ -19,7 +19,7 @@ import { HttpProxy } from "./proxy";
 import { addFileUploadRoutes } from "./host-files/file-uploads";
 import { FileWriter } from "./host-files/FileWriter";
 import { startWhenReady } from "./startup";
-import { logUncaughtErrors } from "./uncaught-errors";
+import { errorText, logUncaughtErrors } from "./uncaught-errors";
 
 if (!app.requestSingleInstanceLock()) {
   app.exit();
@@ -55,13 +55,14 @@ async function ensureAccessibilityPermission(): Promise<boolean> {
   });
 }
 
-startWhenReady(
+// A start fails only before logUncaughtErrors() runs, so the process's default handling reports it
+void startWhenReady(
   app,
   process.platform,
   ensureAccessibilityPermission,
   async () => {
-    tray = new AppTray(eventPipe);
     const logger = new Logger(eventPipe);
+    tray = new AppTray(eventPipe, logger);
     logRendererEntries(eventPipe, logger);
     const gameConfig = new GameConfig(logger);
     const poeWindow = new GameWindow();
@@ -86,54 +87,60 @@ startWhenReady(
     }
     logUncaughtErrors(process, logger);
 
+    const startOverlay = async () => {
+      const overlay = new OverlayWindow(eventPipe, logger, poeWindow);
+      // eslint-disable-next-line no-new -- the instance listens to key events from its constructor
+      new OverlayVisibility(eventPipe, overlay);
+      const shortcuts = new Shortcuts(
+        logger,
+        overlay,
+        poeWindow,
+        gameConfig,
+        eventPipe,
+      );
+      eventPipe.onEventAnyClient("CLIENT->MAIN::update-host-config", (cfg) => {
+        overlay.updateOpts(
+          cfg.overlayKey,
+          cfg.windowTitle,
+          cfg.hideOverlayOnBlur,
+        );
+        shortcuts.updateActions(
+          cfg.shortcuts,
+          cfg.stashScroll,
+          cfg.logKeys,
+          cfg.restoreClipboard,
+        );
+        shortcuts.updateDelay(cfg.initialDelay);
+        gameLogWatcher
+          .restart(cfg.clientLog ?? "", cfg.readClientLog)
+          .catch(logRejection(logger, "GameLogWatcher", "restart"));
+        void gameConfig.readConfig(cfg.gameConfig ?? ""); // logs a failed read
+        tray.overlayKey = cfg.overlayKey;
+        void fileWriter.restart(cfg.libraryAlpha, cfg.libraryOutputPath); // logs a failed write
+      });
+      uIOhook.start();
+      let address: ListenAddress;
+      try {
+        address = await startServer(appUpdater, logger);
+      } catch (error) {
+        dialog.showErrorBox(
+          "Kalandra cannot start",
+          `Kalandra cannot start the local web server that serves its page.\n\n${String(error)}`,
+        );
+        app.quit();
+        return;
+      }
+      logger.write(`info ${os.type()} ${os.release} / v${app.getVersion()}`);
+      overlay.loadAppPage(address);
+      tray.pageUrl = pageUrl(address);
+    };
     setTimeout(
-      async () => {
-        const overlay = new OverlayWindow(eventPipe, logger, poeWindow);
-        // eslint-disable-next-line no-new -- the instance listens to key events from its constructor
-        new OverlayVisibility(eventPipe, overlay);
-        const shortcuts = new Shortcuts(
-          logger,
-          overlay,
-          poeWindow,
-          gameConfig,
-          eventPipe,
-        );
-        eventPipe.onEventAnyClient(
-          "CLIENT->MAIN::update-host-config",
-          (cfg) => {
-            overlay.updateOpts(
-              cfg.overlayKey,
-              cfg.windowTitle,
-              cfg.hideOverlayOnBlur,
-            );
-            shortcuts.updateActions(
-              cfg.shortcuts,
-              cfg.stashScroll,
-              cfg.logKeys,
-              cfg.restoreClipboard,
-            );
-            shortcuts.updateDelay(cfg.initialDelay);
-            gameLogWatcher.restart(cfg.clientLog ?? "", cfg.readClientLog);
-            gameConfig.readConfig(cfg.gameConfig ?? "");
-            tray.overlayKey = cfg.overlayKey;
-            fileWriter.restart(cfg.libraryAlpha, cfg.libraryOutputPath);
-          },
-        );
-        uIOhook.start();
-        let address: ListenAddress;
-        try {
-          address = await startServer(appUpdater, logger);
-        } catch (error) {
-          dialog.showErrorBox(
-            "Kalandra cannot start",
-            `Kalandra cannot start the local web server that serves its page.\n\n${String(error)}`,
+      () => {
+        startOverlay().catch((error: unknown) => {
+          logger.write(
+            `error [main] Cannot start the overlay: ${errorText(error)}`,
           );
-          app.quit();
-          return;
-        }
-        logger.write(`info ${os.type()} ${os.release} / v${app.getVersion()}`);
-        overlay.loadAppPage(address);
-        tray.pageUrl = pageUrl(address);
+        });
       },
       // fixes(linux): window is black instead of transparent
       process.platform === "linux" ? 1000 : 0,

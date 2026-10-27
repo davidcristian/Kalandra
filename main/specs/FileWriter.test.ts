@@ -6,6 +6,7 @@ import { FileWriter } from "../src/host-files/FileWriter";
 import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 import type { LibrarySessionWrite } from "../../ipc/library";
+import type { IpcEventPayload } from "../../ipc/types";
 
 type StartPayload = Extract<LibrarySessionWrite, { start: true }>;
 
@@ -41,8 +42,14 @@ async function readText(file: string): Promise<string> {
   }
 }
 
+// Sends an event the way a page does, and resolves once FileWriter has handled it
+async function send(event: IpcEventPayload<"CLIENT->MAIN::write-data">) {
+  await server.emit("CLIENT->MAIN::write-data", event);
+  await writer.idle();
+}
+
 async function sendEntry(ts: number) {
-  await server.emit("CLIENT->MAIN::write-data", {
+  await send({
     action: "client-log-event",
     data: { ts, ms: 0, type: "log" },
   });
@@ -63,7 +70,7 @@ async function writeEntries(dir: string, ...stamps: number[]) {
 }
 
 async function sendSessionStart(name: string) {
-  await server.emit("CLIENT->MAIN::write-data", {
+  await send({
     action: "session",
     start: true,
     name,
@@ -77,11 +84,11 @@ function incompleteStart(fields: Partial<StartPayload>): StartPayload {
 }
 
 async function sendRow(text: string) {
-  await server.emit("CLIENT->MAIN::write-data", { action: "log-item", text });
+  await send({ action: "log-item", text });
 }
 
 async function sendSessionStop() {
-  await server.emit("CLIENT->MAIN::write-data", {
+  await send({
     action: "session",
     start: false,
   });
@@ -183,10 +190,7 @@ describe("FileWriter.restart", () => {
     await sendSessionStart("session");
 
     await writer.restart(true, second);
-    await server.emit("CLIENT->MAIN::write-data", {
-      action: "log-item",
-      text: "a row after the folder change",
-    });
+    await sendRow("a row after the folder change");
 
     expect(await readText(path.join(folder, "session.csv"))).toBe(
       "a header\na row after the folder change\n",
@@ -284,7 +288,7 @@ describe("a Library session start", () => {
     incompleteStart({ action: "session", start: true, name: "rolls" }),
   ])("replies that it failed to a start without a field: %j", async (e) => {
     await writer.restart(true, folder);
-    await server.emit("CLIENT->MAIN::write-data", e);
+    await send(e);
 
     expect(sessionReplies()).toEqual([
       { sessionName: e.name, result: "failed" },
@@ -307,10 +311,7 @@ describe("FileWriter writes", () => {
     await delayFirstWrite();
 
     const started = sendSessionStart("rolls");
-    await server.emit("CLIENT->MAIN::write-data", {
-      action: "log-item",
-      text: "a row",
-    });
+    await sendRow("a row");
     await started;
 
     expect(await readText(path.join(folder, "rolls.csv"))).toBe(

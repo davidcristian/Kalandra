@@ -1,6 +1,7 @@
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AppTray } from "../src/AppTray";
+import { Logger } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 
 interface FakeImage {
@@ -14,12 +15,14 @@ interface MenuItem {
   click?: () => void;
 }
 
-// Stands in for the desktop: keeps the tray, its menu and every window, link, folder and quit the app opens
+// Stands in for the desktop: keeps the tray, its menu and every window, link, folder and quit the app opens,
+// or with failure set rejects each window, link and folder with it
 const desktop = vi.hoisted(() => ({
   trays: [] as Array<{ image: FakeImage; toolTip: string; menu: MenuItem[] }>,
   messages: [] as Array<{ title: string; message: string }>,
   opened: [] as string[],
   quits: 0,
+  failure: null as Error | null,
 }));
 
 vi.mock("electron", () => {
@@ -56,15 +59,18 @@ vi.mock("electron", () => {
     Menu: { buildFromTemplate: (template: MenuItem[]) => template },
     shell: {
       openExternal: async (url: string) => {
+        if (desktop.failure) throw desktop.failure;
         desktop.opened.push(url);
       },
       openPath: async (folder: string) => {
+        if (desktop.failure) throw desktop.failure;
         desktop.opened.push(folder);
         return "";
       },
     },
     dialog: {
       showMessageBox: async (box: { title: string; message: string }) => {
+        if (desktop.failure) throw desktop.failure;
         desktop.messages.push(box);
         return { response: 0 };
       },
@@ -80,8 +86,25 @@ function onPlatform(platform: NodeJS.Platform) {
 
 function createTray() {
   const server = new FakeServer();
-  const tray = new AppTray(server);
-  return { server, tray, shown: desktop.trays[desktop.trays.length - 1] };
+  const logger = new Logger(server);
+  const tray = new AppTray(server, logger);
+  return {
+    server,
+    logger,
+    tray,
+    shown: desktop.trays[desktop.trays.length - 1],
+  };
+}
+
+const loggedLines = (logger: Logger) =>
+  logger.history
+    .split("\n")
+    .filter((line) => line !== "")
+    .map((line) => line.replace(/^\[[^\]]*\] /, ""));
+
+// The fakes reject at once, so the tray has handled each rejection after the pending promise callbacks
+async function rejectionsHandled() {
+  await new Promise((resolve) => setImmediate(resolve));
 }
 
 function click(menu: MenuItem[], label: string) {
@@ -96,6 +119,7 @@ beforeEach(() => {
   desktop.messages = [];
   desktop.opened = [];
   desktop.quits = 0;
+  desktop.failure = null;
 });
 
 afterEach(() => {
@@ -164,6 +188,24 @@ describe("AppTray", () => {
     click(shown.menu, "Open config folder");
 
     expect(desktop.opened).toEqual([path.join("/home/userData", "apt-data")]);
+  });
+
+  it("logs a message, a page and a folder that the desktop fails to open", async () => {
+    const { logger, tray, shown } = createTray();
+    tray.pageUrl = "http://localhost:4321";
+    desktop.failure = new Error("no application is set to open it");
+
+    click(shown.menu, "Settings/League");
+    click(shown.menu, "Open in Browser");
+    click(shown.menu, "Open config folder");
+    await rejectionsHandled();
+
+    const folder = path.join("/home/userData", "apt-data");
+    expect(loggedLines(logger)).toEqual([
+      "error [AppTray] Cannot show a message: no application is set to open it",
+      "error [AppTray] Cannot open http://localhost:4321: no application is set to open it",
+      `error [AppTray] Cannot open ${folder}: no application is set to open it`,
+    ]);
   });
 
   it("quits from the menu and when a page asks to quit, and not for other actions", async () => {

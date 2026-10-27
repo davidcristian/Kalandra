@@ -1,13 +1,17 @@
 import path from "path";
 import { app, Tray, Menu, shell, nativeImage, dialog } from "electron";
 import type { ServerEvents } from "./server";
+import { type Logger, logRejection } from "./RemoteLogger";
 
 export class AppTray {
   public overlayKey = "Shift + Space";
   private tray: Tray;
   pageUrl?: string;
 
-  constructor(server: ServerEvents) {
+  constructor(
+    server: ServerEvents,
+    private readonly logger: Logger,
+  ) {
     let trayImage = nativeImage.createFromPath(
       path.join(
         __dirname,
@@ -38,23 +42,33 @@ export class AppTray {
       {
         label: "Settings/League",
         click: () => {
-          dialog.showMessageBox({
-            title: "Settings",
-            message: `Open Path of Exile 2 and press "${this.overlayKey}". Click on the button with cog icon there.`,
-          });
+          dialog
+            .showMessageBox({
+              title: "Settings",
+              message: `Open Path of Exile 2 and press "${this.overlayKey}". Click on the button with cog icon there.`,
+            })
+            .catch(logRejection(this.logger, "AppTray", "show a message"));
         },
       },
       {
         label: "Open in Browser",
         click: () => {
-          if (this.pageUrl) shell.openExternal(this.pageUrl);
+          if (!this.pageUrl) return;
+          shell
+            .openExternal(this.pageUrl)
+            .catch(
+              logRejection(this.logger, "AppTray", `open ${this.pageUrl}`),
+            );
         },
       },
       { type: "separator" },
       {
         label: "Open config folder",
         click: () => {
-          shell.openPath(path.join(app.getPath("userData"), "apt-data"));
+          const folder = path.join(app.getPath("userData"), "apt-data");
+          shell
+            .openPath(folder)
+            .catch(logRejection(this.logger, "AppTray", `open ${folder}`));
         },
       },
       {

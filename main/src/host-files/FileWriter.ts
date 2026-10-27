@@ -50,11 +50,16 @@ export class FileWriter {
     private server: ServerEvents,
     private logger: Logger,
   ) {
-    this.server.onEventAnyClient("CLIENT->MAIN::write-data", async (e) => {
-      await this.inOrder(async () => {
+    this.server.onEventAnyClient("CLIENT->MAIN::write-data", (e) => {
+      void this.inOrder(async () => {
         await this.handleWriteData(e);
-      });
+      }); // inOrder() logs a failed file operation
     });
+  }
+
+  /** Resolves once every event and restart that came before the call has been handled. */
+  async idle(): Promise<void> {
+    await this.queue;
   }
 
   async restart(enabled: boolean, outputPath: string | null): Promise<void> {

@@ -25,3 +25,15 @@ export class Logger {
     });
   }
 }
+
+/** Returns a rejection handler that writes `error [<source>] Cannot <action>: <message>` to the log. */
+export function logRejection(
+  logger: Pick<Logger, "write">,
+  source: string,
+  action: string,
+): (error: unknown) => void {
+  return (error) => {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.write(`error [${source}] Cannot ${action}: ${message}`);
+  };
+}

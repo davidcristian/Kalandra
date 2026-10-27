@@ -154,6 +154,22 @@ server.on("upgrade", (req, socket, head) => {
   });
 });
 
+async function sendHostState(
+  res: ServerResponse,
+  configStore: ConfigStore,
+  appUpdater: Pick<AppUpdater, "info">,
+): Promise<void> {
+  res.setHeader("content-type", "application/json");
+  const { contents, problem } = await configStore.load();
+  const resBody: HostState = {
+    version: app.getVersion(),
+    updater: appUpdater.info,
+    contents,
+    configProblem: problem,
+  };
+  res.end(JSON.stringify(resBody));
+}
+
 export async function startServer(
   appUpdater: Pick<AppUpdater, "info">,
   logger: Logger,
@@ -230,17 +246,9 @@ export async function startServer(
     });
   });
 
-  httpRoutes.addListener("request", async (req, res) => {
+  httpRoutes.addListener("request", (req, res) => {
     if (req.url === "/config") {
-      res.setHeader("content-type", "application/json");
-      const { contents, problem } = await configStore.load();
-      const resBody: HostState = {
-        version: app.getVersion(),
-        updater: appUpdater.info,
-        contents,
-        configProblem: problem,
-      };
-      res.end(JSON.stringify(resBody));
+      void sendHostState(res, configStore, appUpdater); // load() logs a failed read
     }
   });
 

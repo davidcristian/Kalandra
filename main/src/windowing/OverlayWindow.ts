@@ -7,7 +7,7 @@ import {
 import { type ListenAddress, pageUrl } from "../listen-option";
 import { isTradeSiteUrl } from "../proxy";
 import type { ServerEvents } from "../server";
-import type { Logger } from "../RemoteLogger";
+import { type Logger, logRejection } from "../RemoteLogger";
 import type { GameWindow } from "./GameWindow";
 import { overlayKeyCommand } from "./overlay-keys";
 import { watchPage } from "./page-watch";
@@ -82,28 +82,33 @@ export class OverlayWindow {
     );
 
     this.window.webContents.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url);
+      shell
+        .openExternal(details.url)
+        .catch(logRejection(this.logger, "Overlay", "open a link"));
       return { action: "deny" };
     });
   }
 
   loadAppPage(address: ListenAddress) {
     if (!this.window) {
-      shell.openExternal(
-        process.env.VITE_DEV_SERVER_URL || `${pageUrl(address)}/index.html`,
-      );
+      const browserUrl =
+        process.env.VITE_DEV_SERVER_URL || `${pageUrl(address)}/index.html`;
+      shell
+        .openExternal(browserUrl)
+        .catch(logRejection(this.logger, "Overlay", `open ${browserUrl}`));
       return;
     }
 
     const url =
       process.env.VITE_DEV_SERVER_URL ||
       `http://localhost:${address.port}/index.html`;
+    const logFailedLoad = logRejection(this.logger, "Overlay", "load the page");
 
     if (process.env.VITE_DEV_SERVER_URL) {
-      this.window.loadURL(url);
+      this.window.loadURL(url).catch(logFailedLoad);
       this.window.webContents.openDevTools({ mode: "detach", activate: false });
     } else {
-      this.window.loadURL(url);
+      this.window.loadURL(url).catch(logFailedLoad);
     }
   }
 

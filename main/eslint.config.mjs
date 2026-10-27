@@ -5,19 +5,6 @@ import prettier from "eslint-config-prettier";
 
 // The files that broke a rule when it was turned on, by rule. The lists only shrink: fix a file, then remove it.
 const existingOffenders = {
-  "@typescript-eslint/no-floating-promises": [
-    "src/AppTray.ts",
-    "src/AppUpdater.ts",
-    "src/host-files/ConfigStore.ts",
-    "src/main.ts",
-    "src/windowing/OverlayWindow.ts",
-  ],
-  "@typescript-eslint/no-misused-promises": [
-    "src/AppUpdater.ts",
-    "src/host-files/FileWriter.ts",
-    "src/main.ts",
-    "src/server.ts",
-  ],
   "@typescript-eslint/no-non-null-assertion": [
     "specs/AppTray.test.ts",
     "specs/overlay-window.test.ts",

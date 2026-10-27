@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HISTORY_ENTRIES, Logger } from "../src/RemoteLogger";
+import { HISTORY_ENTRIES, Logger, logRejection } from "../src/RemoteLogger";
 import { FakeServer } from "./fake-server";
 
 function writeEntries(count: number) {
@@ -42,5 +42,20 @@ describe("Logger", () => {
     const entries = server.logEntries();
     expect(entries).toHaveLength(HISTORY_ENTRIES + 5);
     expect(entries[0]).toMatch(/\] info entry 0\n$/);
+  });
+});
+
+describe("logRejection", () => {
+  it("logs the message of an Error and the text of any other value", () => {
+    const logger = new Logger(new FakeServer());
+    const logFailedOpen = logRejection(logger, "AppTray", "open the folder");
+
+    logFailedOpen(new Error("access is denied"));
+    logFailedOpen("no handler");
+
+    expect(historyLines(logger)).toEqual([
+      "error [AppTray] Cannot open the folder: access is denied",
+      "error [AppTray] Cannot open the folder: no handler",
+    ]);
   });
 });

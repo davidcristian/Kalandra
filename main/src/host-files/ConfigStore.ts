@@ -100,9 +100,9 @@ export class ConfigStore {
     private readonly wait: Wait = sleep,
   ) {
     server.onEventAnyClient("CLIENT->MAIN::save-config", (cfg) => {
-      this.enqueue(async () => {
+      void this.enqueue(async () => {
         await this.save(cfg.contents);
-      });
+      }); // save() logs a failed write
       server.sendEventTo("broadcast", {
         name: "MAIN->CLIENT::config-changed",
         payload: { contents: cfg.contents },

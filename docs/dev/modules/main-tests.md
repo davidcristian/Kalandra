@@ -11,10 +11,12 @@ replaces it with `vi.mock("electron", ...)`.
 - `served-file.test.ts` covers the path check, and `request-origin.test.ts` the header check.
 - `startup.test.ts` covers the startup order on each platform, with a fake `app` that emits `ready` once.
 - `AppTray.test.ts` builds the tray through a fake Electron on each platform, clicks each menu entry, Open in Browser
-  also before the server listens, and sends `CLIENT->MAIN::user-action` messages.
-- `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version or fails,
-  with or without an `error` event. The fake downloads only while `autoDownload` is on, and the test passes each
-  platform in, with and without `--no-updates`, and as the portable build.
+  also before the server listens and with a desktop that fails to open each one, and sends `CLIENT->MAIN::user-action`
+  messages.
+- `AppUpdater.test.ts` creates the updater with a fake electron-updater whose check finds a new version, finds none or
+  fails, with or without an `error` event. It sends each user action and checks again after 16 hours of fake time.
+  The fake downloads only while `autoDownload` is on, and the test passes each platform in, with and without
+  `--no-updates`, and as the portable build.
 - `start-server.test.ts` calls `startServer()` with a fake updater, checks the address it resolves, reads `GET /config`
   before and after a `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of
   the overlay window, of a browser and with none, sends messages main cannot use, and sends client log entries from the
@@ -31,7 +33,8 @@ replaces it with `vi.mock("electron", ...)`.
   `net.request` answers with the request and body it was given, or fails. It sends the page's `cookie` header to a trade
   site and to the other hosts, and reads the headers of a response that sets a cookie. The test also passes `set-cookie`
   headers through the listener the proxy adds to the default session.
-- `RemoteLogger.test.ts` writes more entries than the history keeps.
+- `RemoteLogger.test.ts` writes more entries than the history keeps, and logs an `Error` and a string with
+  `logRejection()`.
 - `renderer-log.test.ts` sends `CLIENT->MAIN::log-entry` payloads through `FakeServer` and reads the lines main's log
   broadcasts: one with line breaks, one over the length limit, and payloads without a known level or a text message.
 - `uncaught-errors.test.ts` emits uncaught errors and unhandled rejections of each kind of value from an `EventEmitter`
@@ -70,9 +73,10 @@ replaces it with `vi.mock("electron", ...)`.
   focus.
 - `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process.
 - `overlay-window.test.ts` creates `OverlayWindow` with a fake `BrowserWindow` and a fake `OverlayController`. It checks
-  the window options on each platform, the menu with and without a dev run, the page it loads, the attach to the game
-  window, the focus changes, the overlay key and Escape in the window and in a web view, and Hide overlay on blur. It
-  sends `will-attach-webview` with a preload and Node.js on, for the trade site and for addresses the check blocks.
+  the window options on each platform, the menu with and without a dev run, the page it loads, a load and a link that
+  fail, the attach to the game window, the focus changes, the overlay key and Escape in the window and in a web view,
+  and Hide overlay on blur. It sends `will-attach-webview` with a preload and Node.js on, for the trade site and for
+  addresses the check blocks.
 - `widget-area.test.ts` sends `OVERLAY->MAIN::track-area` through the fake server and mouse events through the fake
   global hook at the edges of the area and the close threshold, and on Windows and Linux through a fake `screen` at
   150% scale.
@@ -93,8 +97,8 @@ replaces it with `vi.mock("electron", ...)`.
   ignores the log folder of the Path of Exile 1 Mac client and the game folder under the application data folder.
 - `GameConfig.test.ts` reads each modifier code, a file with a byte order mark, a file without the key and key
   codes it cannot read, and reads a file again only at a new path.
-- `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts`, whose `emit` settles when its
-  handlers' promises settle. It stops sessions, starts one twice with the same name and sends events while the
+- `FileWriter.test.ts` sends client events through the fake server in `fake-server.ts` and waits for `idle()` after
+  each one. It stops sessions, starts one twice with the same name and sends events while the
   feature is off. It delays the first write to check the line order, and keeps the files it opens to check which
   ones it closed.
 - `GameLogWatcher.test.ts` calls the change listener of a fake `FileWatch` or `fs.watchFile`, deletes a new log as

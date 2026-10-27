@@ -8,11 +8,13 @@ import { FakeServer } from "./fake-server";
 const check = vi.hoisted(() => ({
   failure: undefined as Error | undefined,
   emitsError: true,
+  finds: true,
+  installs: 0,
 }));
 
 // A check finds version 9.9.9 and, with autoDownload on, downloads it, as electron-updater does.
-// With check.failure set, it emits the error and then rejects with it, as electron-updater does,
-// or with check.emitsError false only rejects.
+// With check.finds false it finds no update. With check.failure set, it emits the error and then
+// rejects with it, as electron-updater does, or with check.emitsError false only rejects.
 vi.mock("electron-updater", async () => {
   const { EventEmitter } = await import("node:events");
   class FakeAutoUpdater extends EventEmitter {
@@ -26,6 +28,10 @@ vi.mock("electron-updater", async () => {
         }
         throw check.failure;
       }
+      if (!check.finds) {
+        this.emit("update-not-available");
+        return null;
+      }
       this.emit("update-available", { version: "9.9.9" });
       if (this.autoDownload) {
         this.emit("update-downloaded", { version: "9.9.9" });
@@ -33,7 +39,9 @@ vi.mock("electron-updater", async () => {
       return null;
     }
 
-    quitAndInstall() {}
+    quitAndInstall() {
+      check.installs += 1;
+    }
   }
   return { autoUpdater: new FakeAutoUpdater() };
 });
@@ -58,10 +66,13 @@ beforeEach(() => {
   autoUpdater.removeAllListeners();
   check.failure = undefined;
   check.emitsError = true;
+  check.finds = true;
+  check.installs = 0;
 });
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.useRealTimers();
 });
 
 function createUpdater(platform: NodeJS.Platform) {
@@ -91,6 +102,48 @@ describe("AppUpdater", () => {
     expect(updater.info).toEqual({
       state: "update-downloaded",
       version: "9.9.9",
+    });
+  });
+
+  it("checks again every 16 hours", () => {
+    vi.useFakeTimers();
+    const { server } = createUpdater("win32");
+
+    vi.advanceTimersByTime(16 * 60 * 60 * 1000 - 1);
+    expect(states(server.sent)).toHaveLength(3);
+    vi.advanceTimersByTime(1);
+    expect(states(server.sent)).toHaveLength(6);
+  });
+
+  it("checks when a page asks, installs when a page asks to restart, and ignores other actions", async () => {
+    const { server } = createUpdater("win32");
+
+    await server.emit("CLIENT->MAIN::user-action", {
+      action: "check-for-update",
+    });
+    expect(states(server.sent)).toHaveLength(6);
+
+    await server.emit("CLIENT->MAIN::user-action", { action: "quit" });
+    expect(check.installs).toBe(0);
+    await server.emit("CLIENT->MAIN::user-action", {
+      action: "update-and-restart",
+    });
+    expect(check.installs).toBe(1);
+    expect(states(server.sent)).toHaveLength(6);
+  });
+
+  it("reports when the check finds no update", () => {
+    vi.useFakeTimers({ now: 1_700_000_000_000 });
+    check.finds = false;
+    const { server, updater } = createUpdater("win32");
+
+    expect(states(server.sent)).toEqual([
+      "checking-for-update",
+      "update-not-available",
+    ]);
+    expect(updater.info).toEqual({
+      state: "update-not-available",
+      checkedAt: 1_700_000_000_000,
     });
   });
 
