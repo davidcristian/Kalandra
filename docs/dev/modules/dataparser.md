@@ -42,12 +42,6 @@ Without `--pull`, it builds from the inputs already in `data/`. It builds Englis
 languages in no fixed order, and each language overwrites `output/<lang>/stats.ndjson`, `items.ndjson` and
 `client_strings.js`. Each build logs `Building <lang>: <n>/9` between two lines of `=` signs.
 
-`src/create-styles.py` is a second command. It builds three CSS user styles for the trade site (`tagOnly`,
-`tagOnlyCompact` and `kvanRules`). A rule that matches no stat writes only a comment with its name and logs a
-warning. It writes each style to `output/css/` and then copies it to `../gist-trade-highlight/`. This repo has no
-such folder, so the first copy fails and ends the run before the other two styles are written. The app does not read
-these styles.
-
 ## Inputs
 
 None of these is committed, and `dataParser/.gitignore` ignores them, so `git status` does not list them after a run.
@@ -230,7 +224,7 @@ gives the markers: `needs_game_export` skips when `data/vendor/tables/` and `dat
 `.gitkeep`, and `needs_trade_data` when `data/json/` holds none. `test_game_store_i.py` needs the export, and the
 `main()` tests that build every language need both. `ValueConverterService` reads the blight tables on first use and
 the advanced stat descriptions through `GameStore`, so its tests give it small tables through a `FakeGameStore`.
-Without the inputs, 269 tests pass and 280 skip on 27 Oct 2026.
+Without the inputs, 245 tests pass and 280 skip on 27 Oct 2026.
 
 **Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper` and
 `npx`, `pathofexile-dat` 16.0.0 from npm, a local Path of Exile 2 install, and the official trade sites.

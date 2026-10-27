@@ -1,9 +1,9 @@
 # create-styles.py copies to a folder the repo does not have
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
-**Origin:** [dataParser/src/create-styles.py](../../../../dataParser/src/create-styles.py)
-**Verified:** 2026-10-18
+**Origin:** [modules/dataparser.md](../../modules/dataparser.md)
+**Verified:** 2026-10-27
 
 `create-styles.py` builds three CSS user styles for the trade site: `tagOnly`, `tagOnlyCompact`
 and `kvanRules`. In one loop it writes each style to `output/css/<name>.user.css`, then calls
@@ -27,3 +27,6 @@ lists the script.
 - 2026-10-18: Found while the dataParser module doc was written.
 - 2026-10-27: The maintainer chose to remove the script, its constants in `src/constants/css.py` and
   its mention in modules/dataparser.md.
+- 2026-10-27: refactor(dataparser): remove the trade site user styles. It also removes the
+  modules only the script read (the CSS rules, the style builder and `TaggedStats`), their
+  tests, the tag constants in `src/constants/other.py` and the built styles in `output/css/`.
