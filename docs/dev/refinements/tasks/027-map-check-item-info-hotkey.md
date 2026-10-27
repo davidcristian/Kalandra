@@ -1,9 +1,9 @@
 # Map check and Item info are two hotkey rows for one setting
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/settings/hotkeys.vue](../../../../renderer/src/web/settings/hotkeys.vue)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Settings, Hotkeys has a Map check row and an Item info row. Both edit
 `_configModelValue(itemCheckWidget, "hotkey")` in `hotkeys.vue`, so a key set in one shows in the
@@ -27,3 +27,6 @@ task is declined.
 - 2026-10-18: Checked against the tree. Removed the option to document the shared key, because
   docs/settings.md and docs/map-check.md already say the two rows set one key.
 - 2026-10-27: The maintainer chose one row whose label names both uses.
+- 2026-10-27: feat(renderer): merge the map check and item info hotkey rows. The label joins
+  the translated `map_check.name` and `item.info` with " / ", so it needs no new string and every
+  language keeps its text.

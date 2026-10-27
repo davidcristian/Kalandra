@@ -32,7 +32,7 @@ Details: [Price check](/price-check). For a private league, see [Private leagues
 
 Shows a summary of the item under the cursor, such as weapon DPS, with buttons that open the item on the wiki, PoEDB or
 Craft of Exile, or search your stash for its base type. It has no default hotkey: set one in Settings, Hotkeys,
-**Item info**. Each button can also have its own hotkey in Settings, Item info.
+**Map check / Item info**. Each button can also have its own hotkey in Settings, Item info.
 
 Details: [Item info](/item-info).
 
@@ -40,7 +40,7 @@ Details: [Item info](/item-info).
 
 ## Map check
 
-For a waystone, the Item info hotkey opens Map check instead. Map check lists the waystone's mods and shows the mark
+For a waystone, the same hotkey opens Map check instead. Map check lists the waystone's mods and shows the mark
 of each mod: dangerous, warning, good or none. Click a mod to change its mark. Three profiles keep three separate sets of
 marks. Settings, Map check lists every waystone mod with its mark, and its **Only selected** toggle shows only the
 marked mods.

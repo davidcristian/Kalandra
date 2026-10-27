@@ -151,12 +151,12 @@ General, sets another path), and uses Alt when the file does not set it
   cursor away from the item instead: the window closes (`main/src/windowing/WidgetAreaTracker.ts`).
   With Ctrl + Alt + D the window opens with focus and stays until you press Escape or return to
   the game.
-- **Other item keys** have no default: Item info and Map check in Settings, Hotkeys (both rows set
-  the same `hotkey` of the item check widget, so a key set in one shows in the other), and "Open
-  item on wiki", "Open item on PoEDB", "Open base item on Craft of Exile", "Find in Stash" and
-  "Filter by" in Settings, Item info. Set one before checking it. With a key set for "Open item on
-  wiki", that key on an item opens `https://www.poe2wiki.net/wiki/<English item name>` in the
-  default browser (`openWiki` in `renderer/src/web/item-check/hotkeyable-actions.ts`).
+- **Other item keys** have no default: Map check / Item info in Settings, Hotkeys (one row that sets
+  the `hotkey` of the item check widget), and "Open item on wiki", "Open item on PoEDB", "Open base
+  item on Craft of Exile", "Find in Stash" and "Filter by" in Settings, Item info. Set one before
+  checking it. With a key set for "Open item on wiki", that key on an item opens
+  `https://www.poe2wiki.net/wiki/<English item name>` in the default browser (`openWiki` in
+  `renderer/src/web/item-check/hotkeyable-actions.ts`).
 - **Logs:** `debug [Shortcuts] Action type: copy-item` with key recording on.
   `error [proxy] <message> (<host>)` when main cannot reach a site.
   `warn [renderer] Loading prices failed: No price file for <league> (<status>)` when the price

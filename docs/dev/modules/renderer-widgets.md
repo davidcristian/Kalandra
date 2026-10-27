@@ -176,7 +176,9 @@ the app provides and throw when nothing does), `specs/web/widget-menu.test.ts` (
 widget of, and
 `disableWidget` and `enableWidget`, which add `menu::skip` once and remove every copy),
 `specs/web/settings/hotkey-conflicts.test.ts` (`settings/hotkey-conflicts.ts`, the hotkeys that two actions
-share in the edited config, and the hint of a field for them and for each reason main gives), `specs/web/stash-search.test.ts` (`stash-search/widget.ts` and `presets.ts`: the search of a
+share in the edited config, and the hint of a field for them and for each reason main gives),
+`specs/web/settings/hotkeys-page.test.ts` (the Hotkeys page, whose one row for the item check key has the
+translated names of Map check and Item info joined by " / ", in English and German), `specs/web/stash-search.test.ts` (`stash-search/widget.ts` and `presets.ts`: the search of a
 new Stash search widget and of each preset in English, German and Korean, an edited entry, the hotkey of a preset,
 and the `< 39` and `< 40` config steps) and
 `specs/web/host-events.test.ts` (`Host.sendEvent()`, which sends no `OVERLAY->MAIN::` event from a

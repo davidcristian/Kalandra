@@ -7,9 +7,8 @@ weapon it also shows the damage per second (DPS).
 
 ## Open it
 
-Set a key in Settings, **Hotkeys** page, **Item info**. It has no key by default. **Item info** and **Map check** on
-that page set the same key. Point at an item and press the key: the window opens next to the game's panel on the side
-of the item, and it closes when you return to the game.
+Set a key in Settings, **Hotkeys** page, **Map check / Item info**. It has no key by default. Point at an item and press
+the key: the window opens next to the game's panel on the side of the item, and it closes when you return to the game.
 
 For a Waystone that is not unique and for an Expedition Logbook, the same key opens [Map check](/map-check) instead.
 

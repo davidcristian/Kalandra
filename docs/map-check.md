@@ -7,9 +7,9 @@ whether a Waystone has a modifier you want to avoid or one you look for.
 
 ## Open it
 
-Set a key in Settings, **Hotkeys** page, **Map check**. It has no key by default. **Map check** and **Item info** on
-that page set the same key. Point at a Waystone that is not unique and press the key. The same key opens Map check for
-an Expedition Logbook. Any other item opens [Item info](/item-info).
+Set a key in Settings, **Hotkeys** page, **Map check / Item info**. It has no key by default. Point at a Waystone that
+is not unique and press the key. The same key opens Map check for an Expedition Logbook. Any other item opens
+[Item info](/item-info).
 
 ![Map check of a Waystone](/reference-images/MapCheck.png)
 

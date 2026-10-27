@@ -75,11 +75,7 @@ const hotkeys = computed<HotkeySchema[]>(() => {
       required: true,
     },
     {
-      translationKey: "map_check.name",
-      config: _configModelValue(itemCheckWidget, "hotkey"),
-    },
-    {
-      translationKey: "item.info",
+      translationKey: ["map_check.name", "item.info"],
       config: _configModelValue(itemCheckWidget, "hotkey"),
     },
   ];

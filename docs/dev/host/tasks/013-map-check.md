@@ -5,7 +5,7 @@
 **Origin:** [docs/map-check.md](../../../map-check.md)
 **Verified:** 2026-10-27
 
-**Claims.** Map check and Item info in Settings, Hotkeys set one key, the `hotkey` of the item check
+**Claims.** The Map check / Item info row in Settings, Hotkeys sets the `hotkey` of the item check
 widget, which has no default. The widget shows Map check when `isMapLike` in
 `renderer/src/web/item-check/WidgetItemCheck.vue` is true, and Item info otherwise. `isMapLike` is
 true for a non-unique item of the category `Map`, which holds Waystones, and for the
@@ -45,3 +45,5 @@ text for parser cases.
 - 2026-10-21: Added the language change, since marks now name a modifier by its stat ref.
 - 2026-10-27: `isMapLike` no longer lists the heist contract, heist blueprint and invitation
   categories, which no item of the game data has.
+- 2026-10-27: Settings, Hotkeys shows one Map check / Item info row for the key in place of two
+  rows.

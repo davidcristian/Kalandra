@@ -25,8 +25,7 @@ does not accept a key combination that contains `F12`, which Windows reserves fo
 | **Price check**: **Auto-hide Mode** | `Ctrl + D` | Opens the price check window for the item under the cursor. The window closes when you move the mouse away: [Price check](/price-check#start-a-price-check) explains how to keep it open. The hotkey is `Ctrl` or `Alt` plus one key. |
 | **Price check**: **Open without auto-hide** | `Ctrl + Alt + D` | Opens the price check window and keeps it open until you close it. |
 | **Overlay** | `Shift + Space` | Switches between the game and the overlay with its widgets. `Escape` also returns to the game. |
-| **Map check** | Not Set | Opens Map check for a Waystone that is not unique and for the other items that [Map check](/map-check) lists, and Item info for any other item. |
-| **Item info** | Not Set | The same key as **Map check**: changing one changes both. |
+| **Map check / Item info** | Not Set | Opens Map check for a Waystone that is not unique and for the other items that [Map check](/map-check) lists, and Item info for any other item. |
 | **Stash tab scrolling** | Ctrl + MouseWheel | While you hold `Ctrl` and the cursor is not over the stash grid, Kalandra presses the Right or Left arrow key for each step of the mouse wheel, which switches stash tabs. Turn off **Mousewheel Zoom** in the game's options (Options, UI) to use it. **Disabled** turns off Kalandra's stash tab scrolling. |
 
 Kalandra does not register a key that the game uses: `Ctrl + C`, `Ctrl + V`, `Ctrl + A`, `Ctrl + F`,

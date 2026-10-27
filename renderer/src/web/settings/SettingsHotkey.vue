@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <label class="flex-1"
-      >{{ t(schema.translationKey) }}
+      >{{ label }}
       <span v-if="schema.required" :class="$style.required">*</span></label
     >
     <HotkeyInput
@@ -43,12 +43,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import HotkeyInput from "../settings/HotkeyInput.vue";
 
 export interface HotkeySchema {
-  readonly translationKey: string;
+  /** A list of keys labels a hotkey that several features share, as their names joined by " / ". */
+  readonly translationKey: string | readonly string[];
   readonly config:
     | { value: string | null }
     | {
@@ -58,11 +60,18 @@ export interface HotkeySchema {
   readonly required?: boolean;
 }
 
-defineProps<{
+const props = defineProps<{
   schema: HotkeySchema;
 }>();
 
 const { t } = useI18n();
+
+const label = computed(() =>
+  [props.schema.translationKey]
+    .flat()
+    .map((key) => t(key))
+    .join(" / "),
+);
 </script>
 
 <style lang="postcss" module>

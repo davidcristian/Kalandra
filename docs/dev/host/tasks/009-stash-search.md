@@ -36,14 +36,14 @@ say:
 - With Restore clipboard on, a game that stalls before it pastes still pastes the search, never the
   text copied before it.
 
-**Do.** Open the stash and click a search in a Stash search widget. Set a key for Item info in
-Settings, Hotkeys (it has no default), open Item info on an item, and click Find in Stash. Repeat
-with a vendor window open. Try a search with quotes and one regular expression from the guide.
-Click the dollar sign on items with a price note whose note and name, without quotes, have 46 and
-47 characters together. Open Kalandra's page with the tray's Open in Browser, click a search there,
-and check that nothing is typed into the browser and that Settings, Debug shows the warning.
-Set the game and the Language setting to German, add a Stash search widget, and click its search
-and each search of `Dump sorting`. Tick Restore clipboard, copy a word in another program, open the
+**Do.** Open the stash and click a search in a Stash search widget. Set a key for Map check / Item
+info in Settings, Hotkeys (it has no default), open Item info on an item, and click Find in Stash.
+Repeat with a vendor window open. Try a search with quotes and one regular expression from the
+guide. Click the dollar sign on items with a price note whose note and name, without quotes, have 46
+and 47 characters together. Open Kalandra's page with the tray's Open in Browser, click a search
+there, and check that nothing is typed into the browser and that Settings, Debug shows the warning.
+Set the game and the Language setting to German, add a Stash search widget, and click its search and
+each search of `Dump sorting`. Tick Restore clipboard, copy a word in another program, open the
 stash and click a search.
 
 **Pass.** Each claim holds, and the game's own limit for the search box is noted. With Restore
@@ -67,3 +67,4 @@ History line.
   the game data of the Language setting too, such as `Kampfwaffe` and `Wegsteinlevel` in German.
 - 2026-10-26: A stash search now leaves its text on the clipboard with Restore clipboard on, so a
   game that stalls pastes the search.
+- 2026-10-27: The key that opens Item info is the Map check / Item info row in Settings, Hotkeys.
