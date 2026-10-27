@@ -4,11 +4,22 @@ import path from "path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { init, ITEM_BY_REF } from "@/assets/data";
-import { ItemRarity, parseClipboard } from "@/parser";
+import { ItemCategory, ItemRarity, ParsedItem, parseClipboard } from "@/parser";
 import { createVirtualItem } from "@/parser/ParsedItem";
 import { __testExports, NinjaSchema } from "@/web/background/Prices";
 import { getDetailsId } from "@/web/price-check/trends/getDetailsId";
-import { MetaSkillGem, RareItem, RareMap } from "@specs/Parser/items";
+import {
+  ArmourHighValueRareItem,
+  MagicItem,
+  MetaSkillGem,
+  NewExplicitTypeDefinitions,
+  NormalItem,
+  RareItem,
+  RareMap,
+  RareWithImplicit,
+  TwoImplicitItem,
+  UnidentifiedTier,
+} from "@specs/Parser/items";
 
 const RENDERER = path.resolve(__dirname, "../../../..");
 const readText = (file: string) => fs.readFileSync(file, "utf-8");
@@ -28,11 +39,24 @@ function parsedUnique(refName: string) {
   });
 }
 
-function findPrice(priceFile: string, refName: string) {
+// Takes no rarity, as the parser does for an item whose rarity line is Currency.
+function parsedCurrency(refName: string) {
+  return createVirtualItem({
+    category: ItemCategory.Currency,
+    info: present(ITEM_BY_REF("ITEM", refName))[0],
+  });
+}
+
+function findPrice(priceFile: string, item: ParsedItem) {
   const { findInDatabase, splitJsonBlob } = __testExports;
-  const query = present(getDetailsId(parsedUnique(refName)));
+  const query = present(getDetailsId(item));
   return findInDatabase(splitJsonBlob(priceFile, SCHEMA), query)?.info;
 }
+
+const servicePriceFile = () =>
+  readText(
+    path.join(RENDERER, "../priceService/tests/fixtures/price_file.json"),
+  );
 
 describe("getDetailsId", () => {
   beforeEach(async () => {
@@ -41,13 +65,15 @@ describe("getDetailsId", () => {
   });
 
   it("finds a unique weapon in the price file the price service writes", () => {
-    const priceFile = readText(
-      path.join(RENDERER, "../priceService/tests/fixtures/price_file.json"),
-    );
+    expect(
+      findPrice(servicePriceFile(), parsedUnique("Redbeak"))?.detailsId,
+    ).toBe("redbeak-shortsword");
+  });
 
-    expect(findPrice(priceFile, "Redbeak")?.detailsId).toBe(
-      "redbeak-shortsword",
-    );
+  it("finds a currency item in the price file the price service writes", () => {
+    expect(
+      findPrice(servicePriceFile(), parsedCurrency("Exalted Orb"))?.detailsId,
+    ).toBe("exalted-orb");
   });
 
   it("finds a unique flask by its base type, which the price service writes as its variant", () => {
@@ -69,7 +95,9 @@ describe("getDetailsId", () => {
       ],
     });
 
-    expect(findPrice(priceFile, "Olroth's Resolve")?.primaryValue).toBe(1.5);
+    expect(
+      findPrice(priceFile, parsedUnique("Olroth's Resolve"))?.primaryValue,
+    ).toBe(1.5);
   });
 
   it.each([
@@ -78,13 +106,6 @@ describe("getDetailsId", () => {
       MetaSkillGem,
       "GEM",
       "Mirage Archer",
-      undefined,
-    ],
-    [
-      "a rare weapon by its base type",
-      RareItem,
-      "ITEM",
-      "Rider Bow",
       undefined,
     ],
     [
@@ -99,4 +120,22 @@ describe("getDetailsId", () => {
 
     expect(getDetailsId(parsed)).toEqual({ ns, name, variant });
   });
+
+  it.each([
+    ["a normal armour piece", NormalItem],
+    ["a magic weapon", MagicItem],
+    ["a magic ring", UnidentifiedTier],
+    ["a rare weapon", RareItem],
+    ["a rare armour piece", ArmourHighValueRareItem],
+    ["a rare ring", RareWithImplicit],
+    ["a rare amulet", NewExplicitTypeDefinitions],
+    ["a rare belt", TwoImplicitItem],
+  ])(
+    "returns no query for %s, whose base type the price file never has",
+    (_, item) => {
+      const parsed = parseClipboard(item.rawText)._unsafeUnwrap();
+
+      expect(getDetailsId(parsed)).toBeUndefined();
+    },
+  );
 });

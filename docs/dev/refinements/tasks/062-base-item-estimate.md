@@ -1,6 +1,6 @@
 # The price check looks up a base item price that the price file never has
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/price-check/trends/getDetailsId.ts](../../../../renderer/src/web/price-check/trends/getDetailsId.ts)
 **Verified:** 2026-10-27
@@ -25,3 +25,5 @@ weapon gets no base item query.
 - 2026-10-27: The maintainer chose to remove `forBasetype()` and the base item branches of
   `PriceTrend.vue`. Checked again: none of the 23 categories in `namespaceMap.json` holds base
   types.
+- 2026-10-27: Became "refactor(renderer): remove the base item price lookup". `getDetailsId()`
+  returns no query for these items, and the "Base item" label is gone from every `app_i18n.json`.

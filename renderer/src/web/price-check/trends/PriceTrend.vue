@@ -1,9 +1,6 @@
 <template>
   <div v-if="priceData" class="flex items-center pb-4" style="min-height: 3rem">
-    <div
-      v-if="!isValuableBasetype && !slowdown.isReady.value"
-      class="flex flex-1 justify-center"
-    >
+    <div v-if="!slowdown.isReady.value" class="flex flex-1 justify-center">
       <div><i class="fas fa-dna fa-spin text-gray-600"></i></div>
       <i18n-t keypath="trade_result.getting_price" class="pl-2">
         <span class="text-gray-600">{{ t(":getting_price_from") }}</span>
@@ -47,11 +44,7 @@
         :fraction="filters.stackSize != null"
         :item-img="item.info.icon"
         :item-base="item.info"
-      >
-        <template #item v-if="isValuableBasetype">
-          <span class="text-gray-400">{{ t(":base_item") }}</span>
-        </template>
-      </item-quick-price>
+      />
       <div
         v-if="priceData.change || priceData.volume"
         class="flex flex-col items-center"
@@ -142,7 +135,7 @@
 import { defineComponent, PropType, computed, watch } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import { CurrencyValue, usePoeninja } from "@/web/background/Prices";
-import { isValuableBasetype, getDetailsId } from "./getDetailsId";
+import { getDetailsId } from "./getDetailsId";
 import { TradeVolume, tradeVolume } from "./trade-volume";
 import ItemQuickPrice from "@/web/ui/ItemQuickPrice.vue";
 import VueApexcharts from "vue3-apexcharts";
@@ -225,9 +218,6 @@ export default defineComponent({
       openNinja() {
         if (priceData.value) window.open(priceData.value.url);
       },
-      isValuableBasetype: computed(() => {
-        return isValuableBasetype(props.item);
-      }),
       slowdown,
       volumeSetting,
     };

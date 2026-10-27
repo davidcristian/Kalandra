@@ -15,25 +15,6 @@ export function getCurrencyDetailsId(id: string) {
   };
 }
 
-export function isValuableBasetype(item: ParsedItem): boolean {
-  if (
-    !(
-      item.rarity === ItemRarity.Normal ||
-      item.rarity === ItemRarity.Magic ||
-      item.rarity === ItemRarity.Rare
-    ) ||
-    !item.category
-  )
-    return false;
-
-  return (
-    ACCESSORY.has(item.category) ||
-    ARMOUR.has(item.category) ||
-    WEAPON.has(item.category) ||
-    item.category === ItemCategory.Quiver
-  );
-}
-
 export function getDetailsId(item: ParsedItem) {
   if (item.category && GEM.has(item.category)) {
     return forSkillGem(item);
@@ -60,8 +41,9 @@ export function getDetailsId(item: ParsedItem) {
       variant: variant([item.rarity ? item.rarity.toString() : ""]),
     };
   }
-  if (isValuableBasetype(item)) {
-    return forBasetype(item);
+  // No category of the price file holds base types, so equipment that is not unique has no query.
+  if (isEquipment(item)) {
+    return undefined;
   }
   return {
     ns: item.info.namespace,
@@ -78,14 +60,14 @@ function forSkillGem(item: ParsedItem) {
   };
 }
 
-function forBasetype(item: ParsedItem) {
-  if (item.influences.length > 1) return;
-
-  return {
-    ns: item.info.namespace,
-    name: item.info.refName,
-    variant: variant([item.influences.length ? item.influences[0] : null]),
-  };
+function isEquipment(item: ParsedItem): boolean {
+  return (
+    item.category !== undefined &&
+    (ACCESSORY.has(item.category) ||
+      ARMOUR.has(item.category) ||
+      WEAPON.has(item.category) ||
+      item.category === ItemCategory.Quiver)
+  );
 }
 
 function forUniqueItem(item: ParsedItem) {
