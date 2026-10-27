@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from constants.filenames import (
+    ADVANCED_MOD_STAT_DESCRIPTIONS,
     BASE_ITEM_TYPES,
     BLIGHT_CRAFTING_ITEMS,
     BLIGHT_CRAFTING_RECIPES,
@@ -24,13 +25,35 @@ from constants.known_stats import (
 )
 from constants.lang import ENGLISH, GERMAN
 from services.value_converter_service import ValueConverterService
-from tests.inputs import needs_game_export
 
 
 def make_service() -> ValueConverterService:
     """Returns an English service with no blight oils, without reading the blight tables."""
-    with patch.object(ValueConverterService, "get_blight", return_value={}):
-        return ValueConverterService(lang=ENGLISH)
+    service = ValueConverterService(lang=ENGLISH)
+    service.blight = {}
+    return service
+
+
+def use_historic_texts(
+    monkeypatch: pytest.MonkeyPatch, lang: str, texts: list[str]
+) -> None:
+    """Serves the given advanced texts of the historic jewel stat as the export of one language."""
+    FakeGameStore.exports = {
+        lang: {
+            ADVANCED_MOD_STAT_DESCRIPTIONS: pd.DataFrame(
+                {
+                    "id": ["other_stat", "local_unique_jewel_alternate_tree_version"],
+                    "matchers": [[{"string": "Other"}], [{"string": t} for t in texts]],
+                }
+            )
+        }
+    }
+    monkeypatch.setattr("services.value_converter_service.GameStore", FakeGameStore)
+
+
+def filler_texts(count: int) -> list[str]:
+    """Returns the texts of the historic jewel versions that no test row names."""
+    return [f"Version {n}" for n in range(1, count + 1)]
 
 
 @pytest.mark.parametrize(
@@ -69,8 +92,13 @@ def test_agg_by_hash_builds_one_option_stat_from_the_rows_of_a_value_stat(hash_v
     ]
 
 
-@needs_game_export
-def test_agg_by_hash_builds_one_stat_per_row_of_a_historic_jewel():
+def test_agg_by_hash_builds_one_stat_per_row_of_a_historic_jewel(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    advanced = (
+        "Glorifying the defilement of # souls in tribute to Ulaman(Amanamu-Ulaman)"
+    )
+    use_historic_texts(monkeypatch, ENGLISH, [*filler_texts(27), advanced])
     rows = pd.DataFrame(
         [
             {
@@ -92,7 +120,14 @@ def test_agg_by_hash_builds_one_stat_per_row_of_a_historic_jewel():
     assert out["trade"].tolist() == [
         {"ids": {"explicit": ["explicit.stat_3418580811|28"]}}
     ]
-    assert "advanced" in out["matchers"].tolist()[0][0]
+    assert out["matchers"].tolist() == [
+        [
+            {
+                "string": "Glorifying the defilement of # souls in tribute to Ulaman",
+                "advanced": advanced,
+            }
+        ]
+    ]
 
 
 def test_agg_by_hash_returns_the_rows_of_another_stat_unchanged():
@@ -186,6 +221,9 @@ class FakeGameStore:
     def get(self, name: str) -> pd.DataFrame:
         return self.tables[name].copy()
 
+    def get_description(self, name: str) -> pd.DataFrame:
+        return self.tables[name].copy()
+
 
 def blight_export(oil_names: dict[int, str]) -> dict[str, pd.DataFrame]:
     """Returns two anointable passives, 101 and 102, and the oils of the game's first rows."""
@@ -215,15 +253,17 @@ def blight_export(oil_names: dict[int, str]) -> dict[str, pd.DataFrame]:
     }
 
 
+ENGLISH_OILS = {
+    1131: "Potent Liquid Melancholy",
+    1111: "Diluted Liquid Ire",
+    1120: "Concentrated Liquid Isolation",
+    1115: "Liquid Envy",
+}
+
+
 def test_get_blight_names_each_oil_by_its_english_base_item(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    english = {
-        1131: "Potent Liquid Melancholy",
-        1111: "Diluted Liquid Ire",
-        1120: "Concentrated Liquid Isolation",
-        1115: "Liquid Envy",
-    }
     german = {
         1131: "Wirkungsvolle Flüssige Melancholie",
         1111: "Verdünnter Flüssiger Zorn",
@@ -231,7 +271,7 @@ def test_get_blight_names_each_oil_by_its_english_base_item(
         1115: "Flüssiger Neid",
     }
     FakeGameStore.exports = {
-        ENGLISH: blight_export(english),
+        ENGLISH: blight_export(ENGLISH_OILS),
         GERMAN: blight_export(german),
     }
     monkeypatch.setattr("services.value_converter_service.GameStore", FakeGameStore)
@@ -246,6 +286,59 @@ def test_get_blight_names_each_oil_by_its_english_base_item(
     }
     assert ValueConverterService(ENGLISH).blight == expected
     assert ValueConverterService(GERMAN).blight == expected
+
+
+def test_the_service_reads_the_blight_tables_only_for_a_notable(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    FakeGameStore.exports = {ENGLISH: {}}
+    monkeypatch.setattr("services.value_converter_service.GameStore", FakeGameStore)
+    ring_id = f"explicit.stat_{JEWEL_RING_RADIUS}"
+    notable_id = f"enchant.stat_{ALLOCATES_NOTABLE}"
+    service = ValueConverterService(ENGLISH)
+
+    ring = service.convert_value_stats_to_trade(
+        pd.DataFrame(
+            [
+                {
+                    "hash": JEWEL_RING_RADIUS,
+                    "text": "Tiny Ring",
+                    "value": 1,
+                    "type": "explicit",
+                    "id": ring_id,
+                }
+            ]
+        )
+    )
+    FakeGameStore.exports = {ENGLISH: blight_export(ENGLISH_OILS)}
+    notable = service.convert_value_stats_to_trade(
+        pd.DataFrame(
+            [
+                {
+                    "hash": ALLOCATES_NOTABLE,
+                    "text": "Allocates Notable",
+                    "value": 101,
+                    "type": "enchant",
+                    "id": notable_id,
+                }
+            ]
+        )
+    )
+
+    assert ring["matchers"].tolist() == [[{"string": "Tiny Ring", "value": 1}]]
+    assert notable["matchers"].tolist() == [
+        [
+            {
+                "string": "Allocates Notable",
+                "value": 101,
+                "oils": [
+                    "Concentrated Liquid Isolation",
+                    "Diluted Liquid Ire",
+                    "Liquid Envy",
+                ],
+            }
+        ]
+    ]
 
 
 def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():
@@ -311,8 +404,9 @@ def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():
     ]
 
 
-@needs_game_export
-def test_historic_agg_integration():
+def test_historic_agg_writes_each_advanced_text_beside_its_trade_value(
+    monkeypatch: pytest.MonkeyPatch,
+):
     df = pd.DataFrame(
         [
             {
@@ -491,11 +585,12 @@ def test_historic_agg_integration():
         ]
     )
 
-    with patch.object(ValueConverterService, "get_blight", return_value={}):
-        svc = ValueConverterService(lang="en")
-        out = svc.historic_agg(df)
+    advanced = [matchers[0]["advanced"] for matchers in expected_df["matchers"]]
+    use_historic_texts(monkeypatch, ENGLISH, [*filler_texts(20), *advanced])
 
-        pd.testing.assert_frame_equal(out, expected_df)
+    out = ValueConverterService(lang=ENGLISH).historic_agg(df)
+
+    pd.testing.assert_frame_equal(out, expected_df)
 
 
 GERMAN_HISTORIC_JEWELS = [
@@ -534,8 +629,15 @@ GERMAN_HISTORIC_JEWELS = [
 ]
 
 
-@needs_game_export
-def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_conqueror():
+def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_conqueror(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    # The German export names one version on two lines, so its list is one text shorter
+    german = [
+        f"{text}(Version)\nPassive im Radius wurden erobert"
+        for _, text in GERMAN_HISTORIC_JEWELS
+    ]
+    use_historic_texts(monkeypatch, GERMAN, [*filler_texts(19), *german])
     rows = pd.DataFrame(
         [
             {
@@ -550,8 +652,7 @@ def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_co
         ]
     )
 
-    with patch.object(ValueConverterService, "get_blight", return_value={}):
-        out = ValueConverterService(lang=GERMAN).historic_agg(rows)
+    out = ValueConverterService(lang=GERMAN).historic_agg(rows)
 
     assert [
         (

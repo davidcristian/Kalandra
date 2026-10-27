@@ -1,6 +1,6 @@
 # dataParser unit tests that build a ValueConverterService need the game export
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/tests/inputs.py](../../../../dataParser/tests/inputs.py)
 **Verified:** 2026-10-27
@@ -21,3 +21,5 @@ reading the tables only when a method needs them. Then the marker leaves them.
 
 - 2026-10-27: Left when the tests that read the game export were made to skip without it
   ([051](051-dataparser-tests-and-ci.md)).
+- 2026-10-27: test(dataparser): run the stat builder tests without the game export. With the
+  export and trade data hidden, 269 tests pass and 280 skip, where 227 passed and 321 skipped.

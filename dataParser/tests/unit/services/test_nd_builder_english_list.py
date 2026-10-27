@@ -3,10 +3,6 @@ from typing import Any
 import pandas as pd
 
 from services.nd_builder_service import NdBuilderService
-from tests.inputs import needs_game_export
-
-
-pytestmark = needs_game_export
 
 
 class FakeTradeStore:

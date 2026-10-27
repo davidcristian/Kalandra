@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from collections.abc import Iterable
+from functools import cached_property
 from pprint import pformat
 from typing import Protocol, SupportsInt, cast
 
@@ -28,7 +29,6 @@ from constants.known_stats import (
 )
 from constants.lang import ENGLISH, GERMAN, LANG
 from stores.game_store import GameStore
-from stores.helpers.description import Description
 
 
 class ValueStatRow(Protocol):
@@ -70,7 +70,11 @@ def oil_ref_names(ref_store: GameStore) -> dict[int, str]:
 class ValueConverterService:
     def __init__(self, lang: LANG) -> None:
         self.lang: LANG = lang
-        self.blight = self.get_blight()
+
+    @cached_property
+    def blight(self) -> dict[int, list[str]]:
+        """Returns the oils of each anointable passive, read from the export on first use."""
+        return self.get_blight()
 
     def get_blight(self) -> dict[int, list[str]]:
         """Returns the English names of the oils that anoint each passive, by its graph id."""
@@ -159,12 +163,13 @@ class ValueConverterService:
         return pd.DataFrame([out])
 
     def historic_agg(self, in_df: pd.DataFrame) -> pd.DataFrame:
-        advanced_desc = Description(self.lang, ADVANCED_MOD_STAT_DESCRIPTIONS)
-        advanced_desc.load()
+        advanced_desc = GameStore(self.lang).get_description(
+            ADVANCED_MOD_STAT_DESCRIPTIONS
+        )
         # to_dict types the keys as Hashable; the index holds the stat ids
         advanced_df = cast(
             dict[str, list[dict[str, str]]],
-            advanced_desc.to_dataframe().set_index("id")["matchers"].to_dict(),
+            advanced_desc.set_index("id")["matchers"].to_dict(),
         )
         historic_matchers = advanced_df["local_unique_jewel_alternate_tree_version"]
         advanced_desc_array = [matcher["string"] for matcher in historic_matchers]

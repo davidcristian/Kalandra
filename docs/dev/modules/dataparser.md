@@ -226,10 +226,10 @@ does not include these hooks, so Lint & Format does not run them.
 
 The tests that read inputs a clone does not have skip with a reason when the inputs are missing. `tests/inputs.py`
 gives the markers: `needs_game_export` skips when `data/vendor/tables/` and `data/vendor/files/` hold no file but
-`.gitkeep`, and `needs_trade_data` when `data/json/` holds none. `test_game_store_i.py`, the `NdBuilderService` and
-`TaggedStats` tests and three `ValueConverterService` tests need the export: `ValueConverterService` reads game
-tables when it is built, and a stat description file in `historic_agg`. The `main()` tests that build every language
-need both. Without them, 226 tests pass and 312 skip on 27 Oct 2026.
+`.gitkeep`, and `needs_trade_data` when `data/json/` holds none. `test_game_store_i.py` needs the export, and the
+`main()` tests that build every language need both. `ValueConverterService` reads the blight tables on first use and
+the advanced stat descriptions through `GameStore`, so its tests give it small tables through a `FakeGameStore`.
+Without the inputs, 269 tests pass and 280 skip on 27 Oct 2026.
 
 **Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper` and
 `npx`, `pathofexile-dat` 16.0.0 from npm, a local Path of Exile 2 install, and the official trade sites.
