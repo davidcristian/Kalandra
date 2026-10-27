@@ -1,9 +1,4 @@
 {
-  "src/parser/Parser.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    }
-  },
   "src/web/Config.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 26

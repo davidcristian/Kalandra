@@ -19,8 +19,10 @@ price check, also imports `@/parser/<file>` directly for `ParsedItem`, `Parser`,
 
 - `parseClipboard(clipboard)` returns a neverthrow `Result<ParsedItem, string>`. It splits the text into sections,
   checks that the first one starts with the item class line, reads rarity, name and base type from it
-  (`parseNamePlate`), then runs the `parsers` list in [Parser.ts](../../../renderer/src/parser/Parser.ts) in
-  order. A section parser returns `SECTION_PARSED` (the section is removed from the list), `SECTION_SKIPPED` (try
+  (`parseNamePlate`), then runs the `namePlateParsers` list in
+  [Parser.ts](../../../renderer/src/parser/Parser.ts), finds the item's records (`findInDatabase`) and runs the
+  `parsers` list, both in order through `runParsers` in `run-parsers.ts`. The parsers before the lookup take a
+  state without `info`, so they cannot read the records. A section parser returns `SECTION_PARSED` (the section is removed from the list), `SECTION_SKIPPED` (try
   the next section) or `PARSER_SKIPPED` (stop this parser). Each section is parsed by at most one parser and each
   parser parses at most one section. An entry `{ virtual: fn }` runs once on the item without a section and can
   end the parse with an error.

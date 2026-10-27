@@ -43,14 +43,15 @@ import {
 } from "./augment-builder";
 import { avg, combinations } from "./utils";
 import { parseJewelleryQuality } from "./jewellery-quality";
+import {
+  runParsers,
+  type ParserFn,
+  type SectionParseResult,
+  type VirtualParserFn,
+} from "./run-parsers";
 
-type SectionParseResult =
-  | "SECTION_PARSED"
-  | "SECTION_SKIPPED"
-  | "PARSER_SKIPPED";
-
-type ParserFn = (section: string[], item: ParserState) => SectionParseResult;
-type VirtualParserFn = (item: ParserState) => Result<never, string> | void;
+/** The parser state before the item is found in the game data. */
+type NamePlateState = Omit<ParserState, "info" | "infoVariants">;
 
 const LANGUAGE_DETECTOR = [
   {
@@ -127,14 +128,21 @@ export interface ParserState extends ParsedItem {
   infoVariants: BaseType[];
 }
 
-const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
+const namePlateParsers: Array<
+  ParserFn<NamePlateState> | { virtual: VirtualParserFn<NamePlateState> }
+> = [
   parseUnidentified,
   { virtual: parseSuperior },
   { virtual: parseExceptional },
   parseSynthesised,
   parseCategoryByHelpText,
   { virtual: normalizeName },
-  { virtual: findInDatabase },
+];
+
+const parsers: Array<
+  ParserFn<ParserState> | { virtual: VirtualParserFn<ParserState> }
+> = [
+  { virtual: setCategoryFromInfo },
   // -----------
   parseItemLevel,
   parseRequirements,
@@ -179,37 +187,30 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
 
 export function parseClipboard(clipboard: string): Result<ParsedItem, string> {
   try {
-    let sections = itemTextToSections(clipboard);
+    const sections = itemTextToSections(clipboard);
 
     if (sections[0][2] === _$.CANNOT_USE_ITEM) {
       sections[0].pop(); // remove CANNOT_USE_ITEM line
       sections[1].unshift(...sections[0]); // prepend item class & rarity into second section
       sections.shift(); // remove first section where CANNOT_USE_ITEM line was
     }
-    const parsed = parseNamePlate(sections[0], clipboard);
-    if (!parsed.isOk()) return parsed;
+    const plate = parseNamePlate(sections[0], clipboard);
+    if (!plate.isOk()) return plate;
 
     sections.shift();
 
-    // each section can be parsed at most by one parser
-    // and each parser can only be used to parse one section
-    for (const parser of parsers) {
-      if (typeof parser === "object") {
-        const error = parser.virtual(parsed.value);
-        if (error) return error;
-        continue;
-      }
-      for (const section of sections) {
-        const result = parser(section, parsed.value);
-        if (result === "SECTION_PARSED") {
-          sections = sections.filter((s) => s !== section);
-          break;
-        } else if (result === "PARSER_SKIPPED") {
-          break;
-        }
-      }
-    }
-    return Object.freeze(parsed);
+    const plateError = runParsers(namePlateParsers, sections, plate.value);
+    if (plateError) return plateError;
+    const info = findInDatabase(plate.value);
+    if (!info.isOk()) return err(info.error);
+    // choose 1st variant, correct one will be picked at the end of parsing
+    const item: ParserState = Object.assign(plate.value, {
+      infoVariants: info.value,
+      info: info.value[0],
+    });
+    const error = runParsers(parsers, sections, item);
+    if (error) return error;
+    return Object.freeze(ok(item));
   } catch (e) {
     console.error("Cannot parse the item text:", e);
     return err("item.parse_error");
@@ -236,7 +237,7 @@ function itemTextToSections(text: string) {
   return sections.filter((section) => section.length);
 }
 
-function normalizeName(item: ParserState) {
+function normalizeName(item: NamePlateState) {
   if (item.rarity === ItemRarity.Magic) {
     const baseType = magicBasetype(item.name);
     if (baseType) {
@@ -273,7 +274,7 @@ function normalizeName(item: ParserState) {
   }
 }
 
-function findInDatabase(item: ParserState) {
+function findInDatabase(item: NamePlateState): Result<BaseType[], string> {
   let info: BaseType[] | undefined;
   if (item.category === ItemCategory.DivinationCard) {
     info = ITEM_BY_REF("DIVINATION_CARD", item.name);
@@ -318,11 +319,11 @@ function findInDatabase(item: ParserState) {
     }
   }
 
-  info = recordsMatchingItem(info, item);
-  item.infoVariants = info;
-  // choose 1st variant, correct one will be picked at the end of parsing
-  item.info = info[0];
-  // same for every variant
+  return ok(recordsMatchingItem(info, item));
+}
+
+/** Sets the category from the game data when the item text has none; it is the same for every variant. */
+function setCategoryFromInfo(item: ParserState) {
   if (
     !item.category ||
     item.info.craftable?.category === ItemCategory.Wombgift
@@ -537,7 +538,7 @@ function parseNamePlate(section: string[], rawText: string) {
   line = section.shift();
   const baseType = line && markupConditionParser(line);
 
-  const item: ParserState = {
+  const item: NamePlateState = {
     rarity: undefined,
     category: undefined,
     name,
@@ -548,8 +549,6 @@ function parseNamePlate(section: string[], rawText: string) {
     statsByType: [],
     unknownModifiers: [],
     influences: [],
-    info: undefined!,
-    infoVariants: undefined!,
     rawText,
   };
 
@@ -646,7 +645,7 @@ function parseFoil(section: string[], item: ParsedItem) {
   return "SECTION_SKIPPED";
 }
 
-function parseUnidentified(section: string[], item: ParsedItem) {
+function parseUnidentified(section: string[], item: NamePlateState) {
   const match = section[0].match(_$.UNIDENTIFIED);
   if (match) {
     item.isUnidentified = true;
@@ -1293,7 +1292,7 @@ function parseTimelostRadius(section: string[], item: ParsedItem) {
   return "SECTION_SKIPPED";
 }
 
-function parseSynthesised(section: string[], item: ParserState) {
+function parseSynthesised(section: string[], item: NamePlateState) {
   if (section.length === 1) {
     if (section[0] === _$.SECTION_SYNTHESISED) {
       item.isSynthesised = true;
@@ -1317,7 +1316,7 @@ function parseSynthesised(section: string[], item: ParserState) {
   return "SECTION_SKIPPED";
 }
 
-function parseSuperior(item: ParserState) {
+function parseSuperior(item: NamePlateState) {
   if (
     item.rarity === ItemRarity.Normal ||
     (item.rarity === ItemRarity.Magic && item.isUnidentified) ||
@@ -1331,7 +1330,7 @@ function parseSuperior(item: ParserState) {
   }
 }
 
-function parseExceptional(item: ParserState) {
+function parseExceptional(item: NamePlateState) {
   if (
     item.rarity === ItemRarity.Normal ||
     (item.rarity === ItemRarity.Magic && item.isUnidentified) ||
@@ -1354,7 +1353,7 @@ function firstCapture(text: string, patterns: RegExp[]): string {
   return text;
 }
 
-function parseCategoryByHelpText(section: string[], item: ParsedItem) {
+function parseCategoryByHelpText(section: string[], item: NamePlateState) {
   if (section[0] === _$.BEAST_HELP) {
     item.category = ItemCategory.CapturedBeast;
     return "SECTION_PARSED";
