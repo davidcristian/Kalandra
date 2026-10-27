@@ -9,8 +9,8 @@ bar of the overlay and how to move, edit, hide and delete widgets.
 ## Price check
 
 Hover an item in the game and press `Ctrl + D`. Kalandra builds a search for the official trade site from the item's
-stats and lists the matching items with their prices. For a rare item, it waits until you tick the stats that matter
-and press **Search**. For currency it lists bulk offers with their stock.
+stats, searches at once and lists the matching items with their prices. For a rare item, tick the stats that matter
+and press **Search** to search again. For currency it lists bulk offers with their stock.
 
 For items in its price file, such as currency and uniques, the window also shows an estimated price and, when the file
 has one, its trend over the last 7 days. Kalandra reads that price from its own price service at

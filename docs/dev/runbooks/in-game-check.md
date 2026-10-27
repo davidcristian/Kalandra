@@ -143,7 +143,8 @@ General, sets another path), and uses Alt when the file does not set it
   - Auto-hide Mode: hold Ctrl and press D.
   - Open without auto-hide: Ctrl + Alt + D.
 - **See:** with Ctrl + D on an item, the price check window opens beside it with the item, its
-  filters and the trade results. For an item the price file lists, such as a currency or a unique,
+  filters and the trade results. It searches at once for a normal, magic, rare or unique item.
+  For an item the price file lists, such as a currency or a unique,
   it also shows the estimate from `https://kalandra.ashoal.com/prices/<league>.json`. How the
   league id becomes that file name is in [price-service.md](../modules/price-service.md#the-files).
   The file's categories are in `renderer/public/data/namespaceMap.json`. Above the listings, the

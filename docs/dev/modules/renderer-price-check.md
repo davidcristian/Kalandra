@@ -30,14 +30,14 @@ that the route needs ([main.md](main.md)).
   `apiToSatisfySearch` returns `trade` when a stat filter is enabled. For a divination card or a map with a stack
   size filter, it returns `bulk` when that filter is enabled. Otherwise it returns `bulk` for an item with a
   `tradeTag` and `trade` for the rest. The window searches at once when "Perform an auto search, when pressing"
-  is on for the key used (`smartInitialSearch`, `lockedInitialSearch`) and the item is unique, unidentified,
-  veiled, a charm, or of a category not in `CATEGORY_TO_TRADE_ID`, such as a relic.
+  is on for the key used (`smartInitialSearch`, `lockedInitialSearch`) and `searchesAtOnce` in `initial-search.ts`
+  returns true: for an item with a rarity, or of a category not in `CATEGORY_TO_TRADE_ID`, such as a gem.
   Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
   the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
   ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).
   Before a search, it shows a tip that `createTipSchedule()` in `help/tips.ts` picks: with every item at
   **Always**, after 7, 20, 50 or 100 items without one at the other settings, and none at **Never**.
-  `specs/web/tips.test.ts` checks it.
+  `specs/web/tips.test.ts` checks it, and `specs/web/price-check/initial-search.test.ts` which items search at once.
 
 ### Filters (`filters/`)
 
