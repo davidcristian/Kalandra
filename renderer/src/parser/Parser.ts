@@ -157,12 +157,10 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   parseWaystone,
   parseSockets,
   parseAugmentSockets,
-  parseHeistBlueprint,
   parseTrials,
   parseAreaLevel,
   parseMirrored,
   parseSanctified,
-  parseSentinelCharge,
   parseLogbookArea,
   parseLogbookArea,
   parseLogbookArea,
@@ -1305,21 +1303,6 @@ function parseTimelostRadius(section: string[], item: ParsedItem) {
   return "SECTION_SKIPPED";
 }
 
-function parseSentinelCharge(section: string[], item: ParsedItem) {
-  if (item.category !== ItemCategory.Sentinel) return "PARSER_SKIPPED";
-
-  if (section.length === 1) {
-    if (section[0].startsWith(_$.SENTINEL_CHARGE)) {
-      item.sentinelCharge = parseInt(
-        section[0].slice(_$.SENTINEL_CHARGE.length),
-        10,
-      );
-      return "SECTION_PARSED";
-    }
-  }
-  return "SECTION_SKIPPED";
-}
-
 function parseSynthesised(section: string[], item: ParserState) {
   if (section.length === 1) {
     if (section[0] === _$.SECTION_SYNTHESISED) {
@@ -1394,44 +1377,6 @@ function parseCategoryByHelpText(section: string[], item: ParsedItem) {
   }
 
   return "SECTION_SKIPPED";
-}
-
-function parseHeistBlueprint(section: string[], item: ParsedItem) {
-  if (item.category !== ItemCategory.HeistBlueprint) return "PARSER_SKIPPED";
-
-  parseAreaLevelNested(section, item);
-  if (!item.areaLevel) {
-    return "SECTION_SKIPPED";
-  }
-
-  item.heist = {};
-
-  for (const line of section) {
-    if (line.startsWith(_$.HEIST_TARGET)) {
-      const targetText = line.slice(_$.HEIST_TARGET.length);
-      switch (targetText) {
-        case _$.HEIST_BLUEPRINT_ENCHANTS:
-          item.heist.target = "Enchants";
-          break;
-        case _$.HEIST_BLUEPRINT_GEMS:
-          item.heist.target = "Gems";
-          break;
-        case _$.HEIST_BLUEPRINT_REPLICAS:
-          item.heist.target = "Replicas";
-          break;
-        case _$.HEIST_BLUEPRINT_TRINKETS:
-          item.heist.target = "Trinkets";
-          break;
-      }
-    } else if (line.startsWith(_$.HEIST_WINGS_REVEALED)) {
-      item.heist.wingsRevealed = parseInt(
-        line.slice(_$.HEIST_WINGS_REVEALED.length),
-        10,
-      );
-    }
-  }
-
-  return "SECTION_PARSED";
 }
 
 function parseTrials(section: string[], item: ParsedItem) {

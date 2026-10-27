@@ -85,7 +85,6 @@ export interface ParsedItem {
   isMirrored?: boolean;
   isSanctified?: boolean;
   influences: ItemInfluence[];
-  sentinelCharge?: number;
   isSynthesised?: boolean;
   isFractured?: boolean;
   isVeiled?: boolean;
@@ -96,10 +95,6 @@ export interface ParsedItem {
     text: string;
     type: ModifierType;
   }>;
-  heist?: {
-    wingsRevealed?: number;
-    target?: "Enchants" | "Trinkets" | "Gems" | "Replicas";
-  };
   note?: string;
   category?: ItemCategory;
   requires?: {

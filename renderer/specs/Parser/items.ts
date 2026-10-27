@@ -53,7 +53,6 @@ export class TestItem implements ParsedItem {
   isUnmodifiable?: boolean | undefined;
   isMirrored?: boolean | undefined;
   influences: ItemInfluence[] = [];
-  sentinelCharge?: number | undefined;
   isSynthesised?: boolean | undefined;
   isFractured?: boolean | undefined;
   isVeiled?: boolean | undefined;
@@ -61,12 +60,6 @@ export class TestItem implements ParsedItem {
   statsByType: StatCalculated[] = [];
   newMods: ParsedModifier[] = [];
   unknownModifiers: Array<{ text: string; type: ModifierType }> = [];
-  heist?:
-    | {
-        wingsRevealed?: number;
-        target?: "Enchants" | "Trinkets" | "Gems" | "Replicas";
-      }
-    | undefined;
 
   note?: string;
   category?: ItemCategory | undefined;

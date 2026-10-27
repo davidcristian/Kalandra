@@ -155,7 +155,7 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
   Logbook: the area name, a faction line that matches a stat, then the area's modifiers, which it takes without
   reading them. Adding or moving an entry changes which parser reads which section, so the change comes with parser
   cases for the item kinds it affects.
-- **`Parser.ts` is 1823 lines** (2026-10-27, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
+- **`Parser.ts` is 1768 lines** (2026-10-27, `wc -l renderer/src/parser/Parser.ts`). New, separable code goes in
   a new file under `renderer/src/parser/` and is called from it (AGENTS.md, rule 6).
 
 **Dependencies.** neverthrow for `Result`, `@sindresorhus/fnv1a` for the index hash, and the game data from
