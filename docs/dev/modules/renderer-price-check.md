@@ -151,7 +151,7 @@ it at start. The "Refresh" button next to the league list in the price check set
 under "Failed to load leagues" call it again. A league whose id ends in `(PL<number>)` counts as private.
 `isPopular` is true for a listed league that is not private, and no price file is read for any other. When the saved
 league is not in the list and is not private, `load()` selects the third league when the list has more than two,
-otherwise the first. A failed load is logged with `console.warn` and its message kept in `error`.
+otherwise the first. A failed load is logged with `console.warn` and `logToMain()`, and its message kept in `error`.
 
 ## Invariants
 
@@ -159,15 +159,15 @@ otherwise the first. A failed load is logged with `console.warn` and its message
   [ADR-0005](../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). The request calls
   `RateLimiter.waitMulti(RATE_LIMIT_RULES.<SET>)` before it is sent and `adjustRateLimits(set, response.headers)`
   after. Each set starts as one request per 5 seconds; the headers `x-rate-limit-rules`, `x-rate-limit-<rule>` and
-  `x-rate-limit-<rule>-state` replace it with the server's rules, each window longer by `apiLatencySeconds`
-  ("Extra time to prevent spurious Rate limiting", default 2). A rule whose two headers are missing, or that does
-  not give a limit above 0, a window and a hit count for each entry, is skipped with a `console.warn`. The set then
-  keeps its current limiters beside the rules it could read. The third field of a `-state` entry is the seconds left
-  of a restriction, and `Retry-After` gives them for every limiter in the set. `RateLimiter.restrict` holds every
-  request on the limiter until they are over, and `estimateTime` counts them. A `Retry-After` that is not a number
-  of seconds is logged and ignored. Before a search or an exchange request,
-  `preventQueueCreation` throws `Retry after <n> seconds` when the sets' current use would delay it by 1.5
-  seconds or more. A new trade site request uses one of these sets or adds a new one.
+  `x-rate-limit-<rule>-state` replace it with the server's rules, each window longer by `apiLatencySeconds` ("Extra
+  time to prevent spurious Rate limiting", default 2). A rule whose two headers are missing, or that does not give a
+  limit above 0, a window and a hit count for each entry, is skipped with a `console.warn`. The set then keeps its
+  current limiters beside the rules it could read. The third field of a `-state` entry is the seconds left of a
+  restriction, and `Retry-After` gives them for every limiter in the set. `RateLimiter.restrict` holds every request
+  on the limiter until they are over, and `estimateTime` counts them. A `Retry-After` that is not a number of seconds
+  is logged and ignored. `logToMain()` sends each warning once a run per rule and for `Retry-After`. Before a search
+  or an exchange request, `preventQueueCreation` throws `Retry after <n> seconds` when the sets' current use would
+  delay it by 1.5 seconds or more. A new trade site request uses one of these sets or adds a new one.
 - **Three trade site requests do not use the sets**: the league list (`/api/trade2/data/leagues`), and the item
   and stat lists in `web/background/TradeData.ts` (`/api/trade2/data/items` and `/data/stats` on
   `www.pathofexile.com`). The league list loads at start, on Refresh and on Retry. The two lists load with the
@@ -247,4 +247,4 @@ reads hand-written responses with `readTradeData` and answers each trade site re
 `artificial-slowdown.test.ts` there checks with fake timers when a result list stops waiting after a reset.
 `specs/web/watch-order.test.ts` mounts a component with a fake renderer and checks that Vue runs its watchers in
 the order they are defined. No test calls a live site. `specs/web/leagues.test.ts` loads leagues from a fake trade
-site and checks the league `load()` selects and `isPopular`.
+site and checks the league `load()` selects, `isPopular` and the line a failed load sends to main.

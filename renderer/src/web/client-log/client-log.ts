@@ -1,6 +1,7 @@
 import { createGlobalState } from "@vueuse/core";
 import { readonly, shallowRef } from "vue";
 import { Host } from "@/web/background/IPC";
+import { logToMain } from "@/web/background/log-to-main";
 import { ClientLogEvent } from "@ipc/types";
 import { ClientLogInfoType, parseClientLogText } from "./client-log-parser";
 
@@ -16,6 +17,7 @@ export function createClientLog() {
   let currentDateTime = 0;
   const lineQueue: string[] = [];
   let processing = false;
+  let sentFailure = false;
 
   /** Handles the lines in order, and logs and skips a line that fails, so the lines after it are still handled. */
   function handleLines(lines: readonly string[]) {
@@ -28,10 +30,22 @@ export function createClientLog() {
         handleLine(line);
       } catch (error) {
         console.error("Skipped a Client.txt line that failed:", line, error);
+        reportFailure(error);
       }
       line = lineQueue.shift();
     }
     processing = false;
+  }
+
+  // A failure can repeat on every line of one kind, and a line can hold chat text, so main gets only the first error
+  function reportFailure(error: unknown) {
+    if (sentFailure) return;
+    sentFailure = true;
+    const reason = error instanceof Error ? error.message : String(error);
+    logToMain(
+      "error",
+      `Skipped a Client.txt line that failed: ${reason}. Later failures go only to the renderer's console`,
+    );
   }
 
   function handleLine(line: string) {

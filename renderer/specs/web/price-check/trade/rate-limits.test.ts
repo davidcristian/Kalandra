@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import { adjustRateLimits } from "@/web/price-check/trade/common";
 import { RateLimiter } from "@/web/price-check/trade/RateLimiter";
+import type { IpcEvent } from "@ipc/types";
 
 // Hand-written in the format the trade site sends with a search response
 const SEARCH_HEADERS = {
@@ -212,6 +213,74 @@ describe("adjustRateLimits", () => {
     ]);
   });
 });
+
+describe("adjustRateLimits with headers it cannot read", () => {
+  let adjust: typeof adjustRateLimits;
+  let sentToMain: IpcEvent[];
+
+  beforeEach(async () => {
+    setupTests({
+      widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })],
+    });
+    // common.ts sends each problem once per module, so each test imports a new one
+    vi.resetModules();
+    const { Host } = await import("@/web/background/IPC");
+    sentToMain = [];
+    vi.mocked(Host.sendEvent).mockImplementation((event) => {
+      sentToMain.push(event);
+    });
+    const common = await import("@/web/price-check/trade/common");
+    adjust = common.adjustRateLimits;
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("sends each rule it skips to main's log once, whatever its header values", () => {
+    const limits = new Set<RateLimiter>();
+
+    adjust(limits, headersWith({ "x-rate-limit-ip": null }));
+    adjust(
+      limits,
+      headersWith({
+        "x-rate-limit-ip": null,
+        "x-rate-limit-ip-state": "2:10:0,2:60:0,2:300:0",
+      }),
+    );
+    adjust(limits, headersWith({ "x-rate-limit-account": null }));
+
+    expect(sentToMain).toEqual([
+      warningToMain(
+        'Skipped rate limit rule "Ip": limit header "null", state header "1:10:0,1:60:0,1:300:0"',
+      ),
+      warningToMain(
+        'Skipped rate limit rule "Account": limit header "null", state header "1:5:0"',
+      ),
+    ]);
+  });
+
+  it("sends a Retry-After it ignores to main's log once", () => {
+    const limits = new Set<RateLimiter>();
+
+    adjust(limits, new Headers({ "retry-after": "soon" }));
+    adjust(limits, new Headers({ "retry-after": "later" }));
+
+    expect(sentToMain).toEqual([
+      warningToMain(
+        'Ignored Retry-After header "soon": not a number of seconds',
+      ),
+    ]);
+  });
+});
+
+function warningToMain(message: string): IpcEvent {
+  return {
+    name: "CLIENT->MAIN::log-entry",
+    payload: { level: "warn", message },
+  };
+}
 
 function accountState(state: string): Headers {
   return headersWith({

@@ -2,16 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { AppConfig } from "@/web/Config";
 import type * as Leagues from "@/web/background/Leagues";
+import type { IpcEvent } from "@ipc/types";
 
 const LEAGUES = ["Standard", "Hardcore", "Rise of the Abyssal", "HC Abyssal"];
 
-/** Answers the league list request with the leagues in `ids`, as the trade site sends them. */
+/** Answers the league list request with the leagues in `ids`, as the trade site sends them, or with a web page while `down` is set. */
 class FakeTradeSite {
   ids: string[] = LEAGUES;
   requests: string[] = [];
+  down = false;
 
   proxy = async (hostAndPath: string) => {
     this.requests.push(hostAndPath);
+    if (this.down) return new Response("<html></html>", { status: 503 });
     const result = this.ids.map((id) => ({ id, realm: "poe2", text: id }));
     return new Response(JSON.stringify({ result }));
   };
@@ -20,6 +23,7 @@ class FakeTradeSite {
 describe("useLeagues", () => {
   let site: FakeTradeSite;
   let leagues: ReturnType<typeof Leagues.useLeagues>;
+  let sentToMain: IpcEvent[];
 
   async function loadWithSaved(leagueId: string | undefined) {
     setupTests({ leagueId });
@@ -32,6 +36,10 @@ describe("useLeagues", () => {
     site = new FakeTradeSite();
     const { Host } = await import("@/web/background/IPC");
     vi.mocked(Host.proxy).mockImplementation(site.proxy);
+    sentToMain = [];
+    vi.mocked(Host.sendEvent).mockImplementation((event) => {
+      sentToMain.push(event);
+    });
     const { useLeagues } = await import("@/web/background/Leagues");
     leagues = useLeagues();
   });
@@ -83,6 +91,24 @@ describe("useLeagues", () => {
     setupTests({ leagueId: "Dawn of the Hunt" });
 
     expect(leagues.selected.value?.isPopular).toBe(false);
+  });
+
+  it("keeps the saved league and sends the error to main's log when the site is down", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    site.down = true;
+    await loadWithSaved("Hardcore");
+
+    expect(AppConfig().leagueId).toBe("Hardcore");
+    expect(sentToMain).toEqual([
+      {
+        name: "CLIENT->MAIN::log-entry",
+        payload: {
+          level: "warn",
+          message:
+            "Cannot load the trade leagues: The trade site sent a web page instead of data (status 503). It can be down, under maintenance or showing a bot check.",
+        },
+      },
+    ]);
   });
 
   it("replaces a saved Path of Exile 1 Ruthless league, which the site does not list", async () => {

@@ -114,7 +114,8 @@ Under **Cycle Through All Tips:**, the arrow buttons show each tip in turn.
 ## Debug
 
 The page shows the last 1000 lines of Kalandra's log. Errors appear there, such as a hotkey that Kalandra could not
-register, a game file it did not find or a price file it could not download. Add the log when you
+register, a game file it did not find, a price file it could not download, or a league list or item list it could
+not load from the trade site. Add the log when you
 [report a problem on GitHub](https://github.com/davidcristian/Kalandra/issues).
 
 | Label | Default | What it changes |

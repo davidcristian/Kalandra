@@ -40,7 +40,8 @@ that a saved config survives every update covers it ([config.md](config.md),
   whenever the overlay starts or stops having something to draw, saves the config when the window loses focus,
   and starts the background state: `usePoeninja()`, `useLeagues().load()` and `useClientLog()`, the shared
   `createClientLog()` state, whose `handleLines()` reads the `MAIN->CLIENT::game-log` lines in order. A line that
-  throws is logged with `console.error` and skipped, and the lines after it are still read.
+  throws is logged with `console.error` and skipped, and the lines after it are still read. `logToMain()` sends the
+  error of the first such line of a run, without the line, which can hold chat text.
 - [Widget.vue](../../../renderer/src/web/overlay/Widget.vue) is the frame, with the "hide", "edit", "move" and
   "delete" buttons. Its props: `config` (a widget with an `anchor`: `pos` such as `tl` or `cc`, and `x` and `y` in
   percent of the screen), `moveHandles`, `readonly`, `removable`, `hideable` and `inlineEdit`. With `inlineEdit`

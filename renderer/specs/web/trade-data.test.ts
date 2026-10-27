@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as TradeData from "@/web/background/TradeData";
 import type { TradeLists } from "@/assets/data/trade-lists";
+import type { IpcEvent } from "@ipc/types";
 import { HeldRequests, settle } from "./held-requests";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -30,6 +31,7 @@ class FakeTradeSite {
 describe("useTradeData", () => {
   let site: FakeTradeSite;
   let tradeData: ReturnType<typeof TradeData.useTradeData>;
+  let sentToMain: IpcEvent[];
 
   beforeEach(async () => {
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "Date"] });
@@ -38,6 +40,10 @@ describe("useTradeData", () => {
     site = new FakeTradeSite();
     const { Host } = await import("@/web/background/IPC");
     vi.mocked(Host.proxy).mockImplementation(site.proxy);
+    sentToMain = [];
+    vi.mocked(Host.sendEvent).mockImplementation((event) => {
+      sentToMain.push(event);
+    });
     const { useTradeData } = await import("@/web/background/TradeData");
     tradeData = useTradeData();
   });
@@ -61,6 +67,25 @@ describe("useTradeData", () => {
     expect(tradeData.isLoading.value).toBe(false);
     expect(tradeData.error.value).toBeNull();
     expect([...tradeData.tradeItemData.value]).toEqual(["Iron Ring"]);
+    expect(sentToMain).toEqual([]);
+  });
+
+  it("sends the error of a failed download to main's log", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    site.down = true;
+
+    await tradeData.load(true);
+
+    expect(sentToMain).toEqual([
+      {
+        name: "CLIENT->MAIN::log-entry",
+        payload: {
+          level: "warn",
+          message:
+            "Cannot load the trade item and stat lists: The trade site sent a web page instead of data (status 503). It can be down, under maintenance or showing a bot check.",
+        },
+      },
+    ]);
   });
 
   it("applies a reload that brings new stats and no new items", async () => {

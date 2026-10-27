@@ -4,7 +4,7 @@ import { init } from "@/assets/data";
 import { createClientLog } from "@/web/client-log/client-log";
 import fs from "fs";
 import { Host } from "@/web/background/IPC";
-import type { ClientLogEvent } from "@ipc/types";
+import type { ClientLogEvent, IpcEvent } from "@ipc/types";
 import path from "path";
 
 const log1 = `
@@ -1170,6 +1170,45 @@ describe("clientLog", () => {
     }
     expect(logged).toHaveLength(1);
     expect(logged[0]).toContain(gameVersion);
+  });
+
+  it("sends only the error of the first line that fails to main's log", () => {
+    const levelUp = (level: number) =>
+      `2026/10/20 09:00:01 1800000100 3ef232c2 [INFO Client 443804] : kvanClientLogTestOne (Mercenary) is now level ${level}`;
+    const sentToMain: IpcEvent[] = [];
+    vi.mocked(Host.sendEvent).mockImplementation((event) => {
+      if (event.name === "CLIENT->MAIN::write-data") {
+        throw new Error("The connection to main closed");
+      }
+      sentToMain.push(event);
+    });
+    const logged: unknown[][] = [];
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation((...args: unknown[]) => {
+        logged.push(args);
+      });
+    const { handleLines, playerLevel } = createClientLog();
+
+    try {
+      handleLines([levelUp(30), levelUp(31)]);
+      handleLines([levelUp(32)]);
+    } finally {
+      consoleError.mockRestore();
+      vi.mocked(Host.sendEvent).mockReset();
+    }
+    expect(playerLevel.value).toBe(32);
+    expect(logged).toHaveLength(3);
+    expect(sentToMain).toEqual([
+      {
+        name: "CLIENT->MAIN::log-entry",
+        payload: {
+          level: "error",
+          message:
+            "Skipped a Client.txt line that failed: The connection to main closed. Later failures go only to the renderer's console",
+        },
+      },
+    ]);
   });
 
   it.each([

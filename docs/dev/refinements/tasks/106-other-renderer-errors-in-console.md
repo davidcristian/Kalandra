@@ -1,6 +1,6 @@
 # Renderer errors other than a failed price file load reach only the browser console
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/background/log-to-main.ts](../../../../renderer/src/web/background/log-to-main.ts)
 **Verified:** 2026-10-27
@@ -27,3 +27,10 @@ that holds no cookie, token or session ID, with a test that reads the event, and
 
 - 2026-10-27: Filed when the price file error was sent to main's log
   ([013](013-renderer-errors-not-in-debug.md)), which kept the other renderer errors out of scope.
+- 2026-10-27: Done as "feat(renderer): send trade site and Client.txt errors to main's log". The
+  first failed `Client.txt` line of a run is sent without the line, which can hold chat text, and
+  each unreadable rate limit rule or `Retry-After` once a run.
+- 2026-10-27: `Kalandra cannot start` stays in the console and on the page. In a packaged build
+  every error `startApp()` catches comes before `Host.init()`, since Vue logs a component error at
+  mount instead of throwing, so the event would wait in the queue forever. Opening the socket from
+  the failed page would make it main's last active client, which gets the price check's item.

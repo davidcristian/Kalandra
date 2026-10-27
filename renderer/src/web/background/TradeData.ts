@@ -3,6 +3,7 @@ import { createGlobalState } from "@vueuse/core";
 import { Host } from "@/web/background/IPC";
 import { readTradeData } from "@/web/price-check/trade/trade-response";
 import { setTradeLists } from "@/assets/data/trade-lists";
+import { logToMain } from "./log-to-main";
 
 const RETRY_INTERVAL_MS = 30 * 60 * 1000;
 const UPDATE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -168,6 +169,10 @@ export const useTradeData = createGlobalState(() => {
       if (controller === downloadController) {
         console.warn(e);
         error.value = (e as Error).message;
+        logToMain(
+          "warn",
+          `Cannot load the trade item and stat lists: ${error.value}`,
+        );
       }
     } finally {
       if (controller === downloadController) isLoading.value = false;

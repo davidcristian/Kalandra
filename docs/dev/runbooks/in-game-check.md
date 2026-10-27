@@ -35,11 +35,22 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
   `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
   `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`,
   `paste-in-chat`, `stash-search` or `trigger-event`.
-- **The renderer's console** holds what the page logs. Of these lines, only a failed price file
-  load is also in Settings, Debug. A dev run opens the developer tools at start. In a packaged
-  build, focus the overlay and press Ctrl + Shift + I: the overlay window's menu has the
-  `toggleDevTools` role (`main/src/windowing/OverlayWindow.ts`), and Electron binds that role to
-  Ctrl + Shift + I on Windows.
+- **The renderer's console** holds what the page logs. A dev run opens the developer tools at
+  start. In a packaged build, focus the overlay and press Ctrl + Shift + I: the overlay window's
+  menu has the `toggleDevTools` role (`main/src/windowing/OverlayWindow.ts`), and Electron binds
+  that role to Ctrl + Shift + I on Windows.
+- **Console lines that Settings, Debug also shows** are sent with `logToMain()`
+  (`renderer/src/web/background/log-to-main.ts`):
+  - `warn [renderer] Loading prices failed: <reason>` ([section 4](#4-the-price-check-keys)).
+  - `warn [renderer] Cannot load the trade leagues: <reason>` (`Leagues.ts`) and
+    `warn [renderer] Cannot load the trade item and stat lists: <reason>` (`TradeData.ts`), such
+    as a reason that starts with `The trade site sent a web page instead of data (status 503)`.
+  - `error [renderer] Skipped a Client.txt line that failed: <reason>. Later failures go only to
+    the renderer's console`, for the first such line of a run (`client-log.ts`).
+  - `warn [renderer] Skipped rate limit rule "<rule>": limit header "<value>", state header
+    "<value>"` and `warn [renderer] Ignored Retry-After header "<value>": not a number of
+    seconds`, once a run for each rule and for `Retry-After` (`price-check/trade/common.ts`).
+  - `Kalandra cannot start` is not sent: the page shows it before it connects to main.
 - **The config folder** opens from the tray item Open config folder.
 
 Four lines from `main/src/shortcuts/` apply to every key below:

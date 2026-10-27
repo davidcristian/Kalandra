@@ -52,6 +52,10 @@ and for the area. You can type your level into it, and two kinds of log lines up
 - `Generating level <N> area "<area>" with seed <N>` sets the area level. Towns and hideouts do not change it.
   Entering `G1_1`, the first area of the campaign, also sets your level to 1, because a new character starts there.
 
+When Kalandra fails to read a line, it skips the line and reads the lines after it. The first such line after Kalandra
+starts writes `Skipped a Client.txt line that failed: <reason>` to the `Debug` page.
+[Report it on GitHub](https://github.com/davidcristian/Kalandra/issues) with the lines of that page.
+
 Kalandra does not store the log. If you also turn on the experimental `Item Data Collection` feature, Kalandra writes
 the events it reads, such as level ups, area changes and deaths, to `client-log.ndjson` in the output folder of that
 feature. By default this is the `apt-data\csv-data` folder of Kalandra's data folder (`%APPDATA%\kalandra` on

@@ -2,6 +2,7 @@ import { computed, shallowRef, readonly } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { AppConfig, poeWebApi } from "@/web/Config";
 import { Host } from "./IPC";
+import { logToMain } from "./log-to-main";
 import { readTradeData } from "@/web/price-check/trade/trade-response";
 
 interface TradeLeague {
@@ -60,6 +61,7 @@ export const useLeagues = createGlobalState(() => {
     } catch (e) {
       console.warn("Cannot load the trade leagues:", e);
       error.value = (e as Error).message;
+      logToMain("warn", `Cannot load the trade leagues: ${error.value}`);
     } finally {
       isLoading.value = false;
     }

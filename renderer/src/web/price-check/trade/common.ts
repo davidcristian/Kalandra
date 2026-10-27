@@ -2,6 +2,7 @@ import { shallowReactive } from "vue";
 import type { ItemFilters, StatFilter } from "../filters/interfaces";
 import { priceCheckConfig } from "@/web/price-check/price-check-config";
 import { RateLimiter } from "./RateLimiter";
+import { logToMain } from "@/web/background/log-to-main";
 import { ParsedItem, ItemCategory } from "@/parser";
 export { poeWebApi as getTradeEndpoint } from "@/web/Config";
 
@@ -79,6 +80,16 @@ interface ServerLimit {
 // A rule name becomes part of a header name, and Headers.get throws on an invalid name
 const RULE_NAME = /^[\w-]+$/;
 
+// Every response repeats a header problem, so main's log gets each problem once per run
+const problemsSentToMain = new Set<string>();
+
+function warnHeaderProblem(problem: string, message: string): void {
+  console.warn(message);
+  if (problemsSentToMain.has(problem)) return;
+  problemsSentToMain.add(problem);
+  logToMain("warn", message);
+}
+
 export function adjustRateLimits(
   clientLimits: Set<RateLimiter>,
   headers: Headers,
@@ -137,7 +148,8 @@ function readRule(
         isCount(hits) && Number.isFinite(restriction) && restriction >= 0,
     );
   if (!isReadable) {
-    console.warn(
+    warnHeaderProblem(
+      `rule ${rule}`,
       `Skipped rate limit rule "${rule}": limit header "${limitStr}", state header "${stateStr}"`,
     );
     return undefined;
@@ -155,7 +167,8 @@ function readRetryAfter(value: string | null): number {
   const seconds = Number(value);
   if (Number.isFinite(seconds) && seconds >= 0) return seconds;
 
-  console.warn(
+  warnHeaderProblem(
+    "retry-after",
     `Ignored Retry-After header "${value}": not a number of seconds`,
   );
   return 0;

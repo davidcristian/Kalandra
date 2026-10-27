@@ -29,7 +29,7 @@ neither process's type check reads it. The routes that move the messages are in
 | `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `passHostConfig()` in `host-config.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus; `server.ts`, for the one client left after a close | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
-| `CLIENT->MAIN::log-entry` | `level`: `error`, `warn` or `info`; `message` | `logToMain()` in `log-to-main.ts`, called by `load()` in `Prices.ts` when a price file load fails | `logRendererEntries()` in `renderer-log.ts`, which writes the line through `Logger` |
+| `CLIENT->MAIN::log-entry` | `level`: `error`, `warn` or `info`; `message` | `logToMain()` in `log-to-main.ts`, called when a load fails in `Prices.ts`, `Leagues.ts` or `TradeData.ts`, for the first `Client.txt` line that fails in `client-log.ts`, and once a run for each rate limit rule or `Retry-After` header that `trade/common.ts` cannot read | `logRendererEntries()` in `renderer-log.ts`, which writes the line through `Logger` |
 | `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetTimer.vue` |
@@ -118,7 +118,8 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   Debug among main's own lines. It writes only the first line of `message`, cut to 500 characters
   (`RENDERER_LOG_CHARS`), and for a payload without a known `level` and a text `message` it writes
   `warn [renderer] Ignored a log entry without a known level and a text message`. A caller sends text it wrote,
-  never a cookie, a token or a session ID.
+  never a cookie, a token or a session ID. `startApp()` in `startup.ts` sends nothing: in a packaged build, each error
+  it catches comes before `Host.init()` opens the socket, so the page shows the error in place of the app.
 
 `config-problem.ts`:
 
@@ -173,8 +174,9 @@ the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `H
 **Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
 `renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes.
 `main/specs/renderer-log.test.ts` sends `log-entry` payloads, valid and not, through a fake server and reads main's
-log, and `renderer/specs/web/prices-selection.test.ts` reads the `log-entry` that a missing price file sends. The
-type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs
+log. In `renderer/specs/web/`, `prices-selection.test.ts`, `leagues.test.ts`, `trade-data.test.ts`,
+`client-log.test.ts` and `price-check/trade/rate-limits.test.ts` read the `log-entry` each sender sends. The type
+checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs
 both pre-commit type check hooks. It also runs `lint-fix-ipc`, which runs ESLint with main's config, and
 `format-ipc`, which runs Prettier with the `.prettierrc` that main and the renderer share. Both run from the repo
 root, since ESLint skips a file outside the folder it runs from, and CI runs them over all files. main's config
