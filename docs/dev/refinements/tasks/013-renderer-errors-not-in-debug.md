@@ -1,9 +1,9 @@
 # Renderer errors such as a missing price file do not reach Settings, Debug
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/background/Prices.ts](../../../../renderer/src/web/background/Prices.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Settings, Debug shows main's log: the history that `Logger` in `main/src/RemoteLogger.ts` keeps and
 sends in `MAIN->CLIENT::log-entry` events. No `IpcEvent` in `ipc/types.ts` sends a log line the
@@ -24,3 +24,5 @@ runbook then names that line.
 
 - 2026-10-18: Found while the in-game check runbook was written, by tracing where the price file
   error goes.
+- 2026-10-27: feat: show failed price file loads in Settings, Debug. The other renderer errors
+  that reach only the console are [106](106-other-renderer-errors-in-console.md).

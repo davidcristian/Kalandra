@@ -67,6 +67,9 @@ The entry, the server and the app services, in `main/src/`:
   1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. Callers start a message with its level
   (`info`, `warn`, `error` or `debug`), and most add a `[Component]` tag after it. Only the path lines that
   `GameLogWatcher` writes after its `Found 2 log files` error have no level. The Debug settings page shows the log.
+- `renderer-log.ts`: `logRendererEntries(server, logger)`, which `main.ts` calls after it creates the `Logger`, writes
+  each `CLIENT->MAIN::log-entry` a page sends as `<level> [renderer] <message>`. `rendererLogLine()` makes the line
+  from the unchecked payload ([ipc.md](ipc.md#public-contract)).
 - `AppUpdater.ts`: `AppUpdater` wraps electron-updater. Setting `info` broadcasts `MAIN->CLIENT::updater-state`. It
   checks once when it is created, after it reads `--no-updates`, and every 16 hours, so the first check does not wait
   for the page. It handles the `check-for-update` and `update-and-restart` user actions. Automatic download is off for

@@ -159,8 +159,8 @@ save the new response under `priceService/tests/fixtures/ninja/` and check `exch
    `curl -s http://localhost:8080/prices/index.json`. If that prints the file, the tunnel is down: read
    `docker compose --profile tunnel logs tunnel` and check `TUNNEL_TOKEN`. If it does not, `web` is down: read
    `docker compose logs web`.
-4. `200`: the service side works. The app loads prices only for some leagues and logs a failed load to the
-   renderer's console ([price-service.md](../modules/price-service.md#app-side)).
+4. `200`: the service side works. The app loads prices only for some leagues and logs a failed load to Settings,
+   Debug and the renderer's console ([price-service.md](../modules/price-service.md#app-side)).
 
 ### Old prices after a fix
 

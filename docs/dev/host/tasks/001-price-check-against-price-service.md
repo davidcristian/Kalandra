@@ -38,10 +38,8 @@ gives for it, each with its estimate when the file lists it.
 
 **Record.** The build, the leagues, and each item with the estimate shown and its line in the file.
 A wrong value is a bug: file a refinement with the item, the estimate and the line. When no
-estimate shows, read the developer tools console for `No price file for <league> (<status>)`, which
-reaches only the console ([refinement 013](../../refinements/tasks/013-renderer-errors-not-in-debug.md)).
-A dev run opens the developer tools at start, and [003](003-overlay-key-and-focus.md) checks
-whether Ctrl + Shift + I opens them in a packaged build. Settings, Debug shows
+estimate shows, read Settings, Debug for
+`warn [renderer] Loading prices failed: No price file for <league> (<status>)`, and for
 `error [proxy] <message> (kalandra.ashoal.com)` when main cannot reach the host.
 
 ## History
@@ -50,3 +48,5 @@ whether Ctrl + Shift + I opens them in a packaged build. Settings, Debug shows
   replaced poe.ninja as the app's price source, and no in-game check of it has run.
 - 2026-10-19: Added a unique flask to step 2. The price check finds a unique flask by its base
   item, as it does every other unique.
+- 2026-10-27: Step Record reads the missing price file line in Settings, Debug, where the app now
+  sends it ([refinement 013](../../refinements/tasks/013-renderer-errors-not-in-debug.md)).

@@ -178,8 +178,10 @@ seconds (`timeout_seconds` in `NinjaClient`), which no variable changes.
   after a recent price check or item search
   ([renderer-price-check.md](renderer-price-check.md#price-estimates-backgroundpricests-backgroundprice-sourcets)).
 - When the response has an error status, `load` writes the error `No price file for <league id> (<status>)` to the
-  renderer's console as a warning. The app keeps the prices it already loaded, and a change of league or core
-  currency clears them first. With none loaded, the app shows no price estimate.
+  renderer's console as a warning, and sends it to main's log, which Settings, Debug shows, as
+  `warn [renderer] Loading prices failed: No price file for <league id> (<status>)`. The app keeps the prices it
+  already loaded, and a change of league or core currency clears them first. With none loaded, the app shows no
+  price estimate.
 - `findPriceByQuery` links each price to its poe.ninja page,
   `https://poe.ninja/poe2/economy/<league>/<url>/<detailsId>`, which the user can open. `<league>` is the league's
   name in poe.ninja's URLs (`selectedLeagueToUrl`). The app requests nothing from poe.ninja itself.

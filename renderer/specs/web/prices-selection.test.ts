@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { reactive } from "vue";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { IpcEvent } from "@ipc/types";
 import { setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
 import { AppConfig } from "@/web/Config";
@@ -34,6 +35,7 @@ const PUBLIC_DIR = path.resolve(__dirname, "../../public");
 
 let widget: PriceCheckWidget;
 let warnings: string[];
+let sentToMain: IpcEvent[];
 
 /** Answers each price file request with `body`, and fails an aborted request as fetch does. */
 function servePriceFile(body: string, status = 200) {
@@ -66,6 +68,10 @@ beforeEach(async () => {
   warnings = [];
   vi.spyOn(console, "warn").mockImplementation((error: unknown) => {
     warnings.push(String(error));
+  });
+  sentToMain = [];
+  vi.mocked(Host.sendEvent).mockImplementation((event) => {
+    sentToMain.push(event);
   });
 });
 
@@ -101,6 +107,25 @@ describe("usePoeninja after a change of league or core currency", () => {
       "Error: No price file for Fixture League C (404)",
     ]);
     expect(prices.cachedCurrencyByQuery(EXALTED_ORB, 100)).toBeUndefined();
+  });
+});
+
+describe("usePoeninja when the price file is missing", () => {
+  it("sends the error to main's log, which Settings, Debug shows", async () => {
+    usePoeninja();
+    servePriceFile("", 404);
+    await selectLeague("Fixture League G");
+
+    expect(sentToMain).toEqual([
+      {
+        name: "CLIENT->MAIN::log-entry",
+        payload: {
+          level: "warn",
+          message:
+            "Loading prices failed: No price file for Fixture League G (404)",
+        },
+      },
+    ]);
   });
 });
 

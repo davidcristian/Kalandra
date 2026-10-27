@@ -10,6 +10,7 @@ import {
   ITEM_DROP as BUNDLED_ITEM_DROP,
 } from "@/assets/data";
 import { priceFileUrl } from "./price-source";
+import { logToMain } from "./log-to-main";
 
 export type NinjaSchema = NinjaSchemaV1;
 type NinjaSchemaV1 = {
@@ -218,7 +219,10 @@ export const usePoeninja = createGlobalState(() => {
 
       lastUpdateTime = Date.now();
     } catch (e) {
-      if (controller === downloadController) console.warn(e);
+      if (controller === downloadController) {
+        console.warn(e);
+        logToMain("warn", `Loading prices failed: ${(e as Error).message}`);
+      }
     } finally {
       if (controller === downloadController) isLoading.value = false;
     }

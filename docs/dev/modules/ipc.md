@@ -28,6 +28,7 @@ type check covers the files it imports. The routes that move the messages are in
 | `CLIENT->MAIN::update-host-config` | `HostConfig` | `pushHostConfig()` in `Config.ts` | `main.ts` |
 | `CLIENT->MAIN::used-recently` | `isOverlay` | `OverlayWindow.vue`, on mount and on focus; `server.ts`, for the one client left after a close | `server.ts` (the last active client), `OverlayWindow` |
 | `CLIENT->MAIN::user-action` | `action`: `check-for-update`, `update-and-restart` or `quit`; or `stash-search` with `text` | `about.vue`, `SettingsWindow.vue`, `WidgetStashSearch.vue`, `hotkeyable-actions.ts` | `AppUpdater`, `AppTray`, `Shortcuts` |
+| `CLIENT->MAIN::log-entry` | `level`: `error`, `warn` or `info`; `message` | `logToMain()` in `log-to-main.ts`, called by `load()` in `Prices.ts` when a price file load fails | `logRendererEntries()` in `renderer-log.ts`, which writes the line through `Logger` |
 | `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
 | `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetTimer.vue` |
@@ -109,6 +110,15 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   key another program holds, found when the game window becomes active). A hotkey that two actions share is not
   listed, since the Settings window finds those in the config it edits.
 
+`renderer-log.ts`:
+
+- `IpcRendererLogEntry` is the `CLIENT->MAIN::log-entry` member of `IpcEvent`, kept out of `types.ts` for the same
+  reason, with its `RendererLogLevel`. main writes it as `<level> [renderer] <message>`, so it shows in Settings,
+  Debug among main's own lines. It writes only the first line of `message`, cut to 500 characters
+  (`RENDERER_LOG_CHARS`), and for a payload without a known `level` and a text `message` it writes
+  `warn [renderer] Ignored a log entry without a known level and a text message`. A caller sends text it wrote,
+  never a cookie, a token or a session ID.
+
 `config-problem.ts`:
 
 - `ConfigProblem` is the `configProblem` of `HostState`, kept out of `types.ts` for the same reason. It says why
@@ -140,10 +150,10 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
   not expose the socket's state.
 - A message crosses as JSON text, so a payload holds only values that survive `JSON.stringify()`. `item` in
   `item-text` is set only through `selfDispatch()`, which does not serialize, to pass an already parsed item.
-- Neither end checks a payload. `server.ts` ignores and logs a message that is not JSON, has no string `name` or
-  names an event main has no handler for, and logs a handler that throws; `IPC.ts` passes the untyped result of
-  `JSON.parse()` to `selfDispatch()`. main serves the renderer files it was packaged with, so both ends come from
-  one build.
+- Neither end checks a payload, except main's `CLIENT->MAIN::log-entry` handler, which writes the page's text to
+  its log. `server.ts` ignores and logs a message that is not JSON, has no string `name` or names an event main has
+  no handler for, and logs a handler that throws; `IPC.ts` passes the untyped result of `JSON.parse()` to
+  `selfDispatch()`. main serves the renderer files it was packaged with, so both ends come from one build.
 - A new `HostConfig` field is set in `getConfigForHost()` and in the expected payload of
   `renderer/specs/web/host-config.test.ts`, whose types make `tsc` fail until it is, and is read in the `main.ts`
   handler. A setting main needs follows the hard rule as well ([config.md](config.md)).
@@ -152,12 +162,15 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 - A change to a `ClientLogEvent` member changes `client-log.ndjson`, so it updates
   [client-log-parser.md](../../client-log-parser.md) in the same commit.
 
-**Dependencies.** None: `KeyToCode.ts`, `library.ts`, `hotkeys.ts` and `config-problem.ts` import nothing, and
-`types.ts` imports only `library.ts`, `hotkeys.ts` and `config-problem.ts`. main imports them in `server.ts`,
-`AppUpdater.ts`, `Shortcuts.ts`, `registrable-actions.ts`, `GameConfig.ts`, `FileWriter.ts` and `ConfigStore.ts`;
-the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `HotkeyInput.vue`, `settings/hotkey-conflicts.ts` and `library/session.ts`.
+**Dependencies.** None: `KeyToCode.ts`, `library.ts`, `hotkeys.ts`, `renderer-log.ts` and `config-problem.ts`
+import nothing, and `types.ts` imports only those four. main imports them in `server.ts`, `AppUpdater.ts`,
+`Shortcuts.ts`, `registrable-actions.ts`, `GameConfig.ts`, `FileWriter.ts`, `ConfigStore.ts` and `renderer-log.ts`;
+the renderer in `IPC.ts`, `Config.ts`, `client-log/`, `LoadingAnimation.vue`, `HotkeyInput.vue`,
+`settings/hotkey-conflicts.ts`, `library/session.ts` and `log-to-main.ts`.
 
 **Tests.** `main/specs/key-names.test.ts` checks the functions of `KeyToCode.ts` and that its tables agree, and
-`renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes. The type checks are `npm
-run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs both pre-commit type
-check hooks. No hook runs ESLint or Prettier on `ipc/`, locally or in CI.
+`renderer/specs/web/client-log.test.ts` checks the `ClientLogEvent` values the parser makes.
+`main/specs/renderer-log.test.ts` sends `log-entry` payloads, valid and not, through a fake server and reads main's
+log, and `renderer/specs/web/prices-selection.test.ts` reads the `log-entry` that a missing price file sends. The
+type checks are `npm run build` in `main/` and `npm run check-types` in `renderer/`, and a change under `ipc/` runs
+both pre-commit type check hooks. No hook runs ESLint or Prettier on `ipc/`, locally or in CI.

@@ -26,19 +26,20 @@ waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
 ## Where the logs are
 
 - **Settings, Debug** shows the last 1000 lines main has written since it started (`Logger` in
-  `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. To open Settings,
-  press the overlay key (Shift + Space) and click the cog icon in the main button bar. The tray item
+  `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. A line the page
+  sends to main has the area `renderer` (`main/src/renderer-log.ts`). To open Settings, press the
+  overlay key (Shift + Space) and click the cog icon in the main button bar. The tray item
   Settings/League only shows a message that says this.
 - **Record all key presses**, a checkbox in Settings, Debug, makes main log every key pressed
   while the game window is active as `debug [Shortcuts] Keydown <keys>` and
   `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
   `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`,
   `paste-in-chat`, `stash-search` or `trigger-event`.
-- **The renderer's console** holds what the page logs, such as a price file that failed to load. A
-  dev run opens the developer tools at start. In a packaged build, focus the overlay and press
-  Ctrl + Shift + I: the overlay window's menu has the `toggleDevTools` role
-  (`main/src/windowing/OverlayWindow.ts`), and Electron binds that role to Ctrl + Shift + I on
-  Windows.
+- **The renderer's console** holds what the page logs. Of these lines, only a failed price file
+  load is also in Settings, Debug. A dev run opens the developer tools at start. In a packaged
+  build, focus the overlay and press Ctrl + Shift + I: the overlay window's menu has the
+  `toggleDevTools` role (`main/src/windowing/OverlayWindow.ts`), and Electron binds that role to
+  Ctrl + Shift + I on Windows.
 - **The config folder** opens from the tray item Open config folder.
 
 Four lines from `main/src/shortcuts/` apply to every key below:
@@ -146,9 +147,11 @@ General, sets another path), and uses Alt when the file does not set it
   wiki", that key on an item opens `https://www.poe2wiki.net/wiki/<English item name>` in the
   default browser (`openWiki` in `renderer/src/web/item-check/hotkeyable-actions.ts`).
 - **Logs:** `debug [Shortcuts] Action type: copy-item` with key recording on.
-  `error [proxy] <message> (<host>)` when main cannot reach a site. In the renderer's console,
-  `No price file for <league> (<status>)` when the price file is missing
-  (`renderer/src/web/background/Prices.ts`).
+  `error [proxy] <message> (<host>)` when main cannot reach a site.
+  `warn [renderer] Loading prices failed: No price file for <league> (<status>)` when the price
+  file is missing (`renderer/src/web/background/Prices.ts`), and
+  `warn [renderer] Loading prices failed: <reason>` for any other failed load, such as one after an
+  `error [proxy]` line for `kalandra.ashoal.com`. The renderer's console shows the same errors.
 
 ## 5. Chat commands
 

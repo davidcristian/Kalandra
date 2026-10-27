@@ -6,6 +6,7 @@ import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
 import { type ListenAddress, pageUrl } from "./listen-option";
 import { Logger } from "./RemoteLogger";
+import { logRendererEntries } from "./renderer-log";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
 import { GameConfig } from "./host-files/GameConfig";
@@ -61,6 +62,7 @@ startWhenReady(
   async () => {
     tray = new AppTray(eventPipe);
     const logger = new Logger(eventPipe);
+    logRendererEntries(eventPipe, logger);
     const gameConfig = new GameConfig(logger);
     const poeWindow = new GameWindow();
     const appUpdater = new AppUpdater(eventPipe, logger);

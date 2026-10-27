@@ -31,6 +31,8 @@ replaces it with `vi.mock("electron", ...)`.
   site and to the other hosts, and reads the headers of a response that sets a cookie. The test also passes `set-cookie`
   headers through the listener the proxy adds to the default session.
 - `RemoteLogger.test.ts` writes more entries than the history keeps.
+- `renderer-log.test.ts` sends `CLIENT->MAIN::log-entry` payloads through `FakeServer` and reads the lines main's log
+  broadcasts: one with line breaks, one over the length limit, and payloads without a known level or a text message.
 - `uncaught-errors.test.ts` emits uncaught errors and unhandled rejections of each kind of value from an `EventEmitter`
   in place of `process`.
 
