@@ -1,6 +1,6 @@
 # Two data builds write different stats files when Python's hash seed differs
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/services/nd_builder_service.py](../../../../dataParser/src/services/nd_builder_service.py)
 **Verified:** 2026-10-27
@@ -22,3 +22,9 @@ ids of the same rows in two orders and expects one result.
 
 - 2026-10-27: Found when two full builds were compared byte for byte
   ([108](108-dataparser-unit-tests-need-the-export.md)).
+- 2026-10-27: The set was in `share_trade_ids` in `english_stat_list.py`, which runs after
+  `dedupe_matchers`. A shared stat now lists its own types first, then the others in ref order.
+  Builds with seeds 0, 1 and 12345 then wrote the same files byte for byte. The committed files
+  came from a random seed, so the next data update reorders the keys of 16 lines once; the old
+  code differed from them in 24 lines with seed 0 and 19 with seed 1. Became
+  `fix(dataparser): order shared trade ids the same way in every build`.

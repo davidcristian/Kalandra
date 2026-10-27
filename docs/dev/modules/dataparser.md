@@ -151,11 +151,12 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   `src/services/value_converter_service.py`). Every language gets the English stat list
   (`src/services/english_stat_list.py`): the same refs and a stat for every English trade id. Stats that share an
   English matcher text become one stat in every language, under the ref the English build keeps. Stats that only the
-  language gives the same text stay apart, and each gets the trade ids of all of them, so a search finds any of
-  them. A stat that the language's trade site does not list takes its matchers from the game's descriptions, and
-  has none when the game has no description for it either: on 25 Oct 2026 `pathofexile.tw` listed 5915 of the 8229
-  stat ids of `www.pathofexile.com`, so 33 Traditional Chinese stats, such as the `Bonded:` rune stats, have no
-  matchers.
+  language gives the same text stay apart, and each gets the trade ids of all of them, so a search finds any of them.
+  The `trade.ids` of each list its own types first, then the other types in the order of their refs, so the file does
+  not change with `PYTHONHASHSEED`. A stat that the language's trade site does not list takes its matchers from the
+  game's descriptions, and has none when the game has no description for it either: on 25 Oct 2026 `pathofexile.tw`
+  listed 5915 of the 8229 stat ids of `www.pathofexile.com`, so 33 Traditional Chinese stats, such as the `Bonded:` rune
+  stats, have no matchers.
 - `items.ndjson`, one line per item: `name` (this language), `refName` (English), `namespace`, `icon`, `tags`, `w`,
   `h`, and `craftable`, `unique`, `tradeTag`, `armour` and `augment` where they apply. A unique's `refName`
   is its name on the English trade site, and its `name` is the `Text2` of the game's `Words` row whose English

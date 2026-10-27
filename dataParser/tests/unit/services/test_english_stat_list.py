@@ -1,6 +1,12 @@
 import pandas as pd
 
-from services.english_stat_list import share_trade_ids, text_by_ref, with_language_text
+from services.english_stat_list import (
+    TradeIds,
+    linked_trade_ids,
+    share_trade_ids,
+    text_by_ref,
+    with_language_text,
+)
 
 
 def test_with_language_text_keeps_each_english_stat_and_only_those():
@@ -94,3 +100,43 @@ def test_share_trade_ids_leaves_the_given_stats_unchanged():
     _ = share_trade_ids(stats, [{"Gain # Rage on Hit", "Grants # Rage on Hit"}])
 
     assert stats["trade"].tolist() == rage_stats()["trade"].tolist()
+
+
+def test_share_trade_ids_lists_each_stats_own_trade_ids_first():
+    result = share_trade_ids(
+        rage_stats(), [{"Gain # Rage on Hit", "Grants # Rage on Hit"}]
+    )
+
+    keys = [list(trade["ids"]) for trade in result["trade"]]
+    assert keys == [["explicit", "implicit"], ["implicit", "explicit"], ["explicit"]]
+
+
+def rage_ids() -> dict[str, TradeIds]:
+    return {
+        "Gain # Rage on Hit": {"explicit": ["explicit.stat_2258007247"]},
+        "Grants # Rage on Hit": {"implicit": ["implicit.stat_1725749947"]},
+        "# Rage on Hit": {
+            "enchant": ["enchant.stat_1725749947"],
+            "explicit": ["explicit.stat_1725749947"],
+        },
+    }
+
+
+def test_linked_trade_ids_gives_one_result_for_the_same_stats_in_two_orders():
+    refs = list(rage_ids())
+    reversed_ids = dict(reversed(rage_ids().items()))
+
+    first = linked_trade_ids("Gain # Rage on Hit", refs, rage_ids())
+    second = linked_trade_ids("Gain # Rage on Hit", refs[::-1], reversed_ids)
+
+    assert list(first.items()) == list(second.items())
+
+
+def test_linked_trade_ids_lists_the_own_types_first_then_the_others_in_ref_order():
+    result = linked_trade_ids("Grants # Rage on Hit", set(rage_ids()), rage_ids())
+
+    assert list(result.items()) == [
+        ("implicit", ["implicit.stat_1725749947"]),
+        ("enchant", ["enchant.stat_1725749947"]),
+        ("explicit", ["explicit.stat_1725749947", "explicit.stat_2258007247"]),
+    ]

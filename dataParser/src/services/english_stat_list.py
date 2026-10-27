@@ -1,7 +1,7 @@
 """Keeps the stats of every language to the English stat list."""
 
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 import pandas as pd
 
@@ -43,11 +43,7 @@ def share_trade_ids(
     def trade_of(ref: str, trade: dict[str, TradeIds]) -> dict[str, TradeIds]:
         if ref not in linked:
             return trade
-        ids: defaultdict[str, set[str]] = defaultdict(set)
-        for other in linked[ref]:
-            for mod_type, other_ids in ids_by_ref[other].items():
-                ids[mod_type].update(other_ids)
-        return {**trade, "ids": {mod_type: sorted(v) for mod_type, v in ids.items()}}
+        return {**trade, "ids": linked_trade_ids(ref, linked[ref], ids_by_ref)}
 
     out = stats.copy()
     out["trade"] = pd.Series(
@@ -56,3 +52,15 @@ def share_trade_ids(
         dtype=object,
     )
     return out
+
+
+def linked_trade_ids(
+    ref: str, linked_refs: Iterable[str], ids_by_ref: Mapping[str, TradeIds]
+) -> TradeIds:
+    """Merges the trade ids of a stat and its linked stats: its own types first, then theirs in ref order."""
+    # The order of a set of strings changes with PYTHONHASHSEED, and the key order is written to stats.ndjson
+    ids: defaultdict[str, set[str]] = defaultdict(set)
+    for other in [ref, *sorted(set(linked_refs) - {ref})]:
+        for mod_type, other_ids in ids_by_ref[other].items():
+            ids[mod_type].update(other_ids)
+    return {mod_type: sorted(v) for mod_type, v in ids.items()}
