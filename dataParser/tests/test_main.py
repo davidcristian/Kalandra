@@ -86,6 +86,17 @@ def test_main_matches_a_trade_stat_to_its_english_text(build: Path):
     assert life["trade"]["ids"]["explicit"] == ["explicit.stat_3299347043"]
 
 
+@needs_game_export
+@needs_trade_data
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_main_writes_the_skills_that_bases_grant(build: Path, lang: str):
+    stats = read_ndjson(build / "output" / lang / "stats.ndjson")
+
+    granted = [stat["id"] for stat in stats if stat["trade"]["ids"] is None]
+
+    assert {"parry", "raise_shield", "spear_throw"} <= set(granted)
+
+
 def trade_ids(stats: list[dict[str, Any]]) -> set[str]:
     return {
         trade_id

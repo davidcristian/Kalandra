@@ -23,6 +23,7 @@ from constants.known_stats import (
 from constants.lang import ENGLISH, LANG
 from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
 from services import english_stat_list
+from services.granted_skills import granted_skill_stats
 from services.image_provider import DEFAULT_LEAGUE, MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
 from services.nd_builder_functions import (
@@ -102,7 +103,8 @@ class NdBuilderService:
 
         logger.info("Adding logbook factions")
         log_faction = self.logbook_factions.get_out_factions()
-        log_added = pd.concat([missing_filled, log_faction]).sort_values("ref")
+        skills = granted_skill_stats(self.game_store, self.ref_game_store)
+        log_added = pd.concat([missing_filled, log_faction, skills]).sort_values("ref")
 
         logger.info("Cleaning up stats")
         return self.clean_up_ndjson(log_added)

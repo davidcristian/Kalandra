@@ -138,7 +138,9 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
 - `stats.ndjson`, one line per stat: `ref` (the English text), `better`, `matchers` (the text in this language, with
   `#` for a number) and `trade.ids` (the trade site's stat ids by type, or `null` for a stat without any, such as a
   logbook faction), plus `id`, `dp`, `fromAreaMods`, `trade.option` and `trade.inverted` where they apply. The parser
-  matches mod lines against `matchers`. The types of a trade id without a `|<value>` part are those in `MOD_TYPES`
+  matches mod lines against `matchers`. The skills that a base grants without a level, such as `Grants Skill: Parry`,
+  take their text from the client string `ItemDisplayGrantedSkillNoScaling` and the gem names that
+  `GRANTED_SKILL_GEMS` in `src/services/granted_skills.py` lists, since the export has no table that links them. The types of a trade id without a `|<value>` part are those in `MOD_TYPES`
   (`src/constants/mod_types.py`), with `augment` written as `rune`. Any other type on such an id in the trade site's
   `stats.json` stops the build with a `ValueError`. Each matcher of `Allocates #` has `oils`, the English item names
   of the three oils that anoint the notable, from the game's `BlightCraftingItems` rows (`get_blight()` in
