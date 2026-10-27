@@ -25,3 +25,5 @@ lists the script.
 ## History
 
 - 2026-10-18: Found while the dataParser module doc was written.
+- 2026-10-27: The maintainer chose to remove the script, its constants in `src/constants/css.py` and
+  its mention in modules/dataparser.md.

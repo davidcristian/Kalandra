@@ -39,3 +39,6 @@ committed files; or record that the data is maintained another way. Step 5 of
 
 - 2026-10-18: Found while the game data update runbook was written, by comparing the tool's
   `output/` with `renderer/public/data/`.
+- 2026-10-27: The maintainer chose to bring this copy up to the committed data. First compare a
+  build from the local game export with the committed files, then write each missing builder, the
+  Waystone `map` field first, until a run reproduces them.

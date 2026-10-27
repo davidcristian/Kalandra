@@ -31,3 +31,5 @@ Done looks like: the maintainer's choice is in the History and in
 - 2026-10-22: Deleted the commented-out `dialog.showErrorBox` in `initConfig()`, titled
   `Kalandra: incompatible configuration`, which described this case from the `catch` block for a
   file that does not parse.
+- 2026-10-27: The maintainer chose to use the newer file as it is and log a warning. Left: the
+  warning, a test with a `configVersion` above the current one, and the rule in ADR-0003.

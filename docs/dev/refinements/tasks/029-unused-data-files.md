@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** data
 **Origin:** [renderer/public/data/remnants.json](../../../../renderer/public/data/remnants.json)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Three tracked files have no reader:
 
@@ -30,3 +30,5 @@ and its generator in modules/dataparser.md, so that the next data update writes 
   tree for each file name.
 - 2026-10-18: Checked against the tree. Replaced the search result for `remnant`: the game data
   and the test data contain the word in many item and stat names, and no code file contains it.
+- 2026-10-27: The maintainer confirmed that the three files are unused and chose to remove them.
+  Checked again: no code reads any of them.

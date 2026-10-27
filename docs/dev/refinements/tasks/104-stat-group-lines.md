@@ -1,6 +1,6 @@
 # The data loader cannot read the stat group lines of Exiled Exchange 2's newer data
 
-**Status:** open
+**Status:** declined 2026-10-27
 **Area:** data
 **Origin:** [docs/dev/runbooks/cherry-pick-upstream.md](../../runbooks/cherry-pick-upstream.md)
 **Verified:** 2026-10-26
@@ -40,3 +40,8 @@ jewel and a helmet.
 ## History
 
 - 2026-10-26: Found when the two commits were tried as cherry-picks and aborted.
+- 2026-10-27: Declined both commits. The bug that the second fixes is not in Kalandra. The committed
+  data has no group lines, and the data tool, which is to reproduce the committed data
+  ([052](052-dataparser-older-than-committed-data.md)), writes none. The first conflicts with
+  Kalandra's lookups, which read every row with a hash. A later need for group lines starts as a new
+  task.

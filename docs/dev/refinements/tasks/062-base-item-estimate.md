@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** renderer
 **Origin:** [renderer/src/web/price-check/trends/getDetailsId.ts](../../../../renderer/src/web/price-check/trends/getDetailsId.ts)
-**Verified:** 2026-10-19
+**Verified:** 2026-10-27
 
 For a normal, magic or rare weapon, armour piece, ring, amulet, belt or quiver, `isValuableBasetype()`
 in `getDetailsId.ts` is true, and `getDetailsId()` returns the query of `forBasetype()`: namespace
@@ -22,3 +22,6 @@ weapon gets no base item query.
 
 - 2026-10-19: Found while the price check page was compared with the code. The page said these items
   show the price of their base item; it now says they have no estimate.
+- 2026-10-27: The maintainer chose to remove `forBasetype()` and the base item branches of
+  `PriceTrend.vue`. Checked again: none of the 23 categories in `namespaceMap.json` holds base
+  types.

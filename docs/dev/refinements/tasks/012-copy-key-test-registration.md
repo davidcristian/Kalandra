@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** main
 **Origin:** [main/src/shortcuts/Shortcuts.ts](../../../../main/src/shortcuts/Shortcuts.ts)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `updateActions()` in `main/src/shortcuts/Shortcuts.ts` adds an action of type `test-only` for the
 copy keys: `Ctrl + C` merged with the game's advanced item descriptions key, so `Ctrl + Alt + C` by
@@ -29,3 +29,6 @@ and the two pages stop saying that the line can name the copy keys.
 
 - 2026-10-18: Found while the ipc module doc was written, by reading `updateActions()` and
   `register()`.
+- 2026-10-27: The maintainer chose to remove the `test-only` action. Checked again: the filter in
+  `registrable-actions.ts` still removes it. Left: remove the action and correct
+  docs/nothing-happens.md and docs/no-item-mods.md.

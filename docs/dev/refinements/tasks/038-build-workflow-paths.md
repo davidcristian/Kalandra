@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** ci
 **Origin:** [.github/workflows/main.yml](../../../../.github/workflows/main.yml)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The Build workflow in `.github/workflows/main.yml` packages the app on Windows, Linux and macOS and
 uploads the packages to the draft release for the current version, if one exists. It runs on a push
@@ -28,3 +28,6 @@ change with it: the CI table in [architecture.md](../../architecture.md),
   `paths-ignore` with the Safety section.
 - 2026-10-18: The task review restated the title as a defect, added `priceService/` and
   `dataParser/` as paths that run Build, and added architecture.md to the docs that change.
+- 2026-10-27: The maintainer chose to run Build only for changes to the app: a `paths` list of
+  `main/**`, `renderer/**`, `ipc/**` and the `main.yml` and `test.yml` workflows replaces
+  `paths-ignore`. Packaging reads nothing outside `main/` and `renderer/dist`.

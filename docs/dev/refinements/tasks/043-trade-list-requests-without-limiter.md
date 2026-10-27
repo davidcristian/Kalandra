@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** trade
 **Origin:** [AGENTS.md](../../../../AGENTS.md#architecture-rules)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 The proxy rule in Architecture rules of AGENTS.md says every search, fetch and exchange request goes through the
 `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`. Those are the requests in
@@ -26,3 +26,7 @@ Done looks like: a decision for the maintainer. Either the three requests wait o
 - 2026-10-18: Found while ADR-0005 and the renderer price check module doc were written, by listing every
   `Host.proxy` call to the trade site. The same day, the AGENTS.md rule was narrowed to the search, fetch and
   exchange requests, which leaves this code question.
+- 2026-10-27: The maintainer chose no limiter, with the reason in ADR-0005. The item and stat lists
+  load when the app starts or changes language, then at most every 2 hours and only after a price
+  check in the last hour. The league list loads when the overlay starts and on each Retry. Left:
+  that reason, and `load()` in `Leagues.ts` returns while a load runs, with a test.

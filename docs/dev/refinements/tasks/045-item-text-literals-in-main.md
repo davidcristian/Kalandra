@@ -28,3 +28,6 @@ item class line, since neither language has a `client_strings.js`.
 ## History
 
 - 2026-10-18: Found while the main module doc and ADR-0007 were written.
+- 2026-10-27: The maintainer chose to allow the literals: language detection must recognize
+  languages the app has no data for, so it cannot come from that data. Left: the exception in
+  AGENTS.md and ADR-0007.

@@ -26,3 +26,6 @@ AGENTS.md match it.
 
 - 2026-10-22: Found by a search for `patreon` in the repo. Filed when ADR-0001 and AGENTS.md were
   corrected to state that the links in the app are inside HTML comments.
+- 2026-10-27: The maintainer chose to leave the links out. Left: delete the two blocks and the
+  `Support development on` key from every `app_i18n.json`, and make ADR-0001 and AGENTS.md match.
+  The README, `.github/FUNDING.yml` and the patron list in Settings keep the credit.

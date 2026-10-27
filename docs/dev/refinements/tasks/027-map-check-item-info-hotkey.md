@@ -26,3 +26,4 @@ task is declined.
   `hotkeys.vue`.
 - 2026-10-18: Checked against the tree. Removed the option to document the shared key, because
   docs/settings.md and docs/map-check.md already say the two rows set one key.
+- 2026-10-27: The maintainer chose one row whose label names both uses.

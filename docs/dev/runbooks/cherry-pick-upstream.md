@@ -44,7 +44,9 @@ marks with `-` each commit whose change is already in `master` unchanged, and wi
 
 Read the commit with `git show <commit>` before taking it. Leave out a commit that undoes a
 Kalandra decision: an upstream version bump, a link back to Kvan7's repo, or a change to where
-prices come from ([ADR-0006](../adr/ADR-0006-own-price-service.md)).
+prices come from ([ADR-0006](../adr/ADR-0006-own-price-service.md)). The two commits that add stat
+group lines to `stats.ndjson` are declined, for the reasons in
+[task 104](../refinements/tasks/104-stat-group-lines.md).
 
 ## Take it
 

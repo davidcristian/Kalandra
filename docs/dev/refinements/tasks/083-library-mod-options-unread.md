@@ -22,3 +22,6 @@ upgrade step deletes it from saved configs, and no existing step changes.
 
 - 2026-10-22: Found while the commented-out mod option checkboxes and their unused bindings were
   removed from `ProfileSettings.vue`. The saved field was kept, because it is user data.
+- 2026-10-27: The maintainer chose to remove `modOpts`. Left: remove it from the profile type in
+  `widget.ts` and from `initInstance()`, and add an upgrade step that deletes it from saved
+  profiles.

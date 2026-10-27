@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** dataparser
 **Origin:** [dataParser/src/services/image_provider.py](../../../../dataParser/src/services/image_provider.py)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-27
 
 `ImageProvider` in `image_provider.py` reads the item image cache `src/services/itemImageCache.json`,
 which is not committed. Its constructor creates that file when it is missing, and `main()` in `main.py`
@@ -31,3 +31,6 @@ the cache stays outside the repo, the cache. The `.gitkeep` files stay tracked.
   on the paths a run writes.
 - 2026-10-25: The backup moved from the `ImageProvider` constructor to `main()`. The other claims
   still hold: no `.gitignore` matches these paths, and the count is still 445.
+- 2026-10-27: The maintainer chose to keep the cache local to each machine. Left:
+  `dataParser/.gitignore` ignores the cache, its backup, the game export and the trade data and
+  keeps the `.gitkeep` files, and the game data update runbook says the cache is local.

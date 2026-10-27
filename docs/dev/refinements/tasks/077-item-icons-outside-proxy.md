@@ -1,6 +1,6 @@
 # Item icons load from web.poecdn.com outside the proxy
 
-**Status:** open
+**Status:** declined 2026-10-27
 **Area:** renderer
 **Origin:** [ADR-0005](../../adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)
 **Verified:** 2026-10-22
@@ -30,3 +30,6 @@ AGENTS.md and architecture.md match it.
 
 - 2026-10-22: Found by a search for `<img>` bindings and the hosts of the `icon` fields. Filed when
   ADR-0005 and AGENTS.md were corrected to name the item icons as an exception.
+- 2026-10-27: Declined. The maintainer chose to keep the direct loads and the written exception. The
+  icons come from a static image host, not the trade API that rate limits and bans clients, and
+  loading them through `/proxy` needs another way past the check of ADR-0009.

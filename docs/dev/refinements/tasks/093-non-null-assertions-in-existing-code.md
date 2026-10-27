@@ -37,3 +37,6 @@ count.
   `present()` in the specs. `existingOffenders` in main is empty, and the renderer keeps 26 in
   `web/Config.ts`, all in `upgradeConfig()` steps, which never change. Closing the task needs a
   decision: add this rule to the `eslint-disable` line at the top of `upgradeConfig()`.
+- 2026-10-27: The maintainer chose to add the rule to the `eslint-disable` line at the top of
+  `upgradeConfig()`, whose old steps never change. Left: that line with its reason, and
+  `--prune-suppressions` to empty `eslint-suppressions.json`.
