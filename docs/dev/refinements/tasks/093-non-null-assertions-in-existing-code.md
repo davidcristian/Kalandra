@@ -3,16 +3,15 @@
 **Status:** open
 **Area:** rules
 **Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 A non-null assertion (`value!`) tells TypeScript that a value is not `null` or `undefined` without
 checking it, so a missing value fails later, at the line that reads it. ESLint checks
 `@typescript-eslint/no-non-null-assertion` in both processes, except for the code that broke it
-when it was turned on. In main, `existingOffenders` in `main/eslint.config.mjs` turns the rule off
-for the three spec files listed. In the renderer, `renderer/eslint-suppressions.json` holds the
-count of each file. Most are in the specs, in `web/Config.ts`, whose `upgradeConfig()` steps never
-change, in `trade/pathofexile-trade.ts` and in the price check filters, where many assert a
-filter's `roll`.
+when it was turned on. In main, `existingOffenders` in `main/eslint.config.mjs` turns a rule off
+for the files listed, and lists none for this rule. In the renderer,
+`renderer/eslint-suppressions.json` holds the count of each file, and only `web/Config.ts` is left,
+in `upgradeConfig()` steps, which never change.
 
 Done looks like: each place narrows the value with a check that handles the missing case, uses
 optional chaining where `undefined` is fine, or gets a type that cannot be missing. Then its file
@@ -33,3 +32,8 @@ count.
   that file is in `upgradeConfig()` steps, which never change, and in `AppConfig()`.
 - 2026-10-26: The 16 in `web/client-log/client-log-parser.ts` were replaced by reading the named
   groups of each match with optional chaining.
+- 2026-10-27: The rest of the app code, the specs and the two main specs dropped theirs, through
+  `requireWidget()`, `priceCheckConfig()`, the inject helpers, `hasRoll()` for the filters and
+  `present()` in the specs. `existingOffenders` in main is empty, and the renderer keeps 26 in
+  `web/Config.ts`, all in `upgradeConfig()` steps, which never change. Closing the task needs a
+  decision: add this rule to the `eslint-disable` line at the top of `upgradeConfig()`.
