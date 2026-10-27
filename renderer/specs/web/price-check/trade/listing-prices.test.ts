@@ -162,10 +162,10 @@ describe("requestResults prices", () => {
     expect(byId("2fa2f1ee71").priceDivines).toBe(3);
     expect(byId("65c7c4e8e6").priceDivines).toBeUndefined();
     expect(suggestPrice(results)).toEqual({
-      price: 0.002835,
-      low: 0.002835,
+      price: 0.001846,
+      low: 0.001846,
       high: 0.002835,
-      reliability: "high",
+      reliability: "medium",
       sellers: 14,
       leftOut: 0,
     });

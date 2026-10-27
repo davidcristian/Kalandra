@@ -45,11 +45,11 @@ describe("inDivines", () => {
 });
 
 describe("suggestPrice", () => {
-  it("takes the 25th percentile as the price and the 10th to 50th as the range", () => {
+  it("takes the cheapest seller as the price and the range up to the 25th percentile", () => {
     expect(suggestPrice(sellers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))).toEqual({
-      price: 3.5,
-      low: 2,
-      high: 6,
+      price: 1,
+      low: 1,
+      high: 3.5,
       reliability: "low",
       sellers: 11,
       leftOut: 0,
@@ -62,12 +62,13 @@ describe("suggestPrice", () => {
       listing(2, "many"),
       listing(9, "many"),
       listing(4, "other"),
+      listing(6, "third"),
     ];
 
     expect(suggestPrice(listings)).toMatchObject({
-      low: 2.2,
+      price: 2,
       high: 3,
-      sellers: 2,
+      sellers: 3,
     });
   });
 
@@ -76,10 +77,10 @@ describe("suggestPrice", () => {
       listing(0.5, "me", { isMine: true }),
       listing(undefined, "unknown currency"),
       listing(0, "no price"),
-      ...sellers(2, 2),
+      ...sellers(2, 2, 2),
     ];
 
-    expect(suggestPrice(listings)).toMatchObject({ price: 2, sellers: 2 });
+    expect(suggestPrice(listings)).toMatchObject({ price: 2, sellers: 3 });
   });
 
   it("leaves out a cheap listing that is not instant buyout, but keeps a cheap instant one", () => {
@@ -88,35 +89,43 @@ describe("suggestPrice", () => {
     const rest = sellers(10, 10, 10, 10);
 
     expect(suggestPrice([fixer, ...rest])).toMatchObject({
-      low: 10,
+      price: 10,
       sellers: 4,
       leftOut: 1,
     });
     expect(suggestPrice([instant, ...rest])).toMatchObject({
+      price: 1,
       sellers: 5,
       leftOut: 0,
     });
   });
 
-  it("keeps a listing that is not instant buyout at 40% of the median", () => {
+  it("keeps a listing that is not instant buyout at 40% of the median, and prices at the cheapest instant one", () => {
     const listings = [
       listing(4, "online", { isInstantBuyout: false }),
       ...sellers(10, 10),
     ];
 
-    expect(suggestPrice(listings)).toMatchObject({ sellers: 3, leftOut: 0 });
+    expect(suggestPrice(listings)).toMatchObject({
+      price: 10,
+      low: 4,
+      high: 10,
+      sellers: 3,
+      leftOut: 0,
+    });
   });
 
-  it("returns null for fewer than two sellers", () => {
+  it("returns null for fewer than three sellers", () => {
     expect(suggestPrice([])).toBeNull();
     expect(suggestPrice([listing(3, "only"), listing(4, "only")])).toBeNull();
+    expect(suggestPrice(sellers(1, 2))).toBeNull();
     const fixer = listing(1, "fixer", { isInstantBuyout: false });
-    expect(suggestPrice([fixer, listing(10, "seller")])).toBeNull();
+    expect(suggestPrice([fixer, ...sellers(10, 10)])).toBeNull();
   });
 
   it("rates high from 8 sellers whose range top is at most 1.5 times its bottom", () => {
-    const tight = sellers(10, 10, 10, 15, 15, 15, 15, 15);
-    const wider = sellers(10, 10, 10, 15.1, 15.1, 15.1, 15.1, 15.1);
+    const tight = sellers(10, 15, 15, 15, 15, 15, 15, 15);
+    const wider = sellers(10, 15.1, 15.1, 15.1, 15.1, 15.1, 15.1, 15.1);
 
     expect(suggestPrice(tight)?.reliability).toBe("high");
     expect(suggestPrice(wider)?.reliability).toBe("medium");
@@ -124,8 +133,10 @@ describe("suggestPrice", () => {
   });
 
   it("rates medium from 4 sellers whose range top is at most 2.5 times its bottom", () => {
-    expect(suggestPrice(sellers(10, 10, 40, 40))?.reliability).toBe("medium");
-    expect(suggestPrice(sellers(10, 10, 40.2, 40.2))?.reliability).toBe("low");
+    expect(suggestPrice(sellers(10, 30, 30, 30))?.reliability).toBe("medium");
+    expect(suggestPrice(sellers(10, 30.2, 30.2, 30.2))?.reliability).toBe(
+      "low",
+    );
     expect(suggestPrice(sellers(10, 10, 10))?.reliability).toBe("low");
   });
 });

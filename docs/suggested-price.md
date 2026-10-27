@@ -20,12 +20,12 @@ with their tier, so the search finds items with the same strong rolls. A jewel k
 
 ## What the line shows
 
-For example: **Suggested price:** `~ 6 ex (5 ~ 8 ex)` **high reliability**, after a yellow exclamation mark.
+For example: **Suggested price:** `~ 5 ex (5 ~ 8 ex)` **high reliability**, after a yellow exclamation mark.
 
 - The price after `~`, in your primary base currency, or in Divine Orbs when the whole range is above one Divine Orb.
-- The range in brackets: where most of the cheaper sellers ask.
+- The range in brackets: from the cheapest comparable listing up to where the cheapest quarter of sellers ask.
 - The reliability: **high reliability**, **medium reliability** or **low reliability**.
-- **too few listings** when fewer than two sellers are left to count.
+- **too few listings** when fewer than three sellers are left to count.
 
 Point at the line to see that the feature is experimental, how many sellers the price counts and how many it left
 out as likely price fixing.
@@ -39,14 +39,15 @@ out as likely price fixing.
 3. It leaves out a listing that you cannot buy at once and that asks for less than 40% of the median price. Such a
    listing is often price fixing: a low price whose seller does not reply to buyers. A listing you can buy at once
    always counts, since anyone can buy it at that price. The default listing type, **Instant**, shows only those.
-4. The suggested price is the 25th percentile of the prices left: with 20 sellers, about the fifth cheapest. The range
-   runs from the 10th to the 50th percentile.
+4. The suggested price is the cheapest listing left that you can buy at once. Anyone can buy a comparable item at
+   that price now, so a buyer pays no more for yours. The range runs from the cheapest listing left to the 25th
+   percentile of the prices: with 20 sellers, about the fifth cheapest.
 
 | Reliability | When |
 | --- | --- |
 | **high** | 8 or more sellers, and the top of the range is at most 1.5 times its bottom |
 | **medium** | 4 or more sellers, and the top of the range is at most 2.5 times its bottom |
-| **low** | 2 or more sellers otherwise |
+| **low** | 3 or more sellers otherwise |
 
 ## Limits
 

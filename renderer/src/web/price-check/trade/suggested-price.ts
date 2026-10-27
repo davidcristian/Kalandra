@@ -29,7 +29,7 @@ export interface SuggestedPrice {
 
 /** A listing that is not instant buyout and costs less than this share of the median is likely price fixing. */
 const PRICE_FIXING_SHARE = 0.4;
-const MIN_SELLERS = 2;
+const MIN_SELLERS = 3;
 
 /** Returns the value of a listing price in Divine Orbs, or undefined when the price file has no rate for it. */
 export function inDivines(
@@ -41,7 +41,7 @@ export function inDivines(
   return rate ? rate.primaryValue * price.amount : undefined;
 }
 
-/** Returns null when fewer than two sellers remain after the cleaning. */
+/** Returns null when fewer than three sellers remain after the cleaning. */
 export function suggestPrice(
   listings: readonly PricedListing[],
 ): SuggestedPrice | null {
@@ -62,19 +62,22 @@ export function suggestPrice(
     sellers.map((seller) => seller.priceDivines),
     0.5,
   );
-  const kept = sellers
-    .filter(
-      (seller) =>
-        seller.isInstantBuyout ||
-        seller.priceDivines >= median * PRICE_FIXING_SHARE,
-    )
-    .map((seller) => seller.priceDivines);
+  const keptSellers = sellers.filter(
+    (seller) =>
+      seller.isInstantBuyout ||
+      seller.priceDivines >= median * PRICE_FIXING_SHARE,
+  );
+  const kept = keptSellers.map((seller) => seller.priceDivines);
   if (kept.length < MIN_SELLERS) return null;
 
-  const low = percentile(kept, 0.1);
-  const high = percentile(kept, 0.5);
+  // A comparable item that anyone can buy at once caps what a buyer pays
+  const price =
+    keptSellers.find((seller) => seller.isInstantBuyout)?.priceDivines ??
+    kept[0];
+  const low = kept[0];
+  const high = Math.max(percentile(kept, 0.25), price);
   return {
-    price: percentile(kept, 0.25),
+    price,
     low,
     high,
     reliability: reliability(kept.length, high / low),
