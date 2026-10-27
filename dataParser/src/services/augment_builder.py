@@ -5,6 +5,7 @@ import pandas as pd
 
 from constants.filenames import (
     BASE_ITEM_TYPES,
+    ITEM_CLASSES,
     SOUL_CORE_STAT_CATEGORIES,
     SOUL_CORE_STATS,
     SOUL_CORES,
@@ -14,6 +15,7 @@ from constants.lang import ENGLISH
 from stores.game_store import GameStore
 from stores.trade_store import TradeStore
 
+# The item classes of the soul core stat categories whose TargetItemClasses is empty
 SOUL_CORE_CLASS_MAPPINGS = {
     "All": [
         "Bow",
@@ -41,7 +43,7 @@ SOUL_CORE_CLASS_MAPPINGS = {
         "Shield",
         "Sceptre",
     ],
-    "Martial Weapons": [
+    "Martial Weapon": [
         "Bow",
         "Claw",
         "Crossbow",
@@ -57,7 +59,6 @@ SOUL_CORE_CLASS_MAPPINGS = {
         "Two Hand Sword",
         "Warstaff",
     ],
-    "Caster Weapons": ["Staff", "Wand"],
     "Armour": [
         "Helmet",
         "Body Armour",
@@ -67,7 +68,6 @@ SOUL_CORE_CLASS_MAPPINGS = {
         "Focus",
         "Shield",
     ],
-    "Shield": ["Shield", "Buckler"],
 }
 
 logger = logging.getLogger(__name__)
@@ -138,13 +138,16 @@ class AugmentBuilder:
         soul_core_categories = self.ref_game_store.get(SOUL_CORE_STAT_CATEGORIES).drop(
             columns=["_index"]
         )
+        item_classes = self.ref_game_store.get(ITEM_CLASSES)
+        class_ids = dict(zip(item_classes["_index"], item_classes["Id"]))
 
-        def classes(category: str) -> list[str]:
-            if category not in SOUL_CORE_CLASS_MAPPINGS:
-                return [category]
-            return SOUL_CORE_CLASS_MAPPINGS[category]
+        def classes(row: pd.Series) -> list[str]:
+            targets: list[int] = row["TargetItemClasses"]
+            if targets:
+                return [str(class_ids[target]) for target in targets]
+            return SOUL_CORE_CLASS_MAPPINGS.get(row["Id"], [row["Id"]])
 
-        soul_core_categories["Classes"] = soul_core_categories["Id"].apply(classes)
+        soul_core_categories["Classes"] = soul_core_categories.apply(classes, axis=1)
         logger.debug(soul_core_categories["Classes"])
         # to_dict types the keys as Hashable; the index holds the category ids
         return cast(dict[str, list[str]], soul_core_categories["Classes"].to_dict())
