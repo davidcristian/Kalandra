@@ -110,8 +110,7 @@ For any other item, choose the filters, then click **Search**, press `Enter` in 
 the filters straight onto **Search**. After a search, a change to any filter outside the listing menu brings back
 the **Search** button. A change in the listing menu searches again at once.
 
-Before a search, the window sometimes shows a tip under the filters. **How often to show tips when price checking**
-in the Help settings sets how often.
+**How often to show tips when price checking** (Help settings) sets how often a tip shows before a search.
 
 ## Trade results
 
@@ -213,7 +212,8 @@ the bottom of the screen, beside the window, turns red while requests wait. Clic
   its base type is new too: the search uses the copied base type text. The lists help only if the game is in English.
 - A requirements line that Kalandra cannot read, or a `{ ... }` modifier line whose prefix, suffix or tier it cannot
   read, does not stop the check: the item has no **Req. Level:** filter, or that modifier is not counted as a prefix
-  or suffix.
+  or suffix. A modifier line that Kalandra cannot match to a stat the trade site searches for its modifier type
+  shows as **Not recognized modifier**, without a filter.
 - **POE2 language doesn't match Kalandra**: set the same language in the game and in the General settings.
 - **Trade site request failed**: **Retry** sends the search again and **Browser** opens it in the built-in browser.
   Read [Query is too complex](/complex-query) and [Invalid JSON](/invalid-json) for the two common messages.

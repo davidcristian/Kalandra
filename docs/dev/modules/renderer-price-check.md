@@ -52,15 +52,15 @@ that the route needs ([main.md](main.md)).
   quality, levels, the corrupted and other states, and the `trade` options (league, listing type, currency).
   A unique's base type comes from the item data through `uniqueBaseTradeName` in `filters/common.ts`, or is
   the copied base type text when the item data does not have that base.
-- `initUiModFilters` and `createExactStatFilters` (`create-stat-filters.ts`) return the `StatFilter` list, one
-  per stat with its trade ids, roll range and `FilterTag`. The tag starts as the one `FILTER_TAG_BY_MODIFIER_TYPE`
-  in `interfaces.ts` gives the stat's modifier type. The range is the `searchStatRange` setting ("Fill stat
-  values") as a percentage of the value, or of a unique's roll range. `createExactStatFilters` and the Mageblood
-  preset take at most 2, and 0 for a tablet. `calculatedStatToFilter` takes 0 for the Charm Slots stat, a magic
-  item that `itemIsModifiable` returns false for, and a unique's stat at its best roll. `pseudo/` adds filters
-  for the trade site's pseudo stats, each the sum of several item stats, such as total fire resistance
-  (`filterPseudo` and its `PSEUDO_RULES`), and the item property filters (`filterItemProp`). The types are in
-  `filters/interfaces.ts`.
+- `initUiModFilters` and `createExactStatFilters` (`create-stat-filters.ts`) return the `StatFilter` list, one per
+  stat that has a trade id of its modifier type (`hasTradeIdOfType` in `parser/modifiers.ts`), with its trade ids,
+  roll range and `FilterTag`. The tag starts as the one `FILTER_TAG_BY_MODIFIER_TYPE` in `interfaces.ts` gives the
+  stat's modifier type. The range is the `searchStatRange` setting ("Fill stat values") as a percentage of the
+  value, or of a unique's roll range. `createExactStatFilters` and the Mageblood preset take at most 2, and 0 for a
+  tablet. `calculatedStatToFilter` takes 0 for the Charm Slots stat, a magic item that `itemIsModifiable` returns
+  false for, and a unique's stat at its best roll. `pseudo/` adds filters for the trade site's pseudo stats, each
+  the sum of several item stats, such as total fire resistance (`filterPseudo` and its `PSEUDO_RULES`), and the item
+  property filters (`filterItemProp`). The types are in `filters/interfaces.ts`.
 - `text-keys.ts` builds the `app_i18n.json` key that names a modifier type (`item.mod_added_rune`) or a trade
   category (`item_category.weapon_bow`). The English file has a category text for each trade id in
   `CATEGORY_TO_TRADE_ID` and for no other, which `specs/web/price-check/filters/text-keys.test.ts` checks.

@@ -5,7 +5,9 @@ import {
   itemIsModifiable,
 } from "@/parser";
 import {
+  hasTradeIdOfType,
   ModifierType,
+  SEARCHED_AS_EXPLICIT,
   StatCalculated,
   StatRoll,
   statSourcesTotal,
@@ -99,9 +101,9 @@ export function createExactStatFilters(
   }
 
   ctx.filters.push(
-    ...ctx.statsByType.map((mod) =>
-      calculatedStatToFilter(mod, ctx.searchInRange, item),
-    ),
+    ...ctx.statsByType
+      .filter((calc) => hasTradeIdOfType(calc.stat, calc.type))
+      .map((mod) => calculatedStatToFilter(mod, ctx.searchInRange, item)),
   );
 
   for (const filter of ctx.filters) {
@@ -203,9 +205,7 @@ export function initUiModFilters(
       item.rarity === ItemRarity.Normal ? 100 : opts.searchStatRange,
     statsByType: item.statsByType.map((calc) => {
       if (
-        (calc.type === ModifierType.Fractured ||
-          calc.type === ModifierType.Desecrated ||
-          calc.type === ModifierType.Crafted) &&
+        SEARCHED_AS_EXPLICIT.has(calc.type) &&
         calc.stat.trade.ids?.[ModifierType.Explicit]
       ) {
         return { ...calc, type: ModifierType.Explicit };
@@ -258,9 +258,9 @@ export function initUiModFilters(
   }
 
   ctx.filters.push(
-    ...ctx.statsByType.map((mod) =>
-      calculatedStatToFilter(mod, ctx.searchInRange, item),
-    ),
+    ...ctx.statsByType
+      .filter((calc) => hasTradeIdOfType(calc.stat, calc.type))
+      .map((mod) => calculatedStatToFilter(mod, ctx.searchInRange, item)),
   );
 
   if (item.isVeiled) {

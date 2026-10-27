@@ -7,7 +7,7 @@ import {
 import type { StatMatcher, Stat, BaseType } from "@/assets/data";
 import { ModifierType } from "./modifiers";
 import { ItemCategory } from "./meta";
-import { statFitsModifier, statMatchForLine } from "./match-stats";
+import { idsFitType, statFitsModifier, statMatchForLine } from "./match-stats";
 
 // This file is a little messy and scary,
 // but that's how stats translations are parsed :-D
@@ -333,7 +333,7 @@ export function getRollOrMinmaxAvg(values: number[]): number {
 
 function tryTradeStatTranslation(stat: string, type: ModifierType) {
   const tradeStat = TRADE_STAT_BY_MATCH_STR(stat);
-  if (!tradeStat || (type === ModifierType.Augment && !tradeStat[type])) return;
+  if (!tradeStat || !idsFitType(tradeStat, type)) return;
 
   // use naive stat
   const statLine: Stat = {

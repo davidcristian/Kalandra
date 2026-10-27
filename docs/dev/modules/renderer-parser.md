@@ -49,11 +49,11 @@ The other files, each called from `Parser.ts` or from the price check:
 | File | What it does |
 | --- | --- |
 | `advanced-mod-desc.ts` | `parseModInfoLine` reads one `{ ... }` line, `groupLinesByMod` pairs it with its stat lines, `parseModType` reads a suffix such as ` (implicit)`, ` (enchant)` or ` (rune)` |
-| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stats with that text through `STAT_BY_MATCH_STR`, picks one with `statMatchForLine`, and falls back to the trade site's stat text, which for a rune line must have a `rune` id. That text is English in every app language, so the fallback matches only English item text ([refinement 063](../refinements/tasks/063-trade-lists-english-only.md)) |
-| `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll` |
+| `stat-translations.ts` | `linesToStatStrings` joins lines into candidate stat texts and skips reminder text in parentheses; `tryParseTranslation` replaces numbers with `#`, finds the stats with that text through `STAT_BY_MATCH_STR`, picks one with `statMatchForLine`, and falls back to the trade site's stat text when its trade ids fit the line's modifier type (`idsFitType` in `match-stats.ts`). That text is English in every app language, so the fallback matches only English item text ([refinement 063](../refinements/tasks/063-trade-lists-english-only.md)) |
+| `modifiers.ts` | `ModifierType`, `StatCalculated`, `sumStatsByModType`, `translateStatWithRoll`; `SEARCHED_AS_EXPLICIT`, the fractured, desecrated and crafted types that `initUiModFilters` searches by a stat's explicit id when it has one; `hasTradeIdOfType`, which the stat filters call to make a filter only for a stat with a trade id of its type |
 | `magic-name.ts` | `magicBasetype` finds the base type in a magic item name by trying every run of words against the item data |
 | `match-records.ts` | `recordsMatchingItem` keeps the records of an item lookup that match the copied item: a unique by its base type, and base types that share a translated name by the armour, evasion and energy shield lines the item shows. `findInDatabase` in `Parser.ts` takes the first record it keeps, or the first of all when none matches ([refinement 059](../refinements/tasks/059-shared-translated-item-names.md)) |
-| `match-stats.ts` | `statMatchForLine` picks the stat of a line among the stats that share its text: one that `statFitsModifier` accepts for the modifier type (it has a trade id of the type, or grants a skill), then one with no other advanced text, because the app copies items with advanced descriptions, else the first in the data ([refinement 064](../refinements/tasks/064-shared-stat-texts.md)) |
+| `match-stats.ts` | `statMatchForLine` picks the stat of a line among the stats that share its text: one that `statFitsModifier` accepts for the modifier type, then one with no other advanced text, because the app copies items with advanced descriptions, else the first in the data ([refinement 064](../refinements/tasks/064-shared-stat-texts.md)). `statFitsModifier` accepts a stat with a trade id of the type, and a granted skill (`Grants Skill`) whose trade ids `idsFitType` accepts or that has none, as the skill of every buckler, shield and spear, which `parseStatsFromMod` leaves out. `idsFitType` is the rule for a granted skill and for a trade site stat: an id of the line's type, or for a type in `SEARCHED_AS_EXPLICIT` that id or the explicit id |
 | `meta.ts` | `ItemCategory` and the category sets `WEAPON`, `ARMOUR`, `GEM` and others. `ItemCategory` has a member for each `craftable.category` of the item data, and `specs/data/item-categories.test.ts` checks that, and that each other member is listed there with its reason |
 | `jewellery-quality.ts` | `parseJewelleryQuality` reads the quality line of a ring, amulet, belt or jewel, such as `Quality (Attribute Modifiers): +20% (augmented)`, into `quality`, and sets `qualityType` to the catalyst whose modifier tag in `CATALYST_TO_TAG` the line names. The item editor and the stat filters read `qualityType` |
 | `calc-q20.ts`, `calc-base.ts` | armour and weapon values at 20% quality and the base value without modifiers; `recalculateItemProperties` is called by the item editor in the price check |
@@ -144,13 +144,13 @@ indexes need; `specs/data/make-index-files.test.ts` runs it on temporary files.
   come from `dataParser`, and the `*.index.bin` files from `npm run make-index-files`. Git ignores `*.bin`, so the
   index files must be written before the tests, `npm run dev` or a build, and again after any data change.
 - **Item text is untrusted.** `parseClipboard` runs inside a `try`, passes what it caught to `console.error` and
-  returns `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat
-  goes to `unknownModifiers` and the parse continues. A new parser returns `SECTION_SKIPPED` for a section that is
-  not its own instead of throwing. `parseModifiers` skips a section that has a `{ ... }` line but does not start with
-  one, because `groupLinesByMod` reads only a section that starts with one. A requirements line that `REQUIRES_LINE`
-  does not match is logged with `console.warn` and leaves `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or
-  `MODIFIER_INCREASED` does not match is logged the same way, and the modifier keeps its type and tags without the
-  parts that did not match.
+  returns `item.parse_error`, so an error thrown by a parser function never leaves it. A line that matches no stat,
+  or only a stat whose trade ids do not fit its modifier type, goes to `unknownModifiers` and the parse continues. A
+  new parser returns `SECTION_SKIPPED` for a section that is not its own instead of throwing. `parseModifiers` skips
+  a section that has a `{ ... }` line but does not start with one, because `groupLinesByMod` reads only a section
+  that starts with one. A requirements line that `REQUIRES_LINE` does not match is logged with `console.warn` and
+  leaves `requires` unset. A `{ ... }` line that `MODIFIER_LINE` or `MODIFIER_INCREASED` does not match is logged
+  the same way, and the modifier keeps its type and tags without the parts that did not match.
 - **The order of `parsers` sets the result.** A section goes to the first parser in the list that accepts it.
   `parseModifiers` is listed five times, one per modifier section as its comments name them (enchant, augment,
   implicit, granted skill, explicit), and `parseLogbookArea` three times, once per area section of an Expedition

@@ -1,9 +1,9 @@
 # A stat without a trade id for its modifier type makes a filter without a trade id
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** parser
 **Origin:** [renderer/src/parser/stat-translations.ts](../../../../renderer/src/parser/stat-translations.ts)
-**Verified:** 2026-10-19
+**Verified:** 2026-10-27
 
 `tryParseTranslation()` in `stat-translations.ts` accepts a stat from `stats.ndjson` only when its
 `trade.ids` has a key for the modifier type, except a stat whose ref starts with `Grants Skill`.
@@ -27,3 +27,8 @@ for an implicit and a crafted line in that case.
 
 - 2026-10-19: Found while the rune line fallback was fixed. The code paths above are from reading
   the code; no test or in-game check has shown the filter error yet.
+- 2026-10-27: The paths were as written, with one change: the trade data downloaded on 2026-10-25
+  has a `crafted` category, which the saved list in `renderer/specs/data/stats.json` lacks. Became
+  "fix(parser): keep stats without a fitting trade id out of the filters". No copied item under
+  `renderer/specs/Parser/` reaches the case: its implicit and crafted lines match the game data
+  with an id of their type. The parser tests are function tests on real lines from `items.ts`.

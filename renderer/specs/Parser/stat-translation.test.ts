@@ -11,6 +11,7 @@ const lists = vi.hoisted(() => {
 
 vi.mock("@/assets/data", async (importOriginal) => ({
   ...(await importOriginal<object>()),
+  CLIENT_STRINGS_REF: { GRANTS_SKILL: "Grants Skill: " },
   STAT_BY_MATCH_STR: (text: string): StatMatch[] =>
     lists.stats.flatMap((stat) => {
       const matcher = stat.matchers.find(
@@ -66,6 +67,25 @@ const OPTION_STAT: Stat = {
     },
     option: true,
   },
+};
+
+// Real lines from items.ts: the Prismatic Ring implicit, the Obliterator Bow crafted suffix and the wand skill
+const IMPLICIT_TEXT = "#% to all Elemental Resistances";
+const IMPLICIT_LINE = "+8(7-10)% to all Elemental Resistances";
+const CRAFTED_TEXT = "#% to Critical Hit Chance";
+const CRAFTED_LINE = "+3.45(3.11-3.8)% to Critical Hit Chance";
+// The trade site's ids for this text in specs/data/stats.json, which has no crafted category
+const CRIT_IDS = {
+  explicit: ["explicit.stat_518292764"],
+  fractured: ["fractured.stat_518292764"],
+  desecrated: ["desecrated.stat_518292764"],
+};
+const SKILL_LINE = "Grants Skill: Level 20 Chaos Bolt";
+const SKILL_STAT: Stat = {
+  ref: "Grants Skill: Level # Chaos Bolt",
+  better: StatBetter.PositiveRoll,
+  matchers: [{ string: "Grants Skill: Level # Chaos Bolt" }],
+  trade: { ids: { skill: ["skill.chaosbolt"] } },
 };
 
 function parse(string: string, type = ModifierType.Explicit) {
@@ -205,5 +225,48 @@ describe("tryParseTranslation", () => {
 
     expect(result?.stat.trade.ids?.rune).toEqual(PHYS_IDS.rune);
     expect(result?.roll?.value).toBe(36);
+  });
+
+  it("does not use a trade stat without an implicit id for an implicit line", () => {
+    lists.tradeIds.set(IMPLICIT_TEXT, {
+      explicit: ["explicit.stat_2901986750"],
+    });
+
+    expect(parse(IMPLICIT_LINE, ModifierType.Implicit)).toBeUndefined();
+  });
+
+  it("uses a trade stat with an implicit id for an implicit line", () => {
+    const ids = { implicit: ["implicit.stat_2901986750"] };
+    lists.tradeIds.set(IMPLICIT_TEXT, ids);
+
+    const result = parse(IMPLICIT_LINE, ModifierType.Implicit);
+
+    expect(result?.stat.trade.ids).toEqual(ids);
+    expect(result?.roll).toMatchObject({ value: 8, min: 7, max: 10 });
+  });
+
+  it("uses the explicit id of a trade stat for a crafted line", () => {
+    lists.tradeIds.set(CRAFTED_TEXT, CRIT_IDS);
+
+    const result = parse(CRAFTED_LINE, ModifierType.Crafted);
+
+    expect(result?.stat.trade.ids).toEqual(CRIT_IDS);
+    expect(result?.roll).toMatchObject({ value: 3.45, min: 3.11, max: 3.8 });
+  });
+
+  it("does not use a trade stat without a crafted or explicit id for a crafted line", () => {
+    lists.tradeIds.set(CRAFTED_TEXT, {
+      fractured: CRIT_IDS.fractured,
+      desecrated: CRIT_IDS.desecrated,
+    });
+
+    expect(parse(CRAFTED_LINE, ModifierType.Crafted)).toBeUndefined();
+  });
+
+  it("does not use a granted skill without a trade id of the line's type", () => {
+    lists.stats.push(SKILL_STAT);
+
+    expect(parse(SKILL_LINE, ModifierType.Implicit)).toBeUndefined();
+    expect(parse(SKILL_LINE, ModifierType.Skill)?.stat).toBe(SKILL_STAT);
   });
 });

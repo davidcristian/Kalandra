@@ -217,3 +217,17 @@ export const INTERNAL_AUGMENT_TYPES = new Set([
   ModifierType.Augment,
   ModifierType.AddedAugment,
 ]);
+
+/** The modifier types that the price check filters search by the explicit trade id of a stat that has one. */
+export const SEARCHED_AS_EXPLICIT = new Set([
+  ModifierType.Fractured,
+  ModifierType.Desecrated,
+  ModifierType.Crafted,
+]);
+
+/** Returns whether the stat has a trade id of the modifier type, which a filter of that type searches. */
+export function hasTradeIdOfType(stat: Stat, modType: ModifierType): boolean {
+  const type =
+    modType === ModifierType.AddedAugment ? ModifierType.Augment : modType;
+  return stat.trade.ids != null && type in stat.trade.ids;
+}

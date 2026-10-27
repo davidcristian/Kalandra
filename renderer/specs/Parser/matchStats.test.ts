@@ -1,5 +1,9 @@
 import { init, type Stat, type StatMatch } from "@/assets/data";
-import { statFitsModifier, statMatchForLine } from "@/parser/match-stats";
+import {
+  idsFitType,
+  statFitsModifier,
+  statMatchForLine,
+} from "@/parser/match-stats";
 import { ModifierType } from "@/parser/modifiers";
 import { setupTests } from "@specs/vitest.setup";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -33,7 +37,11 @@ const RUNE_WITH_ADVANCED = match(
 );
 const SANCTUM_A = match("Has Crystal Shard", { sanctum: ["sanctum.stat_5"] });
 const SANCTUM_B = match("Has Glass Shard", { sanctum: ["sanctum.stat_6"] });
-const SKILL = match("Grants Skill: Level # Parry", {});
+const SKILL = match("Grants Skill: Level # Chaos Bolt", {
+  skill: ["skill.chaosbolt"],
+});
+// stats.ndjson has null trade ids for the skill of every buckler
+const BUCKLER_SKILL = match("Grants Skill: Parry", null);
 
 beforeAll(async () => {
   setupTests();
@@ -89,5 +97,44 @@ describe("statFitsModifier", () => {
       false,
     );
     expect(statFitsModifier(SKILL.stat, ModifierType.Skill)).toBe(true);
+  });
+
+  it("accepts a granted skill only with trade ids that fit the type", () => {
+    expect(statFitsModifier(SKILL.stat, ModifierType.Implicit)).toBe(false);
+    expect(statFitsModifier(SKILL.stat, ModifierType.Crafted)).toBe(false);
+  });
+
+  it("accepts a granted skill without trade ids, which the parser leaves out", () => {
+    expect(statFitsModifier(BUCKLER_SKILL.stat, ModifierType.Skill)).toBe(true);
+    expect(statFitsModifier(BUCKLER_SKILL.stat, ModifierType.Implicit)).toBe(
+      true,
+    );
+  });
+});
+
+describe("idsFitType", () => {
+  const EXPLICIT = { explicit: ["explicit.stat_1"] };
+
+  it("needs an id of the type for an implicit, skill or rune line", () => {
+    expect(idsFitType(EXPLICIT, ModifierType.Implicit)).toBe(false);
+    expect(idsFitType(EXPLICIT, ModifierType.Skill)).toBe(false);
+    expect(idsFitType(EXPLICIT, ModifierType.AddedAugment)).toBe(false);
+    expect(idsFitType({ implicit: ["i"] }, ModifierType.Implicit)).toBe(true);
+    expect(idsFitType({ rune: ["r"] }, ModifierType.AddedAugment)).toBe(true);
+  });
+
+  it.each([
+    ModifierType.Fractured,
+    ModifierType.Desecrated,
+    ModifierType.Crafted,
+  ])("takes the id of the type or the explicit id for a %s line", (type) => {
+    expect(idsFitType({ [type]: ["own"] }, type)).toBe(true);
+    expect(idsFitType(EXPLICIT, type)).toBe(true);
+    expect(idsFitType({ implicit: ["i"], rune: ["r"] }, type)).toBe(false);
+  });
+
+  it("fits no type without trade ids", () => {
+    expect(idsFitType(null, ModifierType.Explicit)).toBe(false);
+    expect(idsFitType({}, ModifierType.Explicit)).toBe(false);
   });
 });
