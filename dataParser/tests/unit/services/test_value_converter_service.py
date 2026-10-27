@@ -24,6 +24,7 @@ from constants.known_stats import (
 )
 from constants.lang import ENGLISH, GERMAN
 from services.value_converter_service import ValueConverterService
+from tests.inputs import needs_game_export
 
 
 def make_service() -> ValueConverterService:
@@ -68,6 +69,7 @@ def test_agg_by_hash_builds_one_option_stat_from_the_rows_of_a_value_stat(hash_v
     ]
 
 
+@needs_game_export
 def test_agg_by_hash_builds_one_stat_per_row_of_a_historic_jewel():
     rows = pd.DataFrame(
         [
@@ -309,6 +311,7 @@ def test_convert_value_stats_to_trade_builds_one_stat_per_supported_hash():
     ]
 
 
+@needs_game_export
 def test_historic_agg_integration():
     df = pd.DataFrame(
         [
@@ -531,6 +534,7 @@ GERMAN_HISTORIC_JEWELS = [
 ]
 
 
+@needs_game_export
 def test_historic_agg_writes_the_trade_site_id_beside_the_german_text_of_each_conqueror():
     rows = pd.DataFrame(
         [

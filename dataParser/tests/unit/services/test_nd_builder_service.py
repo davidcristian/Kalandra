@@ -7,6 +7,10 @@ import pytest
 from constants.filenames import ITEM_IMAGE_CACHE
 from services.image_provider import NOT_FOUND
 from services.nd_builder_service import NdBuilderService
+from tests.inputs import needs_game_export
+
+
+pytestmark = needs_game_export
 
 
 def setup_stats_combined_df_tests(ref_df, lang_df):

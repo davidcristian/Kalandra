@@ -17,6 +17,7 @@ from main import main, pull_inputs, write_ndjson, write_text
 from providers.game_api import GameDataProvider
 from services.request_pacer import RequestPacer
 from tests.fake_http import FakeClock, FakeResponse, FakeSession
+from tests.inputs import needs_game_export, needs_trade_data
 
 OUTPUT_FILES = ("stats.ndjson", "items.ndjson", "client_strings.js")
 # A trade id of a stat with a game description; the others take the trade site's text
@@ -44,6 +45,8 @@ def read_ndjson(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
 
 
+@needs_game_export
+@needs_trade_data
 @pytest.mark.parametrize("lang", LANGUAGES)
 def test_main_writes_the_stats_and_items_of_each_language(build: Path, lang: str):
     stats = read_ndjson(build / "output" / lang / "stats.ndjson")
@@ -61,6 +64,8 @@ def test_main_writes_the_stats_and_items_of_each_language(build: Path, lang: str
     assert "export default {" in client_strings
 
 
+@needs_game_export
+@needs_trade_data
 def test_main_matches_a_trade_stat_to_its_english_text(build: Path):
     stats = read_ndjson(build / "output" / ENGLISH / "stats.ndjson")
 
@@ -79,6 +84,8 @@ def trade_ids(stats: list[dict[str, Any]]) -> set[str]:
     }
 
 
+@needs_game_export
+@needs_trade_data
 @pytest.mark.parametrize("lang", [lang for lang in LANGUAGES if lang != ENGLISH])
 def test_main_writes_the_english_stat_list_in_each_language(build: Path, lang: str):
     english = read_ndjson(build / "output" / ENGLISH / "stats.ndjson")
@@ -95,6 +102,8 @@ def has_described_ids(stat: dict[str, Any]) -> bool:
     return bool(ids) and all(STAT_TRADE_ID.match(trade_id) for trade_id in ids)
 
 
+@needs_game_export
+@needs_trade_data
 @pytest.mark.parametrize("lang", LANGUAGES)
 def test_main_gives_the_stats_that_share_a_game_text_the_same_trade_ids(
     build: Path, lang: str
@@ -110,6 +119,8 @@ def test_main_gives_the_stats_that_share_a_game_text_the_same_trade_ids(
     assert shared == {}
 
 
+@needs_game_export
+@needs_trade_data
 @pytest.mark.parametrize("lang", LANGUAGES)
 def test_main_pushes_the_files_of_each_language_to_the_app(build: Path, lang: str):
     for name in OUTPUT_FILES:
@@ -117,6 +128,8 @@ def test_main_pushes_the_files_of_each_language_to_the_app(build: Path, lang: st
         assert pushed.read_bytes() == (build / "output" / lang / name).read_bytes()
 
 
+@needs_game_export
+@needs_trade_data
 def test_main_saves_the_image_cache_in_the_given_folder(build: Path):
     assert sorted(path.name for path in (build / "cache").iterdir()) == sorted(
         [ITEM_IMAGE_CACHE, OLD_ITEM_IMAGE_CACHE]

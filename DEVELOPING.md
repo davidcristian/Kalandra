@@ -131,8 +131,8 @@ part alone:
   the CI runner, so on Windows a shell script problem can show first in CI. In PowerShell at the
   repo root, `docker run --rm -v "${PWD}:/repo" -w /repo rhysd/actionlint:1.7.12` runs the same
   check with shellcheck.
-- `check.py` leaves out the data tool, whose tests need files the repo does not have
-  ([dataparser.md](docs/dev/modules/dataparser.md#tests)).
+- `check.py` leaves out the data tool, whose tests and Pyright hook need the packages in
+  `dataParser/.venv` ([dataparser.md](docs/dev/modules/dataparser.md#setup)).
 
 [docs/dev/architecture.md](docs/dev/architecture.md#ci) lists what each CI workflow runs and on
 which pushes. No workflow runs `npm run build` in `renderer/` or `main/` on a pull request, and

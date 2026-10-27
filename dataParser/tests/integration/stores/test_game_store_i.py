@@ -5,6 +5,10 @@ import pytest
 from constants.filenames import GAME_API_TABLES, STAT_DESCRIPTION_FILES
 from constants.lang import LANG, LANGUAGES
 from stores.game_store import GameStore
+from tests.inputs import needs_game_export
+
+
+pytestmark = needs_game_export
 
 MARKUP = re.compile(r"[\[\]\|\{\}]")
 

@@ -149,8 +149,9 @@ breaks and exits with 1, or exits with 0.
 
 ## Invariants
 
-- `STEPS` holds every check AGENTS.md names except the data tool's, whose tests need files the repo does not have
-  ([dataparser.md](dataparser.md#tests)). A new check in AGENTS.md is a new `Step` or hook in the same commit.
+- `STEPS` holds every check AGENTS.md names except the data tool's, whose tests and Pyright hook need the packages
+  in `dataParser/.venv` ([dataparser.md](dataparser.md#setup)). A new check in AGENTS.md is a new `Step` or hook in
+  the same commit.
 - Every step's folder exists, and no two steps have the same name; `test_check.py` checks both.
 - The banned words exist only in the table in AGENTS.md, which `prosecheck.py` reads on every run.
 - The pre-commit hooks run the five file checks on every commit, after the formatters, so the counts they read are

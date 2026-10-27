@@ -4,6 +4,10 @@ import pandas as pd
 
 from constants.filenames import MODS, STATS, TAGS
 from services.tagged_stats import TaggedStats
+from tests.inputs import needs_game_export
+
+
+pytestmark = needs_game_export
 
 
 def test_get_trade_stats_returns_correctly():

@@ -223,10 +223,12 @@ the repo root, so the config's top-level `files: ^dataParser/` keeps them to thi
 `.github/workflows/test.yml` has no job for `dataParser/`, and the root `.pre-commit-config.yaml` does not include
 these hooks.
 
-A fresh clone with the packages installed still cannot pass the tests as of 18 Oct 2026:
-`tests/integration/stores/test_game_store_i.py` needs the game export in `data/vendor/`, and `tests/test_main.py`
-needs it and the trade data in `data/json/`. The unit tests that build an `NdBuilderService` also need the export,
-since it reads game tables when it is built.
+The tests that read inputs a clone does not have skip with a reason when the inputs are missing. `tests/inputs.py`
+gives the markers: `needs_game_export` skips when `data/vendor/tables/` and `data/vendor/files/` hold no file but
+`.gitkeep`, and `needs_trade_data` when `data/json/` holds none. `test_game_store_i.py`, the `NdBuilderService` and
+`TaggedStats` tests and three `ValueConverterService` tests need the export: `ValueConverterService` reads game
+tables when it is built, and a stat description file in `historic_agg`. The `main()` tests that build every language
+need both. Without them, 226 tests pass and 312 skip on 27 Oct 2026.
 
 **Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper` and
 `npx`, `pathofexile-dat` 16.0.0 from npm, a local Path of Exile 2 install, and the official trade sites.
