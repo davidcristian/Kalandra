@@ -239,9 +239,6 @@ CLIENT_STRING_REGEX: list[RegexClientString] = [
     ConstRegexClientString("METAMORPH_LUNG", ".* Lung"),
     ConstRegexClientString("METAMORPH_HEART", ".* Heart"),
     ConstRegexClientString("METAMORPH_LIVER", ".* Liver"),
-    CapturePlaceholderClientString("QUALITY_ANOMALOUS", ["GemAlternateQuality1Affix"]),
-    CapturePlaceholderClientString("QUALITY_DIVERGENT", ["GemAlternateQuality2Affix"]),
-    CapturePlaceholderClientString("QUALITY_PHANTASMAL", ["GemAlternateQuality3Affix"]),
     CapturePlaceholderClientString(
         "MODIFIER_LINE",
         ["ModDescriptionLineTier", "ModDescriptionLineRank"],
