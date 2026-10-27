@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -17,17 +18,19 @@ const SCHEMA: NinjaSchema = JSON.parse(
 
 // Takes the category from the base item, as the parser does for a unique.
 function parsedUnique(refName: string) {
-  const info = ITEM_BY_REF("UNIQUE", refName)![0];
+  const info = present(ITEM_BY_REF("UNIQUE", refName))[0];
   return createVirtualItem({
     rarity: ItemRarity.Unique,
-    category: ITEM_BY_REF("ITEM", info.unique!.base)![0].craftable!.category,
+    category: present(
+      present(ITEM_BY_REF("ITEM", present(info.unique).base))[0].craftable,
+    ).category,
     info,
   });
 }
 
 function findPrice(priceFile: string, refName: string) {
   const { findInDatabase, splitJsonBlob } = __testExports;
-  const query = getDetailsId(parsedUnique(refName))!;
+  const query = present(getDetailsId(parsedUnique(refName)));
   return findInDatabase(splitJsonBlob(priceFile, SCHEMA), query)?.info;
 }
 

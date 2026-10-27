@@ -12,7 +12,7 @@ vi.mock("@/web/Config", async () => {
       if (!type) {
         return mockConfig;
       } else {
-        return mockConfig.widgets.find((w) => w.wmType === type)!;
+        return mockConfig.widgets.find((w) => w.wmType === type);
       }
     }),
     TipsFrequency: {

@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { __testExports, parseClipboard } from "@/parser/Parser";
@@ -58,7 +59,7 @@ describe("Skill gems parse correctly", () => {
   it("should parse meta skill gem", () => {
     const result = parseClipboard(MetaSkillGem.rawText).unwrapOr(null);
     expect(result).not.toBeNull();
-    expect(result!.category).toBe(MetaSkillGem.category);
-    expect(result!.gemLevel).toBe(MetaSkillGem.gemLevel);
+    expect(present(result).category).toBe(MetaSkillGem.category);
+    expect(present(result).gemLevel).toBe(MetaSkillGem.gemLevel);
   });
 });

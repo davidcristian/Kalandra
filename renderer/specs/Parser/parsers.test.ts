@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { CLIENT_STRINGS as _$, init } from "@/assets/data";
 import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -188,7 +189,7 @@ describe("parseRequirements", () => {
       const parsedItem = createTestItem();
 
       const res = __testExports.parseRequirements(
-        sections.find((s) => s.some((l) => l.startsWith(_$.REQUIRES)))!,
+        present(sections.find((s) => s.some((l) => l.startsWith(_$.REQUIRES)))),
         parsedItem,
       );
 

@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
@@ -81,7 +82,7 @@ describe("parseTrials", () => {
       expect(res).toBe("SECTION_PARSED");
       expect(parsedItem.areaLevel).toBe(area);
       expect(parsedItem.trials).toBeDefined();
-      expect(parsedItem.trials!.numberOfTrials).toEqual(count);
+      expect(present(parsedItem.trials).numberOfTrials).toEqual(count);
     },
   );
 
@@ -110,8 +111,8 @@ describe("parseTrials", () => {
       expect(res).toBe("SECTION_PARSED");
       expect(parsedItem.areaLevel).toBe(area);
       expect(parsedItem.trials).toBeDefined();
-      expect(parsedItem.trials!.numberOfTrials).toEqual(count);
-      expect(parsedItem.trials!.ultimatumHint).toEqual(hint);
+      expect(present(parsedItem.trials).numberOfTrials).toEqual(count);
+      expect(present(parsedItem.trials).ultimatumHint).toEqual(hint);
     },
   );
 

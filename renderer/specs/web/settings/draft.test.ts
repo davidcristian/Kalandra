@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { describe, expect, it } from "vitest";
 import { isReactive, reactive } from "vue";
 import { defaultConfigMock } from "@specs/vitest.setup";
@@ -19,8 +20,8 @@ describe("settings draft", () => {
     const live = liveConfig();
 
     draft.open(live);
-    draft.copy.value!.fontSize = 20;
-    draft.copy.value!.widgets[0].wmTitle = "Edited";
+    present(draft.copy.value).fontSize = 20;
+    present(draft.copy.value).widgets[0].wmTitle = "Edited";
 
     expect(isReactive(draft.copy.value)).toBe(true);
     expect(live.fontSize).toBe(12);
@@ -70,9 +71,9 @@ describe("settings draft", () => {
     const live = liveConfig({ language: "ru" });
 
     draft.open(live);
-    draft.copy.value!.language = "de";
+    present(draft.copy.value).language = "de";
     draft.preview("language", "de");
-    const saved = saveDraft(draft.copy.value!);
+    const saved = saveDraft(present(draft.copy.value));
     draft.close(saved);
 
     expect(saved.language).toBe("de");

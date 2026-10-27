@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { reactive } from "vue";
@@ -61,7 +62,7 @@ beforeEach(async () => {
   vi.mocked(Host.proxy).mockReset();
   await init("en");
   widget = reactive({
-    ...AppConfig<PriceCheckWidget>("price-check")!,
+    ...present(AppConfig<PriceCheckWidget>("price-check")),
     coreCurrency: "exalted",
   });
   AppConfig().widgets = [widget];

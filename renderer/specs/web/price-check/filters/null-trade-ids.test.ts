@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init, STAT_BY_REF } from "@/assets/data";
 import { ItemRarity, type ParsedItem } from "@/parser/ParsedItem";
@@ -38,7 +39,7 @@ beforeAll(async () => {
 
 describe("a stat whose trade ids are null in the data", () => {
   it.each(REFS)("is the data line of %s", (ref) => {
-    expect(STAT_BY_REF(ref)!.trade.ids).toBeNull();
+    expect(present(STAT_BY_REF(ref)).trade.ids).toBeNull();
   });
 
   it.each(REFS)("makes the filter of a stat with no ids: %s", (ref) => {

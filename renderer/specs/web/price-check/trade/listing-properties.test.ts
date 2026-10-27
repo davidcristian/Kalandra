@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,7 +27,9 @@ function savedQuarterstaff(): SavedListing {
   const saved: { result: SavedListing[] } = JSON.parse(
     fs.readFileSync(file, "utf-8"),
   );
-  return saved.result.find((result) => result.id.startsWith("2fa2f1ee"))!;
+  return present(
+    saved.result.find((result) => result.id.startsWith("2fa2f1ee")),
+  );
 }
 
 describe("requestResults item properties", () => {

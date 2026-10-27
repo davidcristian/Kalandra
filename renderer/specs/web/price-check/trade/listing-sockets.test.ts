@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,7 +20,9 @@ function savedSceptre(): SavedListing {
   const saved: { result: SavedListing[] } = JSON.parse(
     fs.readFileSync(file, "utf-8"),
   );
-  return saved.result.find((result) => result.id.startsWith("4ec60fea5b"))!;
+  return present(
+    saved.result.find((result) => result.id.startsWith("4ec60fea5b")),
+  );
 }
 
 describe("requestResults gem sockets", () => {

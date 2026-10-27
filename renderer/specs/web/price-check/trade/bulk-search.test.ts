@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { Settings } from "luxon";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
@@ -137,10 +138,13 @@ describe("execBulkSearch", () => {
         }),
       },
     ]);
-    expect(result!.haveTag).toBe("exalted");
-    expect(result!.total).toBe(12);
+    expect(present(result).haveTag).toBe("exalted");
+    expect(present(result).total).toBe(12);
     expect(
-      result!.listed.map((entry) => [entry.exchangeAmount, entry.itemAmount]),
+      present(result).listed.map((entry) => [
+        entry.exchangeAmount,
+        entry.itemAmount,
+      ]),
     ).toEqual([
       [1, 2],
       [1, 1],
@@ -165,13 +169,16 @@ describe("execBulkSearch", () => {
     const [result] = await search("seller", ["exalted"], "Me#0001");
 
     expect(
-      result!.listed.map((entry) => [entry.isMine, entry.accountStatus]),
+      present(result).listed.map((entry) => [
+        entry.isMine,
+        entry.accountStatus,
+      ]),
     ).toEqual([
       [true, "online"],
       [false, "afk"],
       [false, "offline"],
     ]);
-    expect(result!.listed[0]).toMatchObject({
+    expect(present(result).listed[0]).toMatchObject({
       accountName: "Me#0001",
       ign: expect.stringMatching(/^Character\d+$/),
       stock: 40,
@@ -190,12 +197,12 @@ describe("execBulkSearch", () => {
 
     const [divine, exalted] = await search("split", ["divine", "exalted"]);
 
-    expect(divine!.total).toBe(3);
-    expect(divine!.listed.map((entry) => entry.exchangeAmount)).toEqual([
-      1, 2, 3,
-    ]);
-    expect(exalted!.total).toBe(37);
-    expect(exalted!.listed).toHaveLength(8);
+    expect(present(divine).total).toBe(3);
+    expect(present(divine).listed.map((entry) => entry.exchangeAmount)).toEqual(
+      [1, 2, 3],
+    );
+    expect(present(exalted).total).toBe(37);
+    expect(present(exalted).listed).toHaveLength(8);
   });
 
   it("leaves the exalted list out when the first page holds too few of its listings", async () => {
@@ -210,7 +217,7 @@ describe("execBulkSearch", () => {
     const [divine, exalted] = await search("later", ["divine", "exalted"]);
 
     expect(exalted).toBeNull();
-    expect(divine!.total).toBe(248);
+    expect(present(divine).total).toBe(248);
   });
 
   it("reads a repeated search from the cache", async () => {

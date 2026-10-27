@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { afterEach, describe, expect, it } from "vitest";
 import type { Config } from "@/web/Config";
 import { Host } from "@/web/background/IPC";
@@ -13,7 +14,7 @@ function openDraft(edit: (config: Config) => void): Config {
   const config = hotkeyConfig();
   edit(config);
   settingsDraft.open(config);
-  return settingsDraft.copy.value!;
+  return present(settingsDraft.copy.value);
 }
 
 afterEach(() => {

@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
@@ -22,13 +23,13 @@ function presetsOf(text: string) {
 }
 
 function preset(presets: FilterPreset[], id: string) {
-  return presets.find((preset) => preset.id === id)!;
+  return present(presets.find((preset) => preset.id === id));
 }
 
 function statFilter(preset: FilterPreset, statRef: string) {
   const filter = preset.stats.find((filter) => filter.statRef === statRef);
   expect(filter, statRef).toBeDefined();
-  return filter!;
+  return present(filter);
 }
 
 /** The value the trade search sends for a stat filter, after the user turns it on. */
@@ -45,7 +46,7 @@ function searchedValue(
     (filter) => filter.id === tradeId,
   );
   expect(sent, tradeId).toBeDefined();
-  return sent!.value;
+  return present(sent).value;
 }
 
 describe("the stat filters of a price check", () => {
@@ -108,9 +109,9 @@ describe("the stat filters of a price check", () => {
 
     expect(filter.disabled).toBe(true);
     expect(filter.hidden).toBe(CONST_ROLL);
-    expect(filter.roll!.min).toBeUndefined();
-    expect(filter.roll!.max).toBeUndefined();
-    expect(filter.roll!.bounds).toBeUndefined();
+    expect(present(filter.roll).min).toBeUndefined();
+    expect(present(filter.roll).max).toBeUndefined();
+    expect(present(filter.roll).bounds).toBeUndefined();
   });
 
   it("show a reduced roll of an increased stat as reduced and search the increased stat below its negative", () => {

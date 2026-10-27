@@ -3,6 +3,7 @@
  */
 
 import { parseClipboard } from "@/parser";
+import { present } from "@specs/present";
 import { ModifierType } from "@/parser/modifiers";
 import {
   CharmQuality,
@@ -154,8 +155,8 @@ describe("Parse lines the game data does not match", () => {
     expect(parsedItem.unknownModifiers).toEqual([
       { text: "15% increased Light Radius", type: ModifierType.Augment },
     ]);
-    const sockets = parsedItem.augmentSockets!;
-    const expected = RuneLineWithoutRuneStat.augmentSockets!;
+    const sockets = present(parsedItem.augmentSockets);
+    const expected = present(RuneLineWithoutRuneStat.augmentSockets);
     expect(sockets.empty).toBe(expected.empty);
     expect(sockets.augments.map((augment) => augment?.refName)).toEqual(
       expected.augments.map((augment) => augment?.refName),

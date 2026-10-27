@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { ItemCategory } from "@/parser/meta";
 import { ItemRarity, ParsedItem } from "@/parser/ParsedItem";
 import {
@@ -43,7 +44,7 @@ describe("unidentified item tests", () => {
 
     expect(res.unidentified).toBeUndefined();
     expect(res.unidentifiedTier).toBeTruthy();
-    expect(res.unidentifiedTier!.value).toBe(4);
+    expect(present(res.unidentifiedTier).value).toBe(4);
   });
 
   it.each([
@@ -79,8 +80,8 @@ describe("unidentified item tests", () => {
 
     const res = createFilters(item, createTestCreateOptions());
 
-    expect(res.unidentifiedTier!.value).toBe(tier);
-    expect(res.unidentifiedTier!.disabled).toBe(disabled);
+    expect(present(res.unidentifiedTier).value).toBe(tier);
+    expect(present(res.unidentifiedTier).disabled).toBe(disabled);
   });
 });
 

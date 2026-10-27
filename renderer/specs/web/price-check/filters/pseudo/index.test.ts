@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions, createTestItem } from "@specs/helper";
@@ -61,12 +62,12 @@ describe("filterPseudoSources", () => {
     ];
 
     const result = __testExports.filterPseudoSources(stats, (calc, source) => {
-      const value = source.contributes!.value;
+      const value = present(source.contributes).value;
       if (value < 25) return null;
       const multi = calc.type === ModifierType.Enchant ? 2 : 1;
       return {
         ...source,
-        contributes: { ...source.contributes!, value: value * multi },
+        contributes: { ...present(source.contributes), value: value * multi },
       };
     });
 
@@ -339,7 +340,7 @@ describe("filterPseudo", () => {
   it("should give a Temple Tablet an enabled uses remaining filter", () => {
     const item = parseClipboard(TempleTablet.rawText)._unsafeUnwrap();
     const { presets, active } = createPresets(item, createTestCreateOptions());
-    const stats = presets.find((preset) => preset.id === active)!.stats;
+    const stats = present(presets.find((preset) => preset.id === active)).stats;
     const uses = stats.find((f) => f.statRef === "# uses remaining");
 
     expect(item.category).toBe(ItemCategory.Tablet);

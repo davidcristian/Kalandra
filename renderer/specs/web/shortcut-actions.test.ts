@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { describe, expect, it } from "vitest";
 import { shortcutActions } from "@/web/shortcut-actions";
 import { findWidget } from "@/web/settings/utils";
@@ -31,14 +32,17 @@ describe("the hotkeys the renderer sends to main", () => {
 
   it("adds each item check and library hotkey that is set", () => {
     const config = hotkeyConfig();
-    const itemCheck = findWidget<ItemCheckWidget>("item-check", config)!;
+    const itemCheck = present(
+      findWidget<ItemCheckWidget>("item-check", config),
+    );
     itemCheck.wikiKey = "Alt + W";
     itemCheck.craftOfExileKey = "Alt + E";
     itemCheck.poedbKey = "Alt + Q";
     itemCheck.stashSearchKey = "Alt + S";
     itemCheck.samePricedKey = "Alt + P";
     itemCheck.hotkey = "Alt + M";
-    findWidget<LibraryWidget>("library", config)!.logItemKey = "Alt + L";
+    present(findWidget<LibraryWidget>("library", config)).logItemKey =
+      "Alt + L";
 
     expect(shortcutActions(config).slice(3)).toEqual([
       {
@@ -76,7 +80,7 @@ describe("the hotkeys the renderer sends to main", () => {
   it("leaves out the Craft of Exile key for a language other than English", () => {
     const config = hotkeyConfig();
     config.language = "de";
-    findWidget<ItemCheckWidget>("item-check", config)!.craftOfExileKey =
+    present(findWidget<ItemCheckWidget>("item-check", config)).craftOfExileKey =
       "Alt + E";
 
     expect(shortcutActions(config).slice(3)).toEqual([]);

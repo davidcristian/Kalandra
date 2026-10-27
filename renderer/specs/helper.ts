@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { BaseType, STAT_BY_REF } from "@/assets/data";
 import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
@@ -102,7 +103,7 @@ export function createParsedStat(
   statRef: string,
   value: number | [number, number],
 ): ParsedStat {
-  const stat = STAT_BY_REF(statRef)!;
+  const stat = present(STAT_BY_REF(statRef));
 
   return {
     stat,

@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -45,8 +46,10 @@ function priceFileWithGreaterChaosOrb(): string {
   const file: PriceFile = JSON.parse(
     readFixture("../../../../../priceService/tests/fixtures/price_file.json"),
   );
-  const currency = file.itemOverviews.find((list) => list.type === "Currency")!;
-  const chaos = currency.lines.find((line) => line.id === "chaos")!;
+  const currency = present(
+    file.itemOverviews.find((list) => list.type === "Currency"),
+  );
+  const chaos = present(currency.lines.find((line) => line.id === "chaos"));
   currency.lines.push({
     ...chaos,
     name: "Greater Chaos Orb",
@@ -62,7 +65,7 @@ function fetchResponse(): string {
     readFixture("../../../docs/fetchResponses.json"),
   );
   const byId = (prefix: string) =>
-    saved.result.find((result) => result.id.startsWith(prefix))!;
+    present(saved.result.find((result) => result.id.startsWith(prefix)));
   const alchemy = byId("00d17082eb");
   const greaterChaos = byId("03d4465694");
   greaterChaos.listing.price.currency = "greater-chaos-orb";

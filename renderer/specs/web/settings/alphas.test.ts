@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { describe, expect, it } from "vitest";
 import { reactive } from "vue";
 import { defaultConfigMock } from "@specs/vitest.setup";
@@ -9,7 +10,7 @@ function openSettings(overrides: Partial<Config>): Config {
   defaultConfigMock(overrides);
   const draft = createSettingsDraft();
   draft.open(reactive(AppConfig()));
-  return draft.copy.value!;
+  return present(draft.copy.value);
 }
 
 function openGeneralPage(copy: Config) {

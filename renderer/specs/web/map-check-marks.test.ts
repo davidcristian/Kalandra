@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { RareMap } from "@specs/Parser/items";
@@ -41,8 +42,11 @@ function converted(marks: MapCheckStat[]): MapCheckStat[] {
 }
 
 function target(ref: string, text: string) {
-  const stat = STAT_BY_REF(ref)!;
-  return markTarget(stat, stat.matchers.find((m) => m.string === text)!);
+  const stat = present(STAT_BY_REF(ref));
+  return markTarget(
+    stat,
+    present(stat.matchers.find((m) => m.string === text)),
+  );
 }
 
 beforeEach(() => {
@@ -135,7 +139,9 @@ describe("map check marks after a language change", () => {
 
     await loadForLang("en");
     const item = parseClipboard(RareMap.rawText)._unsafeUnwrap();
-    const crit = prepareMapStats(item).find((stat) => stat.matcher === CRIT)!;
+    const crit = present(
+      prepareMapStats(item).find((stat) => stat.matcher === CRIT),
+    );
 
     expect(findMark(marks, crit.target)).toBe(marks[0]);
     expect(isOutdated(1, marks[0])).toBe(false);
@@ -198,7 +204,7 @@ describe("the settings rows of a stat", () => {
   it("are one row for each key, named by its first wording, with every wording to search", async () => {
     await init("en");
 
-    const rows = statTargets(STAT_BY_REF(GOLD)!);
+    const rows = statTargets(present(STAT_BY_REF(GOLD)));
 
     expect(rows.map((row) => row.text)).toEqual([
       "#% increased Gold found in Map",
@@ -236,7 +242,7 @@ describe("the default marks of earlier versions", () => {
 
     nameDefaultMarksByRef(config);
 
-    expect(config.widgets[1].maps!.selectedStats).toEqual([
+    expect(present(config.widgets[1].maps).selectedStats).toEqual([
       { ref: RESISTANCES, decision: "w--" },
       { matcher: GOLD_DE, decision: "g--" },
       { ref: REFLECT, decision: "d--" },
@@ -249,7 +255,7 @@ describe("the default marks of earlier versions", () => {
     const config = savedConfig([{ matcher: RESISTANCES, decision: "w--" }]);
 
     nameDefaultMarksByRef(config);
-    const marks = config.widgets[1].maps!.selectedStats;
+    const marks = present(config.widgets[1].maps).selectedStats;
 
     expect(
       findMark(marks, target(RESISTANCES, "#% maximale Spielerwiderstände")),

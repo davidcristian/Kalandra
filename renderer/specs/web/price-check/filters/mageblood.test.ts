@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { reactive } from "vue";
 import { setupTests } from "@specs/vitest.setup";
@@ -48,11 +49,11 @@ function presetOf(legacies: Kind[]) {
 }
 
 function legacyFilter(stats: StatFilter[], kind: Kind) {
-  return stats.find((stat) => stat.option?.value === OPTION[kind])!;
+  return present(stats.find((stat) => stat.option?.value === OPTION[kind]));
 }
 
 function duplicatesFilter(stats: StatFilter[]) {
-  return stats.find((stat) => stat.tradeId[0] === "item.duplicates")!;
+  return present(stats.find((stat) => stat.tradeId[0] === "item.duplicates"));
 }
 
 /** The stat groups of the search, after `change` edits the stat filters as the user would. */
@@ -222,7 +223,7 @@ describe("the price check of a Mageblood", () => {
   it("leaves out the duplicates when the Duplicates filter is off", () => {
     const stats = search(["Topaz", "Topaz", "Gold", "Topaz"], (filters) => {
       const duplicates = duplicatesFilter(filters);
-      duplicates.roll!.min = 3;
+      present(duplicates.roll).min = 3;
       duplicates.disabled = true;
     });
 
@@ -268,7 +269,7 @@ describe("the price check of a Mageblood", () => {
   it("fails a search whose duplicates and checked kinds add up to more than four", () => {
     expect(() =>
       search(["Topaz", "Gold", "Topaz", "Jade"], (filters) => {
-        duplicatesFilter(filters).roll!.min = 2;
+        present(duplicatesFilter(filters).roll).min = 2;
       }),
     ).toThrow("not valid Mageblood, reduce duplicates or unselect a Legacy");
   });

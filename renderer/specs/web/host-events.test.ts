@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { ConfigProblem } from "@ipc/config-problem";
 import type { HostState, IpcEvent } from "@ipc/types";
@@ -133,12 +134,12 @@ describe("Host.logs after a reconnect", () => {
   it("replaces the page's copy with the history main sends to the new socket", async () => {
     vi.stubGlobal("WebSocket", FakeWebSocket);
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-    const first = FakeWebSocket.created.at(-1)!;
+    const first = present(FakeWebSocket.created.at(-1));
     first.receive(logEntry("[12:00:00] info before\n"));
 
     first.onclose({ code: 1006 });
     vi.runOnlyPendingTimers();
-    const second = FakeWebSocket.created.at(-1)!;
+    const second = present(FakeWebSocket.created.at(-1));
     await second.isOpen;
     second.receive(
       logEntry("[12:00:00] info before\n[12:00:01] info while closed\n"),
@@ -152,7 +153,7 @@ describe("Host.logs after a reconnect", () => {
 });
 
 // Each test after the reconnect test reads the socket that test opened
-const socket = () => FakeWebSocket.created.at(-1)!;
+const socket = () => present(FakeWebSocket.created.at(-1));
 
 describe("Host.unregisteredHotkeys", () => {
   it("keeps the last list of hotkeys main did not register", () => {

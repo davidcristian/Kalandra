@@ -118,6 +118,8 @@ part alone:
   lint fails when a file has more or fewer; `npm run lint -- --prune-suppressions` lowers a count
   after a fix. In `main/`, `existingOffenders` in `main/eslint.config.mjs` turns a rule off for
   the files listed; remove a file once it passes. Both lists only shrink.
+- A renderer test reads a value it expects through `present()` from `renderer/specs/present.ts`,
+  which fails the test when the value is `undefined` or `null`, rather than a non-null assertion.
 - ESLint checks rule 7 of AGENTS.md in both processes: `no-explicit-any`, `ban-ts-comment` for
   `@ts-ignore` and an `@ts-expect-error` without a reason, `no-empty` for an empty `catch`, and
   `no-restricted-syntax` for a cast through `unknown` and an empty `.catch()` handler. No installed

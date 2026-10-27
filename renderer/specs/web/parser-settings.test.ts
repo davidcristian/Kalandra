@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { describe, expect, it, vi } from "vitest";
 import { parserSettings } from "@/parser/settings";
 import { AppConfig } from "@/web/Config";
@@ -10,7 +11,7 @@ describe("parser settings", () => {
     expect(parserSettings().language).toBe("de");
 
     AppConfig().language = "ja";
-    AppConfig<PriceCheckWidget>("price-check")!.savedAugments = {
+    present(AppConfig<PriceCheckWidget>("price-check")).savedAugments = {
       Helmet: ["Iron Rune", null],
     };
 

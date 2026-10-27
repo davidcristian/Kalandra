@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
@@ -53,7 +54,7 @@ describe("the filters of a gem", () => {
     });
     expect(sent.filters.misc_filters?.filters).not.toHaveProperty("gem_level");
 
-    filters.gemLevel!.disabled = false;
+    present(filters.gemLevel).disabled = false;
     expect(query().filters.misc_filters?.filters.gem_level).toEqual({
       min: 14,
     });

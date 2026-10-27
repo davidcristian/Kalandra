@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import path from "path";
@@ -25,7 +26,7 @@ function savedListing(idPrefix: string): FetchResult {
   const data: { result: FetchResult[] } = JSON.parse(
     fs.readFileSync(filePath, "utf8"),
   );
-  return data.result.find((result) => result.id.startsWith(idPrefix))!;
+  return present(data.result.find((result) => result.id.startsWith(idPrefix)));
 }
 
 function getFetchResult(idPrefix: string) {
@@ -49,7 +50,7 @@ describe("pathofexile-trade tooltip parsing", () => {
     const displayItem = __testExports.parseFetchResult(
       getFetchResult("65c7c4e8"),
     );
-    const tiers = getTiers(displayItem!.explicitMods);
+    const tiers = getTiers(present(displayItem).explicitMods);
 
     expect(tiers).toEqual(["P2", "S3"]);
   });
@@ -58,7 +59,7 @@ describe("pathofexile-trade tooltip parsing", () => {
     const displayItem = __testExports.parseFetchResult(
       getFetchResult("ece06af2"),
     );
-    const tiers = getTiers(displayItem!.explicitMods);
+    const tiers = getTiers(present(displayItem).explicitMods);
 
     expect(tiers).toEqual(["P7", "P7", "P5", "S5", "S6"]);
   });
@@ -67,7 +68,7 @@ describe("pathofexile-trade tooltip parsing", () => {
     const displayItem = __testExports.parseFetchResult(
       getFetchResult("2fa2f1ee"),
     );
-    const tiers = getTiers(displayItem!.explicitMods);
+    const tiers = getTiers(present(displayItem).explicitMods);
 
     expect(tiers).toEqual(["P2 + P5", "P6", "P5", "S4", "S4", "S4"]);
   });
@@ -76,7 +77,7 @@ describe("pathofexile-trade tooltip parsing", () => {
     const displayItem = __testExports.parseFetchResult(
       getFetchResult("91c9f13"),
     );
-    const tiers = getTiers(displayItem!.explicitMods);
+    const tiers = getTiers(present(displayItem).explicitMods);
 
     expect(tiers).toEqual(["P19", "S1", "S1", "S1"]);
   });
@@ -89,8 +90,12 @@ describe("parseFetchResult", () => {
   });
 
   it("titles a rare by its name and base, and a magic item by its full name", () => {
-    const rare = __testExports.parseFetchResult(savedListing("00d17082eb"))!;
-    const magic = __testExports.parseFetchResult(savedListing("65c7c4e8e6"))!;
+    const rare = present(
+      __testExports.parseFetchResult(savedListing("00d17082eb")),
+    );
+    const magic = present(
+      __testExports.parseFetchResult(savedListing("65c7c4e8e6")),
+    );
 
     expect([rare.title, rare.rarity]).toEqual([
       ["Phoenix Brand", "Crumbling Maul"],
@@ -103,7 +108,9 @@ describe("parseFetchResult", () => {
   });
 
   it("puts a weapon's total dps above its physical and elemental dps", () => {
-    const maul = __testExports.parseFetchResult(savedListing("00d17082eb"))!;
+    const maul = present(
+      __testExports.parseFetchResult(savedListing("00d17082eb")),
+    );
 
     expect(maul.nameBlock).toEqual([
       { text: "Two Hand Mace ", value: "", color: WHITE },
@@ -120,7 +127,9 @@ describe("parseFetchResult", () => {
   });
 
   it("shows the defence of an armour from the listing's own value", () => {
-    const cap = __testExports.parseFetchResult(savedListing("65c7c4e8e6"))!;
+    const cap = present(
+      __testExports.parseFetchResult(savedListing("65c7c4e8e6")),
+    );
 
     expect(cap.nameBlock).toEqual([
       { text: "Helmet ", value: "", color: WHITE },
@@ -132,11 +141,12 @@ describe("parseFetchResult", () => {
     const waystone = savedListing("0c8eb03c18");
 
     expect(waystone.item.corrupted).toBe(true);
-    expect(__testExports.parseFetchResult(waystone)!.itemTags).toEqual([
+    expect(present(__testExports.parseFetchResult(waystone)).itemTags).toEqual([
       { text: CLIENT_STRINGS.CORRUPTED, color: UNMET },
     ]);
     expect(
-      __testExports.parseFetchResult(savedListing("00d17082eb"))!.itemTags,
+      present(__testExports.parseFetchResult(savedListing("00d17082eb")))
+        .itemTags,
     ).toEqual([]);
   });
 
@@ -175,7 +185,7 @@ describe("parseFetchResult", () => {
         ? String(CLIENT_STRINGS[key as keyof typeof CLIENT_STRINGS])
         : key;
 
-    expect(__testExports.parseFetchResult(listing)!.itemTags).toEqual(
+    expect(present(__testExports.parseFetchResult(listing)).itemTags).toEqual(
       tags.map(([key, color]) => ({ text: text(key), color })),
     );
   });
@@ -228,7 +238,7 @@ describe("requestResults with a listing it cannot read", () => {
       ]),
     ).toEqual([
       [good.id, ["Phoenix Brand", "Crumbling Maul"], 1, "46"],
-      [broken.id, undefined, broken.listing.price!.amount, "50"],
+      [broken.id, undefined, present(broken.listing.price).amount, "50"],
     ]);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toBeInstanceOf(TypeError);

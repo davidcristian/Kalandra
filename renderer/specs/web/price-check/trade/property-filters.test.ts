@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
@@ -46,7 +47,7 @@ function search(
 function prop(props: StatFilter[], tradeId: string) {
   const found = props.find((stat) => stat.tradeId[0] === tradeId);
   expect(found, tradeId).toBeDefined();
-  return found!;
+  return present(found);
 }
 
 describe("the item property filters of a trade search", () => {
@@ -111,7 +112,7 @@ describe("the item property filters of a trade search", () => {
 
   it("sends the maximum the user sets", () => {
     const query = search(ArmourHighValueRareItem, (props) => {
-      prop(props, "item.armour").roll!.max = 3000;
+      present(prop(props, "item.armour").roll).max = 3000;
     });
 
     expect(query.filters.equipment_filters?.filters.ar).toEqual({
@@ -166,11 +167,11 @@ describe("the item property filters of a trade search", () => {
     "leaves out the other elements when the elemental damage names element %s",
     (element, excluded, kept) => {
       const query = search(ItemAllTheModifierTypes, (props) => {
-        prop(props, "item.elemental_dps").option!.value = element;
+        present(prop(props, "item.elemental_dps").option).value = element;
       });
 
       const not = query.stats.find((group) => group.type === "not");
-      const ids = not!.filters.map((filter) => filter.id);
+      const ids = present(not).filters.map((filter) => filter.id);
       for (const stat of excluded) {
         expect(ids).toContain(`explicit.${stat}`);
       }

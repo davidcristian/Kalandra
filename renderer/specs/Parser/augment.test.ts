@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { init, Stat, StatBetter } from "@/assets/data";
 import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
@@ -458,7 +459,7 @@ describe("applyAugmentSockets", () => {
   });
 
   it("fills empty sockets with the augments saved for the item's category", () => {
-    AppConfig<PriceCheckWidget>("price-check")!.savedAugments = {
+    present(AppConfig<PriceCheckWidget>("price-check")).savedAugments = {
       [ItemCategory.Bow]: ["Greater Iron Rune", "Greater Iron Rune"],
     };
     const item = createTestItem();

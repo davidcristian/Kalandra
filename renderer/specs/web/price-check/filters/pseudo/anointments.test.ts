@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions } from "@specs/helper";
@@ -19,7 +20,9 @@ function amulet(enchant = "Allocates Cooked"): ParsedItem {
 }
 
 function enchantOf(item: ParsedItem): StatCalculated {
-  return item.statsByType.find((calc) => calc.type === ModifierType.Enchant)!;
+  return present(
+    item.statsByType.find((calc) => calc.type === ModifierType.Enchant),
+  );
 }
 
 function withOils(enchant: StatCalculated, oils: string[]): StatCalculated {
@@ -37,7 +40,7 @@ function anointment(item: ParsedItem) {
     (stat) => stat.statRef === "Allocates #",
   );
   expect(filter).toBeDefined();
-  return filter!;
+  return present(filter);
 }
 
 describe("the anointment filter of an amulet", () => {

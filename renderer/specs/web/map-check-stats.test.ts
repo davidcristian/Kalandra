@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
 import {
@@ -71,9 +72,9 @@ describe("the rows of the Map check window", () => {
 
   it("name a stat by its ref alone when the game data has no wording for its roll", () => {
     const item = parsed(RareMap.rawText);
-    const projectiles = item.statsByType.find(
-      (calc) => calc.stat.ref === PROJECTILES,
-    )!;
+    const projectiles = present(
+      item.statsByType.find((calc) => calc.stat.ref === PROJECTILES),
+    );
     // Only the wording for the value 0 is left, so the roll of 2 has none
     projectiles.stat = {
       ...projectiles.stat,

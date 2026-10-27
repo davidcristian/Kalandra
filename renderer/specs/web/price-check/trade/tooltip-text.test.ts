@@ -1,3 +1,4 @@
+import { present } from "@specs/present";
 import fs from "fs";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,9 +40,9 @@ function savedQuarterstaff(firstMod: string): FetchResult {
   const saved = readJson<{ result: FetchResult[] }>(
     "../../../docs/fetchResponses.json",
   );
-  const listing = saved.result.find((result) =>
-    result.id.startsWith("2fa2f1ee"),
-  )!;
+  const listing = present(
+    saved.result.find((result) => result.id.startsWith("2fa2f1ee")),
+  );
   const [, ...otherMods] = listing.item.explicitMods as string[];
   listing.item.explicitMods = [firstMod, ...otherMods];
   return listing;
@@ -50,7 +51,9 @@ function savedQuarterstaff(firstMod: string): FetchResult {
 /** The saved Swiftstalker Coat listing with its unrevealed modifiers replaced. */
 function savedUnrevealed(veiledMods: string[]): FetchResult {
   const saved = readJson<FetchResult[]>("../../../docs/fetchResponses2.json");
-  const listing = saved.find((result) => result.id.startsWith("95bcbe83"))!;
+  const listing = present(
+    saved.find((result) => result.id.startsWith("95bcbe83")),
+  );
   listing.item.veiledMods = veiledMods;
   return listing;
 }
@@ -107,13 +110,15 @@ describe("tooltipLineText", () => {
     });
 
     it("shows its properties and its mods", () => {
-      const displayItem = __testExports.parseFetchResult(
-        savedQuarterstaff("Allocates {Something}"),
-      )!;
+      const displayItem = present(
+        __testExports.parseFetchResult(
+          savedQuarterstaff("Allocates {Something}"),
+        ),
+      );
       const lineText = (line: { text: string }) =>
         tooltipLineText(line.text, createAppI18n("en"));
 
-      expect(displayItem.nameBlock!.map(lineText)).toEqual([
+      expect(present(displayItem.nameBlock).map(lineText)).toEqual([
         "Quarterstaff ",
         "Quality: ",
         "Total DPS: ",
@@ -121,7 +126,7 @@ describe("tooltipLineText", () => {
         "Critical Hit Chance: ",
         "Attacks per Second: ",
       ]);
-      expect(lineText(displayItem.explicitMods![0])).toBe(
+      expect(lineText(present(displayItem.explicitMods)[0])).toBe(
         "Allocates {Something}",
       );
       expect(logged).toEqual([]);
@@ -130,11 +135,9 @@ describe("tooltipLineText", () => {
     it("names its unrevealed modifiers with the game's text", async () => {
       const listing = savedUnrevealed(["Prefix05", "Suffix02"]);
       const lineTexts = (lang: string) =>
-        __testExports
-          .parseFetchResult(listing)!
-          .veiledMods!.map((line) =>
-            tooltipLineText(line.text, createAppI18n(lang)),
-          );
+        present(
+          present(__testExports.parseFetchResult(listing)).veiledMods,
+        ).map((line) => tooltipLineText(line.text, createAppI18n(lang)));
 
       expect(lineTexts("en")).toEqual([
         "Desecrated Prefix",
