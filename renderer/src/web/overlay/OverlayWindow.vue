@@ -78,7 +78,7 @@ export default defineComponent({
   },
   setup() {
     usePoeninja();
-    useLeagues().load();
+    void useLeagues().load(); // load() sets error when it fails
     const { handleLines } = useClientLog();
 
     const active = shallowRef(!Host.isElectron);
@@ -102,9 +102,9 @@ export default defineComponent({
     });
 
     window.addEventListener("blur", () => {
-      nextTick(() => {
+      void nextTick(() => {
         saveConfig();
-      });
+      }); // Nothing waits for the save
     });
     window.addEventListener("focus", () => {
       Host.sendEvent({
@@ -147,13 +147,13 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      nextTick(() => {
+      void nextTick(() => {
         Host.sendEvent({
           name: "CLIENT->MAIN::used-recently",
           payload: { isOverlay: Host.isElectron },
         });
         pushHostConfig();
-      });
+      }); // Nothing waits for the events to be sent
     });
 
     const size = (() => {

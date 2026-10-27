@@ -1,9 +1,9 @@
 # Existing code in main and the renderer leaves promises floating
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** rules
 **Origin:** [main/eslint.config.mjs](../../../../main/eslint.config.mjs)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 ESLint checks `@typescript-eslint/no-floating-promises` and `@typescript-eslint/no-misused-promises`
 in both processes, except for the code that broke them when they were turned on. In main,
@@ -35,3 +35,5 @@ with `void` and its reason on the line. Then its file leaves `existingOffenders`
   prediction was removed.
 - 2026-10-26: `shortcuts/Shortcuts.ts` left the main list when the Heist gem OCR was removed with
   its call to `OcrWorker.updateOptions()`.
+- 2026-10-27: fix(main): handle each promise that main does not await, and fix(renderer): handle
+  each promise that the renderer does not await. Neither list holds the two promise rules now.

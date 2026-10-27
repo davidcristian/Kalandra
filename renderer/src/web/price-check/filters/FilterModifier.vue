@@ -235,14 +235,14 @@ export default defineComponent({
       set(value) {
         if (typeof value[0] === "number") {
           props.filter.roll!.min = value[0];
-          nextTick(() => {
+          void nextTick(() => {
             inputMinEl.value!.focus();
-          });
+          }); // Nothing waits for the focus to move
         } else if (typeof value[1] === "number") {
           props.filter.roll!.max = value[1];
-          nextTick(() => {
+          void nextTick(() => {
             inputMaxEl.value!.focus();
-          });
+          }); // Nothing waits for the focus to move
         }
         props.filter.disabled = false;
       },
@@ -256,9 +256,9 @@ export default defineComponent({
         } else if (type === "min") {
           props.filter.roll!.min = props.filter.roll!.default.min;
         }
-        nextTick(() => {
+        void nextTick(() => {
           target.select();
-        });
+        }); // Nothing waits for the text to be selected
       } else {
         target.select();
       }

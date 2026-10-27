@@ -247,10 +247,10 @@ export default defineComponent({
       queuePricesFetch,
     } = usePoeninja();
 
-    nextTick(() => {
+    void nextTick(() => {
       props.config.wmWants = "hide";
       props.config.wmFlags = ["hide-on-blur", "menu::skip"];
-    });
+    }); // Nothing waits for the flags to change
 
     const item = ref<null | Result<ParsedItem, ParseError>>(null);
     const advancedCheck = shallowRef(false);
@@ -405,9 +405,9 @@ export default defineComponent({
 
     function showBrowser(url: string) {
       wm.setFlag(props.config.wmId, "has-browser", true);
-      nextTick(() => {
+      void nextTick(() => {
         iframeEl.value!.src = url;
-      });
+      }); // Nothing waits for the page to open
     }
 
     function closeBrowser() {

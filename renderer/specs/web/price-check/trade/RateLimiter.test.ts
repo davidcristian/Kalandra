@@ -17,6 +17,7 @@ describe("RateLimiter", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("holds a request until the window of the oldest request ends", async () => {
@@ -117,6 +118,25 @@ describe("RateLimiter", () => {
 
     expect(request.sent).toBe(true);
     expect(replacement.stack.length).toBe(1);
+  });
+
+  it("sends a request, and logs that a limiter destroyed after the wait did not count it", async () => {
+    const warnings: string[] = [];
+    vi.spyOn(console, "warn").mockImplementation((text: string) => {
+      warnings.push(text);
+    });
+    const removed = new RateLimiter(10, 5);
+    const kept = new RateLimiter(10, 5);
+
+    const request = RateLimiter.waitMulti([removed, kept]);
+    removed.destroy();
+    await request;
+
+    expect(removed.stack.length).toBe(0);
+    expect(kept.stack.length).toBe(1);
+    expect(warnings).toEqual([
+      "Did not count a request against a removed rate limit:",
+    ]);
   });
 
   it("restricts nothing once destroyed", () => {

@@ -264,7 +264,7 @@ export default defineComponent({
       selectedResults,
       selectedCurr,
       execSearch: () => {
-        search(props.item, props.filters);
+        void search(props.item, props.filters); // search() sets error when it fails
       },
       showSeller: computed(() => widget.value.showSeller),
       makeTradeLink,

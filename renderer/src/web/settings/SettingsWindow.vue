@@ -201,9 +201,9 @@ export default defineComponent({
     const wm = inject<WidgetManager>("wm")!;
     const { t } = useI18n();
 
-    nextTick(() => {
+    void nextTick(() => {
       props.config.wmWants = "hide";
-    });
+    }); // Nothing waits for the flag to change
 
     const selectedComponent = shallowRef<Component>(SettingsHotkeys);
 

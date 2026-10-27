@@ -214,11 +214,11 @@ export default defineComponent({
         );
 
         // NOTE: child `trade-xxx` component renders/receives props on nextTick
-        nextTick(() => {
+        void nextTick(() => {
           if (tradeService.value) {
             tradeService.value.execSearch();
           }
-        });
+        }); // Nothing waits for the search to start
       },
       { deep: false, immediate: true },
     );
@@ -248,9 +248,9 @@ export default defineComponent({
         const pTrade = prev[1];
 
         if (cItem === pItem && cTrade !== pTrade) {
-          nextTick(() => {
+          void nextTick(() => {
             doSearch.value = true;
-          });
+          }); // Nothing waits for the flag to change
         }
       },
       { deep: false },

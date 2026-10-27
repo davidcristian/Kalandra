@@ -185,7 +185,7 @@ export const useTradeData = createGlobalState(() => {
   }
 
   setInterval(() => {
-    load();
+    void load(); // load() sets error when it fails
   }, RETRY_INTERVAL_MS);
 
   return {

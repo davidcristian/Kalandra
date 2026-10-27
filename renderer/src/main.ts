@@ -53,4 +53,4 @@ function showStartupError(message: string) {
   document.getElementById("app")!.replaceChildren(box);
 }
 
-startApp(start, showStartupError);
+void startApp(start, showStartupError); // startApp() logs and shows a failed start

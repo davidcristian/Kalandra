@@ -233,9 +233,9 @@ const wm = inject<WidgetManager>("wm")!;
 const { t } = useI18nNs("item_search");
 const { findPriceByQuery, autoCurrency, queuePricesFetch } = usePoeninja();
 
-nextTick(() => {
+void nextTick(() => {
   props.config.wmFlags = ["invisible-on-blur"];
-});
+}); // Nothing waits for the flags to change
 
 const searchValue = shallowRef("");
 const { items: starred, addItem, clearItems } = useSelectedItems();

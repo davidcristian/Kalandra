@@ -94,7 +94,13 @@ export class RateLimiter {
 
     if (_limiters.every((rl) => !rl.isFullyUtilized && !rl.isRestricted)) {
       _limiters.forEach((rl) => {
-        rl.wait();
+        // A limiter destroyed after the wait above rejects, and it no longer counts requests
+        rl.wait().catch((error: unknown) => {
+          console.warn(
+            "Did not count a request against a removed rate limit:",
+            error,
+          );
+        });
       });
     } else {
       return this.waitMulti(limiters);

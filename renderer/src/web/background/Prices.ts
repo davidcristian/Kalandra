@@ -230,7 +230,7 @@ export const usePoeninja = createGlobalState(() => {
 
   function queuePricesFetch() {
     lastInterestTime = Date.now();
-    load();
+    void load(); // load() logs its own failure
   }
 
   function selectedLeagueToUrl(): string {
@@ -403,14 +403,14 @@ export const usePoeninja = createGlobalState(() => {
   }
 
   setInterval(() => {
-    load();
+    void load(); // load() logs its own failure
   }, RETRY_INTERVAL_MS);
 
   function reloadForNewSelection() {
     xchgRate.value = undefined;
     PRICES_DB = [];
     priceCache.clear();
-    load(true);
+    void load(true); // load() logs its own failure
   }
 
   watch(leagues.selectedId, reloadForNewSelection);

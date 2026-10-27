@@ -191,7 +191,7 @@ export default defineComponent({
         }
       }),
       execSearch: () => {
-        search(props.filters, props.stats, props.item);
+        void search(props.filters, props.stats, props.item); // search() sets error when it fails
       },
       execFilterExaltDivine: () => {
         props.filters.trade.currency = "exalted_divine";

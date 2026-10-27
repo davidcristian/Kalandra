@@ -116,9 +116,9 @@ if (props.config.wmFlags[0] === "uninitialized") {
     y: Math.random() * (15 - 5) + 5,
   };
   props.config.images = [];
-  nextTick(() => {
+  void nextTick(() => {
     wm.show(props.config.wmId);
-  });
+  }); // Nothing waits for the widget to show
 }
 
 const { failed, addImage } = useImageImport(props.config, (file) =>
