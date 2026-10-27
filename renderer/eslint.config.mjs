@@ -56,6 +56,10 @@ export default defineConfigWithVueTs(
       "@typescript-eslint/prefer-reduce-type-parameter": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
       "@typescript-eslint/consistent-indexed-object-style": "off",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "as", objectLiteralTypeAssertions: "never" },
+      ],
       "func-call-spacing": "off",
       "object-shorthand": "off",
       // A void statement marks a promise left to run on its own, which no-floating-promises accepts

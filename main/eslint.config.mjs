@@ -56,6 +56,10 @@ export default defineConfig(
       // A void statement marks a promise left to run on its own, which no-floating-promises accepts
       "no-void": ["error", { allowAsStatement: true }],
       "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "as", objectLiteralTypeAssertions: "never" },
+      ],
       "no-empty": ["error", { allowEmptyCatch: false }],
       "no-restricted-syntax": ["error", castThroughUnknown, emptyCatchHandler],
     },
