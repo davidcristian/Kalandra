@@ -28,6 +28,7 @@ import { decodeOils, applyAnointmentRules } from "./pseudo/anointments";
 import { StatBetter, CLIENT_STRINGS, CATALYST_TYPES } from "@/assets/data";
 import { explicitModifierCount, maxUsefulItemLevel } from "./common";
 import { getMaxSockets } from "@/parser/Parser";
+import { enableHighTierFilters } from "./high-tier-filters";
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem;
@@ -196,6 +197,7 @@ export function initUiModFilters(
   opts: {
     searchStatRange: number;
     defaultAllSelected: boolean;
+    highTierSelected: boolean;
   },
 ): StatFilter[] {
   const ctx: FiltersCreationContext = {
@@ -270,6 +272,7 @@ export function initUiModFilters(
   }
 
   finalFilterTweaks(ctx);
+  if (opts.highTierSelected) enableHighTierFilters(ctx.filters, item);
 
   if (opts.defaultAllSelected) {
     enableAllFilters(ctx.filters);

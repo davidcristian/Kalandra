@@ -155,6 +155,7 @@ export default defineComponent({
             ? prevListingType
             : undefined,
           defaultAllSelected: widget.value.defaultAllSelected,
+          highTierSelected: suggestedPriceEnabled(),
         });
 
         if (

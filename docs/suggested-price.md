@@ -15,6 +15,9 @@ below it, and click **Save**. With it on, the price check also searches the trad
 rare item, as it does for a unique, so the line has listings to work from. The two toggles under **Perform an auto
 search, when pressing** in the price check settings still turn that search off.
 
+For a rare item, it also turns on the stat filters of the item's tier 1 and tier 2 modifiers, the ones the window marks
+with their tier, so the search finds items with the same strong rolls. A jewel keeps its filters off.
+
 ## What the line shows
 
 For example: **Suggested price:** `~ 6 ex (5 ~ 8 ex)` **high reliability**, after a yellow exclamation mark.

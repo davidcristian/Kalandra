@@ -14,7 +14,11 @@ import { setupTests } from "@specs/vitest.setup";
 // stats.ndjson has null trade ids for the skill of every buckler and for each logbook faction
 const REFS = ["Grants Skill: Parry", "Has Logbook Faction: Knights of the Sun"];
 const TYPES = [ModifierType.Explicit, ModifierType.Crafted];
-const OPTS = { searchStatRange: 10, defaultAllSelected: true };
+const OPTS = {
+  searchStatRange: 10,
+  defaultAllSelected: true,
+  highTierSelected: false,
+};
 
 function withEmptyIds(calc: StatCalculated): StatCalculated {
   const copy = structuredClone(calc);

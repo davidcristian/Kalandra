@@ -1768,3 +1768,34 @@ export const MagicNameWithHashOfAnotherItem = itemWithLine(
   "Milarofilegu Temple Maul of the Brute",
 );
 // #endregion MagicNameWithHashOfAnotherItem
+
+// #region HypnoticKnuckle
+export const HypnoticKnuckle = new TestItem(`Item Class: Gloves
+Rarity: Rare
+Hypnotic Knuckle
+Cultist Gauntlets
+--------
+Armour: 98
+Evasion Rating: 90
+--------
+Requires: Level 75, 52 Str, 52 Dex
+--------
+Sockets: S
+--------
+Item Level: 81
+--------
++18% to Fire Resistance (rune)
+--------
+{ Prefix Modifier "Flaring" (Tier: 1) — Damage, Physical, Attack }
+Adds 17(12-19) to 26(22-32) Physical Damage to Attacks
+{ Suffix Modifier "of the Lightning" (Tier: 2) — Elemental, Lightning, Resistance }
++40(36-40)% to Lightning Resistance
+{ Suffix Modifier "of Consumption" (Tier: 4) — Mana }
+Gain 15(15-20) Mana per enemy killed
+{ Suffix Modifier "of Ferocity" (Tier: 1) — Damage, Critical }
+31(30-34)% increased Critical Damage Bonus
+`);
+HypnoticKnuckle.category = ItemCategory.Gloves;
+HypnoticKnuckle.rarity = ItemRarity.Rare;
+HypnoticKnuckle.itemLevel = 81;
+// #endregion HypnoticKnuckle

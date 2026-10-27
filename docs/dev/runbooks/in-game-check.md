@@ -148,8 +148,9 @@ General, sets another path), and uses Alt when the file does not set it
   league id becomes that file name is in [price-service.md](../modules/price-service.md#the-files).
   The file's categories are in `renderer/public/data/namespaceMap.json`. With "Enable experimental
   features" and "Suggested price in the price check" on in Settings, General, a normal, magic or
-  rare item searches at once, and the line "Suggested price:" over the listings shows a price, a
-  range and a reliability, or "too few listings" ([suggested-price.md](../../suggested-price.md)).
+  rare item searches at once, a rare with the stats of its tier 1 and 2 modifiers ticked, and the
+  line "Suggested price:" over the listings shows a price, a range and a reliability, or "too few
+  listings" ([suggested-price.md](../../suggested-price.md)).
   Keep Ctrl held and move
   the cursor into the window: it takes focus, and Ctrl can be released. Release Ctrl and move the
   cursor away from the item instead: the window closes (`main/src/windowing/WidgetAreaTracker.ts`).

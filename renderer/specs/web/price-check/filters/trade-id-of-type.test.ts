@@ -14,7 +14,11 @@ import {
 import { createTestItem } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
 
-const OPTS = { searchStatRange: 10, defaultAllSelected: false };
+const OPTS = {
+  searchStatRange: 10,
+  defaultAllSelected: false,
+  highTierSelected: false,
+};
 
 // Real lines: the crafted suffix of the Obliterator Bow and the implicit of the crossbow in specs/Parser/items.ts
 const CRIT = "#% to Critical Hit Chance";
