@@ -175,3 +175,4 @@ layout and its reasons.
 - 111: [Nothing reads the gem field of the item data](tasks/111-unread-gem-field.md)
 - 112: [Two data builds write different stats files when Python's hash seed differs](tasks/112-dataparser-output-depends-on-hash-seed.md)
 - 113: [A fix outside the app does not start the Build run that a failed upload needs](tasks/113-build-not-started-by-a-fix-outside-the-app.md)
+- 114: [The committed augment lines have a socketBound field that nothing reads](tasks/114-unread-augment-socket-bound-field.md)

@@ -3,7 +3,7 @@
 **Status:** open
 **Area:** dataparser
 **Origin:** [dataParser/src/services/nd_builder_service.py](../../../../dataParser/src/services/nd_builder_service.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 Exiled Exchange 2 developed the data tool in a private repo, so the committed data can be newer
 than this copy ([AGENTS.md](../../../../AGENTS.md#what-this-is)). On 2026-10-18 the committed
@@ -42,3 +42,15 @@ committed files; or record that the data is maintained another way. Step 5 of
 - 2026-10-27: The maintainer chose to bring this copy up to the committed data. First compare a
   build from the local game export with the committed files, then write each missing builder, the
   Waystone `map` field first, until a run reproduces them.
+- 2026-10-27: The tool now writes the Waystone `map` field, the `fixedStats` of six more uniques,
+  the inverted Flesh Crucible damage, the Facebreaker `dp`, the `Grants Skill:` stats, the
+  `Legacy of #` and Flesh Crucible keystone stats, and augment lines with the item classes of the
+  game's categories, every stat of a core, the values the game shows and a lookup by stat hash. A
+  build from the inputs of 25 Oct 2026 matches the committed English records, compared as parsed
+  JSON without icons, but for newer inputs (9 stats added or renamed, the trade ids of 2 stats, the
+  augment lines of 7 items, 5 `tradeTag` values), fields nothing reads (`gem` on 870 gems,
+  `socketBound` on 292 items, 1 `trade.count`, the `id` of 9 merged stats) and the augment lines of
+  6 items that the committed data lacks. The Japanese, Portuguese and French `Grants Skill:` texts
+  differ, since the export has newer text and the French committed text has a backslash. Open until
+  the maintainer's data update; the unread fields are
+  [114](114-unread-augment-socket-bound-field.md).

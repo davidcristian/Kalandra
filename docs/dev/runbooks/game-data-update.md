@@ -98,7 +98,9 @@ On 18 Oct 2026 the last two print 445 and 16.
 
 5. **Read the diff.** Run the commands from [Before the run](#before-the-run) again, then
    `git diff --stat renderer/public/data`. Expect changed lines in all nine languages for the stats and items the
-   patch changed. Stop and ask the maintainer, and do not commit, when:
+   patch changed. The first push after 27 Oct 2026 also makes the changes that
+   [dataparser.md](../modules/dataparser.md#outputs) lists, such as removing the `gem` and `socketBound` fields that
+   nothing reads. Stop and ask the maintainer, and do not commit, when:
 
    - a language has fewer lines in `stats.ndjson` or `items.ndjson` than before, and the patch removed nothing that
      explains it;

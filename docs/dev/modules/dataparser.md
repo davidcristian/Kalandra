@@ -181,9 +181,15 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   in place of each placeholder such as `{0}`. A write that fails, such as on text with no UTF-8 form, logs `Failed to write <path>: <error>` and
   stops the build.
 
-`dataParser/output/` is tracked by git, and `--push` copies from it. On 18 Oct 2026 the app's data is newer than this
-output: `wc -l` gives 1936 lines for `dataParser/output/en/stats.ndjson` and 2526 for
-`renderer/public/data/en/stats.ndjson`.
+`dataParser/output/` is tracked by git, and `--push` copies from it; it is older than the app's data. A build from
+the game export and trade data of 25 Oct 2026 writes the app's English records, compared as parsed JSON without
+icons, except for these, and the other languages differ in the same ways:
+
+- newer inputs: 8 stats only the build has and 1 only the app has, the trade ids of 2 stats, the augment lines of 7
+  items and the `tradeTag` of 5 Wombgifts; in other languages also game text, such as 10 German stats;
+- fields nothing reads: `gem` on 870 gems, `socketBound` on each augment line, `trade.count` on `Legacy of #`, and
+  the `id` that 9 stats merged from several game stat ids keep;
+- augment lines on 6 items, such as Idol of Sirrius, that the app's data lacks.
 
 `--push` writes only the three files per language. The other files in `renderer/public/data/` (`namespaceMap.json`,
 `item-drop.json`, `item-drop.jsonc`, `patrons.json` and each `app_i18n.json`) are not this tool's output. After a
@@ -236,7 +242,7 @@ gives the markers: `needs_game_export` skips when `data/vendor/tables/` and `dat
 `.gitkeep`, and `needs_trade_data` when `data/json/` holds none. `test_game_store_i.py` needs the export, and the
 `main()` tests that build every language need both. `ValueConverterService` reads the blight tables on first use and
 the advanced stat descriptions through `GameStore`, so its tests give it small tables through a `FakeGameStore`.
-Without the inputs, 245 tests pass and 280 skip on 27 Oct 2026.
+Without the inputs, 271 tests pass and 289 skip on 27 Oct 2026.
 
 **Dependencies.** Python 3.12, the packages in `requirements.txt` ([Setup](#setup)), Node.js for `cloudscraper` and
 `npx`, `pathofexile-dat` 16.0.0 from npm, a local Path of Exile 2 install, and the official trade sites.
