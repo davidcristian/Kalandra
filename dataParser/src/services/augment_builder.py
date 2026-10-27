@@ -119,11 +119,7 @@ class AugmentBuilder:
         exploded_joined = soul_core_stats.explode("Stats").merge(
             stats, how="inner", left_on="Stats", right_index=True
         )[["SoulCore", "StatCategory", "Id", "StatsValues"]]
-        with_id = (
-            exploded_joined.loc[~exploded_joined.index.duplicated()]
-            .dropna(subset=["Id"])
-            .reset_index(drop=True)
-        )
+        with_id = exploded_joined.dropna(subset=["Id"]).reset_index(drop=True)
         joined = with_id.merge(nd_stats, left_on="Id", right_on="id", how="inner")
 
         joined["matcher"] = joined["matchers"].apply(self.first_non_negated)

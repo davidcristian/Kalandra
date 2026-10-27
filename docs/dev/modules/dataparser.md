@@ -159,10 +159,10 @@ inside a value stops the build with a `ValueError`, since `JSON.parse` in the ap
   `h`, and `craftable`, `unique`, `tradeTag`, `armour`, `map` and `augment` where they apply. `map` is a Waystone's
   `tier`, the number in its `BaseItemTypes` id such as `MapKeyTier12` (`src/services/map_tiers.py`). `unique` names
   the `base`, and for a unique in `UNIQUE_ITEMS_FIXED_STATS` (`src/constants/known_stats.py`) its `fixedStats`: the
-  refs of the stats that every copy has, so the price check tags its other stats as a variant. `augment` lists the
-  stats of a rune or soul core by item category: the `ItemClasses` ids that its `SoulCoreStatCategories` row targets,
-  or for a row that targets none, such as `Martial Weapon`, those in `SOUL_CORE_CLASS_MAPPINGS`
-  (`src/services/augment_builder.py`). A unique's `refName` is its name on the English trade site, and its `name` is
+  refs of the stats that every copy has, so the price check tags its other stats as a variant. `augment` has a line
+  for each stat of a rune or soul core's `SoulCoreStats` rows, with all the values of its row, and the item
+  categories: the `ItemClasses` ids that its `SoulCoreStatCategories` row targets, or for a row that targets none,
+  such as `Martial Weapon`, those in `SOUL_CORE_CLASS_MAPPINGS` (`src/services/augment_builder.py`). A unique's `refName` is its name on the English trade site, and its `name` is
   the `Text2` of the game's `Words` row whose English `Text2` is that name (`src/services/unique_names.py`). `Text` is
   the game's internal name, which keeps an old name after a rename. A unique without such a row is left out and
   logged as `No unique named <name> ...`.
