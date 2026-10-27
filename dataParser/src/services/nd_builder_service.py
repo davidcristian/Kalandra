@@ -23,7 +23,7 @@ from constants.known_stats import (
 from constants.lang import ENGLISH, LANG
 from constants.mod_types import AUGMENT, EXPLICIT, MOD_TYPES, RUNE
 from services import english_stat_list
-from services.image_provider import MODE, ImageProvider
+from services.image_provider import DEFAULT_LEAGUE, MODE, ImageProvider
 from services.logbook_factions import LogbookFactions
 from services.nd_builder_functions import (
     craftable,
@@ -51,7 +51,11 @@ class NdBuilderService:
     items: pd.DataFrame
 
     def __init__(
-        self, lang: LANG, image_mode: MODE, image_cache_dir: str | None = None
+        self,
+        lang: LANG,
+        image_mode: MODE,
+        image_cache_dir: str | None = None,
+        league: str = DEFAULT_LEAGUE,
     ) -> None:
         self.lang: LANG = lang
 
@@ -63,6 +67,7 @@ class NdBuilderService:
         self.vc = ValueConverterService(lang)
         self.image_mode: MODE = image_mode
         self.image_cache_dir: str | None = image_cache_dir
+        self.league: str = league
         self.specific_column_service = SpecificColumnService(lang)
         self.logbook_factions = LogbookFactions(lang)
 
@@ -414,7 +419,9 @@ class NdBuilderService:
         return filtered
 
     def apply_images(self, items: pd.DataFrame) -> pd.DataFrame:
-        return ImageProvider(self.image_mode, self.image_cache_dir).apply_images(items)
+        return ImageProvider(
+            self.image_mode, self.image_cache_dir, league=self.league
+        ).apply_images(items)
 
     def fill_in_missing_matchers(self, joined_df_i: pd.DataFrame) -> pd.DataFrame:
         trade_stats_df = english_stat_list.language_text_rows(self.stats_combined_df())

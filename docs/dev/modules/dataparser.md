@@ -30,6 +30,7 @@ flags (`src/main.py`):
 | --- | --- | --- |
 | `--pull` | off | first runs the game export and pulls the trade site data into `data/`, then builds |
 | `--image-mode` | `noLookup` | how the English build finds item icons: `noLookup`, `missing`, `new` or `all` ([Image modes](#image-modes)) |
+| `--league` | `Standard` | the trade league the image lookups search, as the trade site names it |
 | `--push` | off | copies each language's three files to `<main-repo-path>/renderer/public/data/<lang>/` |
 | `--main-repo-path` | `..` | the repo root, which is the parent of `dataParser/` |
 | `--log` | `info` | the log level: `debug`, `info`, `warn` or `error` |
@@ -114,8 +115,9 @@ missing, as `data/json/fr/` is in a clone, since that folder has no `.gitkeep`.
 - `missing` looks up items that are missing from the cache or cached as `%NOT_FOUND%`.
 - `all` looks up every item.
 
-A lookup is a trade search and a fetch on `www.pathofexile.com`, in the league that `SEARCH_URL` names, through the
-tool's own `RateLimiter` (`src/services/rate_limiter.py`). After each response it reads the `X-Rate-Limit-Ip` and
+A lookup is a trade search and a fetch on `www.pathofexile.com`, through the tool's own `RateLimiter`
+(`src/services/rate_limiter.py`). The search is in the league that `--league` names, which `search_url()` adds to
+the search address. The default is `DEFAULT_LEAGUE`, `Standard`, since the trade site lists it in every season. After each response it reads the `X-Rate-Limit-Ip` and
 `X-Rate-Limit-Ip-State` headers. With T as twice the seconds per request a rule allows, it waits 1.4 T when the
 previous response of the same policy came at most 1.5 T before, 3 T when the rule's count is at 90% of its limit, and
 the rule's full penalty when the state reports a restriction.

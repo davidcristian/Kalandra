@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 from typing import Any, Literal
+from urllib.parse import quote
 
 import pandas as pd
 from tqdm import tqdm
@@ -17,7 +18,9 @@ MODE = Literal["noLookup", "missing", "new", "all"]
 
 logger = logging.getLogger(__name__)
 
-SEARCH_URL = "https://www.pathofexile.com/api/trade2/search/Fate%20of%20the%20Vaal"
+SEARCH_URL = "https://www.pathofexile.com/api/trade2/search/"
+# Standard never ends, so the default never names a league the trade site no longer lists
+DEFAULT_LEAGUE = "Standard"
 SEARCH_HEADERS = {"content-type": "application/json"}
 FETCH_URL = "https://www.pathofexile.com/api/trade2/fetch/"
 NOT_FOUND = "%NOT_FOUND%"
@@ -35,6 +38,11 @@ def get_script_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))
 
 
+def search_url(league: str) -> str:
+    """Returns the address of a trade search in the league."""
+    return SEARCH_URL + quote(league, safe="")
+
+
 def backup_cache(cache_dir: str | None = None) -> None:
     """Copies the image cache to its backup file, or writes an empty backup when there is no cache."""
     folder = cache_dir or get_script_dir()
@@ -50,11 +58,16 @@ def backup_cache(cache_dir: str | None = None) -> None:
 
 class ImageProvider:
     def __init__(
-        self, mode: MODE, cache_dir: str | None = None, net: RateLimiter | None = None
+        self,
+        mode: MODE,
+        cache_dir: str | None = None,
+        net: RateLimiter | None = None,
+        league: str = DEFAULT_LEAGUE,
     ) -> None:
         self.mode: MODE = mode
         self.cache_dir: str = cache_dir or get_script_dir()
         self.net: RateLimiter = net or RateLimiter(debug=False)
+        self.search_url: str = search_url(league)
         self.failed_in_a_row: int = 0
 
         self.cache: dict[str, str] = self.get_cache()
@@ -121,7 +134,9 @@ class ImageProvider:
     def get_fetch_id(self, item: ItemImage) -> str | None:
         payload = item.search_payload()
         for _ in range(3):
-            result = self.net.post(SEARCH_URL, payload=payload, headers=SEARCH_HEADERS)
+            result = self.net.post(
+                self.search_url, payload=payload, headers=SEARCH_HEADERS
+            )
             if result.status_code == 200:
                 data = result.json()
                 if data.get("result") and len(data.get("result")) > 0:

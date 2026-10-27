@@ -17,7 +17,7 @@ from constants.lang import ENGLISH, LANG, LANGUAGES
 from providers.game_api import GameDataProvider
 from providers.trade_api import TradeApiProvider, create_trade_session
 from services.client_strings_builder import ClientStringsBuilder
-from services.image_provider import MODE, backup_cache
+from services.image_provider import DEFAULT_LEAGUE, MODE, backup_cache
 from services.nd_builder_service import NdBuilderService
 from services.request_pacer import RequestPacer
 
@@ -61,6 +61,7 @@ def main(
     main_repo_path: str = "..",
     output_dir: str = "output",
     image_cache_dir: str | None = None,
+    league: str = DEFAULT_LEAGUE,
 ) -> None:
     """Builds the three files of every language into output_dir/<lang>."""
     if pull:
@@ -83,6 +84,7 @@ def main(
             lang,
             image_mode if lang is ENGLISH else "noLookup",
             image_cache_dir,
+            league,
         )
         lang_dir = os.path.join(output_dir, lang)
         os.makedirs(lang_dir, exist_ok=True)
@@ -118,6 +120,11 @@ if __name__ == "__main__":
         default="noLookup",
         choices=["noLookup", "missing", "new", "all"],
         help="Image mode (noLookup, missing, new, all)",
+    )
+    _ = parser.add_argument(
+        "--league",
+        default=DEFAULT_LEAGUE,
+        help=f"Trade league the image lookups search (default: {DEFAULT_LEAGUE})",
     )
     _ = parser.add_argument(
         "--push",

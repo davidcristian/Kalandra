@@ -1,9 +1,9 @@
 # The image lookup searches a fixed league
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** dataparser
 **Origin:** [dataParser/src/services/image_provider.py](../../../../dataParser/src/services/image_provider.py)
-**Verified:** 2026-10-18
+**Verified:** 2026-10-27
 
 `SEARCH_URL` in `image_provider.py` is
 `https://www.pathofexile.com/api/trade2/search/Fate%20of%20the%20Vaal`, so every image lookup
@@ -23,3 +23,6 @@ runbook no longer asks for a code change.
 ## History
 
 - 2026-10-18: Found while the game data update runbook was written.
+- 2026-10-27: Done in `feat(dataparser): set the league of the image lookups with --league`.
+  The option defaults to `Standard`, `search_url()` adds it to the search address, and step 3 of
+  the runbook passes it on the command line. No lookup was sent to the trade site.

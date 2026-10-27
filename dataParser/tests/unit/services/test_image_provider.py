@@ -154,6 +154,30 @@ def test_failed_lookups_in_a_row_end_the_run_before_the_next_search(
     }
 
 
+def test_a_lookup_searches_standard_when_no_league_is_given(tmp_path: Path) -> None:
+    provider, session = provider_for(tmp_path, found("a1", RING_ICON))
+
+    _ = provider.apply_images(rings("Ruby Ring"))
+
+    assert [url for url, _ in session.sent] == [
+        "https://www.pathofexile.com/api/trade2/search/Standard",
+        "https://www.pathofexile.com/api/trade2/fetch/a1",
+    ]
+
+
+def test_a_lookup_searches_the_given_league(tmp_path: Path) -> None:
+    session = FakeSession(FakeClock(), found("a1", RING_ICON))
+    net = RateLimiter(session=session)
+    provider = ImageProvider("new", str(tmp_path), net, "HC Runes of Aldur")
+
+    with_icons = provider.apply_images(rings("Ruby Ring"))
+
+    assert list(with_icons["icon"]) == [RING_ICON]
+    assert session.sent[0][0] == (
+        "https://www.pathofexile.com/api/trade2/search/HC%20Runes%20of%20Aldur"
+    )
+
+
 def test_a_lookup_that_works_starts_the_count_of_failures_again(
     tmp_path: Path,
 ) -> None:

@@ -71,13 +71,13 @@ On 18 Oct 2026 the last two print 445 and 16.
    A `Failed to fetch JSON from: <url>` or `Failed to read JSON from: <url>` line means that file kept its old copy.
    Fix it before going on, since the build in step 4 reads whatever `data/` holds.
 
-3. **Look up new icons** (optional, ask first). Items new in the patch have no icon in the cache. `SEARCH_URL` in
-   `src/services/image_provider.py` names the league the lookups search, `Fate of the Vaal` on 18 Oct 2026, which is
-   not in poe.ninja's league list of that date (`priceService/tests/fixtures/ninja/leagues.json`). Change it to a
-   current trade league in its own commit, then run:
+3. **Look up new icons** (optional, ask first). Items new in the patch have no icon in the cache. The lookups search
+   the trade league that `--league` names, `Standard` by default. A league that started with the patch has more
+   listings of the items it adds, so pass its `id` from the trade site's list at
+   `https://www.pathofexile.com/api/trade2/data/leagues`:
 
    ```sh
-   python ./src/main.py --image-mode missing
+   python ./src/main.py --image-mode missing --league "<league>"
    ```
 
    The modes are listed in [dataparser.md](../modules/dataparser.md#image-modes). Without a cache file, `missing` and
@@ -141,7 +141,7 @@ On 18 Oct 2026 the last two print 445 and 16.
 | `FileNotFoundError` for `data/json/<lang>/<name>.json` during a build | the trade data was never pulled for that language | run step 2 |
 | `KeyError` from `use_game_store` in `src/services/client_strings_builder.py` | the patch renamed or removed a `ClientStrings` id the tool reads | find the entry with that id in `src/constants/client_string_data.py` and change it to the new id |
 | `ValueError: No data found for <file>` or `No descriptions found for <file>` | a stat description file is empty or has no `description` block | run the export again; if the file stays empty, stop and ask the maintainer |
-| `Unexpected status code` or `Retry limit exceeded` during step 3 | a lookup got a status other than 200 or 429, or got 429 three times; the error ends the run, and the cache is saved only at the end of the English build, so the lookups before the error are lost | stop; check `SEARCH_URL`, and do not retry in a loop, since the trade site bans clients that exceed its limits |
+| `Unexpected status code` or `Retry limit exceeded` during step 3 | a lookup got a status other than 200 or 429, or got 429 three times; the error ends the run, and the cache is saved only at the end of the English build, so the lookups before the error are lost | stop; check that the trade site still lists the `--league` value, and do not retry in a loop, since the trade site bans clients that exceed its limits |
 | `<file> (<n> KB) exceeds 2048 KB.` from `check for added large files` when committing | a data file grew past the limit of that pre-commit hook, which checks every new or changed file; the largest, `ru/items.ndjson`, was 1738 KB on 26 Oct 2026 | stop and ask the maintainer whether to raise `--maxkb` in `.pre-commit-config.yaml` |
 | a parser test fails in step 7 | the new data changed a line the parser reads | fix the generator, or add the client string the parser needs; never edit the generated file |
 
