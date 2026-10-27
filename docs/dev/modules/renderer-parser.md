@@ -165,7 +165,9 @@ The data loader imports from the parser only `meta.ts` and `ParsedItem.ts`, whic
 runtime, and imports no module under `src/web/`. It reads the trade site lists through `tradeLists()` in
 `assets/data/trade-lists.ts`. At start, `connectTradeLists()` in `web/background/TradeData.ts` passes the data
 loader the lists that `useTradeData()` downloads through the proxy, which each lookup reads again
-([renderer-price-check.md](renderer-price-check.md)), and `tradeLists()` throws before that.
+([renderer-price-check.md](renderer-price-check.md)), and `tradeLists()` throws before that. The lint fails on an
+import into `src/web/` from a file under `src/parser/` or `src/assets/`, a type import included
+(`no-restricted-imports` in `renderer/eslint.config.mjs`).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
 the floor in `renderer/vitest.config.ts` (85.0% of the lines of the `.ts` files in `src/` on 26 Oct 2026). The parser

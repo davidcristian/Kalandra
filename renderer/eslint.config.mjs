@@ -73,4 +73,22 @@ export default defineConfigWithVueTs(
       "@typescript-eslint/no-misused-promises": "error",
     },
   },
+
+  {
+    files: ["src/parser/**", "src/assets/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^(@/web|(\\.\\./)+web)(/|$)",
+              message:
+                "The parser and the data loader import nothing from src/web/: the app passes them what they need at start.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );
