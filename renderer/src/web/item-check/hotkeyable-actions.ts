@@ -63,10 +63,8 @@ const POE2DB_CONVERSIONS = new Map([
   ["Time-Lost Ruby", "Time-Lost_Ruby"],
   ["Time-Lost Emerald", "Time-Lost_Emerald"],
   ["Time-Lost Sapphire", "Time-Lost_Sapphire"],
-  // Flasks
-  ["Life Flask", "Life_Flasks"],
-  ["Mana Flask", "Mana_Flasks"],
-  ["Charm", "Charms"],
+  // Charms
+  [ItemCategory.Charm, "Charms"],
   // Relics
   ["Urn Relic", "Urn_Relic"],
   ["Amphora Relic", "Amphora_Relic"],
@@ -75,14 +73,17 @@ const POE2DB_CONVERSIONS = new Map([
   ["Coffer Relic", "Coffer_Relic"],
   ["Tapestry Relic", "Tapestry_Relic"],
   ["Incense Relic", "Incense_Relic"],
-  // Tablet
-  ["Breach Precursor Tablet", "Breach_Precursor_Tablet"],
-  ["Expedition Precursor Tablet", "Expedition_Precursor_Tablet"],
-  ["Delirium Precursor Tablet", "Delirium_Precursor_Tablet"],
-  ["Ritual Precursor Tablet", "Ritual_Precursor_Tablet"],
-  ["Precursor Tablet", "Precursor_Tablet"],
-  ["Overseer Precursor Tablet", "Overseer_Precursor_Tablet"],
 ]);
+
+const POE2DB_FLASK_PAGES = [
+  [" Life Flask", "Life_Flasks"],
+  [" Mana Flask", "Mana_Flasks"],
+] as const;
+
+/** Returns the poe2db page of a flask by the kind that ends its English base name. */
+function flaskPage(refName: string) {
+  return POE2DB_FLASK_PAGES.find(([kind]) => refName.endsWith(kind))?.[1];
+}
 
 export function registerActions() {
   Host.onEvent("MAIN->CLIENT::item-text", (e) => {
@@ -176,6 +177,14 @@ function getPoe2dbPath(item: ParsedItem) {
 
   if (POE2DB_CONVERSIONS.has(refName)) {
     return POE2DB_CONVERSIONS.get(refName)! + "#ModifiersCalc";
+  }
+  const flask = category === ItemCategory.Flask && flaskPage(refName);
+  if (flask) {
+    return flask + "#ModifiersCalc";
+  }
+  // poe2db shows the modifiers of each tablet base on that base's own page
+  if (category === ItemCategory.Tablet) {
+    return encodePoe2dbUri(refName) + "#ModifiersCalc";
   }
   // an item without a category, or of a category with no modifiers page
   if (!category || !POE2DB_CONVERSIONS.has(category)) {

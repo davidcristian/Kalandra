@@ -1,9 +1,9 @@
 # The poedb button opens a flask's or a tablet's own page instead of its calculator
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/item-check/hotkeyable-actions.ts](../../../../renderer/src/web/item-check/hotkeyable-actions.ts)
-**Verified:** 2026-10-25
+**Verified:** 2026-10-27
 
 `getPoe2dbPath()` in `hotkeyable-actions.ts` looks up an item's English base name in
 `POE2DB_CONVERSIONS` before its category. The map lists `Life Flask`, `Mana Flask` and six tablets
@@ -27,3 +27,8 @@ their own page.
 
 - 2026-10-25: Found while tests were added for the poe2db page, by comparing the map's names with
   the base names in the English item data.
+- 2026-10-27: Fixed in "fix(renderer): open the poe2db calculator of flasks and tablets". poe2db
+  has the calculators `Life_Flasks` and `Mana_Flasks`, and each tablet base has one on its own
+  page. No copied flask text is in the repo, so the flask case reads the bases of the item data,
+  and the tablet case reads `TempleTablet`. Host task
+  [020](../../host/tasks/020-copy-items-for-hand-built-parser-cases.md) asks for both copies.

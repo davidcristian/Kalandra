@@ -1,6 +1,12 @@
 import type { IpcEvent } from "@ipc/types";
-import { init } from "@/assets/data";
-import { itemIsModifiable, parseClipboard } from "@/parser";
+import { init, ITEMS_ITERATOR } from "@/assets/data";
+import {
+  ItemCategory,
+  ItemRarity,
+  itemIsModifiable,
+  parseClipboard,
+} from "@/parser";
+import { createVirtualItem } from "@/parser/ParsedItem";
 import { Host } from "@/web/background/IPC";
 import { AppConfig } from "@/web/Config";
 import {
@@ -22,6 +28,7 @@ import {
   RareItem,
   RareJewel,
   RequiresOneAttribute,
+  TempleTablet,
   TwoLineOneImplicitItem,
   UniqueItem,
 } from "@specs/Parser/items";
@@ -76,11 +83,7 @@ describe("the poe2db page of an item", () => {
   it.each([
     ["a unique", UniqueItem.rawText, "The_Eternal_Spark"],
     ["a jewel", RareJewel.rawText, "Ruby#ModifiersCalc"],
-    [
-      "a tablet",
-      TwoLineOneImplicitItem.rawText,
-      "Delirium_Precursor_Tablet#ModifiersCalc",
-    ],
+    ["a tablet", TempleTablet.rawText, "Temple_Tablet#ModifiersCalc"],
     ["a weapon", RareItem.rawText, "Bows#ModifiersCalc"],
     [
       "body armour with armour",
@@ -101,6 +104,42 @@ describe("the poe2db page of an item", () => {
     const item = parseClipboard(rawText)._unsafeUnwrap();
 
     expect(__testExports.poe2dbUrl(item)).toBe(`https://poe2db.tw/us/${path}`);
+  });
+
+  // No copied flask text is in the repo, so this case reads the flask bases of the item data.
+  it("is the calculator of life or mana flasks for each flask base", () => {
+    const life = "https://poe2db.tw/us/Life_Flasks#ModifiersCalc";
+    const mana = "https://poe2db.tw/us/Mana_Flasks#ModifiersCalc";
+    const sizes = [
+      "Lesser",
+      "Medium",
+      "Greater",
+      "Grand",
+      "Giant",
+      "Colossal",
+      "Gargantuan",
+      "Transcendent",
+      "Ultimate",
+    ];
+    const pages = [...ITEMS_ITERATOR('"category": "Flask"')].map((info) => [
+      info.refName,
+      __testExports.poe2dbUrl(
+        createVirtualItem({
+          info,
+          category: ItemCategory.Flask,
+          rarity: ItemRarity.Normal,
+        }),
+      ),
+    ]);
+
+    expect(Object.fromEntries(pages)).toEqual(
+      Object.fromEntries(
+        sizes.flatMap((size) => [
+          [`${size} Life Flask`, life],
+          [`${size} Mana Flask`, mana],
+        ]),
+      ),
+    );
   });
 
   it("is a focus or buckler page without defences, in the app's language", async () => {

@@ -3,7 +3,7 @@
 **Status:** never attempted
 **Needs:** Path of Exile 2 on Windows
 **Origin:** [AGENTS.md](../../../../AGENTS.md#what-every-change-must-pass)
-**Verified:** 2026-10-26
+**Verified:** 2026-10-27
 
 Rule 5 of AGENTS.md says a parser case is the item text copied from the game. Neither
 `renderer/specs/` nor the git history holds a copy of the items below, so their cases in
@@ -21,6 +21,7 @@ copies, and one copy serves both tasks.
 | A rare jewel and a magic jewel | `RareJewel`, `MagicJewel` |
 | A crossbow with an increased Reload Speed modifier | `ReloadSpeedCrossbow` |
 | A Temple Tablet | `TempleTablet` |
+| A life flask and a mana flask | nothing: a new case each, which the poedb flask case in `specs/web/item-check.test.ts` then reads in place of the bases of the item data |
 | The boots or helmet with a keystone rune, and the Flesh Crucible, of [019](019-keystone-lines.md) | `KeystoneRuneLine`, `RandomKeystoneLine` |
 | In Japanese: Arrayed Focus, Array Buckler, Vagabond Armour, Atziri's Disdain and Atziri's Contempt. In German: Plated Vestments, Plated Raiment, Couture of Crimson and Coat of Red | the case for the same item in the `SharedNameItems` region, such as `JaArrayedFocus` |
 
@@ -55,3 +56,5 @@ by hand. Each runs through `parseClipboard` in the suite that read the case it r
   place of a section written by hand, and the copied waystone `RareMap` became a whole item case.
 - 2026-10-26: `KeystoneUniqueLine` became a Mask of the Sanguimancer that a user copied for a bug
   report to Exiled Exchange 2, so the table no longer lists it.
+- 2026-10-27: Added the life and mana flask. No copied flask text exists, so the poedb flask case
+  reads the flask bases of the item data.
