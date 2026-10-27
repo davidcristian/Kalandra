@@ -129,7 +129,6 @@ export interface StatFilter {
 }
 
 export const _INTERNAL_TRADE_IDS = [
-  "item.base_percentile",
   "item.armour",
   "item.evasion_rating",
   "item.energy_shield",
@@ -141,8 +140,6 @@ export const _INTERNAL_TRADE_IDS = [
   "item.aps",
   "item.has_empty_modifier",
   "item.spirit",
-  // FilterModifierItemIsElemental.vue reads these four as entries 12 to 15, so the list above
-  // keeps exactly 12 ids and these four keep their order
   "item.has_elemental_affix",
   "item.has_elemental_fire_affix",
   "item.has_elemental_cold_affix",
@@ -174,6 +171,17 @@ export enum ItemIsElementalModifier {
   Cold = 2,
   Lightning = 3,
 }
+
+/** The id of the roll in `elementalInfo` that each choice of the Elemental DPS filter searches for. */
+export const ELEMENTAL_TRADE_IDS: Record<
+  ItemIsElementalModifier,
+  InternalTradeId
+> = {
+  [ItemIsElementalModifier.Any]: "item.has_elemental_affix",
+  [ItemIsElementalModifier.Fire]: "item.has_elemental_fire_affix",
+  [ItemIsElementalModifier.Cold]: "item.has_elemental_cold_affix",
+  [ItemIsElementalModifier.Lightning]: "item.has_elemental_lightning_affix",
+};
 
 export enum FilterTag {
   Pseudo = "pseudo",

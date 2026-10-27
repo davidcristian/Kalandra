@@ -26,7 +26,6 @@
   "Magic": "Magique",
   "item": {
     "prop_quality": "Q {0}%",
-    "base_percentile": "Percentile de base : {0}%",
     "armour": "Armure : {0}",
     "evasion_rating": "Évasion : {0}",
     "energy_shield": "Bouclier d'énergie : {0}",

@@ -26,7 +26,6 @@
   "Magic": "Magisch",
   "item": {
     "prop_quality": "Q {0}%",
-    "base_percentile": "Basisprozentrang: {0}%",
     "armour": "Rüstung: {0}",
     "evasion_rating": "Ausweichwertung: {0}",
     "energy_shield": "Energieschild: {0}",

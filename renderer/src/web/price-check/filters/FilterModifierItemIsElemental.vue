@@ -22,7 +22,7 @@ import { useI18n } from "vue-i18n";
 import {
   StatFilter,
   ItemIsElementalModifier,
-  INTERNAL_TRADE_IDS,
+  ELEMENTAL_TRADE_IDS,
 } from "./interfaces";
 
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
       filter.disabled = false;
       if (!filter.additionalInfo?.elementalInfo) return;
       const selectedRoll =
-        filter.additionalInfo.elementalInfo[INTERNAL_TRADE_IDS[12 + value]];
+        filter.additionalInfo.elementalInfo[ELEMENTAL_TRADE_IDS[value]];
       filter.roll = selectedRoll;
     }
     function selectRightClick(value: ItemIsElementalModifier) {
@@ -50,7 +50,7 @@ export default defineComponent({
       filter.disabled = false;
       if (!filter.additionalInfo?.elementalInfo) return;
       const selectedRoll =
-        filter.additionalInfo.elementalInfo[INTERNAL_TRADE_IDS[12 + value]];
+        filter.additionalInfo.elementalInfo[ELEMENTAL_TRADE_IDS[value]];
       // A right click only leaves out the other elements, so the roll has no range
       selectedRoll.min = "";
       selectedRoll.max = "";
@@ -63,23 +63,19 @@ export default defineComponent({
 
       return (
         [
-          [ItemIsElementalModifier.Any, INTERNAL_TRADE_IDS[12], "any"],
-          [ItemIsElementalModifier.Fire, INTERNAL_TRADE_IDS[13], "fire"],
-          [ItemIsElementalModifier.Cold, INTERNAL_TRADE_IDS[14], "cold"],
-          [
-            ItemIsElementalModifier.Lightning,
-            INTERNAL_TRADE_IDS[15],
-            "lightning",
-          ],
+          [ItemIsElementalModifier.Any, "any"],
+          [ItemIsElementalModifier.Fire, "fire"],
+          [ItemIsElementalModifier.Cold, "cold"],
+          [ItemIsElementalModifier.Lightning, "lightning"],
         ] as const
       )
         .filter(
-          ([, text]) =>
+          ([value]) =>
             filter.additionalInfo?.elementalInfo &&
-            text in filter.additionalInfo.elementalInfo,
+            ELEMENTAL_TRADE_IDS[value] in filter.additionalInfo.elementalInfo,
         )
-        .map(([value, text, tag]) => ({
-          text,
+        .map(([value, tag]) => ({
+          text: ELEMENTAL_TRADE_IDS[value],
           select: () => select(value),
           context: () => selectRightClick(value),
           isSelected: filter.option?.value === value,

@@ -14,8 +14,8 @@ import { ARMOUR, WEAPON, ItemCategory } from "@/parser/meta";
 import { ParsedItem } from "@/parser";
 import { ModifierType, StatRoll, StatSource } from "@/parser/modifiers";
 import {
+  ELEMENTAL_TRADE_IDS,
   FilterTag,
-  INTERNAL_TRADE_IDS,
   InternalTradeId,
   ItemIsElementalModifier,
   StatFilter,
@@ -255,23 +255,14 @@ function weaponProps(ctx: FiltersCreationContext) {
   if (item.weaponELEMENTAL) {
     const elementalInfo: Record<string, StatFilterRoll> = {};
     if (fireDps.value !== 0)
-      elementalInfo[INTERNAL_TRADE_IDS[13]] = shortRollToFilter(
-        fireDps,
-        ctx.searchInRange,
-        item,
-      );
+      elementalInfo[ELEMENTAL_TRADE_IDS[ItemIsElementalModifier.Fire]] =
+        shortRollToFilter(fireDps, ctx.searchInRange, item);
     if (coldDps.value !== 0)
-      elementalInfo[INTERNAL_TRADE_IDS[14]] = shortRollToFilter(
-        coldDps,
-        ctx.searchInRange,
-        item,
-      );
+      elementalInfo[ELEMENTAL_TRADE_IDS[ItemIsElementalModifier.Cold]] =
+        shortRollToFilter(coldDps, ctx.searchInRange, item);
     if (lightningDps.value !== 0)
-      elementalInfo[INTERNAL_TRADE_IDS[15]] = shortRollToFilter(
-        lightningDps,
-        ctx.searchInRange,
-        item,
-      );
+      elementalInfo[ELEMENTAL_TRADE_IDS[ItemIsElementalModifier.Lightning]] =
+        shortRollToFilter(lightningDps, ctx.searchInRange, item);
     ctx.filters.push(
       propToFilter(
         {
@@ -302,7 +293,8 @@ function weaponProps(ctx: FiltersCreationContext) {
     );
 
     if (Object.keys(elementalInfo).length && elementalFilter.roll) {
-      elementalInfo[INTERNAL_TRADE_IDS[12]] = elementalFilter.roll;
+      elementalInfo[ELEMENTAL_TRADE_IDS[ItemIsElementalModifier.Any]] =
+        elementalFilter.roll;
       elementalFilter.additionalInfo = {
         elementalInfo,
       };

@@ -23,7 +23,6 @@
   "Magic": "매직",
   "item": {
     "prop_quality": "{0}% 퀄리티",
-    "base_percentile": "기본 백분위수: {0}%",
     "armour": "방어도: {0}",
     "evasion_rating": "회피: {0}",
     "energy_shield": "에너지 보호막: {0}",

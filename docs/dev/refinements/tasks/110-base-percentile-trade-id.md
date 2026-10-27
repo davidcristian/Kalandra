@@ -1,6 +1,6 @@
 # The base percentile trade id and its texts remain without a filter
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** renderer
 **Origin:** [renderer/src/web/price-check/filters/interfaces.ts](../../../../renderer/src/web/price-check/filters/interfaces.ts)
 **Verified:** 2026-10-27
@@ -18,3 +18,5 @@ its four ids by name, with a test of the filter it shows for each of them.
 
 - 2026-10-27: Found when the parser stopped writing `basePercentile`
   ([082](082-checks-for-item-names-the-data-lacks.md)).
+- 2026-10-27: refactor(renderer): remove the unused base percentile trade id. The Elemental DPS
+  choices read their four ids by name from `ELEMENTAL_TRADE_IDS`.

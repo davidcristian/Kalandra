@@ -66,7 +66,6 @@
   "You": "You",
   "item": {
     "prop_quality": "Q {0}%",
-    "base_percentile": "Base Percentile: {0}%",
     "armour": "Armour: {0}",
     "evasion_rating": "Evasion Rating: {0}",
     "energy_shield": "Energy Shield: {0}",

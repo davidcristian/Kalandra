@@ -40,7 +40,6 @@
   "Support development on": "Поддержите разработку на",
   "item": {
     "prop_quality": "К-во: {0}%",
-    "base_percentile": "Ролл значений базы: {0}%",
     "armour": "Броня: {0}",
     "evasion_rating": "Уклонение: {0}",
     "energy_shield": "Энерг. щит: {0}",

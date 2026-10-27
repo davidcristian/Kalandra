@@ -26,7 +26,6 @@
   "Magic": "魔法",
   "item": {
     "prop_quality": "品質 {0}%",
-    "base_percentile": "基礎百分位：{0}%",
     "armour": "護甲：{0}",
     "evasion_rating": "閃避值：{0}",
     "energy_shield": "能量護盾：{0}",
