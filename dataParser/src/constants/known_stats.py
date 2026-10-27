@@ -141,6 +141,23 @@ UNIQUE_ITEMS_FIXED_STATS: dict[str, list[str]] = {
     "Prism of Belief": [],
     "Heart of the Well": [],
     "Against the Darkness": [],
+    "Flesh Crucible": [],
+    "Split Personality": [],
+    "Voices": [],
+    "Loreweave": [
+        "Adds # to # Physical Damage to Attacks",
+        "# to Accuracy Rating",
+        "# to Maximum Mana",
+        "#% increased Rarity of Items found",
+        "#% to Quality of all Skills",
+        "#% increased Cast Speed",
+        "Your Maximum Resistances are #%",
+    ],
+    "Mastered Domain": ["Adds Irradiated to a Map \n# use remaining"],
+    "Runeseeker's Call": [
+        "#% increased effect of Socketed Runes",
+        "Only Runes can be Socketed in this item",
+    ],
 }
 
 SAME_TRANSLATIONS_DIFFERENT_STATS: dict[LANG, dict[str, list[str]]] = {
