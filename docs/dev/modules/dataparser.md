@@ -180,9 +180,9 @@ output: `wc -l` gives 1936 lines for `dataParser/output/en/stats.ndjson` and 252
 lines with a `map` field, which this copy of the tool does not write.
 
 `--push` writes only the three files per language. The other files in `renderer/public/data/` (`namespaceMap.json`,
-`item-drop.json`, `item-drop.jsonc`, `remnants.json`, `patrons.json` and each `app_i18n.json`) are not this tool's
-output. After a push, run `npm run make-index-files` in `renderer/`. It writes the `*.index.bin` lookup files from
-the two `.ndjson` files ([renderer-parser.md](renderer-parser.md#the-game-data)), and git ignores them.
+`item-drop.json`, `item-drop.jsonc`, `patrons.json` and each `app_i18n.json`) are not this tool's output. After a
+push, run `npm run make-index-files` in `renderer/`. It writes the `*.index.bin` lookup files from the two `.ndjson`
+files ([renderer-parser.md](renderer-parser.md#the-game-data)), and git ignores them.
 
 ## Invariants
 

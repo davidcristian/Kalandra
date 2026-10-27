@@ -1,8 +1,8 @@
 # remnants.json and two dataParser output files are unused
 
-**Status:** open
+**Status:** done 2026-10-27
 **Area:** data
-**Origin:** [renderer/public/data/remnants.json](../../../../renderer/public/data/remnants.json)
+**Origin:** [modules/dataparser.md](../../modules/dataparser.md)
 **Verified:** 2026-10-27
 
 Three tracked files have no reader:
@@ -32,3 +32,5 @@ and its generator in modules/dataparser.md, so that the next data update writes 
   and the test data contain the word in many item and stat names, and no code file contains it.
 - 2026-10-27: The maintainer confirmed that the three files are unused and chose to remove them.
   Checked again: no code reads any of them.
+- 2026-10-27: Done in `chore(data): remove three data files that nothing reads`. The Origin
+  link names modules/dataparser.md, since `remnants.json` is gone.
