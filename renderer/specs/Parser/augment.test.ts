@@ -6,6 +6,10 @@ import { __testExports } from "@/parser/Parser";
 import { ParsedStat } from "@/parser/stat-translations";
 import { AppConfig } from "@/web/Config";
 import type { PriceCheckWidget } from "@/web/overlay/widgets";
+import {
+  AugmentSaveType,
+  augmentSaveKey,
+} from "@/web/price-check/item-editor/item-editor";
 import { createTestItem, makeCalcStat } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -474,4 +478,33 @@ describe("applyAugmentSockets", () => {
       ModifierType.AddedAugment,
     ]);
   });
+
+  it.each([
+    [AugmentSaveType.MartialWeapon, ItemCategory.Bow, ItemCategory.Crossbow],
+    [AugmentSaveType.CasterWeapon, ItemCategory.Staff, ItemCategory.Wand],
+    [AugmentSaveType.Armour, ItemCategory.BodyArmour, ItemCategory.Helmet],
+    [AugmentSaveType.All, ItemCategory.Wand, ItemCategory.Crossbow],
+  ])(
+    "fills the empty sockets with the %s set the editor saves from a %s on a %s",
+    (saveType, savedOn, checked) => {
+      const priceCheck = AppConfig<PriceCheckWidget>("price-check");
+      if (!priceCheck) throw new Error("The test config has no price check");
+      priceCheck.savedAugments = {
+        [augmentSaveKey(saveType, savedOn)]: ["Greater Iron Rune", null],
+      };
+      const item = createTestItem();
+      item.category = checked;
+      item.augmentSockets = {
+        empty: 0,
+        current: 2,
+        normal: 2,
+        augments: [null, null],
+      };
+
+      __testExports.applyAugmentSockets(item);
+      expect(
+        item.augmentSockets.augments.map((augment) => augment?.refName ?? null),
+      ).toEqual(["Greater Iron Rune", null]);
+    },
+  );
 });

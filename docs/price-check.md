@@ -175,10 +175,10 @@ modify it or it has sockets, and for a ring, amulet or jewel that is not unique 
   Pick an augment from the **Rune**, **Soul Core**, **Idol**, **Legacy** and **Other** tabs, then click a socket to
   put it there. A socket with a red border is bound to its augment and does not change.
 - **Save for:** chooses which items a saved set of augments applies to: the item's class, **Caster Weapons** (wands
-  and staves), **Marital Weapons** (martial weapons), **Armours** or **Default** (every item). **Save** stores the
-  current sockets for that choice, and **Clear Saved** removes them. On the next price check of a non-unique item
-  whose sockets are all empty, Kalandra fills them with the saved augments: the item class first, then the weapon
-  or armour group, then **Default**. A set saved for **Marital Weapons** is not applied in this version.
+  and staves), **Martial Weapons** (bows, crossbows and melee weapons), **Armours** or **Default** (every item).
+  **Save** stores the current sockets for that choice, and **Clear Saved** removes them. On the next price check of
+  a non-unique item whose sockets are all empty, Kalandra fills them with the saved augments: the item class first,
+  then the weapon or armour group, then **Default**.
 - Quality, for rings, amulets and jewels. Pick a catalyst and an amount (0, 20, 30, 40 or 50; up to 70 for a Breach
   Ring; 0 or 20 for a jewel) to see the filters as if the item had that quality. The price on the right is the
   catalyst price times the amount. When the item already has catalyst quality, the square shows that catalyst, and

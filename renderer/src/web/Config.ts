@@ -13,6 +13,7 @@ import { addMissingWidgets } from "./missing-widgets";
 import * as removed from "./removed-widgets";
 import { shortcutActions } from "./shortcut-actions";
 import { nameDefaultMarksByRef } from "./map-check/saved-marks";
+import { moveMartialWeaponAugments } from "./price-check/saved-augments";
 import { ENGLISH_DEFAULTS_40, namePresetEntries } from "./stash-search/presets";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 import { tradeHost } from "./trade-host";
@@ -129,7 +130,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 41,
+  configVersion: 42,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -687,6 +688,11 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 41) {
     removed.removePathOfExile1Widgets(config);
     config.configVersion = 41;
+  }
+
+  if (config.configVersion < 42) {
+    moveMartialWeaponAugments(config);
+    config.configVersion = 42;
   }
 
   return config as Config;

@@ -68,7 +68,9 @@ that the route needs ([main.md](main.md)).
 - The item editor applies its changes in `item-editor/`: `useAugment` from the parser's `augment-builder.ts` puts a
   rune or soul core in a socket, and `applyCatalyst` in `item-editor.ts` applies a catalyst and its quality. Both
   change the item and recompute its properties through `recalculateItemProperties` from the parser. The parser also
-  calls `useAugment` to fill an item's empty sockets with the saved augments. The editor's lists come from
+  calls `useAugment` to fill an item's empty sockets with the saved augments. `augmentSaveKey` in `item-editor.ts`
+  returns the key in the price check's `savedAugments` that the editor saves a set under: the item category,
+  `casterWeapon`, `martialWeapon`, `armour` or `all`, the keys `getSavedAugments` reads. The editor's lists come from
   `categoryAugments` in `augment.ts` and `categoryCatalysts` in `item-editor.ts`, which build each category's list
   once per game data load, so they switch to the new language after a language change.
 

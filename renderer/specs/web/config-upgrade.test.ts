@@ -2,7 +2,11 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import path from "path";
 import type { Config } from "@/web/Config";
-import type { ImageStripWidget, Widget } from "@/web/overlay/widgets";
+import type {
+  ImageStripWidget,
+  PriceCheckWidget,
+  Widget,
+} from "@/web/overlay/widgets";
 import { Host } from "@/web/background/IPC";
 import { registry } from "@/web/overlay/widget-registry";
 import type { StashSearchWidget } from "@/web/stash-search/widget";
@@ -145,6 +149,15 @@ function keysWithoutStep(config: Config) {
     craftOfExileKey: field(widget("item-check"), "craftOfExileKey"),
     ocrGemsKey: field(widget("item-search"), "ocrGemsKey"),
   };
+}
+
+const IRON = "Greater Iron Rune";
+const STORM = "Greater Storm Rune";
+
+function priceCheckOf(config: Config): PriceCheckWidget {
+  return config.widgets.find(
+    (w) => w.wmType === "price-check",
+  ) as PriceCheckWidget;
 }
 
 const SYNDICATE_SHEET = { id: 1, url: "syndicate.jpg" };
@@ -383,10 +396,10 @@ describe("upgradeConfig", () => {
     expect(config.configVersion).toBe(40);
     expect(types(config)).toContain("delve-grid");
     expect(types(config)).toContain("image-strip");
-    const upgraded = upgrade(config);
-    expect(upgraded.configVersion).toBe(41);
-    expect(types(upgraded)).not.toContain("delve-grid");
-    expect(types(upgraded)).not.toContain("image-strip");
+    runSteps(config, 41);
+    expect(config.configVersion).toBe(41);
+    expect(types(config)).not.toContain("delve-grid");
+    expect(types(config)).not.toContain("image-strip");
   });
 
   it("removes a Delve grid whose hotkey the user set from a version 40 config", () => {
@@ -447,6 +460,53 @@ describe("upgradeConfig", () => {
     const upgraded = upgrade(config);
 
     expect(upgraded.widgets.filter((w) => w.wmId === 900)).toEqual([]);
+  });
+
+  it.each([
+    [
+      "moves the set saved for martial weapons to martialWeapon",
+      { Bow: [IRON], maritalWeapon: [IRON, null] },
+      { Bow: [IRON], martialWeapon: [IRON, null] },
+    ],
+    ["moves a cleared set", { maritalWeapon: [] }, { martialWeapon: [] }],
+    [
+      "keeps a martialWeapon set, which the price check already applies",
+      { maritalWeapon: [IRON], martialWeapon: [STORM] },
+      { martialWeapon: [STORM] },
+    ],
+    [
+      "leaves saved augments without a martial weapon set",
+      { all: [IRON] },
+      { all: [IRON] },
+    ],
+  ])("%s in a version 41 config", (_, saved, upgraded) => {
+    const config = asSaved(actual.defaultConfig());
+    config.configVersion = 41;
+    priceCheckOf(config).savedAugments = saved;
+
+    expect(priceCheckOf(upgrade(config)).savedAugments).toEqual(upgraded);
+  });
+
+  it("moves the martial weapon set of every price check widget and skips one without saved augments", () => {
+    const config = asSaved(actual.defaultConfig());
+    config.configVersion = 41;
+    const priceCheck = priceCheckOf(config);
+    priceCheck.savedAugments = { maritalWeapon: [IRON] };
+    const second = {
+      ...priceCheck,
+      wmId: 900,
+      savedAugments: { maritalWeapon: [STORM] },
+    };
+    const withoutSets = { ...priceCheck, wmId: 901, savedAugments: null };
+    config.widgets.push(second, withoutSets);
+
+    const upgraded = upgrade(config);
+
+    expect(
+      upgraded.widgets
+        .filter((w) => w.wmType === "price-check")
+        .map((w) => field(w, "savedAugments")),
+    ).toEqual([{ martialWeapon: [IRON] }, { martialWeapon: [STORM] }, null]);
   });
 
   it("removes the filter generator widget, which the app no longer has, from a version 25 config", () => {

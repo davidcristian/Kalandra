@@ -123,8 +123,8 @@
           >
             {{ t(":caster_weapon") }}
           </option>
-          <option v-if="isMaritalWeapon" value="maritalWeapon">
-            {{ t(":marital_weapon") }}
+          <option v-if="isMartialWeapon" value="martialWeapon">
+            {{ t(":martial_weapon") }}
           </option>
           <option v-if="isArmour" value="armour">{{ t(":armour") }}</option>
           <option value="all">{{ t(":all") }}</option>
@@ -161,7 +161,7 @@ import { augmentTabs } from "./augment-tabs";
 import { AppConfig } from "@/web/Config";
 import { EditorItem } from "@/parser/ParsedItem";
 import { buildEditorItems, useAugment } from "@/parser/augment-builder";
-import { AugmentSaveType } from "./item-editor";
+import { AugmentSaveType, augmentSaveKey } from "./item-editor";
 import { useI18nNs } from "@/web/i18n";
 import { PriceCheckWidget } from "@/web/overlay/widgets";
 import { ARMOUR, MARTIAL_WEAPON } from "@/parser/meta";
@@ -201,31 +201,14 @@ export default defineComponent({
       () => AppConfig<PriceCheckWidget>("price-check")!.savedAugments,
     );
 
-    function getSaveType() {
-      switch (saveType.value) {
-        case AugmentSaveType.Class:
-          return props.item?.category ?? "Unknown";
-        case AugmentSaveType.CasterWeapon:
-          return "casterWeapon";
-        case AugmentSaveType.MaritalWeapon:
-          return "maritalWeapon";
-        case AugmentSaveType.Armour:
-          return "armour";
-        case AugmentSaveType.All:
-          return "all";
-        default:
-          return props.item?.category ?? "Unknown";
-      }
-    }
-
     function handleSave() {
-      const s = getSaveType();
+      const s = augmentSaveKey(saveType.value, props.item?.category);
       savedConfig.value[s] =
         props.item?.augmentSockets?.augments.map((a) => a?.refName ?? null) ??
         [];
     }
     function handleClear() {
-      const s = getSaveType();
+      const s = augmentSaveKey(saveType.value, props.item?.category);
       savedConfig.value[s] = [];
     }
 
@@ -256,7 +239,7 @@ export default defineComponent({
       },
       handleSave,
       handleClear,
-      isMaritalWeapon: computed(
+      isMartialWeapon: computed(
         () =>
           props.item &&
           props.item.category &&

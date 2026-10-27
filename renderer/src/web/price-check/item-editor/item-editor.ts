@@ -92,8 +92,24 @@ export function catalystCost(
 export enum AugmentSaveType {
   Class = "class",
   CasterWeapon = "casterWeapon",
-  MaritalWeapon = "maritalWeapon",
+  MartialWeapon = "martialWeapon",
   Sceptre = "spectre",
   Armour = "armour",
   All = "all",
+}
+
+/** Returns the `savedAugments` key that the augment editor saves a set under, which `getSavedAugments` reads. */
+export function augmentSaveKey(
+  saveType: AugmentSaveType,
+  category: ItemCategory | undefined,
+): string {
+  switch (saveType) {
+    case AugmentSaveType.CasterWeapon:
+    case AugmentSaveType.MartialWeapon:
+    case AugmentSaveType.Armour:
+    case AugmentSaveType.All:
+      return saveType;
+    default:
+      return category ?? "Unknown";
+  }
 }

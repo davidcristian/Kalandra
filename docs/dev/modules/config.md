@@ -18,7 +18,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas`, `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 41. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 42. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -58,6 +58,10 @@ old one and keep that file, so a saved config must survive every update: this is
   `renderer/public/images/` no longer has. A strip whose only images were that sheet goes too when its title is
   `Cheat sheets`, the default strip's, or empty, a strip added from the menu; a strip the user named or emptied
   stays. An uploaded image is named by its MD5 hash, so the step keeps every image the user added.
+- `moveMartialWeaponAugments(config)` in `renderer/src/web/price-check/saved-augments.ts` is what the `< 42` step
+  runs. The item editor saved the martial weapon set of augments under `maritalWeapon`, while the price check reads
+  `martialWeapon`. On each price check widget the step moves that set to `martialWeapon` and removes the old key.
+  A `martialWeapon` set that is already there stays, since it is the one the price check applied.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -125,8 +129,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 41, so the next step is `if (config.configVersion < 42)`, ending with
-  `config.configVersion = 42`, and `defaultConfig()` then returns 42. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 42, so the next step is `if (config.configVersion < 43)`, ending with
+  `config.configVersion = 43`, and `defaultConfig()` then returns 43. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -186,7 +190,9 @@ file. It also checks that a current config stays unchanged, that the `< 38` step
 leaves the two that the `< 40` step names, and that a widget of an unknown type stays. For the `< 41` step it checks
 that no saved config keeps a Delve grid or the default `Cheat sheets` strip, that a version 40 config loses a Delve
 grid with a hotkey, which strips keep their own images and which go, and that the step runs only at version 41.
-It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
+For the `< 42` step it checks that a version 41 config gets each saved `maritalWeapon` set, an empty one too, under
+`martialWeapon` on every price check widget, keeps a `martialWeapon` set already there, and skips a price check
+widget without saved augments. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
 saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single
 instance widget gets the default one with a new `wmId` and a log line, and that a version 2 config without its map
 check widget and a version 15 config without its Delve grid still throw. It takes the last step version from `defaultConfig()`, so a new step needs no change to
