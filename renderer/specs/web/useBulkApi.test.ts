@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ComputedRef, ShallowRef, shallowRef, watch } from "vue";
-import { ParsedItem } from "@/parser";
-import { ItemFilters } from "@/web/price-check/filters/interfaces";
 import {
   BulkSearchExtended,
   useBulkApi,
@@ -12,6 +10,7 @@ import {
   PricingResult,
   execBulkSearch,
 } from "@/web/price-check/trade/pathofexile-bulk";
+import { createTestFilters, createTestItemWithInfo } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
 import { settle } from "./held-requests";
 
@@ -21,9 +20,9 @@ vi.mock("@/web/price-check/trade/pathofexile-bulk", () => ({
 
 type Answer = PromiseWithResolvers<Array<BulkSearch | null>>;
 
-const ITEM = { info: { refName: "Greater Chaos Orb" } } as ParsedItem;
-const CHAOS_ORB = { info: { refName: "Chaos Orb" } } as ParsedItem;
-const DIVINE_ORB = { info: { refName: "Divine Orb" } } as ParsedItem;
+const ITEM = createTestItemWithInfo({ refName: "Greater Chaos Orb" });
+const CHAOS_ORB = createTestItemWithInfo({ refName: "Chaos Orb" });
+const DIVINE_ORB = createTestItemWithInfo({ refName: "Divine Orb" });
 
 const LISTING: PricingResult = {
   id: "listing",
@@ -66,7 +65,7 @@ function search(
   league: string,
   item = ITEM,
 ) {
-  return bulk.search(item, { trade: { league } } as ItemFilters);
+  return bulk.search(item, createTestFilters({ league }));
 }
 
 describe("useBulkApi", () => {

@@ -2,7 +2,7 @@ import { vi } from "vitest";
 import fs from "fs";
 import path from "path";
 import { Config, TipsFrequency } from "@/web/Config";
-import type { Widget } from "@/web/overlay/widgets";
+import type { PriceCheckWidget, Widget } from "@/web/overlay/widgets";
 import { connectParserSettings } from "@/web/parser-settings";
 import { connectTradeLists } from "@/web/background/TradeData";
 
@@ -129,6 +129,22 @@ vi.mock("@/web/background/IPC", () => ({
   },
 }));
 
+/** The price check widget of the test config, with only the settings a test passes. */
+export function priceCheckWidgetMock(
+  settings: Partial<PriceCheckWidget> = {},
+): Widget & Partial<PriceCheckWidget> {
+  return {
+    wmId: 2,
+    wmType: "price-check",
+    wmTitle: "",
+    wmWants: "hide",
+    wmZorder: "exclusive",
+    wmFlags: ["hide-on-blur", "menu::skip"],
+    savedAugments: {},
+    ...settings,
+  };
+}
+
 export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
   const defaultConfig: Config = {
     configVersion: 99999999,
@@ -146,17 +162,7 @@ export const defaultConfigMock = (overrides: Partial<Config> = {}) => {
     language: "en",
     preferredTradeSite: "default",
     realm: "pc-ggg",
-    widgets: [
-      {
-        wmId: 2,
-        wmType: "price-check",
-        wmTitle: "",
-        wmWants: "hide",
-        wmZorder: "exclusive",
-        wmFlags: ["hide-on-blur", "menu::skip"],
-        savedAugments: {},
-      } as Widget,
-    ],
+    widgets: [priceCheckWidgetMock()],
     fontSize: 12,
     showAttachNotification: true,
     overlayAlwaysClose: false,

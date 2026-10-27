@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
-import { createTestCreateOptions } from "@specs/helper";
+import { createTestCreateOptions, createTestItem } from "@specs/helper";
 import { TempleTablet } from "@specs/Parser/items";
 import { init, Stat, StatBetter, STATS_ITERATOR } from "@/assets/data";
 import { ModifierType, StatCalculated, StatSource } from "@/parser/modifiers";
 import { __testExports, filterPseudo } from "@/web/price-check/filters/pseudo";
 import { FiltersCreationContext } from "@/web/price-check/filters/create-stat-filters";
 import { createPresets } from "@/web/price-check/filters/create-presets";
-import { ItemCategory, ParsedItem, parseClipboard } from "@/parser";
+import { ItemCategory, parseClipboard } from "@/parser";
 
 const keepSource = (_calc: StatCalculated, source: StatSource) => source;
 
@@ -141,7 +141,7 @@ describe("filterPseudo", () => {
 
   it("should do nothing if no stats by type", () => {
     const ctx: FiltersCreationContext = {
-      item: {} as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [],
@@ -154,7 +154,7 @@ describe("filterPseudo", () => {
 
   it("should add pseudo for stat", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [createStatHelper(FireResRef)],
@@ -181,7 +181,7 @@ describe("filterPseudo", () => {
 
   it("should add 2 different pseudos", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [
@@ -211,7 +211,7 @@ describe("filterPseudo", () => {
 
   it("should merge two of same stats", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [createStatHelper(FireResRef), createStatHelper(FireResRef)],
@@ -238,7 +238,7 @@ describe("filterPseudo", () => {
 
   it("should join related stats", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [
@@ -266,7 +266,7 @@ describe("filterPseudo", () => {
 
   it("should only keep highest ele res", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [
@@ -296,7 +296,7 @@ describe("filterPseudo", () => {
 
   it("should add tablet implicits", () => {
     const ctx: FiltersCreationContext = {
-      item: { info: { refName: "name" } } as ParsedItem,
+      item: createTestItem(),
       searchInRange: 0,
       filters: [],
       statsByType: [
@@ -321,7 +321,7 @@ describe("filterPseudo", () => {
       .filter((ref) => ref.endsWith("\n# use remaining"));
     const missing = refs.filter((ref) => {
       const ctx: FiltersCreationContext = {
-        item: { info: { refName: "name" } } as ParsedItem,
+        item: createTestItem(),
         searchInRange: 0,
         filters: [],
         statsByType: [createStatHelper(ref, 5, ModifierType.Implicit)],

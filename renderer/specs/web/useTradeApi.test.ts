@@ -1,13 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ItemFilters } from "@/web/price-check/filters/interfaces";
 import { useTradeApi } from "@/web/price-check/trade/trade-api";
 import type {
   PricingResult,
   SearchResult,
 } from "@/web/price-check/trade/pathofexile-trade";
-import { createTestItem } from "@specs/helper";
+import { createTestFilters, createTestItem } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
 import { settle } from "./held-requests";
 
@@ -65,26 +64,11 @@ function saveSearch(league: string, listings: PricingResult[]) {
   });
 }
 
-function filtersFor(league: string): ItemFilters {
-  return {
-    searchExact: {},
-    trade: {
-      offline: false,
-      onlineInLeague: false,
-      listingType: "any",
-      listed: undefined,
-      currency: undefined,
-      league,
-      collapseListings: "app",
-    },
-  };
-}
-
 describe("useTradeApi", () => {
   let api: ReturnType<typeof useTradeApi>;
 
   const search = (league: string) =>
-    api.search(filtersFor(league), [], createTestItem());
+    api.search(createTestFilters({ league }), [], createTestItem());
   const rows = () =>
     api.groupedResults.value.map((row) => [row.id, row.listedTimes]);
 

@@ -1,11 +1,15 @@
-import { STAT_BY_REF } from "@/assets/data";
+import { BaseType, STAT_BY_REF } from "@/assets/data";
 import { ItemCategory } from "@/parser";
 import { ParsedModifier } from "@/parser/advanced-mod-desc";
 import { ModifierType, StatCalculated } from "@/parser/modifiers";
 import { createVirtualItem, ParsedItem } from "@/parser/ParsedItem";
 import type { ParserState } from "@/parser/Parser";
 import { ParsedStat } from "@/parser/stat-translations";
-import { FilterTag, StatFilter } from "@/web/price-check/filters/interfaces";
+import {
+  FilterTag,
+  ItemFilters,
+  StatFilter,
+} from "@/web/price-check/filters/interfaces";
 
 export function createTestStatFilter(): StatFilter {
   return {
@@ -55,6 +59,31 @@ export function createTestItem(): ParsedItem {
       tags: [],
     },
   });
+}
+
+/** A test item whose base type has the given fields. */
+export function createTestItemWithInfo(info: Partial<BaseType>): ParsedItem {
+  const item = createTestItem();
+  return { ...item, info: { ...item.info, ...info } };
+}
+
+/** Filters that search only by the trade settings, with the given ones changed. */
+export function createTestFilters(
+  trade: Partial<ItemFilters["trade"]> = {},
+): ItemFilters {
+  return {
+    searchExact: {},
+    trade: {
+      offline: false,
+      onlineInLeague: false,
+      listingType: "any",
+      listed: undefined,
+      currency: undefined,
+      league: "Standard",
+      collapseListings: "app",
+      ...trade,
+    },
+  };
 }
 
 export function createTestParserState(

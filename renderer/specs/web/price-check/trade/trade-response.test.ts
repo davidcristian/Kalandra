@@ -1,10 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createTestFilters, createTestItemWithInfo } from "@specs/helper";
 import { setupTests } from "@specs/vitest.setup";
-import type { ParsedItem } from "@/parser";
 import { Host } from "@/web/background/IPC";
 import { useLeagues } from "@/web/background/Leagues";
 import { useTradeData } from "@/web/background/TradeData";
-import type { ItemFilters } from "@/web/price-check/filters/interfaces";
 import { execBulkSearch } from "@/web/price-check/trade/pathofexile-bulk";
 import {
   requestResults,
@@ -88,7 +87,10 @@ describe("a trade site request answered with a web page", () => {
   });
 
   it("fails a search with the status", async () => {
-    const body = {} as Parameters<typeof requestTradeResultList>[0];
+    const body: Parameters<typeof requestTradeResultList>[0] = {
+      query: { status: { option: "online" }, stats: [], filters: {} },
+      sort: { price: "asc" },
+    };
 
     await expect(requestTradeResultList(body, "Standard")).rejects.toThrow(
       "(status 503)",
@@ -102,10 +104,8 @@ describe("a trade site request answered with a web page", () => {
   });
 
   it("fails an exchange search with the status", async () => {
-    const item = { info: { tradeTag: "divine" } } as ParsedItem;
-    const filters = {
-      trade: { listingType: "online", league: "Standard" },
-    } as ItemFilters;
+    const item = createTestItemWithInfo({ tradeTag: "divine" });
+    const filters = createTestFilters({ listingType: "online" });
 
     await expect(
       execBulkSearch(item, filters, ["exalted"], { accountName: "" }),

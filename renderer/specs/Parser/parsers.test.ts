@@ -2,6 +2,7 @@ import { CLIENT_STRINGS as _$, init } from "@/assets/data";
 import { __testExports } from "@/parser/Parser";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupTests } from "@specs/vitest.setup";
+import { createTestItem } from "@specs/helper";
 import {
   ArmourHighValueRareItem,
   BowThreeAugments,
@@ -51,7 +52,7 @@ describe("parseWeapon", () => {
   });
   it("Magic Weapon", () => {
     const sections = __testExports.itemTextToSections(MagicItem.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseWeapon(sections[1], parsedItem);
 
@@ -64,7 +65,7 @@ describe("parseWeapon", () => {
   });
   it("Rare Weapon", () => {
     const sections = __testExports.itemTextToSections(RareItem.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseWeapon(sections[1], parsedItem);
 
@@ -79,7 +80,7 @@ describe("parseWeapon", () => {
     const sections = __testExports.itemTextToSections(
       HighDamageRareItem.rawText,
     );
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseWeapon(sections[1], parsedItem);
 
@@ -100,7 +101,7 @@ describe("parseArmour", () => {
   });
   it("Normal Armour", () => {
     const sections = __testExports.itemTextToSections(NormalItem.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseArmour(sections[1], parsedItem);
 
@@ -113,7 +114,7 @@ describe("parseArmour", () => {
   });
   it("Unique Armour", () => {
     const sections = __testExports.itemTextToSections(UniqueItem.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseArmour(sections[1], parsedItem);
 
@@ -128,7 +129,7 @@ describe("parseArmour", () => {
     const sections = __testExports.itemTextToSections(
       ArmourHighValueRareItem.rawText,
     );
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseArmour(sections[1], parsedItem);
 
@@ -148,7 +149,7 @@ describe("parseFlask", () => {
   });
   it("reads the quality of the section with the charges", () => {
     const sections = __testExports.itemTextToSections(CharmQuality.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseFlask(sections[1], parsedItem);
 
@@ -157,7 +158,7 @@ describe("parseFlask", () => {
   });
   it("skips a section without charges and leaves its quality line unread", () => {
     const sections = __testExports.itemTextToSections(BowThreeAugments.rawText);
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseFlask(sections[1], parsedItem);
 
@@ -184,7 +185,7 @@ describe("parseRequirements", () => {
       setupTests();
       await init("en");
       const sections = __testExports.itemTextToSections(item.rawText);
-      const parsedItem = {} as ParsedItem;
+      const parsedItem = createTestItem();
 
       const res = __testExports.parseRequirements(
         sections.find((s) => s.some((l) => l.startsWith(_$.REQUIRES)))!,
@@ -241,7 +242,7 @@ describe("parseRequirements", () => {
     ) => {
       setupTests();
       await init(lang);
-      const parsedItem = {} as ParsedItem;
+      const parsedItem = createTestItem();
 
       const res = __testExports.parseRequirements([str], parsedItem);
 
@@ -253,7 +254,7 @@ describe("parseRequirements", () => {
   it("takes a requirements line it cannot read without setting requires", async () => {
     setupTests();
     await init("en");
-    const parsedItem = {} as ParsedItem;
+    const parsedItem = createTestItem();
 
     const res = __testExports.parseRequirements(
       ["Requires: Level 28, 57 (augmented) Str, 20 Spirit"],

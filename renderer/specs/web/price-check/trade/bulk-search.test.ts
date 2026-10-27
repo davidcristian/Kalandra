@@ -1,10 +1,9 @@
 import { Settings } from "luxon";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { setupTests } from "@specs/vitest.setup";
+import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions, createTestItem } from "@specs/helper";
 import type { ParsedItem } from "@/parser";
 import { Host } from "@/web/background/IPC";
-import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import { createFilters } from "@/web/price-check/filters/create-item-filters";
 import { execBulkSearch } from "@/web/price-check/trade/pathofexile-bulk";
 
@@ -85,9 +84,7 @@ describe("execBulkSearch", () => {
 
   beforeEach(() => {
     setupTests({
-      widgets: [
-        { wmType: "price-check", apiLatencySeconds: 2 } as PriceCheckWidget,
-      ],
+      widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })],
     });
     // The app sets the date locale of its language, as i18n.ts does
     Settings.defaultLocale = "en";

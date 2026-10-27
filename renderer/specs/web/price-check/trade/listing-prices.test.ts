@@ -1,12 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { setupTests } from "@specs/vitest.setup";
+import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import { init } from "@/assets/data";
 import { Host } from "@/web/background/IPC";
 import { usePoeninja } from "@/web/background/Prices";
 import { PRICE_HOST } from "@/web/background/price-source";
-import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import {
   PricingResult,
   requestResults,
@@ -84,9 +83,7 @@ describe("requestResults prices", () => {
 
   beforeEach(async () => {
     setupTests({
-      widgets: [
-        { wmType: "price-check", coreCurrency: "exalted" } as PriceCheckWidget,
-      ],
+      widgets: [priceCheckWidgetMock({ coreCurrency: "exalted" })],
     });
     await init("en");
     fetches = [];

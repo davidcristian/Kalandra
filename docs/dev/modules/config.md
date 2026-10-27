@@ -178,6 +178,8 @@ between rename retries.
 **Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()`
 returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
 the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it.
+`priceCheckWidgetMock()` builds that widget with the settings a test passes, as in
+`setupTests({ widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })] })`.
 `renderer/specs/web/widget-registry.test.ts` loads the real module with `vi.importActual`, checks the widgets of
 `defaultConfig()` and checks that the mock has each top-level field of `defaultConfig()`.
 `renderer/specs/web/config-upgrade.test.ts` runs the real `upgradeConfig()` on the saved configs in

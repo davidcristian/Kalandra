@@ -1,10 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSSRApp, type ComponentPublicInstance } from "vue";
 import { renderToString } from "vue/server-renderer";
-import { setupTests } from "@specs/vitest.setup";
+import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import { createTestCreateOptions, createTestItem } from "@specs/helper";
 import { init } from "@/web/i18n";
-import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import { createFilters } from "@/web/price-check/filters/create-item-filters";
 import TradeBulk from "@/web/price-check/trade/TradeBulk.vue";
 
@@ -42,7 +41,7 @@ describe("the Browser button of a failed bulk search", () => {
   /** Renders TradeBulk.vue with the setting and returns its component instance. */
   async function renderTradeBulk(builtinBrowser: boolean) {
     setupTests({
-      widgets: [{ wmType: "price-check", builtinBrowser } as PriceCheckWidget],
+      widgets: [priceCheckWidgetMock({ builtinBrowser })],
     });
     const item = createTestItem();
     const testItem = { ...item, info: { ...item.info, tradeTag: TRADE_TAG } };

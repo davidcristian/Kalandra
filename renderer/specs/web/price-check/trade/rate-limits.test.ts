@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { setupTests } from "@specs/vitest.setup";
-import type { PriceCheckWidget } from "@/web/overlay/interfaces";
+import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import { adjustRateLimits } from "@/web/price-check/trade/common";
 import { RateLimiter } from "@/web/price-check/trade/RateLimiter";
 
@@ -45,9 +44,7 @@ describe("adjustRateLimits", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     setupTests({
-      widgets: [
-        { wmType: "price-check", apiLatencySeconds: 2 } as PriceCheckWidget,
-      ],
+      widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })],
     });
     warnings = [];
     vi.spyOn(console, "warn").mockImplementation((message: string) => {
