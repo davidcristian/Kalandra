@@ -126,9 +126,9 @@ are the only code that sends trade requests without a key press, under the rules
   `checkNow()`.
 - `PricingPanel.vue`, the pricing block, shows only while the tab has listings: "Priced N of M." with the seconds to
   the next search when `nextSearchAt` is set, the counts of the listings with too few listings, unreadable and
-  failed, the text of a pricer status that waits or fails (`stash_prices.pricing_*`), and the 8 most valuable
-  priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and its
-  reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
+  failed, the text of a pricer status that waits or fails (`pricingStatusText()` in `pricing-text.ts`), and the 8
+  most valuable priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and
+  its reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
 
 ### The settings page
 

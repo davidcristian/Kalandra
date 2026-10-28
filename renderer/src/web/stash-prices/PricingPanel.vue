@@ -26,23 +26,12 @@ import {
   RELIABILITY_TEXT,
   suggestedPriceText,
 } from "@/web/price-check/trade/suggested-price";
-import { readerReserve, type PricerStatus } from "./pricer-state";
+import { readerReserve } from "./pricer-state";
+import { listingNames, pricingStatusText } from "./pricing-text";
 import { useStashPricer } from "./use-stash-pricer";
 import { useStashReader } from "./use-stash-reader";
 import type { StashPricesWidget } from "./widget";
 
-// The status lines; a run that waits for its next search or has nothing left shows only the progress line
-const STATUS_TEXT: Partial<Record<PricerStatus, string>> = {
-  "no-league": "stash_prices.pricing_no_league",
-  "no-prices": "stash_prices.pricing_no_prices",
-  "reading": "stash_prices.pricing_reading",
-  "price-check-open": "stash_prices.pricing_price_check_open",
-  "busy": "stash_prices.pricing_busy",
-  "budget-reached": "stash_prices.pricing_budget_reached",
-  "rate-limited": "stash_prices.pricing_rate_limited",
-  "pricing": "stash_prices.pricing_item",
-  "error": "stash_prices.pricing_error",
-};
 const SHOWN = 8;
 
 export default defineComponent({
@@ -58,15 +47,7 @@ export default defineComponent({
     const reader = useStashReader();
     const now = useNow({ interval: 1000 });
 
-    const names = computed(
-      () =>
-        new Map(
-          reader.state.listings.map((listing) => [
-            listing.id,
-            listing.name || listing.typeLine,
-          ]),
-        ),
-    );
+    const names = computed(() => listingNames(reader.state.listings));
 
     return {
       t,
@@ -85,15 +66,14 @@ export default defineComponent({
         if (!tooFew && !cannotRead && !failed) return null;
         return t(":not_priced", { tooFew, cannotRead, failed });
       }),
-      statusText: computed(() => {
-        const key = STATUS_TEXT[state.status];
-        if (!key) return null;
-        return t(key, {
-          error: state.error ?? "",
-          name: names.value.get(state.pricing ?? "") ?? "",
-          reserve: readerReserve(props.config),
-        });
-      }),
+      statusText: computed(() =>
+        pricingStatusText(
+          state,
+          names.value,
+          readerReserve(props.config),
+          (key, values) => t(key, values),
+        ),
+      ),
       statusClass: computed(() => ({
         "text-red-400": state.status === "error",
         "text-orange-400":
