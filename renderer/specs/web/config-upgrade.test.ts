@@ -553,6 +553,19 @@ describe("upgradeConfig", () => {
     expect(upgrade(config)).toEqual(expected);
   });
 
+  it("turns on the suggested price of every price check widget in a version 43 config", () => {
+    const expected = asSaved(actual.defaultConfig());
+    expected.widgets.push({ ...priceCheckOf(expected), wmId: 900 });
+    const config = asSaved(expected);
+    config.configVersion = 43;
+    for (const widget of config.widgets) {
+      if (widget.wmType !== "price-check") continue;
+      delete (widget as Partial<PriceCheckWidget>).suggestedPrice;
+    }
+
+    expect(upgrade(config)).toEqual(expected);
+  });
+
   it.each([
     [
       "without a library widget",

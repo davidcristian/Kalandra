@@ -67,6 +67,7 @@ export interface PriceCheckWidget extends Widget {
   currencyVolume: "none" | "value" | "item" | "both";
   rememberListingType: boolean;
   initialDelay: number;
+  suggestedPrice: boolean;
   savedAugments: SavedAugments;
 }
 

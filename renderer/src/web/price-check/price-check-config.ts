@@ -7,8 +7,7 @@ export function priceCheckConfig(): PriceCheckWidget {
   return requireWidget<PriceCheckWidget>("price-check", AppConfig());
 }
 
-/** Returns true when the experimental suggested price is on in Settings, General. */
+/** Returns true when the suggested price is on in Settings, Price check. */
 export function suggestedPriceEnabled(): boolean {
-  const config = AppConfig();
-  return config.enableAlphas && config.alphas.includes("suggested-price");
+  return priceCheckConfig().suggestedPrice;
 }

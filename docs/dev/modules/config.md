@@ -17,9 +17,9 @@ old one and keep that file, so a saved config must survive every update: this is
   `overlayBackground`, `overlayBackgroundClose`, `overlayAlwaysClose`, `hideOverlayOnBlur`, `restoreClipboard`,
   `showAttachNotification`, `commands` (each with `text`, `hotkey` and `send`), `clientLog`, `gameConfig`,
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
-  `widgets`, `enableAlphas`, `alphas` (the experimental features turned on: `library` and `suggested-price`),
+  `widgets`, `enableAlphas`, `alphas` (the experimental features turned on: `library`),
   `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 43. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 44. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -69,6 +69,8 @@ old one and keep that file, so a saved config must survive every update: this is
 - `removeModOptions(config)` in `renderer/src/web/library/saved-mod-options.ts` is what the `< 43` step runs. It
   deletes `modOpts`, mod options that no code read, from each profile of each library widget and keeps the other
   profile fields. A library widget without profiles, and a profile that is not an object, stay as they are.
+- The `< 44` step sets `suggestedPrice` to true on each price check widget that has no value for it, so the
+  suggested price is on after an update, as in a new config.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -143,8 +145,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 43, so the next step is `if (config.configVersion < 44)`, ending with
-  `config.configVersion = 44`, and `defaultConfig()` then returns 44. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 44, so the next step is `if (config.configVersion < 45)`, ending with
+  `config.configVersion = 45`, and `defaultConfig()` then returns 45. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -213,7 +215,8 @@ For the `< 42` step it checks that a version 41 config gets each saved `maritalW
 widget without saved augments. For the `< 43` step it checks that a version 42 config loses `modOpts` from every
 profile of every library widget and keeps the other fields, that a config without a library widget, with
 `modOpts` on a widget of another type, or with missing or malformed profiles stays the same, and that a version 28
-or 32 config still gets `generation` from the `< 33` step before the `< 43` step removes `modOpts`. It runs the
+or 32 config still gets `generation` from the `< 33` step before the `< 43` step removes `modOpts`. For the `< 44`
+step it checks that a version 43 config gets `suggestedPrice` on every price check widget. It runs the
 real `initConfig()` with a fake `Host.getConfig()` and checks that a saved config loads as `upgradeConfig()`
 returns it, that a config without the price check or another single instance widget gets the default one with a
 new `wmId` and a log line, that a version 32 config without a library widget gets the one with `modOpts`, and

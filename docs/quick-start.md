@@ -82,11 +82,10 @@ opens this price check window:
 
 ![The price check window for the ring, with the pseudo stat for total Elemental Resistance ticked](/reference-images/example-item-2-window.png)
 
-Each filter is one stat of the item, and the trade search uses the ticked filters. For a rare item, Kalandra ticks some
-filters and waits: tick the stats that matter, then press **Search**. Which stats matter depends on the build that
-would use the item. For a unique, unidentified or veiled item, or an item without a trade site category, such as
-currency, Kalandra searches at once. **Perform an auto search, when pressing** in Settings, Price check has one toggle
-for each price check hotkey that turns this automatic search on or off.
+Each filter is one stat of the item, and the trade search uses the ticked filters. Kalandra ticks some filters and
+searches at once. Which stats matter depends on the build that would use the item, so for a rare item, tick the stats
+that matter and press **Search** again. **Perform an auto search, when pressing** in Settings, Price check has one
+toggle for each price check hotkey that turns this first search on or off.
 
 Some mods have no filter of their own, because Kalandra adds them into a pseudo stat. On this ring, three resistance
 mods form one filter, total Elemental Resistance, marked **pseudo x 3**. The **Hidden** toggle switches the list to

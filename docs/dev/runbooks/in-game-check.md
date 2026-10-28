@@ -146,8 +146,8 @@ General, sets another path), and uses Alt when the file does not set it
   filters and the trade results. For an item the price file lists, such as a currency or a unique,
   it also shows the estimate from `https://kalandra.ashoal.com/prices/<league>.json`. How the
   league id becomes that file name is in [price-service.md](../modules/price-service.md#the-files).
-  The file's categories are in `renderer/public/data/namespaceMap.json`. With "Enable experimental
-  features" and "Suggested price in the price check" on in Settings, General, a normal, magic or
+  The file's categories are in `renderer/public/data/namespaceMap.json`. With "Show a suggested
+  price (experimental)" on in Settings, Price check, as it is by default, a normal, magic or
   rare item searches at once, a rare with its valuable stats such as crit ticked, and the
   line "Suggested price:" over the listings shows a price, a range and a reliability, or "too few
   listings" ([suggested-price.md](../../suggested-price.md)).

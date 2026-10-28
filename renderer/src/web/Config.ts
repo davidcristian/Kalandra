@@ -128,13 +128,13 @@ export interface Config {
   showAttachNotification: boolean;
   overlayAlwaysClose: boolean;
   enableAlphas: boolean;
-  alphas: Array<"library" | "suggested-price">;
+  alphas: Array<"library">;
   tipsFrequency: TipsFrequency;
   readClientLog: boolean;
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 43,
+  configVersion: 44,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -702,6 +702,13 @@ export function upgradeConfig(_config: Config): Config {
   if (config.configVersion < 43) {
     savedLibrary.removeModOptions(config);
     config.configVersion = 43;
+  }
+
+  if (config.configVersion < 44) {
+    for (const w of config.widgets) {
+      if (w.wmType === "price-check") w.suggestedPrice ??= true;
+    }
+    config.configVersion = 44;
   }
 
   return config as Config;

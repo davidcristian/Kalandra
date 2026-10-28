@@ -200,6 +200,7 @@ export default defineComponent({
         currencyVolume: "both",
         rememberListingType: false,
         initialDelay: 48,
+        suggestedPrice: true,
         savedAugments: {},
       };
     },

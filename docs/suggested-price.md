@@ -8,12 +8,12 @@ the line sends no extra request to the trade site. It helps most with a rare, ma
 [price estimate](/price-check#price-estimate) from poe.ninja. How Kalandra works out the price can change in later
 versions.
 
-## Turn it on
+## Turn it off
 
-In Settings, **General** page, check **Enable experimental features**, then **Suggested price in the price check**
-below it, and click **Save**. With it on, the price check also searches the trade site at once for a normal, magic or
-rare item, as it does for a unique, so the line has listings to work from. The two toggles under **Perform an auto
-search, when pressing** in the price check settings still turn that search off.
+The suggested price is on by default. To turn it off, uncheck **Show a suggested price (experimental)** near the top
+of Settings, **Price check** page, and click **Save**. While it is on, the price check also searches the trade site at
+once for a normal, magic or rare item, as it does for a unique, so the line has listings to work from. The two toggles
+under **Perform an auto search, when pressing** on the same page still turn that search off.
 
 For a rare item, it also turns on the filters of the stats that set most of an item's price, at any tier: skill
 levels, Critical Hit Chance and Critical Damage Bonus, Spell Damage, elemental and attack damage, Attack and Cast

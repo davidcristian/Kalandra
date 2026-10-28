@@ -22,8 +22,7 @@ explains.
 
 Change both in Settings, **Hotkeys** page, under **Price check**. The **Auto-hide Mode** hotkey is `Ctrl` or `Alt`
 plus one key, and its `Ctrl` or `Alt` is the key you hold. In **Auto-hide Mode**, once the cursor is in the window,
-moving it out returns you to the game and closes the window. In both modes, the close button in the title bar closes
-it.
+moving it out returns you to the game and closes the window. In both modes, the title bar's close button closes it.
 
 To check item text copied outside the game, press the overlay key (`Shift + Space` by default) and paste the text
 into the **Price check (Ctrl + V)** box of the main button bar. The window opens as with **Open without auto-hide**.
@@ -229,6 +228,7 @@ Open Settings, **Price check** page, or click the price check title bar. Changes
 | **League** and **Refresh** | a league from the list | The league to search and estimate. **Refresh** loads the list again. |
 | **or Private League** | empty | A private league name. See [Private leagues](/private-leagues). |
 | **Account name** | empty | Your account name, so your own listings show **You**. |
+| **Show a suggested price (experimental)** | on | Shows the [suggested price](/suggested-price) line over the listings, searches at once for a normal, magic or rare item and ticks the valuable stats of a rare. |
 | **Show seller** | **No** | Adds a **Seller** column with the **Account name** or the **Last character name**. |
 | **Fill stat values** | 10% | How far from the item's value the minimum (or maximum) starts, from 0 to 50. **Exact value** sets 0. An exact search takes at most 2% ([Filters](#filters)). |
 | **Primary base currency:** | Exalted Orb | Exalted Orb or Chaos Orb, for estimates, the title bar rate and prices in brackets. With Chaos Orb, these show in Exalted Orbs while one Divine Orb costs fewer than 5 Chaos Orbs. |

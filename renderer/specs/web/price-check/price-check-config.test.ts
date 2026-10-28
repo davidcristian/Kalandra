@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultConfigMock } from "@specs/vitest.setup";
+import { defaultConfigMock, priceCheckWidgetMock } from "@specs/vitest.setup";
 import { AppConfig } from "@/web/Config";
 import {
   priceCheckConfig,
@@ -25,14 +25,18 @@ describe("priceCheckConfig", () => {
 });
 
 describe("suggestedPriceEnabled", () => {
-  it("is on only with experimental features and the suggested price both on", () => {
-    defaultConfigMock({ enableAlphas: true, alphas: ["suggested-price"] });
+  it("follows the setting of the price check widget, whether experimental features are on or off", () => {
+    defaultConfigMock({
+      enableAlphas: false,
+      widgets: [priceCheckWidgetMock({ suggestedPrice: true })],
+    });
     expect(suggestedPriceEnabled()).toBe(true);
 
-    defaultConfigMock({ enableAlphas: false, alphas: ["suggested-price"] });
-    expect(suggestedPriceEnabled()).toBe(false);
-
-    defaultConfigMock({ enableAlphas: true, alphas: ["library"] });
+    defaultConfigMock({
+      enableAlphas: true,
+      alphas: ["library"],
+      widgets: [priceCheckWidgetMock({ suggestedPrice: false })],
+    });
     expect(suggestedPriceEnabled()).toBe(false);
   });
 });

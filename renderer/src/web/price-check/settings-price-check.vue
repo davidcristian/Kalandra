@@ -52,6 +52,14 @@
       </div>
     </div>
     <div class="mb-2">
+      <ui-checkbox class="mb-1" v-model="suggestedPrice">{{
+        t(":suggested_price")
+      }}</ui-checkbox>
+      <div class="mb-4 italic text-gray-500">
+        {{ t(":suggested_price_note") }}
+      </div>
+    </div>
+    <div class="mb-2">
       <div class="flex-1 mb-1">{{ t(":show_seller") }}</div>
       <div class="mb-1 flex">
         <ui-radio v-model="showSeller" :value="false" class="mr-4">{{
@@ -272,6 +280,10 @@ export default defineComponent({
       }),
       accountName: configModelValue(() => props.config, "accountName"),
       showSeller: configModelValue(() => configWidget.value, "showSeller"),
+      suggestedPrice: configModelValue(
+        () => configWidget.value,
+        "suggestedPrice",
+      ),
       activateStockFilter: configModelValue(
         () => configWidget.value,
         "activateStockFilter",
