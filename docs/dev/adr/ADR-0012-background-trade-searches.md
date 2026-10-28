@@ -28,10 +28,11 @@ turning it off stops the timer and the running check. It also needs the account 
 searches use the user's IP and the user's share of the limit.
 
 **3. It is paced.** The reader sends one search per check, one check per interval: 10 minutes by default and 5 at
-least. It fetches only the listings it has not fetched before, 10 per request and one request at a time. The pricer
-sends at most one search every 15 seconds, never two at once, and fetches the 20 cheapest listings of it in two
-requests; an item that the price file prices needs no request. Reason: a tab changes only when the user moves items,
-and most checks then fetch nothing; 15 seconds keeps the pricer at 20 of the 60 searches the site allows in 5 minutes.
+least. It fetches every listing the search returns, 10 per request and one request at a time, so at most 10 requests
+a check. The pricer sends at most one search every 15 seconds, never two at once, and fetches the 20 cheapest listings
+of it in two requests; an item that the price file prices needs no request. Reason: the search order does not change
+when an item moves within the tab or a whole tab moves, so only a fetch shows an item's place; 15 seconds keeps the
+pricer at 20 of the 60 searches the site allows in 5 minutes.
 
 **4. It stays within the user's search budget.** No search goes out while the 3 hour search count is at or above the
 `searchBudget` setting: 400 by default, 0 to 600. The pricer stops earlier, at the budget less the searches the reader
