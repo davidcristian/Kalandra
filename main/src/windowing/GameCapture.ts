@@ -42,7 +42,7 @@ export function isSameFrame(
   );
 }
 
-/** Answers the overlay page's requests to capture the game window: on Windows only, while stash detection is on. */
+/** Handles the page's requests to capture the game window, and grants one on Windows while stash detection is on. */
 export class GameCapture {
   private enabled = false;
   private windowTitle = "";

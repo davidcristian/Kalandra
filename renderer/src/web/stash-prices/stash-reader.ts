@@ -44,8 +44,9 @@ export interface ReaderState {
   error: string | null;
   /** The listings in the tab, newest first. */
   listings: StashListing[];
-  /** The account's listings without a price, from the last search, and how many of them it returned. */
+  /** The count of the account's listings without a price that the last search reported. */
   total: number | null;
+  /** The ids the last search returned, at most 100. */
   read: number;
   lastCheckAt: number | null;
   nextCheckAt: number | null;

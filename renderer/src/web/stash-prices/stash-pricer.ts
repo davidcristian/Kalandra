@@ -38,7 +38,7 @@ export function createStashPricer(sources: PricerSources) {
   });
   const items = new Map<string, ReturnType<typeof listingItem>>();
   // The listings that need a search, so each run does not build their filters again
-  const searched = new Set<string>();
+  const needsSearch = new Set<string>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let runId = 0;
   let running = false;
@@ -87,7 +87,7 @@ export function createStashPricer(sources: PricerSources) {
     const prices = new Map(state.prices);
     for (const listing of sources.listings()) {
       if (prices.get(listing.id)?.status !== "queued") continue;
-      if (searched.has(listing.id)) continue;
+      if (needsSearch.has(listing.id)) continue;
       const item = itemOf(listing);
       if (item.isErr()) {
         prices.set(listing.id, { status: "cannot-read", reason: item.error });
@@ -95,7 +95,7 @@ export function createStashPricer(sources: PricerSources) {
       }
       const price = withoutSearch(item.value, league);
       if (price) prices.set(listing.id, price);
-      else searched.add(listing.id);
+      else needsSearch.add(listing.id);
     }
     setPrices(prices);
   }
@@ -249,8 +249,8 @@ export function createStashPricer(sources: PricerSources) {
     for (const id of items.keys()) {
       if (!ids.has(id)) items.delete(id);
     }
-    for (const id of searched) {
-      if (!ids.has(id)) searched.delete(id);
+    for (const id of needsSearch) {
+      if (!ids.has(id)) needsSearch.delete(id);
     }
     setPrices(prices);
     if (!running) void run();
@@ -262,7 +262,7 @@ export function createStashPricer(sources: PricerSources) {
     running = false;
     clearTimeout(timer);
     items.clear();
-    searched.clear();
+    needsSearch.clear();
     resumeAt = 0;
     setPrices(new Map());
     Object.assign(state, {

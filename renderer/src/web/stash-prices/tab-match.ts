@@ -8,13 +8,13 @@ import { type Grid, needsQuad, sideOf } from "./stash-grid";
 
 type Place = Pick<StashListing, "x" | "y" | "w" | "h">;
 
-/** The fewest cells under the listings that let the capture decide. */
+/** The fewest cells under the listings for which a frame can show the tab. */
 export const MIN_ITEM_CELLS = 3;
 
-/** The share of the item cells, and of all cells, that must agree with the listings. */
+/** The share of the item cells, and of all cells, that must match the listings. */
 export const MIN_AGREEMENT = 0.9;
 
-/** How a layout of cells agrees with the listings. */
+/** How a layout of cells matches the listings. */
 export interface LayoutMatch {
   /** The cells under the listings. */
   itemCells: number;
@@ -54,20 +54,20 @@ export function compareLayout(
 ): LayoutMatch {
   let itemCells = 0;
   let itemsSeen = 0;
-  let agreeing = 0;
+  let matching = 0;
   expected.forEach((filled, at) => {
     if (filled) itemCells += 1;
     if (filled && states[at] === "filled") itemsSeen += 1;
-    if (states[at] === (filled ? "filled" : "empty")) agreeing += 1;
+    if (states[at] === (filled ? "filled" : "empty")) matching += 1;
   });
   return {
     itemCells,
     items: itemCells === 0 ? 0 : itemsSeen / itemCells,
-    cells: expected.length === 0 ? 0 : agreeing / expected.length,
+    cells: expected.length === 0 ? 0 : matching / expected.length,
   };
 }
 
-/** Returns whether a layout shows the tab: enough item cells, and most item cells and most cells agree. */
+/** Returns whether a layout shows the tab: enough item cells, and most item cells and most cells match. */
 export function showsTab(match: LayoutMatch): boolean {
   return (
     match.itemCells >= MIN_ITEM_CELLS &&
@@ -78,7 +78,7 @@ export function showsTab(match: LayoutMatch): boolean {
 
 /**
  * Compares an image of the game window with the listings of the tab: as a quad tab, and also as a normal tab when
- * the listings fit one. Returns the layout that shows the tab, or else the one where more cells agree.
+ * the listings fit one. Returns the layout that shows the tab, or else the one where more cells match.
  */
 export function matchTab(
   image: PixelImage,

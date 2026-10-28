@@ -14,7 +14,7 @@ import {
   type StashSearch,
 } from "./stash-listings";
 
-// The trade site's longest search window, 10800 seconds in x-rate-limit-ip, plus apiLatencySeconds
+// The trade site's longest search window, 10800 seconds in x-rate-limit-ip; a limiter's window adds apiLatencySeconds
 const THREE_HOURS_SECONDS = 3 * 60 * 60;
 
 /** Returns the searches counted in the SEARCH limiter with the longest window, or undefined before the site sent a 3 hour window. */

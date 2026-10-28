@@ -1,4 +1,4 @@
-/** The state of the stash pricer, and the rules that decide when it may send a search. */
+/** The state of the stash pricer, and the rules for when it may send a search. */
 
 import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
 import type { ListingPrice } from "./price-item";

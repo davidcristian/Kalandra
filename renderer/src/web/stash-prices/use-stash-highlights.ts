@@ -23,7 +23,7 @@ export const useStashHighlights = createGlobalState(() => {
 
   const threshold = computed(() => {
     const { trashThreshold } = widget();
-    // findPriceByQuery is not reactive, and each price file that loads sets the exchange rate
+    // findPriceByQuery is not reactive, so this reads the exchange rate, which a price file with another rate changes
     if (
       poeninja.xchgRate.value === undefined &&
       trashThreshold.currency !== "div"

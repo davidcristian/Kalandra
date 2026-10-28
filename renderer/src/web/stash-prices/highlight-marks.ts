@@ -1,4 +1,4 @@
-/** Decides the mark of each item in the stash tab from its price, and places the marks, the progress bar and the cells. */
+/** Returns the mark of each item in the stash tab from its price, and places the marks, the progress bar and the cells. */
 
 import type { ListingPrice } from "./price-item";
 import type { PriceCounts } from "./pricer-state";

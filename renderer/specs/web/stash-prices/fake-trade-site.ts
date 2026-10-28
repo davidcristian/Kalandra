@@ -65,7 +65,7 @@ function isAccountSearch(body: unknown): boolean {
 }
 
 /**
- * Answers the searches and fetches of the reader from `listings`, the account's listings without a price, newest
+ * Responds to the searches and fetches of the reader from `listings`, the account's listings without a price, newest
  * first, and the searches of an item from `offers`, cheapest first. A search returns the first 100 ids, as the
  * trade site does.
  */

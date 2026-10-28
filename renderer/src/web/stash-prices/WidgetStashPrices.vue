@@ -44,8 +44,6 @@ import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
 import { clampBudget } from "./reader-settings";
 import type { ReaderStatus } from "./stash-reader";
 import { threeHourSearchCount } from "./stash-requests";
-import { useStashDetector } from "./use-stash-detector";
-import { useStashPricer } from "./use-stash-pricer";
 import { useStashReader } from "./use-stash-reader";
 import { stashPricesDefault, type StashPricesWidget } from "./widget";
 
@@ -82,9 +80,6 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18nNs("stash_prices");
     const reader = useStashReader();
-    // OverlayWindow.vue creates both first through useStashHighlights(); they run while the panel is hidden
-    useStashPricer();
-    useStashDetector();
     const leagues = useLeagues();
     const { state } = reader;
 

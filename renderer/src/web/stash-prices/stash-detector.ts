@@ -83,7 +83,7 @@ function itemCells(listings: readonly StashListing[]): number {
     .length;
 }
 
-/** Creates the detector of the open stash tab: the capture runs only while it can decide something. */
+/** Creates the detector of the open stash tab: the capture runs only while a frame can show the tab. */
 export function createStashDetector(sources: DetectorSources) {
   const state = shallowReactive<DetectorState>({
     open: false,
@@ -184,7 +184,7 @@ export function createStashDetector(sources: DetectorSources) {
     }
     state.match = match;
     if (match.seen) seenQuad = match.quad;
-    // A run counts the frames in a row that disagree with what the capture shows now
+    // A run counts the frames in a row that differ from what the capture shows now
     run = match.seen === captureOpen ? 0 : run + 1;
     if (run >= FRAMES_TO_CHANGE) {
       captureOpen = match.seen;
