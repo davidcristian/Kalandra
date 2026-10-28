@@ -223,26 +223,20 @@ General, sets another path), and uses Alt when the file does not set it
     file was emptied, or `info [GameLogWatcher] The log file was replaced, reading the new file
     from the start` when the editor saved a new file in its place.
 
-## 8. Stash detection, the grid and the marks
+## 8. Stash prices
 
-- **Setting:** on the Stash prices page, **Read the tab in the background** and **Find the open tab in the game
-  window** on, and a key in **Hotkey that marks the tab open or closed**. Save. The tab holds items without a price on
-  3 cells or more, and the widget lists them after a check and has priced a few
-  ([stash-detection.md](../modules/stash-detection.md), [renderer-stash-prices.md](../modules/renderer-stash-prices.md)).
-- **Press:** open the stash on that tab, then another tab, close it, and press the hotkey twice. After each, read the
-  widget's `Stash tab` line with the overlay key: it keeps the last capture. Point at it, and take a screenshot. With
-  the tab open, click a marked item, once with the game active and once with the overlay active, and hold `Alt`.
-  Then turn on **Grid alignment view** and look at the stash, open and closed.
-- **See:** `Stash tab seen.` and the marks within a second of opening the tab, both percentages 90 or more, and `not
-  seen` and no marks on another tab and with the stash closed; the hotkey gives `shown` and `hidden` and the marks
-  with them. Each mark lies on its item, a price on each yellow frame, a trash icon on each red one, and the
-  progress bar under the grid covers no button you need. A click on a mark reaches the game, or the overlay's
-  background, never the mark, and `Alt` hides the marks. The alignment view's lines, and the tooltip's grid start
-  and cell width, match the screenshot within 3 pixels; else write down both, with the resolution, for `GRID_LEFT`,
-  `GRID_TOP` and `GRID_CELL` in `stash-grid.ts`. Kalandra's CPU use in Task Manager stays near that with the stash
-  closed.
-- **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal
-  and `warn [renderer] Stash detection cannot capture the game window: <message>`.
+- **Setting:** **Account name** on the Price check page. On the Stash prices page, **Read the tab in the background**,
+  **Find the open tab in the game window (Windows)** and a key in **Hotkey that marks the tab open or closed**. Save. A
+  public premium stash tab named `kalandra-price-check` holds items without a price on 3 cells or more
+  ([stash-prices.md](../../stash-prices.md)).
+- **Press and see:** the steps of [host task 021](../host/tasks/021-stash-detection.md#steps): reading the tab,
+  pricing, the capture, the hotkey, the marks and the bar, clicks on a mark, the window shown over the active game, the
+  grid alignment view and a paused capture. Read the widget with the overlay key: it shows only while the overlay is
+  active, and its `Stash tab` line then names the last capture's percentages.
+- **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal and
+  `warn [renderer] Stash detection cannot capture the game window: <message>`. A failed check of the tab or pricing
+  search writes `warn [renderer] [stash-prices] The stash tab check failed: <message>` or
+  `warn [renderer] [stash-prices] Pricing a listing failed: <message>`, once for each new message.
 
 ## After the check
 

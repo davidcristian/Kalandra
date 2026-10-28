@@ -64,7 +64,7 @@ fails.
 | [cherry-pick-upstream.md](runbooks/cherry-pick-upstream.md) | Takes one fix from Exiled Exchange 2: the read-only `upstream` remote without its tags, finding the commit, `git cherry-pick -e`, conflicts, and the pull request against `origin` |
 | [docs-site.md](runbooks/docs-site.md) | Previews, builds and deploys the user site: `npm run dev`, `build` and `preview` in `docs/`, a new page with its frontmatter title and sidebar entry, and the Docs workflow |
 | [game-data-update.md](runbooks/game-data-update.md) | Rebuilds `stats.ndjson`, `items.ndjson` and `client_strings.js` for a game patch with `dataParser`, checks the diff before the commit, and writes the index files again |
-| [in-game-check.md](runbooks/in-game-check.md) | Checks the behavior that needs the game on Windows: the overlay and its key, clipboard capture, the price check keys, chat commands, stash tab scrolling, `Client.txt` and stash detection, each with its keys and log lines |
+| [in-game-check.md](runbooks/in-game-check.md) | Checks the behavior that needs the game on Windows: the overlay and its key, clipboard capture, the price check keys, chat commands, stash tab scrolling, `Client.txt` and stash prices, each with its keys and log lines |
 | [price-service-deploy.md](runbooks/price-service-deploy.md) | Runs `priceService/` with Docker Compose so that `kalandra.ashoal.com/prices/` serves its files, checks it with `curl`, and fixes an unhealthy service, failed leagues or missing prices |
 | [release.md](runbooks/release.md) | Releases a version: how the Build workflow uploads only into a draft release, the five version places, the steps from the draft to the published release, and the failures |
 
