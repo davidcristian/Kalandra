@@ -495,6 +495,26 @@
     "exp": "Exp",
     "over": "Over:"
   },
+  "stash_prices": {
+    "tab": "Stash tab: {name}",
+    "items_in_tab": "Items in the tab: {count}",
+    "last_check": "Last check: {time}",
+    "never": "never",
+    "next_check": "Next check: {time}",
+    "searches": "Searches in the last 3 hours: {count} of {budget}",
+    "only_newest": "Only the newest {read} of your {total} listings without a price are read.",
+    "check_now": "Check now",
+    "status_off": "Off. Turn it on in the settings.",
+    "status_no_account": "Set your account name on the Price check page of the settings.",
+    "status_no_league": "Waiting for the league list.",
+    "status_price_check_open": "Paused while the price check is open.",
+    "status_busy": "Paused while your own price checks wait for the rate limit.",
+    "status_budget_reached": "Paused: the searches of the last 3 hours reached the budget.",
+    "status_rate_limited": "Paused by the trade site's rate limit.",
+    "status_checking": "Reading the tab.",
+    "status_waiting": "The tab is read.",
+    "status_error": "The trade site failed: {error}"
+  },
   "library": {
     "name": "Library",
     "log_item_key": "Log item to csv",

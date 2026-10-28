@@ -10,7 +10,7 @@ import { registry as widgetRegistry } from "./overlay/widget-registry.js";
 import { LibraryWidget } from "./library/widget";
 import * as savedLibrary from "./library/saved-mod-options";
 import { addKeysWithoutStep, repairSavedConfig } from "./config-repair";
-import { addMissingWidgets } from "./missing-widgets";
+import { addMissingWidgets, addNewWidget } from "./missing-widgets";
 import { warnIfNewerConfig } from "./newer-config";
 import * as removed from "./removed-widgets";
 import { shortcutActions } from "./shortcut-actions";
@@ -18,6 +18,7 @@ import { nameDefaultMarksByRef } from "./map-check/saved-marks";
 import { moveMartialWeaponAugments } from "./price-check/saved-augments";
 import { ENGLISH_DEFAULTS_40, namePresetEntries } from "./stash-search/presets";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
+import { stashPricesDefault } from "./stash-prices/widget";
 import { tradeHost } from "./trade-host";
 
 const _config = shallowRef<Config | null>(null);
@@ -134,7 +135,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 44,
+  configVersion: 45,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -709,6 +710,11 @@ export function upgradeConfig(_config: Config): Config {
       if (w.wmType === "price-check") w.suggestedPrice ??= true;
     }
     config.configVersion = 44;
+  }
+
+  if (config.configVersion < 45) {
+    addNewWidget(config, stashPricesDefault());
+    config.configVersion = 45;
   }
 
   return config as Config;

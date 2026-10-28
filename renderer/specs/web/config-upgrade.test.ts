@@ -12,6 +12,7 @@ import { registry } from "@/web/overlay/widget-registry";
 import type { StashSearchWidget } from "@/web/stash-search/widget";
 import type { ColumnOpts, LibraryWidget } from "@/web/library/widget";
 import type { LibraryWidgetWithModOptions } from "@/web/library/saved-mod-options";
+import type { StashPricesWidget } from "@/web/stash-prices/widget";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -164,6 +165,12 @@ function priceCheckOf(config: Config): PriceCheckWidget {
 
 function libraryOf(config: Config): LibraryWidget {
   return config.widgets.find((w) => w.wmType === "library") as LibraryWidget;
+}
+
+function stashPricesOf(config: Config): StashPricesWidget {
+  return config.widgets.find(
+    (w) => w.wmType === "stash-prices",
+  ) as StashPricesWidget;
 }
 
 const MOD_OPTIONS = {
@@ -562,6 +569,45 @@ describe("upgradeConfig", () => {
       if (widget.wmType !== "price-check") continue;
       delete (widget as Partial<PriceCheckWidget>).suggestedPrice;
     }
+
+    expect(upgrade(config)).toEqual(expected);
+  });
+
+  it("adds the stash prices widget, off and out of the menu, with the next free wmId to a version 44 config", () => {
+    const expected = asSaved(actual.defaultConfig());
+    const stashPrices = stashPricesOf(expected);
+    const notepad: Widget = {
+      wmId: 900,
+      wmType: "notepad",
+      wmTitle: "",
+      wmWants: "hide",
+      wmZorder: null,
+      wmFlags: [],
+    };
+    expected.widgets = [
+      ...expected.widgets.filter((w) => w !== stashPrices),
+      notepad,
+    ];
+    const config = asSaved(expected);
+    config.configVersion = 44;
+    expected.widgets.push({ ...stashPrices, wmId: 901 });
+
+    expect(upgrade(config)).toEqual(expected);
+    expect(stashPrices).toMatchObject({
+      enabled: false,
+      wmFlags: ["invisible-on-blur", "menu::skip"],
+    });
+  });
+
+  it("keeps the stash prices widget of a version 44 config and adds no second one", () => {
+    const expected = asSaved(actual.defaultConfig());
+    Object.assign(stashPricesOf(expected), {
+      enabled: true,
+      tabName: "dump",
+      wmFlags: ["invisible-on-blur"],
+    });
+    const config = asSaved(expected);
+    config.configVersion = 44;
 
     expect(upgrade(config)).toEqual(expected);
   });

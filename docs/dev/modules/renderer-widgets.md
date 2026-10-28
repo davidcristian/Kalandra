@@ -70,13 +70,14 @@ https://davidcristian.github.io/Kalandra/ (each link opens the page's source).
 | `image-strip` | `overlay/WidgetImageStrip.vue` | `ImageStripWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `notepad` | `notepad/WidgetNotepad.vue` | `NotepadWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `library` | `library/WidgetLibrary.vue` | `LibraryWidget` (`library/widget.ts`) | single | [`/item-data`](../../item-data.md) |
+| `stash-prices` | `stash-prices/WidgetStashPrices.vue` | `StashPricesWidget` (`stash-prices/widget.ts`) | single | none yet |
 
-The menu, price check, item check and library start with `menu::skip`. In the copy that the settings window edits,
-two widgets get the flag from a setting when the window opens and when the setting changes: the XP tracker has it
-while "Allow reading of Client.txt file" is off, and the library unless both "Enable experimental features" and
-"Item Data Collection" are on (`enableWidget` and `disableWidget` in `settings/utils.ts`). Adding the flag also hides
-the widget. The price check is in
-[renderer-price-check.md](renderer-price-check.md).
+The menu, price check, item check, library and stash prices start with `menu::skip`. In the copy that the settings
+window edits, two widgets get the flag from a setting when the window opens and when the setting changes: the XP
+tracker has it while "Allow reading of Client.txt file" is off, and the library unless both "Enable experimental
+features" and "Item Data Collection" are on (`enableWidget` and `disableWidget` in `settings/utils.ts`). Adding the
+flag also hides the widget. The price check is in [renderer-price-check.md](renderer-price-check.md), and the stash
+prices widget in [renderer-stash-prices.md](renderer-stash-prices.md).
 
 ### Stash search presets
 
@@ -93,11 +94,11 @@ text, since the game data has no text for them
 ## Adding a widget
 
 1. Write the component in its own folder under `renderer/src/web/`, with a static
-   `widget: { ... } satisfies WidgetSpec` in its component options, as every registered widget has. Seven put it
+   `widget: { ... } satisfies WidgetSpec` in its component options, as every registered widget has. Eight put it
    in `defineComponent`; four put it in a plain `export default` next to `<script setup>`, as
    `WidgetImageStrip.vue` does. The `type` becomes the `wmType` in every user's saved config, and only an upgrade
    step can change it later.
-2. Write its config type as an interface that extends `Widget`. It goes in `overlay/widgets.ts` or, as for five
+2. Write its config type as an interface that extends `Widget`. It goes in `overlay/widgets.ts` or, as for six
    widgets, in a `widget.ts` in the widget's own folder. A single widget sets every field in
    `initInstance()`. A multi widget sets its fields in `setup` when `wmFlags[0]` is `uninitialized`, as
    `WidgetTimer.vue` does, because `create()` adds a bare `Widget` with only that flag.

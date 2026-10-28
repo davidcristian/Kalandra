@@ -12,6 +12,7 @@ const SAVED_SINCE = new Map<string, number>([
   ["item-search", 12],
   ["experience-tracker", 29],
   ["library", 30],
+  ["stash-prices", 45],
 ]);
 
 // The < 33 step sets the modOpts of the library profile, which the current default lacks
@@ -46,4 +47,14 @@ export function addMissingWidgets(
       added.join(", "),
     );
   }
+}
+
+/** Appends `widget` with the next free wmId to a saved config without a widget of its type, as the step of a new single widget does. */
+export function addNewWidget(
+  config: { widgets: Array<Record<string, unknown>> },
+  widget: Widget,
+): void {
+  if (config.widgets.some((w) => w.wmType === widget.wmType)) return;
+  const wmId = Math.max(0, ...config.widgets.map((w) => Number(w.wmId))) + 1;
+  config.widgets.push({ ...widget, wmId });
 }

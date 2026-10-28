@@ -47,6 +47,7 @@ describe("the widget registry", () => {
       ["image-strip", "multi"],
       ["notepad", "multi"],
       ["library", "single"],
+      ["stash-prices", "single"],
     ]);
   });
 
@@ -86,6 +87,7 @@ describe("the widgets of defaultConfig()", () => {
       [7, "price-check"],
       [8, "item-check"],
       [9, "library"],
+      [10, "stash-prices"],
     ]);
   });
 
@@ -116,7 +118,7 @@ describe("the widgets of defaultConfig()", () => {
     expect(ordered.map((w) => w.wmType)).toEqual(["menu"]);
   });
 
-  it("leave the menu, price check, item check and library out of the menu", () => {
+  it("leave the menu, price check, item check, library and stash prices out of the menu", () => {
     const skipped = actual
       .defaultConfig()
       .widgets.filter((w) => w.wmFlags.includes("menu::skip"));
@@ -126,6 +128,7 @@ describe("the widgets of defaultConfig()", () => {
       "price-check",
       "item-check",
       "library",
+      "stash-prices",
     ]);
   });
 

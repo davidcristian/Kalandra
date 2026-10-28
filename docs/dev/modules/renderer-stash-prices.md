@@ -41,6 +41,26 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
   a search response without a query id, string ids or a total, and `readListing()` returns `undefined` for a fetch
   result it cannot read.
 
+### The widget and its panel
+
+- `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
+  (false), `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`.
+  `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags `invisible-on-blur` and
+  `menu::skip`, at the top left under the main button bar. The `< 45` step adds it to a saved config
+  ([config.md](config.md)).
+- `useStashReader()` in `use-stash-reader.ts` returns the app's one reader, a `createGlobalState`. Its sources are
+  the widget's config through `requireWidget`, `AppConfig().accountName`, `useLeagues().selectedId`, which has a
+  league only after the league list loaded, and `priceCheckConfig().wmWants === "show"`. Code that needs the
+  listings of the tab reads `useStashReader().state`.
+- `WidgetStashPrices.vue` (wmType `stash-prices`, single) is mounted at start like every widget
+  ([renderer-widgets.md](renderer-widgets.md)), so the reader runs while the panel is hidden: a watcher calls
+  `refresh()` at once and whenever `enabled`, `tabName`, `intervalMinutes`, `searchBudget`, the account name or the
+  league changes. The panel, in the `Widget.vue` frame, shows the tab name, the number of listings in the tab, the
+  times of the last and the next check, the 3 hour search count of the budget (`?` before the site sent that
+  window), "Only the newest N of your M listings without a price are read." when the search returned fewer ids
+  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), and **Check now**, which calls
+  `checkNow()`.
+
 ### The order of a check
 
 1. Not `enabled`: `stop()`. No account name: `no-account`. No league in `leagueId()`: `no-league`.
@@ -74,5 +94,6 @@ listings of `specs/docs/fetchResponses.json` with the rate limit headers the sit
 search body, the fetches of new ids only, the tab filter, a gone and a returning listing, a listing moved into the
 tab, an unreadable fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the
 pauses for the price check and the limiter queue, a restriction during the fetches, the trade errors and their log
-lines, and the settings changes. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
+lines, and the settings changes. `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the
+fake site, and renders the panel in English for each status. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
 `reindexedIds()`, `threeHourSearchCount()` and the setting limits. No test calls the live site.

@@ -12,6 +12,7 @@ import WidgetSettings from "../settings/SettingsWindow.vue";
 import WidgetXpTracker from "../leveling/WidgetXpTracker.vue";
 import WidgetNotepad from "../notepad/WidgetNotepad.vue";
 import WidgetLibrary from "../library/WidgetLibrary.vue";
+import WidgetStashPrices from "../stash-prices/WidgetStashPrices.vue";
 
 export const registry = {
   widgets: [] as WidgetComponent[],
@@ -38,3 +39,4 @@ registerWidget(WidgetItemCheck);
 registerWidget(WidgetImageStrip);
 registerWidget(WidgetNotepad);
 registerWidget(WidgetLibrary);
+registerWidget(WidgetStashPrices);
