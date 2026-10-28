@@ -40,6 +40,7 @@ import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
 import { clampBudget } from "./reader-settings";
 import type { ReaderStatus } from "./stash-reader";
 import { threeHourSearchCount } from "./stash-requests";
+import { useStashPricer } from "./use-stash-pricer";
 import { useStashReader } from "./use-stash-reader";
 import { stashPricesDefault, type StashPricesWidget } from "./widget";
 
@@ -76,6 +77,8 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18nNs("stash_prices");
     const reader = useStashReader();
+    // The pricer follows the reader's listings from here on
+    useStashPricer();
     const leagues = useLeagues();
     const { state } = reader;
 

@@ -1,9 +1,10 @@
-# renderer/src/web/stash-prices: reading a stash tab in the background
+# renderer/src/web/stash-prices: reading and pricing a stash tab in the background
 
 **Purpose.** The stash prices feature reads one public premium stash tab of the user's account from the official
-trade site while Kalandra runs: the user drops items without a price into that tab, and the reader keeps a list of
-them with their place in the tab. It is the only code that sends trade requests without a key press, under the rules
-of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the proxy and the rate limiters are in
+trade site while Kalandra runs: the user drops items without a price into that tab, the reader keeps a list of them
+with their place in the tab, and the pricer prices each of them as the price check would. The reader and the pricer
+are the only code that sends trade requests without a key press, under the rules of
+[ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the proxy and the rate limiters are in
 [renderer-price-check.md](renderer-price-check.md#trade-queries-trade).
 
 ## Public contract
@@ -64,6 +65,44 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
 - A fetch result without a type line or a rarity, or with lines the converter does not write (`logbookMods`,
   `mutatedMods`), is `UNREADABLE`. The tags of a modifier header are left out, since the site does not send them.
 
+### The pricer (`stash-pricer.ts`, `price-item.ts`, `pricer-state.ts`)
+
+- `createStashPricer(sources)` returns `{ state, sync, stop }`. `sources` gives the reader's `settings()`,
+  `listings()`, `leagueId()`, `accountName()`, `priceCheckShown()` and `readerChecking()`. `sync()` follows the
+  listings: it queues each new one, forgets each one that left, and starts a run. A listing keeps its price while
+  it stays in the tab. `stop()` ends the running search and forgets every price.
+- `state` (`PricerState`) holds `status`, `error`, `prices` (a `ListingPrice` by listing id, a new map on each
+  change), `counts` (`listings`, `done`, `priced`, `tooFew`, `cannotRead`, `failed`), `pricing` (the listing a
+  search prices) and `nextSearchAt`. A `ListingPrice` is `queued`, `pricing`, `priced` (`value`, `low` and `high` in
+  Divine Orbs for the whole stack, `reliability` or null, `source` `price-file` or `listings`), `too-few`,
+  `cannot-read` (`reason`, an `app_i18n.json` key) or `failed` (`message`).
+- `priceWithoutSearch()` in `price-item.ts` prices an item that needs no search: the price check's estimate from
+  the price file (`getDetailsId` and `findPriceByQuery`, times the stack size), or `cannot-read` with
+  `stash_prices.no_estimate` for an item the price check would search in bulk. `searchPrice()` builds the price
+  check's default filters with `createPresets`, `presetOptions()` and the list of valuable stats on, sends
+  `createTradeRequest` through `requestTradeResultList`, fetches the 20 cheapest ids with `requestResults` (two
+  fetches), and returns `suggestPrice()` of them, or `too-few`.
+- `status` is `off`, `no-league`, `no-prices` (the price file is not loaded), `reading` (the reader checks),
+  `price-check-open`, `busy`, `budget-reached`, `rate-limited`, `pricing`, `waiting` (for the next search), `done`
+  or `error`. `useStashPricer()` in `use-stash-pricer.ts` is the app's one pricer: it reads the widget's config and
+  the reader's state, and calls `sync()` whenever the reader's listings change. `WidgetStashPrices.vue` creates it.
+
+### The order of a pricing run
+
+1. Off: `stop()`. No queued or failed listing: `done`. After a trade error, nothing until the interval ends. No
+   league: `no-league`, and no price file: `no-prices`; both retry after 30 seconds and call `queuePricesFetch()`.
+2. Each queued listing is read with `listingItem()` once. An unreadable one is `cannot-read`, and one the price file
+   prices or that only a bulk exchange finds is settled with `priceWithoutSearch()`, all without a request.
+3. The next listing to search is the newest queued one, then the first failed one. A search starts at least 15
+   seconds (`PACE_MS`) after the last one started, and never while another runs.
+4. `searchPause()` in `pricer-state.ts` holds the search 30 seconds while the price check is shown, the reader
+   checks (`reading`), or a request waits in the SEARCH or FETCH limiters (`busy`), or while a search or a fetch
+   would wait in them (`rate-limited`). It holds it for the interval while the 3 hour count is at or above the
+   budget less `readerReserve()`: 180 minutes divided by the interval, the searches the reader needs in 3 hours.
+5. `holdForFetch()` holds each fetch as the reader's, up to 45 seconds; past that the listing is queued again and
+   the next run finds its search in the price check's cache. A trade error, a 429 included, makes the listing
+   `failed`, logs each new message once to main's log, and stops pricing for the interval.
+
 ### The widget and its panel
 
 - `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
@@ -111,15 +150,18 @@ name on the Price check page is empty. Settings edits a copy of the config, so t
 
 ## Invariants
 
-- **Only this reader sends trade requests without a key press** ([ADR-0012](../adr/ADR-0012-background-trade-searches.md)).
-  It uses the same limiter sets as the price check and no limiter of its own, since the site counts per IP.
+- **Only the reader and the pricer send trade requests without a key press**
+  ([ADR-0012](../adr/ADR-0012-background-trade-searches.md)). They use the same limiter sets as the price check and
+  no limiter of their own, since the site counts per IP.
 - **A check reads at most the newest 100 listings.** The search is not split when `total` is above 100
   ([refinement 115](../refinements/tasks/115-stash-prices-reads-the-newest-100.md)).
 - **Trade responses are untrusted.** A malformed search response is an `error`, and a malformed fetch result is
   skipped.
 
-**Dependencies.** `Host.proxy`, `RATE_LIMIT_RULES`, `adjustRateLimits`, `getTradeEndpoint`, `RateLimiter` and
-`readTradeData` from the price check ([renderer-price-check.md](renderer-price-check.md)), `logToMain()`, Vue.
+**Dependencies.** `Host.proxy`, `RATE_LIMIT_RULES`, `adjustRateLimits`, `getTradeEndpoint`, `RateLimiter`,
+`readTradeData`, `createPresets`, `presetOptions`, `createTradeRequest`, `requestTradeResultList`, `requestResults`,
+`suggestPrice` and `usePoeninja` from the price check ([renderer-price-check.md](renderer-price-check.md)),
+`parseClipboard` from the parser, `logToMain()`, Vue.
 
 **Tests.** `npx vitest run specs/web/stash-prices` in `renderer/`. `stash-reader.test.ts` drives the reader with
 fake timers and `FakeTradeSite` in `fake-trade-site.ts`, which answers searches and fetches from the 21 saved
@@ -133,5 +175,9 @@ page and checks the checkbox's flags, the limits of the two number fields and th
 `reindexedIds()`, `threeHourSearchCount()` and the setting limits. `item-text.test.ts` writes and parses the 23 saved
 listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a
 crossbow with every modifier kind, the tiers, ranges and summed lines, an unrevealed modifier, a unique, a waystone,
-a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases. No test
-calls the live site.
+a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases.
+`stash-pricer.test.ts` drives the pricer with fake timers, `FakeTradeSite` (whose `offers` answer the item searches)
+and the price file fixture with a unique and a rune added: the price file estimates, the search body with the
+valuable stats, the 20 cheapest, the order and the 15 seconds between searches, too few listings, the unreadable
+and bulk items, each pause, the budget less the reader's searches, a trade error, a held fetch, the listings that
+leave and come, and turning it off. No test calls the live site.

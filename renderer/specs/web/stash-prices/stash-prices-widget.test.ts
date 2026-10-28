@@ -19,9 +19,15 @@ import { FakeTradeSite } from "./fake-trade-site";
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
 
 vi.mock("@/web/background/Leagues", async () => {
-  const { shallowRef } = await import("vue");
+  const { computed, shallowRef } = await import("vue");
   const selectedId = shallowRef("Standard");
-  return { useLeagues: () => ({ selectedId }) };
+  // Not popular, so no test loads a price file
+  const selected = computed(() => ({
+    id: selectedId.value,
+    realm: "pc-ggg",
+    isPopular: false,
+  }));
+  return { useLeagues: () => ({ selectedId, selected }) };
 });
 
 function stashPrices(settings: Partial<StashPricesWidget>): StashPricesWidget {
@@ -74,6 +80,27 @@ describe("the stash prices widget", () => {
       '"account":{"input":"Seller05#0005"}',
     );
     expect(useStashReader().state.listings).toHaveLength(3);
+  });
+
+  it("prices the listings the reader reads, and stops with the reader", async () => {
+    setup({ enabled: true, tabName: "5" });
+    const { useStashPricer } = await import(
+      "@/web/stash-prices/use-stash-pricer"
+    );
+    const { state } = useStashPricer();
+
+    await useStashReader().checkNow();
+    expect([...state.prices.keys()]).toEqual(
+      useStashReader().state.listings.map((listing) => listing.id),
+    );
+
+    const { AppConfig } = await import("@/web/Config");
+    const { requireWidget } = await import("@/web/settings/utils");
+    requireWidget<StashPricesWidget>("stash-prices", AppConfig()).enabled =
+      false;
+    useStashReader().refresh();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(state).toMatchObject({ status: "off", counts: { listings: 0 } });
   });
 
   it("sends nothing while the price check widget is shown", async () => {

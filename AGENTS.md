@@ -62,8 +62,8 @@ default instead, so its result stays the same. A setting that `main` needs also 
   `/proxy/<host>/...`, and `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a
   deliberate change to that list. The official trade site bans clients that exceed its rate limits, so every search,
   fetch and exchange request goes through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`
-  ([ADR-0005](docs/dev/adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). Only the stash prices feature searches
-  without a key press, within the user's budget ([ADR-0012](docs/dev/adr/ADR-0012-background-trade-searches.md)).
+  ([ADR-0005](docs/dev/adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). Only the stash prices reader and pricer
+  search without a key press, within the user's budget ([ADR-0012](docs/dev/adr/ADR-0012-background-trade-searches.md)).
 - **Prices come from `priceService/`, never from poe.ninja directly.** poe.ninja asks apps to use their own backend,
   so `renderer/src/web/background/Prices.ts` reads `kalandra.ashoal.com/prices/<league>.json` and poe.ninja is not
   in `PROXY_HOSTS`. Both read the categories from `renderer/public/data/namespaceMap.json`. The app searches the

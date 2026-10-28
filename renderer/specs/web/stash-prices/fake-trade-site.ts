@@ -59,12 +59,19 @@ interface Answer {
   headers?: Record<string, string>;
 }
 
+/** Returns true for the reader's search of the account's listings, and false for a search of an item. */
+function isAccountSearch(body: unknown): boolean {
+  return JSON.stringify(body).includes('"account":');
+}
+
 /**
  * Answers the searches and fetches of the reader from `listings`, the account's listings without a price, newest
- * first. A search returns the first 100 ids, as the trade site does.
+ * first, and the searches of an item from `offers`, cheapest first. A search returns the first 100 ids, as the
+ * trade site does.
  */
 export class FakeTradeSite {
   listings: SavedResult[] = SAVED.map((saved) => structuredClone(saved));
+  offers: SavedResult[] = [];
   searches: Array<{ url: string; method?: string; body: unknown }> = [];
   fetches: string[][] = [];
   /** The searches the site reports in its 3 hour window after a search. */
@@ -82,7 +89,10 @@ export class FakeTradeSite {
         body: JSON.parse(String(init?.body)),
       });
       if (this.failure) return this.answer(this.failure);
-      const ids = this.listings.map((listing) => listing.id);
+      const found = isAccountSearch(this.searches.at(-1)?.body)
+        ? this.listings
+        : this.offers;
+      const ids = found.map((listing) => listing.id);
       return this.answer({
         status: 200,
         body: JSON.stringify({
@@ -104,7 +114,10 @@ export class FakeTradeSite {
       this.afterFetch?.();
       if (this.failure) return this.answer(this.failure);
       const result = ids.map(
-        (id) => this.listings.find((listing) => listing.id === id) ?? null,
+        (id) =>
+          [...this.listings, ...this.offers].find(
+            (listing) => listing.id === id,
+          ) ?? null,
       );
       return this.answer({
         status: 200,

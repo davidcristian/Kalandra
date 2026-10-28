@@ -527,7 +527,8 @@
     "status_checking": "Reading the tab.",
     "status_waiting": "The tab is read.",
     "status_error": "The trade site failed: {error}",
-    "unreadable": "Kalandra cannot read this item from the trade site."
+    "unreadable": "Kalandra cannot read this item from the trade site.",
+    "no_estimate": "The price file has no price for this item, and the trade site lists it only for a bulk exchange."
   },
   "library": {
     "name": "Library",
