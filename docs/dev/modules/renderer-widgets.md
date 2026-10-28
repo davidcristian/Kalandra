@@ -78,9 +78,10 @@ The menu, price check, item check, library and stash prices start with `menu::sk
 window edits, two widgets get the flag from a setting when the window opens and when the setting changes: the XP
 tracker has it while "Allow reading of Client.txt file" is off, and the library unless both "Enable experimental
 features" and "Item Data Collection" are on (`enableWidget` and `disableWidget` in `settings/utils.ts`). Adding the
-flag also hides the widget. The Stash prices page removes the flag when "Read the tab in the background" is checked
-and adds it when it is unchecked. The price check is in [renderer-price-check.md](renderer-price-check.md), and the
-stash prices widget in [renderer-stash-prices.md](renderer-stash-prices.md).
+flag also hides the widget. The Price check page removes the flag when "Price a stash tab in the background" is checked
+and adds it when it or the suggested price is unchecked. The price check is in
+[renderer-price-check.md](renderer-price-check.md), and the stash prices widget in
+[renderer-stash-prices.md](renderer-stash-prices.md).
 
 ### Stash search presets
 

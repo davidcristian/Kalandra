@@ -19,7 +19,7 @@
 853 renderer/src/web/price-check/filters/create-stat-filters.ts
 457 renderer/src/web/price-check/filters/pseudo/index.ts
 683 renderer/src/web/price-check/filters/pseudo/item-property.ts
-379 renderer/src/web/price-check/settings-price-check.vue
+386 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
 1816 renderer/src/web/price-check/trade/pathofexile-trade.ts
 513 renderer/src/web/settings/SettingsWindow.vue

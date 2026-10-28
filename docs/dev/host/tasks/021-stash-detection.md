@@ -5,7 +5,7 @@
 **Origin:** [docs/stash-prices.md](../../../stash-prices.md)
 **Verified:** 2026-10-28
 
-**Claims.** The user page says that with **Read the tab in the background** on, Kalandra reads the listings without a
+**Claims.** The user page says that with stash prices on, Kalandra reads the listings without a
 price in one public tab from the trade site, prices each one, and on Windows captures the game window twice a second
 while the game is active to see when the stash shows the tab, keeping no capture; that the hotkey marks the tab open or
 closed everywhere; and that while the tab is open the overlay draws a mark on each item and a progress bar, takes no
@@ -25,10 +25,12 @@ lines; a constant that is off becomes one with the measured numbers.
 
 ## Steps
 
-1. **Turning it on.** Before the setting is on, the main button bar has no tags icon. Check **Read the tab in the
-   background** and Save. Pass: the tags icon appears; it shows the widget at the top left under the bar; the widget
-   hides when the game gets the focus and shows again with the overlay key. The Stash prices page shows its three
-   sections, Find the open tab, Marks over the stash and Set up the tab, without text cut off.
+1. **Turning it on.** Before the setting is on, the main button bar has no tags icon. On the Price check page, check
+   **Price a stash tab in the background** under **Show a suggested price** and Save. Pass: the tags icon appears; it
+   shows the widget at the top left under the bar; the widget hides when the game gets the focus and shows again with
+   the overlay key. The Stash prices page says it is on and shows its three sections, Find the open tab, Marks over
+   the stash and Set up the tab, without text cut off. Uncheck the suggested price and Save: the tags icon goes, the
+   switch is grayed out, and the Stash prices page says it is off.
 2. **Reading the tab.** Put at least 10 items without a price in the tab: a rare, a magic and a normal item, a unique,
    a stack of 20 or more of one currency, a gem, an uncut gem, a waystone and an Expedition Logbook. Restart Kalandra.
    Pass: within a minute of the league list loading, the widget says `The tab is read.`, `Items in the tab:` counts the

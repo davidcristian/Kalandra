@@ -29,7 +29,7 @@ The main button bar is the widget in the top left corner of the overlay.
   the cog opens the [Settings window](/settings), the magnifier shows Item search, `XP` shows the
   [XP tracker](/xp-tracker) while `Allow reading of Client.txt file` is checked in Settings, the book shows the
   Library widget while the experimental Item Data Collection feature is on, and the tags icon shows
-  [Stash prices](/stash-prices) while its `Read the tab in the background` setting is on. A widget with no title
+  [Stash prices](/stash-prices) while `Price a stash tab in the background` is checked. A widget with no title
   shows `#` and a number.
 - **The three dots.** Hover over them to show the `add widget…` menu, then click a name to add a new widget of that
   type: `Stopwatch`, `Stash search`, `Image strip` or `Notepad`. You can add any number of each. The other widgets

@@ -112,7 +112,7 @@ that the route needs ([main.md](main.md)).
   `fallback/ReloadTradeData.vue` is the "Reload fallback data" button, which loads the trade site's item and stat
   lists again and shows how many of their entries are new. The lists are English, so they help only an English
   item ([renderer-parser.md](renderer-parser.md#the-game-data)). `settings-price-check.vue` is the widget's
-  settings page.
+  settings page, with the stash prices switch ([renderer-stash-prices.md](renderer-stash-prices.md)).
 
 ### Price estimates (`background/Prices.ts`, `background/price-source.ts`)
 

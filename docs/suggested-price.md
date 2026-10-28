@@ -15,6 +15,10 @@ of Settings, **Price check** page, and click **Save**. While it is on, the price
 once for a normal, magic or rare item, as it does for a unique, so the line has listings to work from. The two toggles
 under **Perform an auto search, when pressing** on the same page still turn that search off.
 
+Under it, **Price a stash tab in the background** turns on [stash prices](/stash-prices), which prices the items of a
+public stash tab of yours with the suggested price. It is off by default, and unchecking the suggested price turns it
+off too.
+
 For a rare item, it also turns on the filters of the stats that set most of an item's price, at any tier: skill
 levels, Critical Hit Chance and Critical Damage Bonus, Spell Damage, elemental and attack damage, Attack and Cast
 Speed, Spirit and Rarity of Items found. Stats that add little to the price, such as stun threshold, ailment durations

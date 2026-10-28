@@ -13,7 +13,6 @@ import {
 } from "@/web/stash-prices/widget";
 
 type Page = ComponentPublicInstance & {
-  enabled: boolean;
   intervalMinutes: number | string;
   searchBudget: number | string;
 };
@@ -82,23 +81,19 @@ async function renderPage(config: Config) {
 }
 
 describe("the Stash prices settings page", () => {
-  it("adds the widget's button to the main button bar while the reading is on", async () => {
+  it("says whether stash prices is on and where the switch is", async () => {
     const config = configWith("Seller05#0005");
-    const { page } = await renderPage(config);
 
-    page.enabled = true;
-    expect(stashPricesOf(config)).toMatchObject({
-      enabled: true,
-      wmFlags: ["invisible-on-blur"],
-    });
+    const off = await renderPage(config);
+    expect(off.html).toContain(
+      "Off. Turn it on under Show a suggested price on the Price check page.",
+    );
 
-    stashPricesOf(config).wmWants = "show";
-    page.enabled = false;
-    expect(stashPricesOf(config)).toMatchObject({
-      enabled: false,
-      wmWants: "hide",
-      wmFlags: ["invisible-on-blur", "menu::skip"],
-    });
+    stashPricesOf(config).enabled = true;
+    const on = await renderPage(config);
+    expect(on.html).toContain(
+      "On. Turn it off under Show a suggested price on the Price check page.",
+    );
   });
 
   it("keeps the interval at 5 minutes or more and the budget between 0 and 600", async () => {

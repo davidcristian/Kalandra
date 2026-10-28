@@ -58,6 +58,7 @@
       <div class="mb-4 italic text-gray-500">
         {{ t(":suggested_price_note") }}
       </div>
+      <stash-prices-option :config="config" />
     </div>
     <div class="mb-2">
       <div class="flex-1 mb-1">{{ t(":show_seller") }}</div>
@@ -250,10 +251,19 @@ import type { PriceCheckWidget } from "@/web/overlay/interfaces";
 import { useLeagues } from "../background/Leagues";
 import { usePoeninja } from "../background/Prices.js";
 import UiItemImg from "../ui/UiItemImg.vue";
+import StashPricesOption from "../stash-prices/StashPricesOption.vue";
+import { suggestedPriceModel } from "../stash-prices/widget";
 
 export default defineComponent({
   name: "price_check.name",
-  components: { UiRadio, UiCheckbox, UiToggle, UiErrorBox, UiItemImg },
+  components: {
+    UiRadio,
+    UiCheckbox,
+    UiToggle,
+    UiErrorBox,
+    UiItemImg,
+    StashPricesOption,
+  },
   props: configProp(),
   setup(props) {
     const configWidget = computed(() =>
@@ -280,10 +290,7 @@ export default defineComponent({
       }),
       accountName: configModelValue(() => props.config, "accountName"),
       showSeller: configModelValue(() => configWidget.value, "showSeller"),
-      suggestedPrice: configModelValue(
-        () => configWidget.value,
-        "suggestedPrice",
-      ),
+      suggestedPrice: suggestedPriceModel(() => props.config),
       activateStockFilter: configModelValue(
         () => configWidget.value,
         "activateStockFilter",

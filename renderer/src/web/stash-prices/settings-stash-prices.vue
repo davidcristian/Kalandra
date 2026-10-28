@@ -1,9 +1,12 @@
 <template>
   <div class="max-w-md p-2">
     <div class="mb-4">{{ t(":intro") }}</div>
-    <ui-checkbox class="mb-4" v-model="enabled">{{
-      t(":enabled")
-    }}</ui-checkbox>
+    <div
+      class="mb-4"
+      :class="widget.enabled ? 'text-green-400' : 'text-orange-400'"
+    >
+      {{ widget.enabled ? t(":enabled_on") : t(":status_off") }}
+    </div>
     <div class="mb-4">
       <div class="mb-1">{{ t(":tab_name") }}</div>
       <input
@@ -51,16 +54,15 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { useI18nNs } from "@/web/i18n";
-import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import DetectionSettings from "./DetectionSettings.vue";
 import HighlightSettings from "./HighlightSettings.vue";
 import { configModelValue, configProp, requireWidget } from "../settings/utils";
 import { clampBudget, clampInterval } from "./reader-settings";
-import { setStashPricesEnabled, type StashPricesWidget } from "./widget";
+import type { StashPricesWidget } from "./widget";
 
 export default defineComponent({
   name: "stash_prices.name",
-  components: { UiCheckbox, DetectionSettings, HighlightSettings },
+  components: { DetectionSettings, HighlightSettings },
   props: configProp<StashPricesWidget>(),
   setup(props) {
     const { t } = useI18nNs("stash_prices");
@@ -71,12 +73,6 @@ export default defineComponent({
     return {
       t,
       widget,
-      enabled: computed({
-        get: () => widget.value.enabled,
-        set: (value: boolean) => {
-          setStashPricesEnabled(widget.value, value);
-        },
-      }),
       tabName: configModelValue(() => widget.value, "tabName"),
       intervalMinutes: computed({
         get: () => widget.value.intervalMinutes,

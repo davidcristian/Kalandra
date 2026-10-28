@@ -225,9 +225,9 @@ General, sets another path), and uses Alt when the file does not set it
 
 ## 8. Stash prices
 
-- **Setting:** **Account name** on the Price check page. On the Stash prices page, **Read the tab in the background**,
-  **Find the open tab in the game window (Windows)** and a key in **Hotkey that marks the tab open or closed**. Save. A
-  public premium stash tab named `kalandra-price-check` holds items without a price on 3 cells or more
+- **Setting:** **Account name** and **Price a stash tab in the background** on the Price check page. On the Stash prices
+  page, **Find the open tab in the game window (Windows)** and a key in **Hotkey that marks the tab open or closed**.
+  Save. A public premium stash tab named `kalandra-price-check` holds items without a price on 3 cells or more
   ([stash-prices.md](../../stash-prices.md)).
 - **Press and see:** the steps of [host task 021](../host/tasks/021-stash-detection.md#steps): reading the tab,
   pricing, the capture, the hotkey, the marks and the bar, clicks on a mark, the window shown over the active game, the

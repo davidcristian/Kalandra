@@ -171,13 +171,20 @@ are the only code that sends trade requests without a key press, under the rules
 
 ### The settings page
 
+`StashPricesOption.vue` is the switch under **Show a suggested price** on the Price check page, since the pricer
+prices with the suggested price. Its **Price a stash tab in the background** checkbox calls `setStashPricesEnabled()`
+in `widget.ts`, which sets `enabled` and removes `menu::skip` with `enableWidget()`, or adds it and hides the widget
+with `disableWidget()`. While the suggested price is off, the checkbox is disabled and its setter keeps `enabled`
+false. The page's suggested price checkbox uses `suggestedPriceModel()` from `widget.ts`, which turns stash prices off
+when it turns off. Stash prices needs no runtime check of the suggested price, because only these two checkboxes change
+either setting.
+
 `settings-stash-prices.vue` is the `stash-prices` page of Settings (`SettingsPage` and `menuPages()` in
-`settings/menu.ts`), after Price check in the whole window's menu and alone for the widget's edit button. Its
-**Read the tab in the background** checkbox calls `setStashPricesEnabled()` in `widget.ts`, which sets `enabled` and
-removes `menu::skip` with `enableWidget()`, or adds it and hides the widget with `disableWidget()`. **Stash tab
-name** is trimmed, **Check the tab every** goes through `clampInterval()` and **Search budget for 3 hours** through
-`clampBudget()` when the field loses focus. The page lists the steps that set up the tab and warns when the account
-name on the Price check page is empty. Settings edits a copy of the config, so the reader sees a change on Save.
+`settings/menu.ts`), after Price check in the whole window's menu and alone for the widget's edit button. Its first
+line says whether stash prices is on and where the switch is. **Stash tab name** is trimmed, **Check the tab every**
+goes through `clampInterval()` and **Search budget for 3 hours** through `clampBudget()` when the field loses focus.
+The page lists the steps that set up the tab and warns when the account name on the Price check page is empty.
+Settings edits a copy of the config, so the reader sees a change on Save.
 Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](stash-detection.md)) and
 `HighlightSettings.vue`: **Highlight**, two adjacent buttons with `aria-pressed` that flip `highlightValuable` and
 `highlightTrash`, yellow or red while on and gray while off, and **Trash threshold**, an amount through
@@ -222,8 +229,10 @@ and the limiter queue, a restriction during the fetches, the trade errors and th
 `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the fake site, and renders the panel in
 English for each status. It also checks that `useStashPricer()` follows the reader's listings and stops with it, and
 renders the pricing block: the progress, the next search, the most valuable first, and the text of each pricer status.
-`stash-prices-settings.test.ts` renders the settings page and checks the checkbox's flags, the limits of the number
-fields, the account name warning, the two highlight buttons, the threshold's currencies and the alignment view.
+`stash-prices-option.test.ts` renders the switch and checks its flags and that it stays off while the suggested price
+is off, and that `suggestedPriceModel()` turns stash prices off. `stash-prices-settings.test.ts` renders the settings
+page and checks its on and off line, the limits of the number fields, the account name warning, the two highlight
+buttons, the threshold's currencies and the alignment view.
 `stash-listings.test.ts` checks `readSearch()`, `readListing()`, `reindexedIds()`, `threeHourSearchCount()` and the
 setting limits. `item-text.test.ts` writes and parses the 23 saved listings of `specs/docs/fetchResponses.json` and
 `fetchResponses2.json`: the exact text of a magic helmet and of a crossbow with every modifier kind, the tiers, ranges

@@ -6,7 +6,8 @@ Stash prices reads one public stash tab of yours from the official trade site wh
 it that have no price, and prices each of them as a [price check](/price-check) would. You put items into that tab,
 and Kalandra finds and prices them there without a key press. When you open the tab in the game, Kalandra marks each
 item over the stash with its price or as trash. Its widget shows what it read and priced, when it searches next and how
-many trade searches it may still use. It is off until you turn it on.
+many trade searches it may still use. It is off until you turn it on, and it needs the
+[suggested price](/suggested-price), which prices its items.
 
 ## Set up the tab
 
@@ -16,7 +17,8 @@ many trade searches it may still use. It is off until you turn it on.
    without a price.
 3. Press the overlay key (`Shift + Space` by default), click the cog icon to open the Settings window, and enter your
    **Account name** with its number, such as `Name#1234`, on the **Price check** page.
-4. On the **Stash prices** page, check **Read the tab in the background** and click **Save**.
+4. On the same page, under **Show a suggested price (experimental)**, check **Price a stash tab in the background**
+   and click **Save**. The **Stash prices** page holds its other settings.
 
 Kalandra checks the tab once it has loaded the league list from the trade site, and again after each **Check the tab
 every** interval. The trade site lists an item some time after it reaches a public tab, so an item can first appear at
@@ -24,8 +26,8 @@ a later check. Click **Check now** in the widget to check at once.
 
 ## The widget
 
-Click the tags icon in the main button bar to show the widget. The button is there only while **Read the tab in the
-background** is on. The widget shows:
+Click the tags icon in the main button bar to show the widget. The button is there only while **Price a stash tab in
+the background** is on. The widget shows:
 
 - **Stash tab**: the name of the tab it reads.
 - **Items in the tab**: the items without a price that the last check found in the tab.
@@ -46,7 +48,7 @@ Its **edit** button opens the **Stash prices** page of the Settings window.
 
 | Line | What it means |
 | --- | --- |
-| Off. Turn it on in the settings. | **Read the tab in the background** is off. |
+| Off. Turn it on under Show a suggested price on the Price check page. | **Price a stash tab in the background** is off. |
 | Set your account name on the Price check page of the settings. | The **Account name** on the Price check page is empty. |
 | Waiting for the league list. | Kalandra has not loaded the league list from the trade site yet. It tries again every 30 seconds. |
 | Paused while the price check is open. | It tries again every 30 seconds, and checks once the price check window is closed. |
@@ -60,10 +62,10 @@ Its **edit** button opens the **Stash prices** page of the Settings window.
 ## How Kalandra sees the open tab
 
 To mark the items in the game, Kalandra must detect when the stash shows this tab. On Windows it looks at the game
-window: while **Read the tab in the background** is on, the game window is active and the tab holds items on 3 cells
-or more, the overlay captures the game window twice a second. It reads 4 pixels near the corners of each stash cell:
-a cell under an item has a navy background, or a red one for an item your character cannot use, and an empty cell is
-dark gray. When at least 90% of the cells under the items it read from the trade site look filled, and 90% of all
+window: while **Price a stash tab in the background** is on, the game window is active and the tab holds items on 3
+cells or more, the overlay captures the game window twice a second. It reads 4 pixels near the corners of each stash
+cell: a cell under an item has a navy background, or a red one for an item your character cannot use, and an empty cell
+is dark gray. When at least 90% of the cells under the items it read from the trade site look filled, and 90% of all
 cells look as those items say, in 2 captures in a row, the tab counts as open. After 2 captures that do not match, it
 counts as closed.
 
@@ -77,7 +79,7 @@ counts as closed.
 
 **Hotkey that marks the tab open or closed**: press it when you open the tab and again when you close it. On Windows
 it also changes what the capture saw, until the capture sees the tab open or close. It has no key by default; set one
-on the **Stash prices** page. It works only while **Read the tab in the background** is on.
+on the **Stash prices** page. It works only while **Price a stash tab in the background** is on.
 
 **Grid correction**: Kalandra places the grid of the tab from the height of the game window. When the widget's
 percentages stay low with the tab open, point at that line: its tooltip says where the grid starts and how wide a cell
@@ -142,7 +144,7 @@ the items it has not read before, 10 at a time. The trade site allows 600 search
 for your price checks, the trade website and these checks together, and an address that sends more gets only rate
 limit errors for up to an hour. So Kalandra checks the tab only:
 
-- while **Read the tab in the background** is on and the account name is set,
+- while **Price a stash tab in the background** is on and the account name is set,
 - once per **Check the tab every** interval, or when you click **Check now**,
 - while the count of searches in the last 3 hours is below your **Search budget**,
 - while the price check window is closed and none of your own searches waits for the rate limit.
@@ -203,11 +205,13 @@ the others.
 
 ## Settings
 
-The **Stash prices** page of the Settings window, which the menu lists after **Price check**:
+**Price a stash tab in the background**, under **Show a suggested price (experimental)** on the **Price check** page,
+turns stash prices on and adds the widget's button to the main button bar. It is off by default, and unchecking the
+suggested price turns it off too. The **Stash prices** page of the Settings window, which the menu lists after
+**Price check**, says whether it is on and holds the other settings:
 
 | Setting | Default | What it changes |
 | --- | --- | --- |
-| **Read the tab in the background** | Off | Turns the checks on, and adds the widget's button to the main button bar. |
 | **Stash tab name** | `kalandra-price-check` | The name of the tab to read, as the game shows it. |
 | **Check the tab every** | 10 minutes | The time between two checks, at least 5 minutes. |
 | **Search budget for 3 hours** | 400 | Kalandra checks the tab only while the count of searches from your IP address in the last 3 hours is below this number, from 0 to 600, and prices its items only below this number less the searches of the checks. 0 stops both. |

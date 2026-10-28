@@ -135,7 +135,7 @@ client left after another one disconnects. [modules/ipc.md](modules/ipc.md) list
 
 ## Stash prices, without a key press
 
-1. With **Read the tab in the background** on, `renderer/src/web/stash-prices/` reads the account's listings without a
+1. With stash prices on, `renderer/src/web/stash-prices/` reads the account's listings without a
    price in the named public tab once per interval, and prices each from the price file or with one trade search, after
    the user's own requests and within a search budget ([ADR-0012](adr/ADR-0012-background-trade-searches.md)).
 2. On Windows, main lets the overlay page capture the game window alone (`GameCapture`), and the page compares 4 pixels

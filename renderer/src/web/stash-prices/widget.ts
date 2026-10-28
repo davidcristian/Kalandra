@@ -1,5 +1,12 @@
-import type { Anchor, Widget } from "../overlay/widgets";
-import { disableWidget, enableWidget } from "../settings/utils";
+import { computed, type WritableComputedRef } from "vue";
+import type { Config } from "@/web/Config";
+import type { Anchor, PriceCheckWidget, Widget } from "../overlay/widgets";
+import {
+  disableWidget,
+  enableWidget,
+  findWidget,
+  requireWidget,
+} from "../settings/utils";
 import {
   DEFAULT_THRESHOLD_AMOUNT,
   type TrashThreshold,
@@ -79,4 +86,23 @@ export function setStashPricesEnabled(
   } else {
     disableWidget(widget);
   }
+}
+
+/** Returns the suggested price setting of the price check, which turns stash prices off with it, since stash prices uses it. */
+export function suggestedPriceModel(
+  config: () => Config,
+): WritableComputedRef<boolean> {
+  const priceCheck = () =>
+    requireWidget<PriceCheckWidget>("price-check", config());
+  return computed({
+    get: () => priceCheck().suggestedPrice,
+    set: (value: boolean) => {
+      priceCheck().suggestedPrice = value;
+      const stashPrices = findWidget<StashPricesWidget>(
+        "stash-prices",
+        config(),
+      );
+      if (!value && stashPrices) setStashPricesEnabled(stashPrices, false);
+    },
+  });
 }
