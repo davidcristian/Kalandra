@@ -15,8 +15,8 @@ that captures. Kalandra reads the pixels of no other window and of no screen.
 
 The stash tab itself makes a check without text recognition possible. Every cell under an item has a navy
 background, or a red one for an item the character cannot use, and an empty cell is a dark gray clover
-(`docs/reference-images/DumpSortCurrency.jpg`). Kalandra knows from the trade site which cells of the tab hold the
-items it read, so the open tab is the one whose filled and empty cells match that layout.
+(`docs/reference-images/DumpSortCurrency.jpg`). The listings from the trade site give the cells of the tab that hold
+the items Kalandra read, so the open tab is the one whose filled and empty cells match that layout.
 
 ## Decision
 
@@ -30,12 +30,12 @@ Kalandra's own sees the game.
 **2. The game window alone.** Main grants the window that `desktopCapturer.getSources()` lists under the window title
 setting, the title `electron-overlay-window` attaches to, which does not expose the window's handle. A window capture
 shows the window's own content, so the overlay window over it, with Kalandra's own marks, is not in the frames.
-Reason: the smallest capture that answers the question, and frames that the marks cannot change.
+Reason: the smallest capture that shows whether the tab is open, and frames that the marks cannot change.
 
-**3. Only while it can decide something, 2 frames a second.** The page asks for the capture only in the overlay
+**3. Only while a frame can change the result, 2 frames a second.** The page asks for the capture only in the overlay
 window (`Host.isElectron`), while the game window is active and the tab's listings fill at least 3 cells, and stops
 it otherwise. It asks for video alone at 2 frames per second and reads one frame every 500 ms. Reason: the stash
-opens and closes at the speed of a hand, and a capture of an inactive game or of an empty tab decides nothing.
+opens and closes at the speed of a hand, and a capture of an inactive game or of an empty tab changes nothing.
 
 **4. The frames stay in memory, and only the match leaves.** The page draws the newest frame's part up to the far
 corner of the stash grid onto a canvas, reads 4 pixels near the corners of each cell, and keeps the shares of cells

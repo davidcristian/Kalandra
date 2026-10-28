@@ -31,8 +31,8 @@ background** is on. The widget shows:
 - **Items in the tab**: the items without a price that the last check found in the tab.
 - **Last check** and **Next check**: the time of the last check and of the next one.
 - **Searches in the last 3 hours**: the trade searches that the trade site counted from your IP address in the last 3
-  hours, of your **Search budget**. It shows `?` until the trade site has answered the first trade search since
-  Kalandra started, a price check search included.
+  hours, of your **Search budget**. It shows `?` until the first trade search since Kalandra started has
+  returned, a price check search included.
 - A line that says what it does or why it waits, from the table below.
 - **Priced 23 of 60, next search in 12 s.**: the items priced so far, and when the next pricing search goes out.
 - **Not priced:** the items with too few listings to price, the items Kalandra cannot read, and the searches that
@@ -59,7 +59,7 @@ Its **edit** button opens the **Stash prices** page of the Settings window.
 
 ## How Kalandra sees the open tab
 
-To mark the items in the game, Kalandra must know when the stash shows this tab. On Windows it looks at the game
+To mark the items in the game, Kalandra must detect when the stash shows this tab. On Windows it looks at the game
 window: while **Read the tab in the background** is on, the game window is active and the tab holds items on 3 cells
 or more, the overlay captures the game window twice a second. It reads 4 pixels near the corners of each stash cell:
 a cell under an item has a navy background, or a red one for an item your character cannot use, and an empty cell is

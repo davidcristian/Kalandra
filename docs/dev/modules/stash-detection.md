@@ -87,7 +87,7 @@ cells, the match and the capture loop in the renderer. Code that marks the items
 - `createStashDetector(sources)` returns `{ state, update, toggle, stop }`. `state` (`DetectorState`, a
   `shallowReactive`) holds `open`, `source` (`capture` or `hotkey`), `quad`, `grid` (in CSS pixels of the overlay,
   from `stashGrid()`), `capture` (a `CaptureStatus`), `error` and `match` (the last frame's `TabMatch`).
-- `update()` runs the capture only while it can decide something. Its `capture` is otherwise, in this order: `off`
+- `update()` runs the capture only while a frame can change the result. Its `capture` is otherwise, in this order: `off`
   (the stash prices widget is off), `browser` (the page is not in Electron, `Host.isElectron`), `not-windows` (the
   user agent has no `Windows`), `setting-off` (`captureEnabled` is off), `few-items` (the listings fill fewer than 3
   cells) or `paused` (the game window is not active). Each of these closes the capture. `off` closes the tab; the

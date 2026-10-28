@@ -214,7 +214,7 @@ Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](sta
 `parseClipboard` from the parser, `logToMain()`, Vue.
 
 **Tests.** `npx vitest run specs/web/stash-prices` in `renderer/`. `stash-reader.test.ts` drives the reader with fake
-timers and `FakeTradeSite` in `fake-trade-site.ts`, which answers searches and fetches from the 21 saved listings of
+timers and `FakeTradeSite` in `fake-trade-site.ts`, which serves searches and fetches from the 21 saved listings of
 `specs/docs/fetchResponses.json` with the rate limit headers the site sent on 2026-10-28. It checks the search body, the
 fetches of new ids only, the tab filter, a gone and a returning listing, a listing moved into the tab, an unreadable
 fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the pauses for the price check
@@ -233,7 +233,8 @@ config: when it shows, the threshold from the price file fixture, without its Ch
 the layer and `OverlayWindow.vue` (with no widgets), whose `render-state` follows the open tab.
 `highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
 view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers,
-`FakeTradeSite` (whose `offers` answer the item searches) and the price file fixture with a unique and a rune added: the
-price file estimates, the search body with the valuable stats, the 20 cheapest, the order and the 15 seconds between
-searches, too few listings, the unreadable and bulk items, each pause, the budget less the reader's searches, a trade
-error, a held fetch, the listings that leave and come, and turning it off. No test calls the live site.
+`FakeTradeSite` (whose `offers` are the results of the item searches) and the price file fixture with a unique and a
+rune added: the price file estimates, the search body with the valuable stats, the 20 cheapest, the order and the 15
+seconds between searches, too few listings, the unreadable and bulk items, each pause, the budget less the reader's
+searches, a trade error, a held fetch, the listings that leave and come, and turning it off. No test calls the live
+site.
