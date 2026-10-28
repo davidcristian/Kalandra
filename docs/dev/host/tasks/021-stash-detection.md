@@ -46,8 +46,10 @@ lines; a constant that is off becomes one with the measured numbers.
    opens and go about a second after it closes or another tab shows. With the overlay key, the widget's line says
    `Stash tab seen.` or `not seen`, and with the tab open both percentages are 90 or more. Do it in Windowed mode too,
    and once with both programs run as administrator. Also check the tab with an item highlighted by the stash search,
-   an item under the cursor, an item the character cannot use, and another brightness setting: still seen. Record
-   Kalandra's CPU use in Task Manager with the stash open, closed, and with stash prices off.
+   an item under the cursor, an item the character cannot use, another brightness setting, and HDR on a screen that
+   has it: still seen. The percentages stay the same with the marks drawn, since the capture shows the game window
+   without the overlay. Record Kalandra's CPU use in Task Manager with the stash open, closed, and with stash prices
+   off.
 5. **The hotkey.** Set **Hotkey that marks the tab open or closed** and Save. Press it in the game: the marks show
    and the line says `Stash tab shown with the hotkey.`; press it again: they go. Hold Ctrl and press it: it works,
    and Ctrl stays held in the game. With **Find the open tab in the game window (Windows)** off, only the hotkey
