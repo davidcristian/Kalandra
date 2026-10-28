@@ -83,6 +83,11 @@ is, in pixels of the game window. Compare that with a screenshot of the game, an
 prices** page, in pixels of the game window or in percent of its height, which stays right when you change the
 resolution. **Cell size** is added to the width of a cell of a normal tab.
 
+**Grid alignment view**: turn it on, under the grid correction, to see where Kalandra places the grid. While stash
+prices is on, Kalandra draws the line of every cell over the game, even when it has not seen the tab, since a grid in
+the wrong place keeps the capture from seeing it. Open the tab, compare the lines with the cells of the stash, change
+the grid correction until they match, and turn the view off.
+
 The widget's line under the status says what Kalandra sees, and what the capture does:
 
 | Line | What it means |
@@ -109,9 +114,11 @@ While the stash shows the tab, Kalandra draws over it:
   know Kalandra tried it.
 - On the item that a search prices now: a thin blue frame. An item that waits for its search has no mark.
 
-The trash threshold is 1 Chaos Orb, compared with the value of the whole stack, not of one item: a stack of 20 Chaos
-Orbs is worth 20 Chaos Orbs. Kalandra converts it with the price of a Chaos Orb in the price file, and when the price
-file has none, no item is trash.
+**Highlight** on the **Stash prices** page has two buttons, **Valuable** and **Trash**, each on by default: turn one
+off to leave out its marks. The other marks stay. The **Trash threshold** is 1 Chaos Orb by default, and can be an
+amount of Chaos Orbs, Exalted Orbs or Divine Orbs. It is compared with the value of the whole stack, not of one item: a
+stack of 20 Chaos Orbs is worth 20 Chaos Orbs. Kalandra converts it with the price of that currency in the price file,
+and when the price file has none, no item is trash.
 
 The marks show while the game window is active, and go when the tab or the stash closes, about a second later, or
 when you press the hotkey. Holding `Alt` hides them with the rest of the overlay. They never take a click.
@@ -176,3 +183,6 @@ check**:
 | **Find the open tab in the game window (Windows)** | On | Captures the game window to see when the stash shows the tab ([how](#how-kalandra-sees-the-open-tab)). |
 | **Hotkey that marks the tab open or closed** | None | Marks the tab open or closed by hand. |
 | **Grid correction** | 0 pixels | Moves the grid that Kalandra reads: its left edge, its top edge and the width of a cell, in pixels of the game window or in percent of its height. |
+| **Grid alignment view** | Off | Draws every cell of the grid over the game, to check the grid correction ([how](#how-kalandra-sees-the-open-tab)). |
+| **Highlight** | Valuable and Trash | Marks valuable items with their price and trash items with a trash icon over the open tab ([marks](#the-marks-over-the-stash)). |
+| **Trash threshold** | 1 Chaos Orb | An item whose whole stack is worth less than this is trash. |

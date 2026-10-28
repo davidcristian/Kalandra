@@ -29,6 +29,10 @@
       </label>
     </div>
     <div class="italic text-gray-500 mb-4">{{ t(":grid_help") }}</div>
+    <ui-checkbox class="mb-1" v-model="alignmentView">{{
+      t(":alignment_view")
+    }}</ui-checkbox>
+    <div class="italic text-gray-500 mb-4">{{ t(":alignment_help") }}</div>
   </div>
 </template>
 
@@ -69,6 +73,7 @@ export default defineComponent({
       captureEnabled: configModelValue(() => props.widget, "captureEnabled"),
       toggleKey: configModelValue(() => props.widget, "toggleKey"),
       gridUnit: configModelValue(() => props.widget.gridCorrection, "unit"),
+      alignmentView: configModelValue(() => props.widget, "alignmentView"),
       gridLeft,
       gridTop,
       gridCell,

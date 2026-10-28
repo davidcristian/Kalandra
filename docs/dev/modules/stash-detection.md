@@ -118,7 +118,9 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   so a held `Ctrl` stays down, while the widget is on ([ipc.md](ipc.md)).
 - `DetectionSettings.vue`, under the reading settings of the Stash prices page, has the capture checkbox, the hotkey
   and the grid correction: a unit (pixels of the game window or percent of the window height) and the left, top and
-  cell size values, each limited to -1000 to 1000 by `clampCorrection()`, a value that is not a number being 0.
+  cell size values, each limited to -1000 to 1000 by `clampCorrection()`, a value that is not a number being 0. Under
+  them, **Grid alignment view** sets `alignmentView`, which draws every cell of the grid over the game while the
+  widget is on, also before the tab is seen ([renderer-stash-prices.md](renderer-stash-prices.md)).
 
 ## Invariants
 

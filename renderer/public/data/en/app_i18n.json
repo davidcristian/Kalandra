@@ -569,7 +569,16 @@
     "grid_unit_percent": "Percent of the window height",
     "grid_left": "Left",
     "grid_top": "Top",
-    "grid_cell": "Cell size"
+    "grid_cell": "Cell size",
+    "alignment_view": "Grid alignment view",
+    "alignment_help": "Draws every cell of the grid over the game while stash prices is on, also before the tab is seen. Compare its lines with the cells of the stash, and move the grid with the grid correction above.",
+    "marks": "Marks over the stash",
+    "highlight": "Highlight",
+    "highlight_valuable": "Valuable",
+    "highlight_trash": "Trash",
+    "highlight_help": "While the stash shows the tab, a valuable item gets a yellow frame with its price, and a trash item a red fill with a trash icon. An item without a price gets a dashed frame either way.",
+    "threshold": "Trash threshold",
+    "threshold_help": "An item is trash when its whole stack is worth less than this. Kalandra converts it with the price file."
   },
   "library": {
     "name": "Library",

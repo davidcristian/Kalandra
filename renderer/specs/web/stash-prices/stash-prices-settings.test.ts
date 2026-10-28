@@ -25,6 +25,13 @@ type Detection = ComponentPublicInstance & {
   gridLeft: number | string;
   gridTop: number | string;
   gridCell: number | string;
+  alignmentView: boolean;
+};
+
+type Highlights = ComponentPublicInstance & {
+  toggles: Array<{ key: string; model: { value: boolean } }>;
+  amount: number | string;
+  currency: "chaos" | "exalted" | "div";
 };
 
 let plugin: Awaited<ReturnType<typeof init>>;
@@ -55,16 +62,23 @@ function stashPricesOf(config: Config): StashPricesWidget {
 async function renderPage(config: Config) {
   let page: Page | undefined;
   let detection: Detection | undefined;
+  let highlights: Highlights | undefined;
   // Vitest's node environment compiles .vue files for server rendering, so only renderToString runs them
   const app = createSSRApp(SettingsStashPrices, { config }).use(plugin);
   app.mixin({
     created(this: ComponentPublicInstance) {
       if ("searchBudget" in this) page = this as Page;
       if ("gridLeft" in this) detection = this as Detection;
+      if ("toggles" in this) highlights = this as Highlights;
     },
   });
   const html = await renderToString(app);
-  return { html, page: present(page), detection: present(detection) };
+  return {
+    html,
+    page: present(page),
+    detection: present(detection),
+    highlights: present(highlights),
+  };
 }
 
 describe("the Stash prices settings page", () => {
@@ -142,5 +156,45 @@ describe("the Stash prices settings page", () => {
       toggleKey: "Alt + S",
       gridCorrection: { unit: "%", left: 1.5, top: -1000, cell: 0 },
     });
+  });
+
+  it("turns each highlight on and off, and sets the trash threshold at 0 or more", async () => {
+    const config = configWith("Seller05#0005");
+    const { html, highlights } = await renderPage(config);
+
+    expect(html).toContain("Highlight");
+    expect(html.match(/aria-pressed="true"/g)).toHaveLength(2);
+    expect(html).toContain("Chaos Orb");
+    expect(html).toContain("Exalted Orb");
+    expect(html).toContain("Divine Orb");
+    const [valuable, trash] = highlights.toggles;
+    valuable.model.value = false;
+    highlights.amount = -2;
+    highlights.currency = "div";
+    expect(stashPricesOf(config)).toMatchObject({
+      highlightValuable: false,
+      highlightTrash: true,
+      trashThreshold: { amount: 0, currency: "div" },
+    });
+
+    trash.model.value = false;
+    // An emptied number field gives an empty text
+    highlights.amount = "";
+    expect(stashPricesOf(config)).toMatchObject({
+      highlightValuable: false,
+      highlightTrash: false,
+      trashThreshold: { amount: 1, currency: "div" },
+    });
+    highlights.amount = 2.5;
+    expect(stashPricesOf(config).trashThreshold.amount).toBe(2.5);
+  });
+
+  it("turns the grid alignment view on next to the grid correction", async () => {
+    const config = configWith("Seller05#0005");
+    const { html, detection } = await renderPage(config);
+
+    expect(html).toMatch(/Cell size[\s\S]*Grid alignment view/);
+    detection.alignmentView = true;
+    expect(stashPricesOf(config).alignmentView).toBe(true);
   });
 });

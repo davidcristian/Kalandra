@@ -34,6 +34,8 @@
     <div class="mb-4 border-b min-w-full" />
     <detection-settings :widget="widget" />
     <div class="mb-4 border-b min-w-full" />
+    <highlight-settings :widget="widget" />
+    <div class="mb-4 border-b min-w-full" />
     <div class="text-lg mb-1">{{ t(":setup") }}</div>
     <ol class="list-decimal pl-5 mb-4">
       <li>{{ t(":setup_tab", { name: tabName }) }}</li>
@@ -51,13 +53,14 @@ import { computed, defineComponent } from "vue";
 import { useI18nNs } from "@/web/i18n";
 import UiCheckbox from "@/web/ui/UiCheckbox.vue";
 import DetectionSettings from "./DetectionSettings.vue";
+import HighlightSettings from "./HighlightSettings.vue";
 import { configModelValue, configProp, requireWidget } from "../settings/utils";
 import { clampBudget, clampInterval } from "./reader-settings";
 import { setStashPricesEnabled, type StashPricesWidget } from "./widget";
 
 export default defineComponent({
   name: "stash_prices.name",
-  components: { UiCheckbox, DetectionSettings },
+  components: { UiCheckbox, DetectionSettings, HighlightSettings },
   props: configProp<StashPricesWidget>(),
   setup(props) {
     const { t } = useI18nNs("stash_prices");

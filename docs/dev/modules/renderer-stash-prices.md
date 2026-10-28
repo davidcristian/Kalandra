@@ -176,6 +176,10 @@ removes `menu::skip` with `enableWidget()`, or adds it and hides the widget with
 name** is trimmed, **Check the tab every** goes through `clampInterval()` and **Search budget for 3 hours** through
 `clampBudget()` when the field loses focus. The page lists the steps that set up the tab and warns when the account
 name on the Price check page is empty. Settings edits a copy of the config, so the reader sees a change on Save.
+Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](stash-detection.md)) and
+`HighlightSettings.vue`: **Highlight**, two adjacent buttons with `aria-pressed` that flip `highlightValuable` and
+`highlightTrash`, yellow or red while on and gray while off, and **Trash threshold**, an amount through
+`clampThresholdAmount()` and a select of Chaos, Exalted and Divine Orb, named from the game data (`ITEM_BY_REF`).
 
 ### The order of a check
 
@@ -207,26 +211,27 @@ name on the Price check page is empty. Settings edits a copy of the config, so t
 `suggestPrice` and `usePoeninja` from the price check ([renderer-price-check.md](renderer-price-check.md)),
 `parseClipboard` from the parser, `logToMain()`, Vue.
 
-**Tests.** `npx vitest run specs/web/stash-prices` in `renderer/`. `stash-reader.test.ts` drives the reader with
-fake timers and `FakeTradeSite` in `fake-trade-site.ts`, which answers searches and fetches from the 21 saved
-listings of `specs/docs/fetchResponses.json` with the rate limit headers the site sent on 2026-10-28. It checks the
-search body, the fetches of new ids only, the tab filter, a gone and a returning listing, a listing moved into the
-tab, an unreadable fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the
-pauses for the price check and the limiter queue, a restriction during the fetches, the trade errors and their log
-lines, and the settings changes. `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the
-fake site, and renders the panel in English for each status. It also checks that `useStashPricer()` follows the
-reader's listings and stops with it, and renders the pricing block: the progress, the next search, the most valuable
-first, and the text of each pricer status. `stash-prices-settings.test.ts` renders the settings
-page and checks the checkbox's flags, the limits of the two number fields and the account name warning. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
-`reindexedIds()`, `threeHourSearchCount()` and the setting limits. `item-text.test.ts` writes and parses the 23 saved
-listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a
-crossbow with every modifier kind, the tiers, ranges and summed lines, an unrevealed modifier, a unique, a waystone,
-a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases.
-`stash-highlights.test.ts` runs `useStashHighlights()` on the test config: when it shows, the threshold from the
-price file fixture, without its Chaos Orb and in Divine Orbs, and renders the layer and `OverlayWindow.vue` (with
-no widgets), whose `render-state` follows the open tab. `highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
-view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers, `FakeTradeSite` (whose `offers` answer the item searches)
-and the price file fixture with a unique and a rune added: the price file estimates, the search body with the
-valuable stats, the 20 cheapest, the order and the 15 seconds between searches, too few listings, the unreadable
-and bulk items, each pause, the budget less the reader's searches, a trade error, a held fetch, the listings that
-leave and come, and turning it off. No test calls the live site.
+**Tests.** `npx vitest run specs/web/stash-prices` in `renderer/`. `stash-reader.test.ts` drives the reader with fake
+timers and `FakeTradeSite` in `fake-trade-site.ts`, which answers searches and fetches from the 21 saved listings of
+`specs/docs/fetchResponses.json` with the rate limit headers the site sent on 2026-10-28. It checks the search body, the
+fetches of new ids only, the tab filter, a gone and a returning listing, a listing moved into the tab, an unreadable
+fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the pauses for the price check
+and the limiter queue, a restriction during the fetches, the trade errors and their log lines, and the settings changes.
+`stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the fake site, and renders the panel in
+English for each status. It also checks that `useStashPricer()` follows the reader's listings and stops with it, and
+renders the pricing block: the progress, the next search, the most valuable first, and the text of each pricer status.
+`stash-prices-settings.test.ts` renders the settings page and checks the checkbox's flags, the limits of the number
+fields, the account name warning, the two highlight buttons, the threshold's currencies and the alignment view.
+`stash-listings.test.ts` checks `readSearch()`, `readListing()`, `reindexedIds()`, `threeHourSearchCount()` and the
+setting limits. `item-text.test.ts` writes and parses the 23 saved listings of `specs/docs/fetchResponses.json` and
+`fetchResponses2.json`: the exact text of a magic helmet and of a crossbow with every modifier kind, the tiers, ranges
+and summed lines, an unrevealed modifier, a unique, a waystone, a rune from a socket as a currency stack, a barya, a
+relic, an unidentified copy and the unreadable cases. `stash-highlights.test.ts` runs `useStashHighlights()` on the test
+config: when it shows, the threshold from the price file fixture, without its Chaos Orb and in Divine Orbs, and renders
+the layer and `OverlayWindow.vue` (with no widgets), whose `render-state` follows the open tab.
+`highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
+view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers,
+`FakeTradeSite` (whose `offers` answer the item searches) and the price file fixture with a unique and a rune added: the
+price file estimates, the search body with the valuable stats, the 20 cheapest, the order and the 15 seconds between
+searches, too few listings, the unreadable and bulk items, each pause, the budget less the reader's searches, a trade
+error, a held fetch, the listings that leave and come, and turning it off. No test calls the live site.
