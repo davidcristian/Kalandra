@@ -95,3 +95,4 @@ A check is not a design, so it has more outcomes than a refinement:
 - 018: [The price check reads the catalyst quality of rings, amulets and jewels](tasks/018-catalyst-quality-lines.md)
 - 019: [The price check matches keystone lines to the stat the item has](tasks/019-keystone-lines.md)
 - 020: [Copy the items whose parser cases are built by hand](tasks/020-copy-items-for-hand-built-parser-cases.md)
+- 021: [Stash detection sees the open tab, and its grid lies on the cells](tasks/021-stash-detection.md)

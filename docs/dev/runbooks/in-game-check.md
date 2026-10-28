@@ -150,8 +150,7 @@ General, sets another path), and uses Alt when the file does not set it
   price (experimental)" on in Settings, Price check, as it is by default, a normal, magic or
   rare item searches at once, a rare with its valuable stats such as crit ticked, and the
   line "Suggested price:" over the listings shows a price, a range and a reliability, or "too few
-  listings" ([suggested-price.md](../../suggested-price.md)).
-  Keep Ctrl held and move
+  listings" ([suggested-price.md](../../suggested-price.md)). Keep Ctrl held and move
   the cursor into the window: it takes focus, and Ctrl can be released. Release Ctrl and move the
   cursor away from the item instead: the window closes (`main/src/windowing/WidgetAreaTracker.ts`).
   With Ctrl + Alt + D the window opens with focus and stays until you press Escape or return to
@@ -202,8 +201,7 @@ General, sets another path), and uses Alt when the file does not set it
 
 ## 7. Client.txt for the XP tracker
 
-`Client.txt` is the log file the game writes. The XP tracker reads area changes and level ups from
-it.
+`Client.txt` is the log file the game writes. The XP tracker reads area changes and level ups from it.
 
 - **Setting:** "Allow reading of Client.txt file" in Settings, Leveling or Settings, General, off
   by default. With "PoE log file" empty, main looks in the Windows folders that
@@ -231,6 +229,20 @@ it.
   - `info [GameLogWatcher] The log file got shorter, reading it again from the start` after the
     file was emptied, or `info [GameLogWatcher] The log file was replaced, reading the new file
     from the start` when the editor saved a new file in its place.
+
+## 8. Stash detection and the grid
+
+- **Setting:** on the Stash prices page, **Read the tab in the background** and **Find the open tab in the game
+  window** on, and a key in **Hotkey that marks the tab open or closed**. Save. The tab holds items without a price on
+  3 cells or more, and the widget lists them after a check ([stash-detection.md](../modules/stash-detection.md)).
+- **Press:** with the widget shown, open the stash on that tab, then on another tab, then close it. Press the hotkey
+  twice with the stash closed. Point at the widget's `Stash tab` line, and take a screenshot of the open tab.
+- **See:** `Stash tab seen.` within a second of opening the tab, both percentages 90 or more, and `not seen` on
+  another tab and with the stash closed; `shown` and `hidden with the hotkey`. The tooltip's grid start and cell width
+  match the screenshot within 3 pixels; else write down both, with the resolution, for `GRID_LEFT`, `GRID_TOP` and
+  `GRID_CELL` in `stash-grid.ts`. Kalandra's CPU use in Task Manager stays near that with the stash closed.
+- **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal
+  and `warn [renderer] Stash detection cannot capture the game window: <message>`.
 
 ## After the check
 

@@ -2,9 +2,10 @@
 
 **Purpose.** The stash prices feature ([renderer-stash-prices.md](renderer-stash-prices.md)) marks the items of one
 stash tab while the user has that tab open in the game. On Windows the overlay page finds that out from a capture of
-the game window, which only main can grant ([ADR-0004](../adr/ADR-0004-process-boundary.md)). This document covers
-the capture handler in main, and the grid, the cells, the match and the capture loop in the renderer. Code that
-marks the items over the stash reads `open`, `quad`, `grid` and `source` from `useStashDetector().state`.
+the game window, which only main can grant ([ADR-0004](../adr/ADR-0004-process-boundary.md)), under the rules of
+[ADR-0013](../adr/ADR-0013-game-capture.md). This document covers the capture handler in main, and the grid, the
+cells, the match and the capture loop in the renderer. Code that marks the items over the stash reads `open`, `quad`,
+`grid` and `source` from `useStashDetector().state`.
 
 ## Public contract
 
@@ -87,8 +88,8 @@ marks the items over the stash reads `open`, `quad`, `grid` and `source` from `u
 - `update()` runs the capture only while it can decide something. Its `capture` is otherwise, in this order: `off`
   (the stash prices widget is off), `browser` (the page is not in Electron, `Host.isElectron`), `not-windows` (the
   user agent has no `Windows`), `setting-off` (`captureEnabled` is off), `few-items` (the listings fill fewer than 3
-  cells) or `paused` (the game window is not active). Each of these closes the capture. `off` closes the tab; the others but `paused` close a tab that the
-  capture opened, and `paused` keeps it.
+  cells) or `paused` (the game window is not active). Each of these closes the capture. `off` closes the tab; the
+  others but `paused` close a tab that the capture opened, and `paused` keeps it.
 - While it may run, it asks once (`starting`), and then reads a frame every 500 ms (`FRAME_MS`, `running`): it maps
   the overlay into the frame with `frameMapping()`, reads `sampleArea()` and runs `matchTab()` with the listings. The
   tab opens after 2 frames in a row show it and closes after 2 miss it (`FRAMES_TO_CHANGE`). A request that fails or

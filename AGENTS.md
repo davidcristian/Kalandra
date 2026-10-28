@@ -51,7 +51,8 @@ default instead, so its result stays the same. A setting that `main` needs also 
 
 - **Only `main` reaches the operating system; `renderer` is web code.** Hotkeys, windows, the clipboard, files, game
   logs and network access to other hosts live in `main`. The renderer is a page that `main` serves over HTTP,
-  without Node integration, and it never gets Node APIs.
+  without Node integration, and it never gets Node APIs. On Windows, main lets the overlay page capture the game
+  window alone, for stash detection, and the page keeps no frame ([ADR-0013](docs/dev/adr/ADR-0013-game-capture.md)).
 - **The boundary is [ipc/types.ts](ipc/types.ts).** The two processes talk only through `IpcEvent` messages on the
   `/events` WebSocket and the `/config`, `/uploads` and `/proxy` HTTP routes of `main/src/server.ts`. A route listens
   on `httpRoutes`, behind its Host and Origin check
@@ -218,8 +219,7 @@ the dash and banned-word rules; read your own diff for the rest.
   the Build workflow, which packages the app on three platforms and uploads it to the draft GitHub release for the
   current version if one exists. Never force-push a published branch.
 - **No secrets and no user files in the repo or the logs.** Never commit a `config.json`, a client log or anything
-  from `%APPDATA%`. The only token is the `GITHUB_TOKEN` that CI provides. No log line contains a cookie, a token or
-  a session ID.
+  from `%APPDATA%`. The only token is CI's `GITHUB_TOKEN`. No log line contains a cookie, a token or a session ID.
 - **External input is untrusted.** Clipboard item text, client log lines and trade responses can be malformed or
   come from a game patch the data does not know yet. Parse them without throwing and log what failed.
 - **Be polite to other services.** No loops or tests against the live trade site, poe.ninja or poeprices. A

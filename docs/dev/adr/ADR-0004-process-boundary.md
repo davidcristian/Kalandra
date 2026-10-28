@@ -69,3 +69,5 @@ that union, so a message outside it does not compile.
 - [Architecture](../architecture.md): the components and the data flow of a price check.
 - [ADR-0003](ADR-0003-config-survives-updates.md): `HostConfig` and the config messages.
 - [ADR-0005](ADR-0005-proxy-hosts-and-trade-rate-limits.md): what the `/proxy` route forwards.
+- [ADR-0013](ADR-0013-game-capture.md): main grants the page a capture of the game window, which the page reads with
+  `getDisplayMedia()`.
