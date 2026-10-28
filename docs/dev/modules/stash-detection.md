@@ -32,9 +32,10 @@ cells, the match and the capture loop in the renderer. Code that marks the items
 
 - The Path of Exile 2 UI scales with the window height, and the stash panel is on the left. `GRID_LEFT`, `GRID_TOP`
   and `GRID_CELL` give a normal tab's grid as fractions of the height: at 1920 x 1080 its top left corner is at
-  17, 126.5 and a cell is 52.5 pixels wide. **These are estimates**: the cell size and the left edge come from
-  `docs/reference-images/DumpSortCurrency.jpg`, a 3840 x 2160 screenshot cropped without its top, and the top from
-  aligning the HUD in it with the 1920 x 1080 screenshot `HoverImageStrip.jpg`. The in-game check measures them, and
+  17, 161 and a cell is 52.5 pixels wide. The cell size and the left edge come from
+  `docs/reference-images/DumpSortCurrency.jpg`, a 3840 x 2160 screenshot cropped without its top, and the top from a
+  1920 x 1080 screenshot of the stash in the game with the overlay's marks in it, which put the grid 34.5 pixels under
+  the first estimate from the HUD of `HoverImageStrip.jpg`. Other sizes and aspect ratios are not measured, and
   [refinement 120](../refinements/tasks/120-stash-grid-alignment.md) would find the grid from the frames.
 - A normal tab has 12 cells on a side and a quad tab 24, in the same area. `needsQuad(listings)` returns true when a
   listing reaches past the 12th column or row (`x + w` or `y + h` above 12).

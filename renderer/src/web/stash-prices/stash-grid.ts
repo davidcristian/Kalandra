@@ -1,9 +1,9 @@
 import type { StashListing } from "./stash-listings";
 
-// The grid of a normal tab as fractions of the game window's height: estimates from a 3840 x 2160 screenshot of the
-// stash, aligned on the HUD with a 1920 x 1080 screenshot, and not measured in the game (stash-detection.md)
+// The grid of a normal tab as fractions of the game window's height: the left edge and the cell from a 3840 x 2160
+// screenshot of the stash, the top from a 1920 x 1080 screenshot with the overlay's marks in it (stash-detection.md)
 export const GRID_LEFT = 17 / 1080;
-export const GRID_TOP = 126.5 / 1080;
+export const GRID_TOP = 161 / 1080;
 export const GRID_CELL = 52.5 / 1080;
 
 /** The cells on each side of a normal tab and of a quad tab, which has the same size. */

@@ -18,21 +18,22 @@ describe("stashGrid", () => {
   it("places a normal tab's grid by the window height alone", () => {
     expect(stashGrid(FULL_HD, false, NONE)).toEqual({
       left: 17,
-      top: 126.5,
+      top: 161,
       cell: 52.5,
     });
     expect(
       stashGrid({ width: 2560, height: 1080, dpr: 1 }, false, NONE),
-    ).toEqual({ left: 17, top: 126.5, cell: 52.5 });
-    expect(
-      stashGrid({ width: 1280, height: 720, dpr: 1 }, false, NONE),
-    ).toEqual({ left: 17 * (2 / 3), top: 126.5 * (2 / 3), cell: 35 });
+    ).toEqual({ left: 17, top: 161, cell: 52.5 });
+    const at720 = stashGrid({ width: 1280, height: 720, dpr: 1 }, false, NONE);
+    expect(at720.left).toBeCloseTo(17 * (2 / 3));
+    expect(at720.top).toBeCloseTo(161 * (2 / 3));
+    expect(at720.cell).toBe(35);
   });
 
   it("gives a quad tab the same corner and cells half as wide", () => {
     expect(stashGrid(FULL_HD, true, NONE)).toEqual({
       left: 17,
-      top: 126.5,
+      top: 161,
       cell: 26.25,
     });
   });
@@ -50,7 +51,7 @@ describe("stashGrid", () => {
     );
 
     expect(corrected.left).toBeCloseTo(17 + 2);
-    expect(corrected.top).toBeCloseTo(126.5 - 4);
+    expect(corrected.top).toBeCloseTo(161 - 4);
     expect(corrected.cell).toBeCloseTo(52.5 + 1);
   });
 
@@ -64,7 +65,7 @@ describe("stashGrid", () => {
 
     expect(stashGrid(FULL_HD, false, correction)).toEqual({
       left: 17 + 5.4,
-      top: 126.5 - 10.8,
+      top: 161 - 10.8,
       cell: 52.5 + 1.08,
     });
     const at1440 = stashGrid(
@@ -72,7 +73,7 @@ describe("stashGrid", () => {
       false,
       correction,
     );
-    expect(at1440.top / 1440).toBeCloseTo((126.5 - 10.8) / 1080);
+    expect(at1440.top / 1440).toBeCloseTo((161 - 10.8) / 1080);
   });
 
   it("reads a correction that is not a number as 0, and keeps a cell at least 1 pixel wide", () => {
@@ -83,7 +84,7 @@ describe("stashGrid", () => {
         top: Number.POSITIVE_INFINITY,
         cell: -1000,
       }),
-    ).toEqual({ left: 17, top: 126.5, cell: 1 });
+    ).toEqual({ left: 17, top: 161, cell: 1 });
   });
 });
 
@@ -137,16 +138,16 @@ describe("the grid in a frame", () => {
     const view: Viewport = { width: 1920, height: 1080, dpr: 2 };
     const frame = { width: 3840, height: 2160 };
 
-    // docs/reference-images/DumpSortCurrency.jpg, cropped 22 pixels from the left and 244 from the top
+    // docs/reference-images/DumpSortCurrency.jpg, cropped 22 pixels from the left and 313 from the top
     expect(
       gridInFrame(stashGrid(view, false, NONE), frameMapping(frame, view)),
-    ).toEqual({ left: 22 + 12, top: 244 + 9, cell: 105 });
+    ).toEqual({ left: 22 + 12, top: 313 + 9, cell: 105 });
   });
 
   it("scales a grid with the image it is in", () => {
-    expect(scaleGrid({ left: 34, top: 253, cell: 105 }, 0.5)).toEqual({
+    expect(scaleGrid({ left: 34, top: 322, cell: 105 }, 0.5)).toEqual({
       left: 17,
-      top: 126.5,
+      top: 161,
       cell: 52.5,
     });
   });
@@ -157,9 +158,9 @@ describe("sampleArea", () => {
     expect(
       sampleArea(
         { width: 3840, height: 2160 },
-        { left: 34, top: 253, cell: 105 },
+        { left: 34, top: 322, cell: 105 },
       ),
-    ).toEqual({ width: 34 + 1260, height: 253 + 1260, scale: 32 / 52.5 });
+    ).toEqual({ width: 34 + 1260, height: 322 + 1260, scale: 32 / 52.5 });
   });
 
   it("keeps a small frame at its size and inside its edges", () => {

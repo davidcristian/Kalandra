@@ -199,7 +199,7 @@ describe("useStashDetector", () => {
     page.resize(1080);
     await nextTick();
 
-    expect(state.grid).toEqual({ left: 17, top: 126.5, cell: 52.5 });
+    expect(state.grid).toEqual({ left: 17, top: 161, cell: 52.5 });
   });
 
   it("marks the tab open and closed with the stash prices hotkey alone", async () => {

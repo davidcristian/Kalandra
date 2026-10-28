@@ -13,8 +13,9 @@ click and keeps the overlay window shown. The reader, the pricer and the detecto
 responses, a fake trade site and drawn frames ([renderer-stash-prices.md](../../modules/renderer-stash-prices.md),
 [stash-detection.md](../../modules/stash-detection.md)), and a fake game window was captured in Electron 44
 ([ADR-0013](../../adr/ADR-0013-game-capture.md)). The game, the live trade site with a real account, and the panels'
-look were not checked. The grid of a normal tab is an estimate, at 17, 126.5 with 52.5 pixel cells at 1920 x 1080,
-scaled with the window height (`stash-grid.ts`), and so are the cell colors (`cell-classifier.ts`).
+look were not checked. The grid of a normal tab, at 17, 161 with 52.5 pixel cells at 1920 x 1080, scaled with the
+window height (`stash-grid.ts`), was measured on one screenshot at that size, and the cell colors
+(`cell-classifier.ts`) are estimates.
 
 **Do.** The steps below, at 1920 x 1080 and at one other resolution, in Windowed Fullscreen and in Windowed mode, with
 a normal tab and, if one is at hand, a quad tab. [Section 8 of the runbook](../../runbooks/in-game-check.md#8-stash-prices)
@@ -79,3 +80,6 @@ lines; a constant that is off becomes one with the measured numbers.
 - 2026-10-28: Filed with the detection of the open stash tab, whose grid and colors are estimates.
 - 2026-10-28: Added the marks, the progress bar and the grid alignment view over the open tab.
 - 2026-10-28: Widened to the whole feature, with steps for reading the tab, pricing, the hotkey and clicks.
+- 2026-10-28: A screenshot of the open tab at 1920 x 1080, with the marks shown by the hotkey, put the grid 34.5
+  pixels under the estimate, so its top moved from 126.5 to 161. The capture had not seen the tab. With the new top,
+  the capture saw the tab at that size without the hotkey, and the marks lay on the items. The steps are not run yet.
