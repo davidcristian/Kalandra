@@ -25,19 +25,19 @@ that the route needs ([main.md](main.md)).
   area, the hold key and a distance. Main then hides it with `MAIN->OVERLAY::hide-exclusive-widget` when the
   cursor moves farther than that distance with the hold key up. Main gives the overlay focus when the cursor
   moves inside the area with the hold key down, or when the user clicks in the area.
-- [CheckedItem.vue](../../../renderer/src/web/price-check/CheckedItem.vue) builds the presets for each item,
-  chooses the search API with `apiToSatisfySearch`, and either searches at once or waits for the Search button.
-  `apiToSatisfySearch` returns `trade` when a stat filter is enabled. For a divination card or a map with a stack
-  size filter, it returns `bulk` when that filter is enabled. Otherwise it returns `bulk` for an item with a
-  `tradeTag` and `trade` for the rest. The window searches at once when "Perform an auto search, when pressing"
-  is on for the key used and `searchesAtOnce` in `initial-search.ts` returns true: for a unique, unidentified or
-  veiled item, a charm, a category not in `CATEGORY_TO_TRADE_ID`, and with the suggested price on, any rarity.
-  Its first watcher on the item builds the presets and the next one searches with them, so it needs Vue to run
-  the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
-  ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)).
-  Before a search, it shows a tip that `createTipSchedule()` in `help/tips.ts` picks: with every item at
-  **Always**, after 7, 20, 50 or 100 items without one at the other settings, and none at **Never**.
-  `specs/web/tips.test.ts` checks it, and `specs/web/price-check/initial-search.test.ts` which items search at once.
+- [CheckedItem.vue](../../../renderer/src/web/price-check/CheckedItem.vue) builds the presets for each item with
+  `presetOptions()` (`preset-options.ts`), chooses the search API with `apiToSatisfySearch`, and either searches at
+  once or waits for the Search button. `apiToSatisfySearch` returns `trade` when a stat filter is enabled. For a
+  divination card or a map with a stack size filter, it returns `bulk` when that filter is enabled. Otherwise it
+  returns `bulk` for an item with a `tradeTag` and `trade` for the rest. The window searches at once when "Perform an
+  auto search, when pressing" is on for the key used and `searchesAtOnce` in `initial-search.ts` returns true: for a
+  unique, unidentified or veiled item, a charm, a category not in `CATEGORY_TO_TRADE_ID`, and with the suggested price
+  on, any rarity. Its first watcher on the item builds the presets and the next one searches with them, so it needs
+  Vue to run the watchers of a component in the order they are defined. Vue 3.2.38 to 3.3.6 did not
+  ([vuejs/core#7576](https://github.com/vuejs/core/issues/7576)). Before a search, it shows a tip that
+  `createTipSchedule()` in `help/tips.ts` picks: with every item at **Always**, after 7, 20, 50 or 100 items without
+  one at the other settings, and none at **Never**. `specs/web/tips.test.ts` checks it,
+  `specs/web/price-check/initial-search.test.ts` which items search at once and `preset-options.test.ts` the options.
 
 ### Filters (`filters/`)
 

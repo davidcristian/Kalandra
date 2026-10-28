@@ -75,6 +75,7 @@ import { createTradeRequest } from "./trade/pathofexile-trade";
 import { searchesAtOnce } from "./initial-search";
 import { AppConfig } from "@/web/Config";
 import { priceCheckConfig, suggestedPriceEnabled } from "./price-check-config";
+import { presetOptions } from "./preset-options";
 import { useLeagues } from "@/web/background/Leagues";
 import { createTipSchedule } from "../help/tips";
 
@@ -135,28 +136,22 @@ export default defineComponent({
             ? itemFilters.value.trade.listingType
             : undefined;
 
-        presets.value = createPresets(item, {
-          league: leagues.selectedId.value ?? "",
-          collapseListings: widget.value.collapseListings,
-          activateStockFilter: widget.value.activateStockFilter,
-          searchStatRange: widget.value.searchStatRange,
-          useEn:
-            (AppConfig().language === "cmn-Hant" &&
-              AppConfig().realm === "pc-ggg") ||
-            AppConfig().preferredTradeSite === "www",
-          currency:
-            widget.value.rememberCurrency ||
-            (prevItem &&
-              item.info.namespace === prevItem.info.namespace &&
-              item.info.refName === prevItem.info.refName)
-              ? prevCurrency
+        presets.value = createPresets(
+          item,
+          presetOptions({
+            league: leagues.selectedId.value ?? "",
+            currency:
+              widget.value.rememberCurrency ||
+              (prevItem &&
+                item.info.namespace === prevItem.info.namespace &&
+                item.info.refName === prevItem.info.refName)
+                ? prevCurrency
+                : undefined,
+            listingType: widget.value.rememberListingType
+              ? prevListingType
               : undefined,
-          listingType: widget.value.rememberListingType
-            ? prevListingType
-            : undefined,
-          defaultAllSelected: widget.value.defaultAllSelected,
-          valuableSelected: suggestedPriceEnabled(),
-        });
+          }),
+        );
 
         if (
           (!props.advancedCheck && !widget.value.smartInitialSearch) ||
