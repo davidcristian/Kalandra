@@ -1,6 +1,6 @@
 # OverlayWindow.vue has tests only for the render-state of the stash layer
 
-**Status:** open
+**Status:** done 2026-10-28
 **Area:** renderer
 **Origin:** [renderer/src/web/overlay/OverlayWindow.vue](../../../../renderer/src/web/overlay/OverlayWindow.vue)
 **Verified:** 2026-10-28
@@ -18,3 +18,4 @@ each of these through the events the page sends, and a higher coverage floor if 
 
 - 2026-10-28: Left for later by the stash marks, whose test is the first to render the overlay
   window.
+- 2026-10-28: test(renderer): add tests of the overlay window with widgets

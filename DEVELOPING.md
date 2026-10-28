@@ -99,6 +99,11 @@ part alone:
 
 - `npm test` in `renderer/` starts Vitest in watch mode in an interactive terminal, so use
   `npx vitest run` there.
+- The renderer's `vitest.config.ts` has two projects. `node` builds the modules for the server,
+  so a component renders only with `renderToString()`. `client` runs each `*.client.test.ts`
+  with `specs/client-environment.ts`, which builds them for the browser, so a spec can mount a
+  component with Vue's client renderer, whose watchers run after each change.
+  `npx vitest run --project client` runs only those.
 - `npm run build` in `main/` runs `tsc --noEmit`, then the esbuild bundle. Only `npm run dev`
   imports `electron`, so the build works without the Electron binary.
 - `npm run check-types` in `renderer/`, which a pre-commit hook runs, checks `src/` and `specs/`

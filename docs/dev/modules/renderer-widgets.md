@@ -148,7 +148,12 @@ text, since the game data has no text for them
 [config.md](config.md)); the `IpcEvent` messages in `ipc/types.ts` ([ipc.md](ipc.md)); the background state in
 `web/background/` and `web/client-log/`.
 
-**Tests.** `npx vitest run` in `renderer/`. No test covers `OverlayWindow.vue` or `Widget.vue`, and coverage
+**Tests.** `npx vitest run` in `renderer/`. `specs/web/overlay-window.client.test.ts` mounts `OverlayWindow.vue`
+with Vue's client renderer on fake nodes, a stub registry that draws each widget as an empty element, and a fake
+`Host`. It checks the `render-state` the page sends and the widgets it draws for a shown widget without a blur flag,
+an `invisible-on-blur` widget and a `hide-on-blur` widget as the overlay gains and loses focus, the stash layer and
+the widgets while Alt hides the overlay, and the `save-config` it sends when the window loses focus and when the
+price check closes. No test covers `Widget.vue`, and coverage
 counts only the `.ts` files of `src/` (`coverage.include` in `vitest.config.ts`). `specs/web/widget-registry.test.ts`
 loads every widget component and checks the registered types and the invariants above on the widgets of
 `defaultConfig()`: one entry per single widget, a registered component and valid `Widget` fields for each, the
