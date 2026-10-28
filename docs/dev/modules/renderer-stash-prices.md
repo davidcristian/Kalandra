@@ -1,8 +1,9 @@
-# renderer/src/web/stash-prices: reading and pricing a stash tab in the background
+# renderer/src/web/stash-prices: reading, pricing and marking a stash tab in the background
 
 **Purpose.** The stash prices feature reads one public premium stash tab of the user's account from the official
 trade site while Kalandra runs: the user drops items without a price into that tab, the reader keeps a list of them
-with their place in the tab, and the pricer prices each of them as the price check would. The reader and the pricer
+with their place in the tab, the pricer prices each of them as the price check would, and a layer over the game marks
+them while the stash shows the tab ([stash-detection.md](stash-detection.md) finds that). The reader and the pricer
 are the only code that sends trade requests without a key press, under the rules of
 [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the proxy and the rate limiters are in
 [renderer-price-check.md](renderer-price-check.md#trade-queries-trade).
@@ -37,11 +38,11 @@ are the only code that sends trade requests without a key press, under the rules
 - `reader-settings.ts`: `clampInterval()` (at least 5 minutes, 10 for a value that is not a number) and
   `clampBudget()` (0 to 600, 400 for a value that is not a number), with the defaults as constants.
 - `stash-requests.ts`: `sendSearch()` and `sendFetch()` wait on `RATE_LIMIT_RULES.SEARCH` and `.FETCH` with
-  `RateLimiter.waitMulti`, call `adjustRateLimits` with the response headers and read the body with
-  `readTradeData()`. `threeHourSearchCount()` returns the stack length of the SEARCH limiter with the longest
-  window, or `undefined` before the site sent a window of 3 hours. `holdForFetch()` waits before a background fetch
-  as step 5 of [the order of a check](#the-order-of-a-check) says, and returns why it stopped waiting. `readSearch()` throws a `TradeResponseError` for
-  a search response without a query id, string ids or a total, and `readListing()` returns `undefined` for a fetch
+  `RateLimiter.waitMulti`, call `adjustRateLimits` with the response headers and read the body with `readTradeData()`.
+  `threeHourSearchCount()` returns the stack length of the SEARCH limiter with the longest window, or `undefined` before
+  the site sent a window of 3 hours. `holdForFetch()` waits before a background fetch as step 5 of [the order of a
+  check](#the-order-of-a-check) says, and returns why it stopped waiting. `readSearch()` throws a `TradeResponseError`
+  for a search response without a query id, string ids or a total, and `readListing()` returns `undefined` for a fetch
   result it cannot read.
 
 ### The item of a listing (`item-text.ts`, `mod-text.ts`)
@@ -106,13 +107,13 @@ are the only code that sends trade requests without a key press, under the rules
 
 ### The widget and its panel
 
-- `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
-  (false), `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`, and the
-  settings of [stash detection](stash-detection.md): `captureEnabled`, `toggleKey` and `gridCorrection`, and of the
-  marks: `highlightValuable` and `highlightTrash` (true), `trashThreshold` (1 `chaos`) and `alignmentView` (false),
-  which the `< 47` step adds. `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags `invisible-on-blur` and
-  `menu::skip`, at the top left under the main button bar. The `< 45` step adds it to a saved config
-  ([config.md](config.md)).
+- `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled` (false),
+  `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`, and the settings of
+  [stash detection](stash-detection.md): `captureEnabled`, `toggleKey` and `gridCorrection`, and of the marks:
+  `highlightValuable` and `highlightTrash` (true), `trashThreshold` (1 `chaos`) and `alignmentView` (false), which the
+  `< 47` step adds. `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags
+  `invisible-on-blur` and `menu::skip`, at the top left under the main button bar. The `< 45` step adds it to a saved
+  config ([config.md](config.md)).
 - `useStashReader()` in `use-stash-reader.ts` returns the app's one reader, a `createGlobalState`. Its sources are
   the widget's config through `requireWidget`, `AppConfig().accountName`, `useLeagues().selectedId`, which has a
   league only after the league list loaded, and `priceCheckConfig().wmWants === "show"`. Code that needs the
@@ -150,16 +151,17 @@ are the only code that sends trade requests without a key press, under the rules
 
 - `useStashHighlights()` is the app's one set of highlights, a `createGlobalState`: `threshold` (the widget's
   `trashThreshold` through `thresholdInDivine()` with `findPriceByQuery({ ns: "ITEM", name })`, computed again when
-  `xchgRate` changes, since each price file that loads sets it), `view` (`highlightView()` of the detector's `open`,
+  `xchgRate` changes value, since `findPriceByQuery` is not reactive, so a new price file with the same rate keeps
+  the old threshold), `view` (`highlightView()` of the detector's `open`,
   `quad` and `grid`, the reader's listings, the pricer's prices and counts, and the widget's toggles), and `shown`:
   the widget is `enabled` and the tab is open or `alignmentView` is on.
 - `OverlayWindow.vue` renders `StashHighlights.vue` before the widgets while `shown` holds and the UI is not hidden
-  (`Alt` held), and counts it in `isOverlayVisible`. The panel is `invisible-on-blur`, and main hides the whole
-  window while the game is active unless the page sends `OVERLAY->MAIN::render-state` with `shouldShow` true, so
-  the marks need that. A second widget without `invisible-on-blur` was not used: showing it would change `wmWants`
-  on each open and close of the tab, which the next `saveConfig()` writes to `config.json`, and a saved `show` would
-  draw the marks at the next start. Calling `useStashHighlights()` there creates the reader, pricer and detector
-  before the widget mounts.
+  (`Alt` held), and counts it in `isOverlayVisible`. The panel is `invisible-on-blur`, and with `hideOverlayOnBlur` on
+  main hides the whole window while the game is active unless the page sends `OVERLAY->MAIN::render-state` with
+  `shouldShow` true, so the marks need that. A second widget without `invisible-on-blur` was not used: showing it would
+  change `wmWants` on each open and close of the tab, which the next `saveConfig()` writes to `config.json`, and a saved
+  `show` would draw the marks at the next start. Calling `useStashHighlights()` there creates the reader, pricer and
+  detector before the widget mounts.
 - `StashHighlights.vue` covers the overlay with `pointer-events: none`, so it never takes a click. It draws the
   alignment view as one box with a line every `cell`, and each mark on its cells: `valuable` with a yellow border
   and its price as `suggestedPriceText()` writes it, `trash` with a red fill and the `fa-trash` icon, `unpriced`
@@ -184,7 +186,7 @@ Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](sta
 ### The order of a check
 
 1. Not `enabled`: `stop()`. No account name: `no-account`. No league in `leagueId()`: `no-league`.
-2. The price check shown: `price-check-open`. A request in a SEARCH limiter's queue: `busy`. Both retry after 30
+2. The price check shown: `price-check-open`. A request in a SEARCH limiter's queue: `busy`. These four retry after 30
    seconds (`RETRY_MS`).
 3. `threeHourSearchCount()` at or above `clampBudget(searchBudget)`, an unknown count being 0: `budget-reached`, and
    the next check after the interval. A budget of 0 sends no search at all.

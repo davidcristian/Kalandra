@@ -46,7 +46,8 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   title bar and borders, so the client area is centered across and at the bottom, and a frame smaller than the window
   scales it down. `gridInFrame()` and `scaleGrid()` move a grid into the frame and into a scaled copy of it.
 - `sampleArea(frame, normal)` returns the part of the frame to read, from its top left corner to the far corner of
-  the grid, and the scale that keeps a quad cell 16 pixels wide (`SAMPLE_CELL`), or 1 for a smaller frame.
+  the grid, and the scale that makes a quad cell 32 pixels wide (`SAMPLE_CELL`), or 1 when it is narrower in the
+  frame. At 16 pixels a test put the corner samples on the grid lines.
 
 ### The cells and the match (`cell-classifier.ts`, `tab-match.ts`)
 
