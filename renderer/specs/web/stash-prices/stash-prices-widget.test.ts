@@ -294,11 +294,15 @@ describe("the stash prices widget", () => {
     ],
     [
       { open: true, source: "hotkey", capture: "not-windows" },
-      "Stash tab shown with the hotkey. Capture off: it works only on Windows.",
+      "Stash tab shown with the hotkey. Capture off: it works only on Windows, so use the hotkey.",
     ],
     [
       { source: "hotkey", capture: "paused" },
       "Stash tab hidden with the hotkey. Capture paused while the game window is not active.",
+    ],
+    [
+      { capture: "setting-off" },
+      "Capture off: turned off in the settings, so use the hotkey.",
     ],
     [
       { capture: "browser" },

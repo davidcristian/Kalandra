@@ -19,7 +19,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas` (the experimental features turned on: `library`),
   `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 45. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 46. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -75,6 +75,8 @@ old one and keep that file, so a saved config must survive every update: this is
 - The `< 45` step passes `stashPricesDefault()` from `renderer/src/web/stash-prices/widget.ts` to `addNewWidget()` in
   `missing-widgets.ts`, which appends it with the next free `wmId` unless the config has a stash prices widget. It
   is off and has `menu::skip` ([renderer-stash-prices.md](renderer-stash-prices.md)).
+- The `< 46` step runs `addDetectionSettings()` from `stash-prices/saved-settings.ts`: a stash prices widget without
+  them gets `captureEnabled` true, `toggleKey` null and `gridCorrection` in pixels with 0 for each value.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -149,8 +151,8 @@ old one and keep that file, so a saved config must survive every update: this is
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 45, so the next step is `if (config.configVersion < 46)`, ending with
-  `config.configVersion = 46`, and `defaultConfig()` then returns 46. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 46, so the next step is `if (config.configVersion < 47)`, ending with
+  `config.configVersion = 47`, and `defaultConfig()` then returns 47. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -221,29 +223,28 @@ profile of every library widget and keeps the other fields, that a config withou
 `modOpts` on a widget of another type, or with missing or malformed profiles stays the same, and that a version 28
 or 32 config still gets `generation` from the `< 33` step before the `< 43` step removes `modOpts`. For the `< 44`
 step it checks that a version 43 config gets `suggestedPrice` on every price check widget. For the `< 45` step it
-checks that a version 44 config gets the stash prices widget with the `wmId` after a widget the user added, and that
-a stash prices widget it has stays without a second one. It runs the
-real `initConfig()` with a fake `Host.getConfig()` and checks that a saved config loads as `upgradeConfig()`
-returns it, that a config without the price check or another single instance widget gets the default one with a
-new `wmId` and a log line, that a version 32 config without a library widget gets the one with `modOpts`, and
-that a version 2 config without its map
-check widget and a version 15 config without its Delve grid still throw. It reads the `log-entry` events that
-`initConfig()` sends: a config one version above the current one, with a field and a widget the app does not have,
-loads unchanged and sends one warning with both numbers, and a saved or current config sends none. It takes the last step version from `defaultConfig()`, so a new step needs no change to
-the spec. `renderer/specs/web/host-config.test.ts` sets configs with the real `updateConfig()` and checks the
-`HostConfig` that `pushHostConfig()` sends: each field, from the config and its price check and library widgets, and
-`libraryAlpha`, which is true only when `enableAlphas` is on and `alphas` includes `library`.
-`renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and checks that Save
-sends `save-config` with the edited copy and the window hidden, then `update-host-config`.
-`renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that
-`shortcutActions()` builds. `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()`
-on the widget lists that the `< 29` and `< 30` steps left in saved configs, and
-`renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and `trade-host.test.ts` beside it
-the host `tradeHost()` returns for each language and realm. `main/specs/ConfigStore.test.ts` checks
-`ConfigStore` in a temporary folder: the order of its reads and writes, a write that stops partway, a rename
-that fails while another program has the file open, with the 750 ms of retries on a fake clock and the log line of
-each failed save, a
-dev run's own file and its copy of `config.json`, a `config.json` that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with `EBUSY`, after which no save
-replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET /config` after a
-`save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()` keeps the
-`ConfigProblem`.
+checks that a version 44 config gets the stash prices widget with the `wmId` after a widget the user added, and that a
+stash prices widget it has stays without a second one. For the `< 46` step it checks that a version 45 config gets the
+three settings of stash detection, and keeps the ones it has. It runs the real `initConfig()` with a fake
+`Host.getConfig()` and checks that a saved config loads as `upgradeConfig()` returns it, that a config without the
+price check or another single instance widget gets the default one with a new `wmId` and a log line, that a version 32
+config without a library widget gets the one with `modOpts`, and that a version 2 config without its map check widget
+and a version 15 config without its Delve grid still throw. It reads the `log-entry` events that `initConfig()` sends:
+a config one version above the current one, with a field and a widget the app does not have, loads unchanged and sends
+one warning with both numbers, and a saved or current config sends none. It takes the last step version from
+`defaultConfig()`, so a new step needs no change to the spec. `renderer/specs/web/host-config.test.ts` sets configs
+with the real `updateConfig()` and checks the `HostConfig` that `pushHostConfig()` sends: each field, from the config
+and its price check and library widgets, and `libraryAlpha`, which is true only when `enableAlphas` is on and `alphas`
+includes `library`. `renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and
+checks that Save sends `save-config` with the edited copy and the window hidden, then `update-host-config`.
+`renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that `shortcutActions()` builds.
+`renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()` on the widget lists that the `< 29` and `< 30`
+steps left in saved configs, and `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and
+`trade-host.test.ts` beside it the host `tradeHost()` returns for each language and realm.
+`main/specs/ConfigStore.test.ts` checks `ConfigStore` in a temporary folder: the order of its reads and writes, a
+write that stops partway, a rename that fails while another program has the file open, with the 750 ms of retries on a
+fake clock and the log line of each failed save, a dev run's own file and its copy of `config.json`, a `config.json`
+that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that
+fails with `EBUSY`, after which no save replaces the file until a read succeeds. `main/specs/start-server.test.ts`
+reads `GET /config` after a `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that
+`Host.getConfig()` keeps the `ConfigProblem`.

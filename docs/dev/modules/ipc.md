@@ -32,7 +32,7 @@ neither process's type check reads it. The routes that move the messages are in
 | `CLIENT->MAIN::log-entry` | `level`: `error`, `warn` or `info`; `message` | `logToMain()` in `log-to-main.ts`, called when a load fails in `Prices.ts`, `Leagues.ts` or `TradeData.ts`, for the first `Client.txt` line that fails in `client-log.ts`, for a saved config from a newer version in `newer-config.ts`, and once a run for each rate limit rule or `Retry-After` header that `trade/common.ts` cannot read | `logRendererEntries()` in `renderer-log.ts`, which writes the line through `Logger` |
 | `CLIENT->MAIN::write-data` | `action`: `log-item` with `text`; `session` with `start: true`, `name` and `header`, or `start: false`; `client-log-event` with `data` | `WidgetLibrary.vue` (through `library/session.ts`), `SingleItemSession.vue`, `client-log.ts` | `FileWriter` |
 | `MAIN->CLIENT::item-text` | `target`, `clipboard`, `item?`, `position`, `focusOverlay` | `Shortcuts` (`copy-item`), to the last active client | `PriceCheckWindow.vue`, `WidgetItemCheck.vue`, `hotkeyable-actions.ts`, `SingleItemSession.vue` |
-| `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetTimer.vue` |
+| `MAIN->CLIENT::widget-action` | `target` | `Shortcuts` (`trigger-event`) | `WidgetTimer.vue`, `useStashDetector()` |
 | `MAIN->CLIENT::config-changed` | `contents` | `ConfigStore` | `initConfig()` in `Config.ts`, `OverlayWindow.vue` |
 | `MAIN->CLIENT::log-entry` | `message` | `Logger.write()`; `server.ts` sends the history, the last 1000 entries, to a new client | `Host` (`Host.logs`, the last 1000 lines, cleared when the socket opens) |
 | `MAIN->CLIENT::updater-state` | `UpdateInfo` | `AppUpdater`; `server.ts` sends the current state to a new client | `Host` (`Host.updateInfo`) |
@@ -62,7 +62,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 | `gameConfig` | `gameConfig` (`null` for the default path) | `GameConfig.readConfig()` |
 | `libraryAlpha` | `enableAlphas` with `library` in `alphas` | `FileWriter.restart()` |
 | `libraryOutputPath` | the library widget's `libraryOutputPath` | `FileWriter.restart()` |
-| `stashCapture` | the stash prices widget's `enabled` | `GameCapture.update()`, with `windowTitle` ([stash-detection.md](stash-detection.md)) |
+| `stashCapture` | the stash prices widget's `enabled` and `captureEnabled` | `GameCapture.update()`, with `windowTitle` ([stash-detection.md](stash-detection.md)) |
 
 - `ShortcutAction` is one hotkey and what it does. `shortcut` is key names joined by ` + `, with the modifiers first
   in the order `Ctrl`, `Shift`, `Alt` (`hotkeyToString()`), such as `Ctrl + Alt + D`. With `keepModKeys`, main
@@ -71,7 +71,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 | `type` | Fields | What main does | Built from |
 | --- | --- | --- | --- |
 | `copy-item` | `target`, `focusOverlay?` | presses the copy keys and sends `item-text` with `target` | the price check (`price-check`), the item check widget (`item-check`, `open-wiki`, `open-craft-of-exile`, `open-poedb`, `search-similar`, `search-same-priced`), the library (`log-item`) |
-| `trigger-event` | `target` | broadcasts `widget-action` with `target` | `stopwatch-start-stop:<wmId>` and `stopwatch-reset:<wmId>` per stopwatch |
+| `trigger-event` | `target` | broadcasts `widget-action` with `target` | `stopwatch-start-stop:<wmId>` and `stopwatch-reset:<wmId>` per stopwatch, `stash-prices-toggle` for the stash prices widget's `toggleKey` while it is on |
 | `stash-search` | `text` | types `text` into the stash search | the stash search widget's entries, when its hotkeys are on |
 | `toggle-overlay` | none | moves the focus between the overlay and the game | `overlayKey` |
 | `paste-in-chat` | `text`, `send` | types a chat command | each entry in `commands` with a hotkey |

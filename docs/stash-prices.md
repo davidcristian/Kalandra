@@ -70,7 +70,17 @@ counts as closed.
 - Kalandra never presses a key or clicks for this.
 - Items you put in the tab after the last check, and items with a price, count against the match: up to 14 such
   cells of a normal tab still match. Click **Check now** after you add many items.
-- Linux and macOS have no capture.
+- Linux and macOS have no capture: there, and when you turn the capture off, use the hotkey below.
+
+**Hotkey that marks the tab open or closed**: press it when you open the tab and again when you close it. On Windows
+it also changes what the capture saw, until the capture sees the tab open or close. It has no key by default; set one
+on the **Stash prices** page. It works only while **Read the tab in the background** is on.
+
+**Grid correction**: Kalandra places the grid of the tab from the height of the game window. When the widget's
+percentages stay low with the tab open, point at that line: its tooltip says where the grid starts and how wide a cell
+is, in pixels of the game window. Compare that with a screenshot of the game, and set the difference on the **Stash
+prices** page, in pixels of the game window or in percent of its height, which stays right when you change the
+resolution. **Cell size** is added to the width of a cell of a normal tab.
 
 The widget's line under the status says what Kalandra sees, and what the capture does:
 
@@ -80,7 +90,9 @@ The widget's line under the status says what Kalandra sees, and what the capture
 | Capture: 96% of the item cells and 98% of all cells match. | The last capture: the share of the cells under the items that look filled, and of all cells that look as the items say. Both must be 90% or more. |
 | Capture paused while the game window is not active. | The capture runs again when you return to the game. |
 | Capture off: the tab needs items on 3 cells or more. | Too few items to tell the tab from an empty one. |
-| Capture off: it works only on Windows. | Linux and macOS. |
+| Capture off: it works only on Windows, so use the hotkey. | Linux and macOS. |
+| Capture off: turned off in the settings, so use the hotkey. | **Find the open tab in the game window** is off. |
+| Stash tab shown with the hotkey. / Stash tab hidden with the hotkey. | You pressed the hotkey last. |
 | Capture off: | Any other reason after the colon, such as a game window that Kalandra cannot find. It tries again every 30 seconds, and the [Debug](/settings#debug) log has the reason. |
 
 ## How it uses the trade site
@@ -140,3 +152,6 @@ check**:
 | **Stash tab name** | `kalandra-price-check` | The name of the tab to read, as the game shows it. |
 | **Check the tab every** | 10 minutes | The time between two checks, at least 5 minutes. |
 | **Search budget for 3 hours** | 400 | Kalandra checks the tab only while the count of searches from your IP address in the last 3 hours is below this number, from 0 to 600, and prices its items only below this number less the searches of the checks. 0 stops both. |
+| **Find the open tab in the game window (Windows)** | On | Captures the game window to see when the stash shows the tab ([how](#how-kalandra-sees-the-open-tab)). |
+| **Hotkey that marks the tab open or closed** | None | Marks the tab open or closed by hand. |
+| **Grid correction** | 0 pixels | Moves the grid that Kalandra reads: its left edge, its top edge and the width of a cell, in pixels of the game window or in percent of its height. |

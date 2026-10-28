@@ -34,6 +34,7 @@ export type CaptureStatus =
   | "browser"
   | "not-windows"
   | "off"
+  | "setting-off"
   | "few-items"
   | "paused"
   | "starting"
@@ -56,6 +57,8 @@ export interface DetectorState {
 
 export interface DetectorSettings {
   enabled: boolean;
+  /** Whether the user lets Windows capture the game window. */
+  capture: boolean;
   correction: GridCorrection;
 }
 
@@ -103,9 +106,11 @@ export function createStashDetector(sources: DetectorSources) {
 
   function blocked(): CaptureStatus | null {
     const listings = sources.listings();
-    if (!sources.settings().enabled) return "off";
+    const settings = sources.settings();
+    if (!settings.enabled) return "off";
     const platform = sources.platform();
     if (platform !== null) return platform;
+    if (!settings.capture) return "setting-off";
     if (itemCells(listings) < MIN_ITEM_CELLS) return "few-items";
     return sources.gameActive() ? null : "paused";
   }

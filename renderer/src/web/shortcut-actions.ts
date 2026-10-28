@@ -5,6 +5,7 @@ import type { StashSearchWidget } from "./stash-search/widget";
 import { entrySearchText } from "./stash-search/presets";
 import type { ItemCheckWidget } from "./item-check/widget";
 import type { LibraryWidget } from "./library/widget";
+import { type StashPricesWidget, TOGGLE_TARGET } from "./stash-prices/widget";
 import { offersCraftOfExile } from "./item-check/craft-of-exile";
 
 function widgetOfType<T extends widget.Widget>(config: Config, type: string) {
@@ -105,6 +106,15 @@ export function shortcutActions(config: Config): ShortcutAction[] {
             action: { type: "stash-search", text: entrySearchText(entry) },
           });
         }
+      }
+    } else if (widget.wmType === "stash-prices") {
+      const stashPrices = widget as StashPricesWidget;
+      if (stashPrices.enabled && stashPrices.toggleKey) {
+        actions.push({
+          shortcut: stashPrices.toggleKey,
+          keepModKeys: true,
+          action: { type: "trigger-event", target: TOGGLE_TARGET },
+        });
       }
     } else if (widget.wmType === "timer") {
       const stopwatch = widget as widget.StopwatchWidget;

@@ -122,6 +122,7 @@ describe("useStashDetector", () => {
   let useStashDetector: typeof UseStashDetector.useStashDetector;
   let sent: IpcEvent[];
   let focus: (payload: { game: boolean; overlay: boolean }) => void;
+  let widgetAction: (payload: { target: string }) => void;
 
   async function start(isElectron = true) {
     const { Host } = await import("@/web/background/IPC");
@@ -135,6 +136,8 @@ describe("useStashDetector", () => {
     vi.mocked(Host.onEvent).mockImplementation((name, cb) => {
       if (name === "MAIN->OVERLAY::focus-change") {
         focus = cb as typeof focus;
+      } else if (name === "MAIN->CLIENT::widget-action") {
+        widgetAction = cb as typeof widgetAction;
       }
       return new AbortController();
     });
@@ -197,6 +200,34 @@ describe("useStashDetector", () => {
     await nextTick();
 
     expect(state.grid).toEqual({ left: 17, top: 126.5, cell: 52.5 });
+  });
+
+  it("marks the tab open and closed with the stash prices hotkey alone", async () => {
+    const { state } = await start();
+
+    widgetAction({ target: "stopwatch-start-stop:4" });
+    expect(state.open).toBe(false);
+    widgetAction({ target: "stash-prices-toggle" });
+    expect(state).toMatchObject({ open: true, source: "hotkey" });
+    widgetAction({ target: "stash-prices-toggle" });
+    expect(state.open).toBe(false);
+  });
+
+  it("places the grid with the widget's correction, and captures nothing with the capture turned off", async () => {
+    const widget: StashPricesWidget = {
+      ...enabledWidget(),
+      captureEnabled: false,
+      gridCorrection: { unit: "%", left: 1, top: 0, cell: 0 },
+    };
+    setupTests({ widgets: [priceCheckWidgetMock(), widget] });
+    const { state } = await start();
+
+    focus({ game: true, overlay: false });
+    await nextTick();
+
+    expect(state.capture).toBe("setting-off");
+    expect(state.grid.left).toBeCloseTo(720 * (17 / 1080) + 7.2);
+    expect(page.requests).toEqual([]);
   });
 
   it("asks for no capture in a browser tab or outside Windows", async () => {

@@ -24,8 +24,8 @@ marks the items over the stash reads `open`, `quad`, `grid` and `source` from `u
   capture: <reason>`, `warn [GameCapture] Found no window named "<title>"`, `error [GameCapture] Cannot list the
   windows: <message>` or `info [GameCapture] Captures the window "<title>"`.
 - `update(enabled, windowTitle)` takes `stashCapture` and `windowTitle` of `CLIENT->MAIN::update-host-config`
-  through `passHostConfig()` ([ipc.md](ipc.md)). The renderer sets `stashCapture` from the stash prices widget's
-  `enabled`.
+  through `passHostConfig()` ([ipc.md](ipc.md)). The renderer sets `stashCapture` when the stash prices widget's
+  `enabled` and `captureEnabled` are both on.
 
 ### The grid (`renderer/src/web/stash-prices/stash-grid.ts`)
 
@@ -86,8 +86,8 @@ marks the items over the stash reads `open`, `quad`, `grid` and `source` from `u
   from `stashGrid()`), `capture` (a `CaptureStatus`), `error` and `match` (the last frame's `TabMatch`).
 - `update()` runs the capture only while it can decide something. Its `capture` is otherwise, in this order: `off`
   (the stash prices widget is off), `browser` (the page is not in Electron, `Host.isElectron`), `not-windows` (the
-  user agent has no `Windows`), `few-items` (the listings fill fewer than 3 cells) or `paused` (the game window is not
-  active). Each of these closes the capture. `off` closes the tab; the others but `paused` close a tab that the
+  user agent has no `Windows`), `setting-off` (`captureEnabled` is off), `few-items` (the listings fill fewer than 3
+  cells) or `paused` (the game window is not active). Each of these closes the capture. `off` closes the tab; the others but `paused` close a tab that the
   capture opened, and `paused` keeps it.
 - While it may run, it asks once (`starting`), and then reads a frame every 500 ms (`FRAME_MS`, `running`): it maps
   the overlay into the frame with `frameMapping()`, reads `sampleArea()` and runs `matchTab()` with the listings. The
@@ -99,12 +99,24 @@ marks the items over the stash reads `open`, `quad`, `grid` and `source` from `u
 - `toggle()` opens or closes the tab with `source` `hotkey`, and `quad` from the last frame that showed the tab, or
   from `needsQuad()`. The capture changes it again only when it sees the tab open or close. It does nothing while the
   widget is off.
-- `useStashDetector()` is the app's one detector, a `createGlobalState`. It reads the widget's `enabled`, the reader's
-  listings, the game's focus from `MAIN->OVERLAY::focus-change` (false until the first one) and the window's size
-  and `devicePixelRatio`, and calls `update()` when one of them changes. `WidgetStashPrices.vue` creates it.
+- `useStashDetector()` is the app's one detector, a `createGlobalState`. It reads the widget's `enabled`,
+  `captureEnabled` and `gridCorrection`, the reader's listings, the game's focus from `MAIN->OVERLAY::focus-change`
+  (false until the first one) and the window's size and `devicePixelRatio`, and calls `update()` when one of them
+  changes. It calls `toggle()` on `MAIN->CLIENT::widget-action` with the target `stash-prices-toggle` (`TOGGLE_TARGET`
+  in `widget.ts`). `WidgetStashPrices.vue` creates it.
 - `DetectionLine.vue` is the panel's line under the status: `Stash tab seen.`, `Stash tab not seen.`, or `shown`
   or `hidden with the hotkey`, then what the capture does, such as `Capture: 96% of the item cells and 98% of all
   cells match.` or `Capture off: <reason>.` Its tooltip gives the grid in pixels of the game window.
+
+### The settings (`widget.ts`, `DetectionSettings.vue`)
+
+- `StashPricesWidget` has `captureEnabled` (true), `toggleKey` (null) and `gridCorrection` (`unit` `px`, `left`,
+  `top` and `cell` 0). The `< 46` step adds them to a saved config ([config.md](config.md)).
+- `shortcutActions()` adds `toggleKey` as a `trigger-event` with the target `stash-prices-toggle` and `keepModKeys`,
+  so a held `Ctrl` stays down, while the widget is on ([ipc.md](ipc.md)).
+- `DetectionSettings.vue`, under the reading settings of the Stash prices page, has the capture checkbox, the hotkey
+  and the grid correction: a unit (pixels of the game window or percent of the window height) and the left, top and
+  cell size values, each limited to -1000 to 1000 by `clampCorrection()`, a value that is not a number being 0.
 
 ## Invariants
 
@@ -133,5 +145,6 @@ items, a scene, a dark scene, an empty tab, another tab, a grid off by half a ce
 detector with fake timers and `FakeScreen` in `fake-capture.ts`, which shows drawn frames and scales them as a canvas
 does: each reason the capture does not run, 2 frames to open and to close, a windowed game, a quad tab, a frame of
 twice the size, failures, retries and their log lines, an ended capture, a late grant and the hotkey.
-`use-stash-detector.test.ts` runs the app's detector with a fake page and `stash-prices-widget.test.ts` renders the
-line.
+`use-stash-detector.test.ts` runs the app's detector with a fake page, the hotkey and the settings, and
+`stash-prices-widget.test.ts` renders the line. `stash-prices-settings.test.ts` sets the detection settings,
+`shortcut-actions.test.ts` reads the hotkey, and `config-upgrade.test.ts` checks the `< 46` step.

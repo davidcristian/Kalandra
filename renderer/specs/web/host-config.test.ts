@@ -88,13 +88,20 @@ describe("the settings that pushHostConfig() sends to main", () => {
     } satisfies HostConfig);
   });
 
-  it.each([false, true])(
-    "sends the stash prices widget's enabled, %s, as stashCapture",
-    (enabled) => {
+  it.each([
+    { enabled: false, captureEnabled: true, stashCapture: false },
+    { enabled: true, captureEnabled: false, stashCapture: false },
+    { enabled: true, captureEnabled: true, stashCapture: true },
+  ])(
+    "sends stashCapture $stashCapture when stash prices is on: $enabled, and its capture: $captureEnabled",
+    ({ enabled, captureEnabled, stashCapture }) => {
       const config = actual.defaultConfig();
-      widgetOf<StashPricesWidget>(config, "stash-prices").enabled = enabled;
+      Object.assign(widgetOf<StashPricesWidget>(config, "stash-prices"), {
+        enabled,
+        captureEnabled,
+      });
 
-      expect(pushedHostConfig(config).stashCapture).toBe(enabled);
+      expect(pushedHostConfig(config).stashCapture).toBe(stashCapture);
     },
   );
 

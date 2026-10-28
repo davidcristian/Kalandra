@@ -18,6 +18,15 @@ type Page = ComponentPublicInstance & {
   searchBudget: number | string;
 };
 
+type Detection = ComponentPublicInstance & {
+  captureEnabled: boolean;
+  toggleKey: string | null;
+  gridUnit: "px" | "%";
+  gridLeft: number | string;
+  gridTop: number | string;
+  gridCell: number | string;
+};
+
 let plugin: Awaited<ReturnType<typeof init>>;
 
 beforeAll(async () => {
@@ -45,15 +54,17 @@ function stashPricesOf(config: Config): StashPricesWidget {
 /** Renders the Stash prices page of `config`, and returns its HTML and the page component. */
 async function renderPage(config: Config) {
   let page: Page | undefined;
+  let detection: Detection | undefined;
   // Vitest's node environment compiles .vue files for server rendering, so only renderToString runs them
   const app = createSSRApp(SettingsStashPrices, { config }).use(plugin);
   app.mixin({
     created(this: ComponentPublicInstance) {
       if ("searchBudget" in this) page = this as Page;
+      if ("gridLeft" in this) detection = this as Detection;
     },
   });
   const html = await renderToString(app);
-  return { html, page: present(page) };
+  return { html, page: present(page), detection: present(detection) };
 }
 
 describe("the Stash prices settings page", () => {
@@ -112,5 +123,24 @@ describe("the Stash prices settings page", () => {
     expect(html).toContain(
       "The account name on the Price check page is empty, so the tab is not read.",
     );
+  });
+
+  it("sets the capture, the hotkey and the grid correction, each correction from -1000 to 1000", async () => {
+    const config = configWith("Seller05#0005");
+    const { html, detection } = await renderPage(config);
+
+    expect(html).toContain("Find the open tab in the game window (Windows)");
+    detection.captureEnabled = false;
+    detection.toggleKey = "Alt + S";
+    detection.gridUnit = "%";
+    detection.gridLeft = 1.5;
+    detection.gridTop = -2000;
+    // An emptied number field gives an empty text
+    detection.gridCell = "";
+    expect(stashPricesOf(config)).toMatchObject({
+      captureEnabled: false,
+      toggleKey: "Alt + S",
+      gridCorrection: { unit: "%", left: 1.5, top: -1000, cell: 0 },
+    });
   });
 });

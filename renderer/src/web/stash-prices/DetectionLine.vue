@@ -14,6 +14,7 @@ const CAPTURE_TEXT: Record<CaptureStatus, string> = {
   "browser": "stash_prices.capture_browser",
   "not-windows": "stash_prices.capture_not_windows",
   "off": "stash_prices.capture_off",
+  "setting-off": "stash_prices.capture_setting_off",
   "few-items": "stash_prices.capture_few_items",
   "paused": "stash_prices.capture_paused",
   "starting": "stash_prices.capture_starting",

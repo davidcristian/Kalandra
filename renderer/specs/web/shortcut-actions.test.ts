@@ -146,4 +146,21 @@ describe("the hotkeys the renderer sends to main", () => {
       },
     ]);
   });
+
+  it("adds the stash prices toggle key only while stash prices is on", () => {
+    const config = hotkeyConfig();
+    config.widgets.push(
+      widgetEntry(10, "stash-prices", { enabled: true, toggleKey: "Alt + S" }),
+      widgetEntry(11, "stash-prices", { enabled: false, toggleKey: "Alt + X" }),
+      widgetEntry(12, "stash-prices", { enabled: true, toggleKey: null }),
+    );
+
+    expect(shortcutActions(config).slice(3)).toEqual([
+      {
+        shortcut: "Alt + S",
+        keepModKeys: true,
+        action: { type: "trigger-event", target: "stash-prices-toggle" },
+      },
+    ]);
+  });
 });

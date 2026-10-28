@@ -90,7 +90,8 @@ browser and the timing of price checks. [Price check](/price-check#settings) doc
 ## Stash prices
 
 This page turns on the reading of a public stash tab in the background, and sets the tab's name, how often Kalandra
-checks it and how many trade searches it may use. [Stash prices](/stash-prices#settings) documents this page.
+checks it, how many trade searches it may use, and how Kalandra finds the open tab in the game: the capture of the game
+window on Windows, a hotkey and a grid correction. [Stash prices](/stash-prices#settings) documents this page.
 
 ## Map check
 

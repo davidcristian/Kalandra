@@ -106,7 +106,8 @@ are the only code that sends trade requests without a key press, under the rules
 ### The widget and its panel
 
 - `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
-  (false), `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`.
+  (false), `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`, and the
+  settings of [stash detection](stash-detection.md): `captureEnabled`, `toggleKey` and `gridCorrection`.
   `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags `invisible-on-blur` and
   `menu::skip`, at the top left under the main button bar. The `< 45` step adds it to a saved config
   ([config.md](config.md)).

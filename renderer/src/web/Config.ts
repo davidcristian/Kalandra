@@ -20,6 +20,7 @@ import { ENGLISH_DEFAULTS_40, namePresetEntries } from "./stash-search/presets";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 import { stashPricesDefault } from "./stash-prices/widget";
 import type { StashPricesWidget } from "./stash-prices/widget";
+import { addDetectionSettings } from "./stash-prices/saved-settings";
 import { tradeHost } from "./trade-host";
 
 const _config = shallowRef<Config | null>(null);
@@ -136,7 +137,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 45,
+  configVersion: 46,
   overlayKey: "Shift + Space",
   overlayBackground: "rgba(129, 139, 149, 0.15)",
   overlayBackgroundClose: true,
@@ -718,6 +719,11 @@ export function upgradeConfig(_config: Config): Config {
     config.configVersion = 45;
   }
 
+  if (config.configVersion < 46) {
+    addDetectionSettings(config.widgets);
+    config.configVersion = 46;
+  }
+
   return config as Config;
 }
 
@@ -741,6 +747,6 @@ function getConfigForHost(): HostConfig {
     libraryOutputPath: library.libraryOutputPath,
     initialDelay: priceCheck.initialDelay,
     hideOverlayOnBlur: config.hideOverlayOnBlur,
-    stashCapture: stashPrices.enabled,
+    stashCapture: stashPrices.enabled && stashPrices.captureEnabled,
   };
 }

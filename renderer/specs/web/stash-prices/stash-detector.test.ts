@@ -10,6 +10,7 @@ import {
 import type { StashListing } from "@/web/stash-prices/stash-listings";
 import {
   createStashDetector,
+  type DetectorSettings,
   type DetectorSources,
   FRAME_MS,
   RETRY_MS,
@@ -54,7 +55,7 @@ beforeAll(() => {
 
 describe("createStashDetector", () => {
   let screen: FakeScreen;
-  let settings: { enabled: boolean; correction: GridCorrection };
+  let settings: DetectorSettings;
   let listings: StashListing[];
   let platform: ReturnType<DetectorSources["platform"]>;
   let gameActive: boolean;
@@ -81,7 +82,7 @@ describe("createStashDetector", () => {
     vi.useFakeTimers();
     screen = new FakeScreen();
     screen.frame = sceneFrame;
-    settings = { enabled: true, correction: NONE };
+    settings = { enabled: true, capture: true, correction: NONE };
     listings = ITEMS.map(placed);
     platform = null;
     gameActive = true;
@@ -111,6 +112,13 @@ describe("createStashDetector", () => {
     expect(await statusFor(() => (platform = "not-windows"))).toBe(
       "not-windows",
     );
+    expect(
+      await statusFor(() => {
+        platform = null;
+        settings.capture = false;
+      }),
+    ).toBe("setting-off");
+    settings.capture = true;
     expect(
       await statusFor(() => {
         platform = null;

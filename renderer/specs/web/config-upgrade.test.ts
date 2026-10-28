@@ -599,6 +599,35 @@ describe("upgradeConfig", () => {
     });
   });
 
+  it("adds the capture, the hotkey and the grid correction to the stash prices widget of a version 45 config", () => {
+    const expected = asSaved(actual.defaultConfig());
+    const config = asSaved(expected);
+    config.configVersion = 45;
+    for (const key of ["captureEnabled", "toggleKey", "gridCorrection"]) {
+      Reflect.deleteProperty(stashPricesOf(config), key);
+    }
+
+    expect(upgrade(config)).toEqual(expected);
+    expect(stashPricesOf(expected)).toMatchObject({
+      captureEnabled: true,
+      toggleKey: null,
+      gridCorrection: { unit: "px", left: 0, top: 0, cell: 0 },
+    });
+  });
+
+  it("keeps the capture, the hotkey and the grid correction a version 45 config has", () => {
+    const expected = asSaved(actual.defaultConfig());
+    Object.assign(stashPricesOf(expected), {
+      captureEnabled: false,
+      toggleKey: "Alt + S",
+      gridCorrection: { unit: "%", left: 0.5, top: -1, cell: 0.1 },
+    });
+    const config = asSaved(expected);
+    config.configVersion = 45;
+
+    expect(upgrade(config)).toEqual(expected);
+  });
+
   it("keeps the stash prices widget of a version 44 config and adds no second one", () => {
     const expected = asSaved(actual.defaultConfig());
     Object.assign(stashPricesOf(expected), {

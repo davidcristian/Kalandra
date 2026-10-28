@@ -6,11 +6,9 @@ import { logToMain } from "@/web/background/log-to-main";
 import { requireWidget } from "@/web/settings/utils";
 import { type CaptureEnvironment, openGameCapture } from "./frame-source";
 import { createStashDetector } from "./stash-detector";
-import type { GridCorrection, Viewport } from "./stash-grid";
+import type { Viewport } from "./stash-grid";
 import { useStashReader } from "./use-stash-reader";
-import type { StashPricesWidget } from "./widget";
-
-const NO_CORRECTION: GridCorrection = { unit: "px", left: 0, top: 0, cell: 0 };
+import { type StashPricesWidget, TOGGLE_TARGET } from "./widget";
 
 /** Returns the page's way to capture: `getDisplayMedia()`, a video element and an offscreen canvas. */
 export function browserCapture(): CaptureEnvironment<
@@ -53,7 +51,11 @@ export const useStashDetector = createGlobalState(() => {
   const widget = () =>
     requireWidget<StashPricesWidget>("stash-prices", AppConfig());
   const detector = createStashDetector({
-    settings: () => ({ enabled: widget().enabled, correction: NO_CORRECTION }),
+    settings: () => ({
+      enabled: widget().enabled,
+      capture: widget().captureEnabled,
+      correction: widget().gridCorrection,
+    }),
     listings: () => reader.state.listings,
     platform: () => {
       if (!Host.isElectron) return "browser";
@@ -69,12 +71,17 @@ export const useStashDetector = createGlobalState(() => {
   Host.onEvent("MAIN->OVERLAY::focus-change", (focus) => {
     gameActive.value = focus.game;
   });
+  Host.onEvent("MAIN->CLIENT::widget-action", (action) => {
+    if (action.target === TOGGLE_TARGET) detector.toggle();
+  });
   window.addEventListener("resize", () => {
     viewport.value = readViewport();
   });
   watch(
     () => [
       widget().enabled,
+      widget().captureEnabled,
+      ...Object.values(widget().gridCorrection),
       reader.state.listings,
       gameActive.value,
       viewport.value,
