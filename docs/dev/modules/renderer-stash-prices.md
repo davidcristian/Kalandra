@@ -130,6 +130,20 @@ are the only code that sends trade requests without a key press, under the rules
   most valuable priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and
   its reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
 
+### The marks over the stash (`highlight-marks.ts`)
+
+- `markKind(price, threshold, toggles)` returns the mark of one listing: `valuable` for a priced listing whose stack
+  value is at or above the threshold, `trash` for one below it, each only while its toggle is on; `unpriced` for
+  `too-few`, `cannot-read` and `failed`; `pricing` while a search prices it; and none for a queued listing or one the
+  pricer has not seen. With no threshold, no listing is trash.
+- `thresholdInDivine(threshold, unitPrice)` converts the trash threshold (`amount` and `currency`: `chaos`,
+  `exalted` or `div`) to Divine Orbs with the price file's price of a Chaos Orb or an Exalted Orb, and returns null
+  when the file has no positive price for it. `clampThresholdAmount()` keeps an amount at 0 or more, 1 for a value
+  that is not a number.
+- `highlightView(input)` returns what to draw: while the tab is open, each mark on its item's cells (`itemRect()`,
+  `grid.left + x * grid.cell` and so on) and the progress bar, as wide as the grid, under it; and the grid's cells
+  for the grid alignment view, whether the tab is open or not.
+
 ### The settings page
 
 `settings-stash-prices.vue` is the `stash-prices` page of Settings (`SettingsPage` and `menuPages()` in
@@ -185,7 +199,8 @@ page and checks the checkbox's flags, the limits of the two number fields and th
 listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a
 crossbow with every modifier kind, the tiers, ranges and summed lines, an unrevealed modifier, a unique, a waystone,
 a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases.
-`stash-pricer.test.ts` drives the pricer with fake timers, `FakeTradeSite` (whose `offers` answer the item searches)
+`highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
+view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers, `FakeTradeSite` (whose `offers` answer the item searches)
 and the price file fixture with a unique and a rune added: the price file estimates, the search body with the
 valuable stats, the 20 cheapest, the order and the 15 seconds between searches, too few listings, the unreadable
 and bulk items, each pause, the budget less the reader's searches, a trade error, a held fetch, the listings that
