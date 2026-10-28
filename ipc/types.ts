@@ -12,6 +12,7 @@ export interface HostConfig {
   libraryOutputPath: string | null;
   initialDelay: number;
   hideOverlayOnBlur: boolean;
+  stashCapture: boolean;
 }
 
 export interface ShortcutAction {

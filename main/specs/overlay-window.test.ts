@@ -35,6 +35,11 @@ const desktop = vi.hoisted(() => ({
 vi.mock("electron", async () => {
   const { EventEmitter } = await import("node:events");
   class FakeContents extends EventEmitter {
+    readonly mainFrame = {
+      processId: 7,
+      routingId: desktop.windows.length + 1,
+    };
+
     constructor(private readonly state: (typeof desktop.windows)[number]) {
       super();
     }
@@ -263,6 +268,18 @@ describe("OverlayWindow", () => {
 
     expect(desktop.windows).toHaveLength(0);
     expect(desktop.opened).toEqual(["http://192.168.1.20:4321/index.html"]);
+  });
+
+  it("names the main frame of its page, and none without the overlay window", () => {
+    const { overlay } = createOverlay();
+    expect(overlay.pageFrame).toEqual({ processId: 7, routingId: 1 });
+
+    process.argv.push("--no-overlay");
+    try {
+      expect(createOverlay().overlay.pageFrame).toBeUndefined();
+    } finally {
+      process.argv.pop();
+    }
   });
 
   it("opens a link of the page in the browser instead of a new window", () => {

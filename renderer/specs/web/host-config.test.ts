@@ -5,6 +5,7 @@ import type { Config } from "@/web/Config";
 import type { LibraryWidget } from "@/web/library/widget";
 import type { PriceCheckWidget, Widget } from "@/web/overlay/widgets";
 import { findWidget } from "@/web/settings/utils";
+import type { StashPricesWidget } from "@/web/stash-prices/widget";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -83,8 +84,19 @@ describe("the settings that pushHostConfig() sends to main", () => {
       libraryOutputPath: "D:\\Library",
       initialDelay: 120,
       hideOverlayOnBlur: true,
+      stashCapture: false,
     } satisfies HostConfig);
   });
+
+  it.each([false, true])(
+    "sends the stash prices widget's enabled, %s, as stashCapture",
+    (enabled) => {
+      const config = actual.defaultConfig();
+      widgetOf<StashPricesWidget>(config, "stash-prices").enabled = enabled;
+
+      expect(pushedHostConfig(config).stashCapture).toBe(enabled);
+    },
+  );
 
   it.each([
     { enableAlphas: false, alphas: ["library"], libraryAlpha: false },

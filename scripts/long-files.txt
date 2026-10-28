@@ -2,11 +2,11 @@
 # Each file must have exactly the count written here. Lower a count when a file shrinks, and remove the
 # file once it is within the limit. Raising a count needs its reason in the commit body.
 519 dataParser/src/services/nd_builder_service.py
-322 ipc/types.ts
+323 ipc/types.ts
 484 renderer/src/assets/data/index.ts
 1758 renderer/src/parser/Parser.ts
 372 renderer/src/parser/stat-translations.ts
-743 renderer/src/web/Config.ts
+746 renderer/src/web/Config.ts
 565 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue
 394 renderer/src/web/overlay/OverlayWindow.vue

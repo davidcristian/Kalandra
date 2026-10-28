@@ -2,6 +2,7 @@ import type { AppTray } from "./AppTray";
 import type { FileWriter } from "./host-files/FileWriter";
 import type { GameConfig } from "./host-files/GameConfig";
 import type { GameLogWatcher } from "./host-files/GameLogWatcher";
+import type { GameCapture } from "./windowing/GameCapture";
 import { type Logger, logRejection } from "./RemoteLogger";
 import type { ServerEvents } from "./server";
 import type { Shortcuts } from "./shortcuts/Shortcuts";
@@ -15,6 +16,7 @@ export interface HostConfigServices {
   gameConfig: Pick<GameConfig, "readConfig">;
   tray: Pick<AppTray, "overlayKey">;
   fileWriter: Pick<FileWriter, "restart">;
+  gameCapture: Pick<GameCapture, "update">;
   logger: Pick<Logger, "write">;
 }
 
@@ -23,8 +25,15 @@ export function passHostConfig(
   server: Pick<ServerEvents, "onEventAnyClient">,
   services: HostConfigServices,
 ): void {
-  const { overlay, shortcuts, gameLogWatcher, gameConfig, tray, fileWriter } =
-    services;
+  const {
+    overlay,
+    shortcuts,
+    gameLogWatcher,
+    gameConfig,
+    tray,
+    fileWriter,
+    gameCapture,
+  } = services;
   server.onEventAnyClient("CLIENT->MAIN::update-host-config", (cfg) => {
     overlay.updateOpts(cfg);
     shortcuts.updateActions(cfg);
@@ -35,5 +44,6 @@ export function passHostConfig(
     void gameConfig.readConfig(cfg.gameConfig ?? ""); // logs a failed read
     tray.overlayKey = cfg.overlayKey;
     void fileWriter.restart(cfg.libraryAlpha, cfg.libraryOutputPath); // logs a failed write
+    gameCapture.update(cfg.stashCapture, cfg.windowTitle);
   });
 }

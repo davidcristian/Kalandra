@@ -16,8 +16,9 @@ The entry, the server and the app services, in `main/src/`:
   waits up to 15 seconds for the accessibility permission and quits without it. It then awaits `app.whenReady()`, which
   also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `Logger`,
   `AppTray`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
-  `/uploads/` routes. It creates `OverlayWindow`, `OverlayVisibility` and `Shortcuts` after a timer: 1 second on Linux,
-  because the window is black instead of transparent otherwise, and 0 elsewhere. It passes the services to
+  `/uploads/` routes. After a timer, 1 second on Linux, where the window is black instead of transparent otherwise, and
+  0 elsewhere, it creates `OverlayWindow`, `OverlayVisibility`, `Shortcuts` and `GameCapture`, which answers the page's
+  `getDisplayMedia()` requests ([stash-detection.md](stash-detection.md)). It passes the services to
   `passHostConfig()`, then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects,
   it shows the error box `Kalandra cannot start` and quits, and any other failure there logs
   `error [main] Cannot start the overlay:` with the stack. In development it also installs Vue Devtools.
@@ -227,8 +228,7 @@ The entry, the server and the app services, in `main/src/`:
 - Item text goes to the last active client only; the log, the updater state, the config and the focus state go to
   every client.
 - No file main reads or writes (`apt-data`, `Client.txt`, the game config) is committed to the repo.
-- Code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says, and ESLint fails on an empty `catch` block
-  or `.catch()` handler.
+- Code handles errors as rule 7 of [AGENTS.md](../../../AGENTS.md) says. ESLint fails on an empty `catch` or `.catch()`.
 
 **Dependencies.** `ipc/types.ts`, `ipc/KeyToCode.ts` and `renderer/content-security-policy.ts`, by relative path. At run
 time Electron 44, and the native modules `electron-overlay-window` 4.0.2 and `uiohook-napi` 1.5.x, which the bundle

@@ -9,6 +9,7 @@ import { isTradeSiteUrl } from "../proxy";
 import type { HostConfig } from "../../../ipc/types";
 import type { ServerEvents } from "../server";
 import { type Logger, logRejection } from "../RemoteLogger";
+import type { PageFrame } from "./GameCapture";
 import type { GameWindow } from "./GameWindow";
 import { overlayKeyCommand } from "./overlay-keys";
 import { watchPage } from "./page-watch";
@@ -94,6 +95,11 @@ export class OverlayWindow {
         .catch(logRejection(this.logger, "Overlay", "open a link"));
       return { action: "deny" };
     });
+  }
+
+  /** The main frame of the page in the overlay window, which `GameCapture` lets capture the game window. */
+  get pageFrame(): PageFrame | undefined {
+    return this.window?.webContents.mainFrame;
   }
 
   loadAppPage(address: ListenAddress) {

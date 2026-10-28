@@ -62,6 +62,7 @@ Every `MAIN->CLIENT::` and `MAIN->OVERLAY::` message not marked otherwise is sen
 | `gameConfig` | `gameConfig` (`null` for the default path) | `GameConfig.readConfig()` |
 | `libraryAlpha` | `enableAlphas` with `library` in `alphas` | `FileWriter.restart()` |
 | `libraryOutputPath` | the library widget's `libraryOutputPath` | `FileWriter.restart()` |
+| `stashCapture` | the stash prices widget's `enabled` | `GameCapture.update()`, with `windowTitle` ([stash-detection.md](stash-detection.md)) |
 
 - `ShortcutAction` is one hotkey and what it does. `shortcut` is key names joined by ` + `, with the modifiers first
   in the order `Ctrl`, `Shift`, `Alt` (`hotkeyToString()`), such as `Ctrl + Alt + D`. With `keepModKeys`, main

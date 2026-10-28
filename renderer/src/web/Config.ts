@@ -19,6 +19,7 @@ import { moveMartialWeaponAugments } from "./price-check/saved-augments";
 import { ENGLISH_DEFAULTS_40, namePresetEntries } from "./stash-search/presets";
 import { DEFAULT_FONT_SIZE, validFontSize } from "./settings/font-size";
 import { stashPricesDefault } from "./stash-prices/widget";
+import type { StashPricesWidget } from "./stash-prices/widget";
 import { tradeHost } from "./trade-host";
 
 const _config = shallowRef<Config | null>(null);
@@ -724,6 +725,7 @@ function getConfigForHost(): HostConfig {
   const config = AppConfig();
   const priceCheck = AppConfig("price-check") as widget.PriceCheckWidget;
   const library = AppConfig("library") as LibraryWidget;
+  const stashPrices = AppConfig("stash-prices") as StashPricesWidget;
 
   return {
     shortcuts: shortcutActions(config),
@@ -739,5 +741,6 @@ function getConfigForHost(): HostConfig {
     libraryOutputPath: library.libraryOutputPath,
     initialDelay: priceCheck.initialDelay,
     hideOverlayOnBlur: config.hideOverlayOnBlur,
+    stashCapture: stashPrices.enabled,
   };
 }

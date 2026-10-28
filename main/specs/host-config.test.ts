@@ -66,6 +66,16 @@ class FakeFileWriter {
   }
 }
 
+class FakeGameCapture {
+  enabled = false;
+  windowTitle = "";
+
+  update(enabled: boolean, windowTitle: string) {
+    this.enabled = enabled;
+    this.windowTitle = windowTitle;
+  }
+}
+
 class FakeLogger {
   lines: string[] = [];
 
@@ -82,6 +92,7 @@ function createServices() {
     gameConfig: new FakeGameConfig(),
     tray: { overlayKey: "Shift + Space" },
     fileWriter: new FakeFileWriter(),
+    gameCapture: new FakeGameCapture(),
     logger: new FakeLogger(),
   };
 }
@@ -104,6 +115,7 @@ const CONFIG: HostConfig = {
   libraryOutputPath: "D:/Library",
   initialDelay: 120,
   hideOverlayOnBlur: false,
+  stashCapture: false,
 };
 
 type Switch = {
@@ -118,6 +130,7 @@ const SWITCHES: Record<Switch, (services: Services) => boolean> = {
   readClientLog: (services) => services.gameLogWatcher.readLog,
   libraryAlpha: (services) => services.fileWriter.enabled,
   hideOverlayOnBlur: (services) => services.overlay.hideOverlayOnBlur,
+  stashCapture: (services) => services.gameCapture.enabled,
 };
 
 function switchesOn(services: Services): string[] {
@@ -144,6 +157,7 @@ describe("passHostConfig", () => {
 
     expect(sent.overlay.overlayKey).toBe("Alt + Q");
     expect(sent.overlay.windowTitle).toBe("Path of Exile 2");
+    expect(sent.gameCapture.windowTitle).toBe("Path of Exile 2");
     expect(sent.tray.overlayKey).toBe("Alt + Q");
     expect(sent.shortcuts.actions).toEqual(CONFIG.shortcuts);
     expect(sent.shortcuts.delay).toBe(120);

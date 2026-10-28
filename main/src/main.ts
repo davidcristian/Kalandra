@@ -1,6 +1,12 @@
 "use strict";
 
-import { app, dialog, systemPreferences } from "electron";
+import {
+  app,
+  desktopCapturer,
+  dialog,
+  session,
+  systemPreferences,
+} from "electron";
 import { uIOhook } from "uiohook-napi";
 import os from "node:os";
 import { startServer, eventPipe, httpRoutes } from "./server";
@@ -8,6 +14,7 @@ import { type ListenAddress, pageUrl } from "./listen-option";
 import { Logger } from "./RemoteLogger";
 import { logRendererEntries } from "./renderer-log";
 import { passHostConfig } from "./host-config";
+import { GameCapture } from "./windowing/GameCapture";
 import { GameWindow } from "./windowing/GameWindow";
 import { OverlayWindow } from "./windowing/OverlayWindow";
 import { GameConfig } from "./host-files/GameConfig";
@@ -99,6 +106,10 @@ void startWhenReady(
         gameConfig,
         eventPipe,
       );
+      const gameCapture = new GameCapture(logger, overlay, desktopCapturer);
+      session.defaultSession.setDisplayMediaRequestHandler(
+        gameCapture.handleRequest,
+      );
       passHostConfig(eventPipe, {
         overlay,
         shortcuts,
@@ -106,6 +117,7 @@ void startWhenReady(
         gameConfig,
         tray,
         fileWriter,
+        gameCapture,
         logger,
       });
       uIOhook.start();

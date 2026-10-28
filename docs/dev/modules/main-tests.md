@@ -78,8 +78,10 @@ replaces it with `vi.mock("electron", ...)`.
 - `overlay-window.test.ts` creates `OverlayWindow` with a fake `BrowserWindow` and a fake `OverlayController`. It checks
   the window options on each platform, the menu with and without a dev run, the page it loads, a load and a link that
   fail, the attach to the game window, the focus changes, the overlay key and Escape in the window and in a web view,
-  and Hide overlay on blur. It sends `will-attach-webview` with a preload and Node.js on, for the trade site and for
-  addresses the check blocks.
+  and Hide overlay on blur, and the page frame it names. It sends `will-attach-webview` with a preload and Node.js
+  on, for the trade site and for addresses the check blocks.
+- `game-capture.test.ts` sends capture requests to `GameCapture` with a fake desktop that lists windows or fails, on
+  each platform, and reads the window it answers with and the log lines ([stash-detection.md](stash-detection.md)).
 - `widget-area.test.ts` sends `OVERLAY->MAIN::track-area` through the fake server and mouse events through the fake
   global hook at the edges of the area and the close threshold, and on Windows and Linux through a fake `screen` at
   150% scale.
