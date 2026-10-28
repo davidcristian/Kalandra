@@ -25,11 +25,11 @@ are the only code that sends trade requests without a key press, under the rules
 - A check, when every condition below holds, sends one search with the body of `stashSearchBody(accountName)` in
   `stash-listings.ts`: the account in `trade_filters.account`, `sale_type` `unpriced` and status `any`, sorted by
   `indexed` descending, posted to `/api/trade2/search/<leagueId>` as the price check posts its searches. It drops
-  each fetched id that the result no longer lists, and each id that `reindexedIds()` returns: one the result lists
-  before an id it followed in the last result, which the site indexed again, as after a move between tabs. It then
-  fetches the ids it has not fetched, 10 per request (`/api/trade2/fetch/<ids>?query=<id>`), one request at a time,
-  and keeps each listing whose `listing.stash.name` is `tabName`. A fetch result without a readable id, size or
-  stash place is logged with `console.warn` and not fetched again while the search lists it.
+  each fetched id that the result no longer lists, then fetches every id the result lists, 10 per request
+  (`/api/trade2/fetch/<ids>?query=<id>`), one request at a time, and keeps each listing whose `listing.stash.name`
+  is `tabName`. The search gives no sign that an item moved, within the tab or into it, so each check reads every
+  listing's place again, at most 10 requests, and a listing keeps its last place until its request returns. A fetch
+  result without a readable id, size or stash place is logged with `console.warn` and left out of the tab.
 - `refresh()` applies changed settings: off stops the reader, a changed tab name, account or league empties
   `listings`, stops a running check and checks at once with nothing fetched, and otherwise the next check is at the
   last one plus the interval.
@@ -223,9 +223,10 @@ Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](sta
 **Tests.** `npx vitest run specs/web/stash-prices` in `renderer/`. `stash-reader.test.ts` drives the reader with fake
 timers and `FakeTradeSite` in `fake-trade-site.ts`, which serves searches and fetches from the 21 saved listings of
 `specs/docs/fetchResponses.json` with the rate limit headers the site sent on 2026-10-28. It checks the search body, the
-fetches of new ids only, the tab filter, a gone and a returning listing, a listing moved into the tab, an unreadable
-fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the pauses for the price check
-and the limiter queue, a restriction during the fetches, the trade errors and their log lines, and the settings changes.
+fetches of every id at each check, the tab filter, a gone and a returning listing, an item moved into the tab and one
+moved within it, an unreadable fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget,
+the pauses for the price check and the limiter queue, a restriction during the fetches, the trade errors and their log
+lines, and the settings changes.
 `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the fake site, and renders the panel in
 English for each status. It also checks that `useStashPricer()` follows the reader's listings and stops with it, and
 renders the pricing block: the progress, the next search, the most valuable first, and the text of each pricer status.
@@ -233,8 +234,7 @@ renders the pricing block: the progress, the next search, the most valuable firs
 is off, and that `suggestedPriceModel()` turns stash prices off. `stash-prices-settings.test.ts` renders the settings
 page and checks its on and off line, the limits of the number fields, the account name warning, the two highlight
 buttons, the threshold's currencies and the alignment view.
-`stash-listings.test.ts` checks `readSearch()`, `readListing()`, `reindexedIds()`, `threeHourSearchCount()` and the
-setting limits. `item-text.test.ts` writes and parses the 23 saved listings of `specs/docs/fetchResponses.json` and
+`stash-listings.test.ts` checks `readSearch()`, `readListing()`, `threeHourSearchCount()` and the setting limits. `item-text.test.ts` writes and parses the 23 saved listings of `specs/docs/fetchResponses.json` and
 `fetchResponses2.json`: the exact text of a magic helmet and of a crossbow with every modifier kind, the tiers, ranges
 and summed lines, an unrevealed modifier, a unique, a waystone, a rune from a socket as a currency stack, a barya, a
 relic, an unidentified copy and the unreadable cases. `stash-highlights.test.ts` runs `useStashHighlights()` on the test

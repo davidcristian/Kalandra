@@ -143,12 +143,14 @@ describe("the stash tab reader", () => {
     });
   });
 
-  it("checks again after the interval and fetches only the ids it has not fetched before", async () => {
+  it("checks again after the interval and fetches every id again, so a moved item's place follows", async () => {
     await checkNow();
     site.listings.unshift(
       copyOf(SAVED[0], "new-in-tab", TAB),
       copyOf(SAVED[1], "new-elsewhere", "other"),
     );
+    const moved = site.listings.find((saved) => saved.id === IN_TAB[2]);
+    if (moved) moved.listing.stash = { name: TAB, x: 4, y: 7 };
     site.fetches = [];
 
     await vi.advanceTimersByTimeAsync(INTERVAL - 1);
@@ -156,8 +158,9 @@ describe("the stash tab reader", () => {
     await vi.advanceTimersByTimeAsync(1);
 
     expect(site.searches).toHaveLength(2);
-    expect(site.fetches).toEqual([["new-in-tab", "new-elsewhere"]]);
+    expect(site.fetches.map((fetch) => fetch.length)).toEqual([10, 10, 3]);
     expect(ids(reader.state.listings)).toEqual(["new-in-tab", ...IN_TAB]);
+    expect(reader.state.listings[3]).toMatchObject({ x: 4, y: 7 });
   });
 
   it("checks at most every 5 minutes, whatever the interval says", async () => {
@@ -181,38 +184,45 @@ describe("the stash tab reader", () => {
     site.listings.unshift(sold);
     site.fetches = [];
     await vi.advanceTimersByTimeAsync(INTERVAL);
-    expect(site.fetches).toEqual([[sold.id]]);
+    expect(site.fetches.flat()[0]).toBe(sold.id);
     expect(ids(reader.state.listings)).toEqual([sold.id, IN_TAB[0], IN_TAB[2]]);
   });
 
-  it("fetches a listing again when the search lists it before listings it followed, as after a move into the tab", async () => {
+  it("follows an item moved into the tab, or to another place in it, when the search order stays the same", async () => {
     await checkNow();
-    const moved = site.listings[5];
-    moved.listing.stash.name = TAB;
-    site.listings = [moved, ...site.listings.filter((s) => s !== moved)];
+    const arrived = site.listings[5];
+    arrived.listing.stash = { name: TAB, x: 6, y: 0 };
+    const moved = site.listings.find((saved) => saved.id === IN_TAB[0]);
+    if (moved) moved.listing.stash = { name: TAB, x: 3, y: 3 };
     site.fetches = [];
 
     await vi.advanceTimersByTimeAsync(INTERVAL);
 
-    expect(site.fetches).toEqual([[moved.id]]);
-    expect(ids(reader.state.listings)).toEqual([moved.id, ...IN_TAB]);
+    expect(site.fetches.flat()).toHaveLength(SAVED.length);
+    expect(ids(reader.state.listings)).toEqual(
+      site.listings
+        .filter((saved) => saved.listing.stash.name === TAB)
+        .map((saved) => saved.id),
+    );
+    expect(
+      reader.state.listings.find((listing) => listing.id === arrived.id),
+    ).toMatchObject({ x: 6, y: 0 });
+    expect(
+      reader.state.listings.find((listing) => listing.id === IN_TAB[0]),
+    ).toMatchObject({ x: 3, y: 3 });
   });
 
-  it("keeps a fetch result it cannot read out of the tab, logs it, and does not fetch it again", async () => {
+  it("keeps a fetch result it cannot read out of the tab and logs it", async () => {
     const broken = site.listings.find((saved) => saved.id === IN_TAB[1]);
     if (broken) broken.listing.stash = { name: TAB, x: -1, y: 0 };
 
     await checkNow();
+
     expect(ids(reader.state.listings)).toEqual([IN_TAB[0], IN_TAB[2]]);
     expect(console.warn).toHaveBeenCalledWith(
       "[stash-prices] The fetch response has no readable listing for:",
       IN_TAB[1],
     );
-
-    site.fetches = [];
-    await vi.advanceTimersByTimeAsync(INTERVAL);
-    expect(site.searches).toHaveLength(2);
-    expect(site.fetches).toEqual([]);
   });
 
   it("reads only the newest 100 listings when the account has more, and counts all of them", async () => {
@@ -318,7 +328,7 @@ describe("the stash tab reader", () => {
     app.priceCheckShown = false;
     await vi.advanceTimersByTimeAsync(RETRY);
     expect(site.searches).toHaveLength(2);
-    expect(site.fetches).toHaveLength(3);
+    expect(site.fetches).toHaveLength(4);
     expect(ids(reader.state.listings)).toEqual(IN_TAB);
   });
 

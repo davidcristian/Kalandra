@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { TradeResponseError } from "@/web/price-check/trade/trade-response";
 import { RateLimiter } from "@/web/price-check/trade/RateLimiter";
-import {
-  readListing,
-  readSearch,
-  reindexedIds,
-} from "@/web/stash-prices/stash-listings";
+import { readListing, readSearch } from "@/web/stash-prices/stash-listings";
 import { threeHourSearchCount } from "@/web/stash-prices/stash-requests";
 import { clampBudget, clampInterval } from "@/web/stash-prices/reader-settings";
 import { SAVED, type SavedResult } from "./fake-trade-site";
@@ -64,22 +60,6 @@ describe("readListing", () => {
 
   it("returns undefined for a null result, which the site sends for a listing that is gone", () => {
     expect(readListing(null)).toBeUndefined();
-  });
-});
-
-describe("reindexedIds", () => {
-  it("returns an id the new result lists before an id it followed", () => {
-    expect(reindexedIds(["a", "b", "c"], ["c", "a", "b"])).toEqual(["c"]);
-    expect(reindexedIds(["a", "b", "c", "d"], ["b", "c", "d", "a"])).toEqual([
-      "d",
-      "c",
-      "b",
-    ]);
-  });
-
-  it("returns nothing for new ids above the old ones, or ids that left the result", () => {
-    expect(reindexedIds(["a", "b", "c"], ["x", "y", "a", "c"])).toEqual([]);
-    expect(reindexedIds([], ["a", "b"])).toEqual([]);
   });
 });
 

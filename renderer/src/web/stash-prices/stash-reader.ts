@@ -1,7 +1,7 @@
 import { shallowReactive } from "vue";
 import { logToMain } from "@/web/background/log-to-main";
 import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
-import { reindexedIds, type StashListing } from "./stash-listings";
+import type { StashListing } from "./stash-listings";
 import {
   hasQueue,
   holdForFetch,
@@ -131,16 +131,13 @@ export function createStashReader(sources: ReaderSources) {
     for (const fetchedId of [...fetched.keys()]) {
       if (!listed.has(fetchedId)) fetched.delete(fetchedId);
     }
-    for (const reindexed of reindexedIds(order, search.ids)) {
-      fetched.delete(reindexed);
-    }
     order = search.ids;
     state.total = search.total;
     state.read = search.ids.length;
     publish(settings.tabName);
 
-    const missing = search.ids.filter((listingId) => !fetched.has(listingId));
-    for (let start = 0; start < missing.length; start += FETCH_SIZE) {
+    // The search gives no sign that an item moved, so each check reads every listing's place again
+    for (let start = 0; start < search.ids.length; start += FETCH_SIZE) {
       const end = await holdForFetch({
         priceCheckShown: sources.priceCheckShown,
         deadline,
@@ -151,7 +148,7 @@ export function createStashReader(sources: ReaderSources) {
       });
       if (end) return end;
       state.status = "checking";
-      const chunk = missing.slice(start, start + FETCH_SIZE);
+      const chunk = search.ids.slice(start, start + FETCH_SIZE);
       const listings = await sendFetch(search.queryId, chunk);
       if (id !== runId) return "stopped";
       for (const listingId of chunk) {

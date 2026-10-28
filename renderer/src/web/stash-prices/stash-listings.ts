@@ -120,23 +120,3 @@ export function readListing(result: unknown): StashListing | undefined {
     raw: result,
   };
 }
-
-/**
- * Returns the ids that `current` lists before an id they followed in `previous`. The search is sorted by the time
- * the site indexed each listing, so such an id was indexed again, as when the item moved to another public tab.
- */
-export function reindexedIds(
-  previous: readonly string[],
-  current: readonly string[],
-): string[] {
-  const previousRank = new Map(previous.map((id, rank) => [id, rank]));
-  const reindexed: string[] = [];
-  let lowestRankAfter = Number.POSITIVE_INFINITY;
-  for (let idx = current.length - 1; idx >= 0; idx--) {
-    const rank = previousRank.get(current[idx]);
-    if (rank === undefined) continue;
-    if (rank > lowestRankAfter) reindexed.push(current[idx]);
-    lowestRankAfter = Math.min(lowestRankAfter, rank);
-  }
-  return reindexed;
-}

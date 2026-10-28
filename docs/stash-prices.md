@@ -22,7 +22,8 @@ many trade searches it may still use. It is off until you turn it on, and it nee
 
 Kalandra checks the tab once it has loaded the league list from the trade site, and again after each **Check the tab
 every** interval. The trade site lists an item some time after it reaches a public tab, so an item can first appear at
-a later check. Click **Check now** in the widget to check at once.
+a later check. An item you move, within the tab or into it, keeps its old place and mark until the next check. Click
+**Check now** in the widget to check at once.
 
 ## The widget
 
@@ -139,8 +140,9 @@ the rest of the overlay. They never take a click.
 
 ## How it uses the trade site
 
-Each check sends one trade search for the listings of your account without a price, newest first, and then reads only
-the items it has not read before, 10 at a time. The trade site allows 600 searches in 3 hours from one IP address,
+Each check sends one trade search for the listings of your account without a price, newest first, and then reads the
+listings it returned, 10 per request, which is how it finds where each item is now. The trade site allows 600 searches
+in 3 hours from one IP address,
 for your price checks, the trade website and these checks together, and an address that sends more gets only rate
 limit errors for up to an hour. So Kalandra checks the tab only:
 
