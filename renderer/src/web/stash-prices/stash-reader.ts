@@ -4,6 +4,9 @@ import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
 import { reindexedIds, type StashListing } from "./stash-listings";
 import {
   hasQueue,
+  holdForFetch,
+  type PauseReason,
+  RETRY_MS,
   sendFetch,
   sendSearch,
   threeHourSearchCount,
@@ -15,7 +18,6 @@ import {
   type ReaderSettings,
 } from "./reader-settings";
 
-export const RETRY_MS = 30_000;
 // The trade site returns at most 10 listings per fetch request
 const FETCH_SIZE = 10;
 
@@ -26,9 +28,6 @@ export interface ReaderSources {
   leagueId: () => string | undefined;
   priceCheckShown: () => boolean;
 }
-
-/** A reason the reader waits before a request: the price check is open, a request waits in the limiters, or the limiters are full or restricted. */
-export type PauseReason = "price-check-open" | "busy" | "rate-limited";
 
 export type ReaderStatus =
   | "off"
@@ -53,10 +52,6 @@ export interface ReaderState {
 }
 
 type RunEnd = "done" | "stopped" | PauseReason;
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 /** Creates the reader that searches the account's listings without a price every interval and keeps those in the tab. */
 export function createStashReader(sources: ReaderSources) {
@@ -114,28 +109,6 @@ export function createStashReader(sources: ReaderSources) {
     });
   }
 
-  async function waitForFetch(
-    id: number,
-    deadline: number,
-  ): Promise<RunEnd | null> {
-    for (;;) {
-      const reason: PauseReason | null = sources.priceCheckShown()
-        ? "price-check-open"
-        : hasQueue(RATE_LIMIT_RULES.FETCH)
-          ? "busy"
-          : null;
-      const wait = reason ? RETRY_MS : waitTime(RATE_LIMIT_RULES.FETCH);
-      if (wait === 0) {
-        state.status = "checking";
-        return null;
-      }
-      if (Date.now() + wait > deadline) return reason ?? "rate-limited";
-      if (reason) state.status = reason;
-      await sleep(wait);
-      if (id !== runId) return "stopped";
-    }
-  }
-
   async function read(
     id: number,
     settings: ReaderSettings,
@@ -167,8 +140,16 @@ export function createStashReader(sources: ReaderSources) {
 
     const missing = search.ids.filter((listingId) => !fetched.has(listingId));
     for (let start = 0; start < missing.length; start += FETCH_SIZE) {
-      const end = await waitForFetch(id, deadline);
+      const end = await holdForFetch({
+        priceCheckShown: sources.priceCheckShown,
+        deadline,
+        stopped: () => id !== runId,
+        onPause: (reason) => {
+          state.status = reason;
+        },
+      });
       if (end) return end;
+      state.status = "checking";
       const chunk = missing.slice(start, start + FETCH_SIZE);
       const listings = await sendFetch(search.queryId, chunk);
       if (id !== runId) return "stopped";

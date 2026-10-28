@@ -40,6 +40,41 @@ export function waitTime(limiters: Iterable<RateLimiter>): number {
   return RateLimiter.estimateTime(1, limiters);
 }
 
+export const RETRY_MS = 30_000;
+
+/** A reason a background request waits: the price check is open, a request waits in the limiters, or the limiters are full or restricted. */
+export type PauseReason = "price-check-open" | "busy" | "rate-limited";
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Waits until a background fetch can go without a wait in the FETCH limiters: 30 seconds at a time while the price
+ * check is shown or a fetch waits in the limiters, else the limiters' own wait. Returns null when the fetch can go,
+ * the reason when the wait would end after `deadline`, and "stopped" when `stopped()` returns true after a wait.
+ */
+export async function holdForFetch(hold: {
+  priceCheckShown: () => boolean;
+  deadline: number;
+  stopped: () => boolean;
+  onPause: (reason: PauseReason) => void;
+}): Promise<PauseReason | "stopped" | null> {
+  for (;;) {
+    const reason: PauseReason | null = hold.priceCheckShown()
+      ? "price-check-open"
+      : hasQueue(RATE_LIMIT_RULES.FETCH)
+        ? "busy"
+        : null;
+    const wait = reason ? RETRY_MS : waitTime(RATE_LIMIT_RULES.FETCH);
+    if (wait === 0) return null;
+    if (Date.now() + wait > hold.deadline) return reason ?? "rate-limited";
+    if (reason) hold.onPause(reason);
+    await sleep(wait);
+    if (hold.stopped()) return "stopped";
+  }
+}
+
 /** Sends the search for the account's listings without a price through the SEARCH limiters. */
 export async function sendSearch(
   accountName: string,

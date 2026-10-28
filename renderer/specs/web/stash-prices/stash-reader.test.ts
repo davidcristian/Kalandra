@@ -289,6 +289,22 @@ describe("the stash tab reader", () => {
     expect(ids(reader.state.listings)).toEqual(IN_TAB);
   });
 
+  it("stays off when it is turned off while the price check holds its fetches", async () => {
+    site.afterFetch = () => {
+      app.priceCheckShown = true;
+    };
+
+    const done = reader.checkNow();
+    await vi.advanceTimersByTimeAsync(RETRY - 1);
+    reader.stop();
+    await vi.advanceTimersByTimeAsync(INTERVAL);
+    await done;
+
+    expect(reader.state.status).toBe("off");
+    expect(reader.state.nextCheckAt).toBeNull();
+    expect(site.fetches).toHaveLength(1);
+  });
+
   it("ends a check that the price check holds for longer than the interval, and searches again after it closes", async () => {
     site.afterFetch = () => {
       app.priceCheckShown = true;

@@ -38,7 +38,8 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
 - `stash-requests.ts`: `sendSearch()` and `sendFetch()` wait on `RATE_LIMIT_RULES.SEARCH` and `.FETCH` with
   `RateLimiter.waitMulti`, call `adjustRateLimits` with the response headers and read the body with
   `readTradeData()`. `threeHourSearchCount()` returns the stack length of the SEARCH limiter with the longest
-  window, or `undefined` before the site sent a window of 3 hours. `readSearch()` throws a `TradeResponseError` for
+  window, or `undefined` before the site sent a window of 3 hours. `holdForFetch()` waits before a background fetch
+  as step 5 of [the order of a check](#the-order-of-a-check) says, and returns why it stopped waiting. `readSearch()` throws a `TradeResponseError` for
   a search response without a query id, string ids or a total, and `readListing()` returns `undefined` for a fetch
   result it cannot read.
 
