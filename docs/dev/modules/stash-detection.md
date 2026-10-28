@@ -3,7 +3,8 @@
 **Purpose.** The stash prices feature ([renderer-stash-prices.md](renderer-stash-prices.md)) marks the items of one
 stash tab while the user has that tab open in the game. On Windows the overlay page finds that out from a capture of
 the game window, which only main can grant ([ADR-0004](../adr/ADR-0004-process-boundary.md)). This document covers
-the capture handler in main, and the grid, the cells and the match in the renderer.
+the capture handler in main, and the grid, the cells, the match and the capture loop in the renderer. Code that
+marks the items over the stash reads `open`, `quad`, `grid` and `source` from `useStashDetector().state`.
 
 ## Public contract
 
@@ -71,9 +72,45 @@ the capture handler in main, and the grid, the cells and the match in the render
   one (`needsQuad()`), and returns the layout that shows the tab, or else the one with the higher `cells`, with
   `quad` and `seen`.
 
+### The capture in the page (`frame-source.ts`, `stash-detector.ts`, `use-stash-detector.ts`)
+
+- `openGameCapture(env)` calls `getDisplayMedia()` for video alone at 2 frames per second (`FRAME_RATE`), plays the
+  stream in a video element that is never in the page, and returns a `FrameSource`: `size()` (null before the first
+  frame), `read(area)`, which draws the top left `width` by `height` pixels of the newest frame at `scale` without
+  smoothing on one canvas per size and returns its `ImageData`, `ended()` (every video track ended, as when the game
+  window closes) and `close()`, which stops every track. A video that does not play stops the stream and rejects.
+  `browserCapture()` in `use-stash-detector.ts` is the page's `CaptureEnvironment`: `navigator.mediaDevices`, a
+  `<video>` element and an `OffscreenCanvas` with `willReadFrequently`.
+- `createStashDetector(sources)` returns `{ state, update, toggle, stop }`. `state` (`DetectorState`, a
+  `shallowReactive`) holds `open`, `source` (`capture` or `hotkey`), `quad`, `grid` (in CSS pixels of the overlay,
+  from `stashGrid()`), `capture` (a `CaptureStatus`), `error` and `match` (the last frame's `TabMatch`).
+- `update()` runs the capture only while it can decide something. Its `capture` is otherwise, in this order: `off`
+  (the stash prices widget is off), `browser` (the page is not in Electron, `Host.isElectron`), `not-windows` (the
+  user agent has no `Windows`), `few-items` (the listings fill fewer than 3 cells) or `paused` (the game window is not
+  active). Each of these closes the capture. `off` closes the tab; the others but `paused` close a tab that the
+  capture opened, and `paused` keeps it.
+- While it may run, it asks once (`starting`), and then reads a frame every 500 ms (`FRAME_MS`, `running`): it maps
+  the overlay into the frame with `frameMapping()`, reads `sampleArea()` and runs `matchTab()` with the listings. The
+  tab opens after 2 frames in a row show it and closes after 2 miss it (`FRAMES_TO_CHANGE`). A request that fails or
+  a frame that cannot be read is `failed` with its message; a capture that ends is `failed` with `the capture ended`.
+  It sends each new message once to main's log as `Stash detection cannot capture the game window: <message>`, and
+  asks again after 30 seconds (`RETRY_MS`). A capture that main grants after the detector stopped wanting it is
+  closed at once.
+- `toggle()` opens or closes the tab with `source` `hotkey`, and `quad` from the last frame that showed the tab, or
+  from `needsQuad()`. The capture changes it again only when it sees the tab open or close. It does nothing while the
+  widget is off.
+- `useStashDetector()` is the app's one detector, a `createGlobalState`. It reads the widget's `enabled`, the reader's
+  listings, the game's focus from `MAIN->OVERLAY::focus-change` (false until the first one) and the window's size
+  and `devicePixelRatio`, and calls `update()` when one of them changes. `WidgetStashPrices.vue` creates it.
+- `DetectionLine.vue` is the panel's line under the status: `Stash tab seen.`, `Stash tab not seen.`, or `shown`
+  or `hidden with the hotkey`, then what the capture does, such as `Capture: 96% of the item cells and 98% of all
+  cells match.` or `Capture off: <reason>.` Its tooltip gives the grid in pixels of the game window.
+
 ## Invariants
 
 - Main grants a capture and never reads a frame: the frames go to the page that asked, and main stores nothing.
+- The page keeps one frame at a time in memory and reads a few pixels of it. No frame is stored, logged or sent; only
+  the match leaves the detector.
 - A capture that main granted runs until the page stops it. Turning the feature off refuses the next request only.
 - Window capture shows the game window's own content, so the overlay window over it is not in the frames.
 
@@ -92,3 +129,9 @@ screenshot (`reference-cells.ts`), and classifies drawn tabs. `SyntheticFrame` i
 the reference colors: navy and red items with art in their middle, clover in the empty cells, grid lines, noise on
 every pixel, over a scene of random colors. `tab-match.test.ts` matches a drawn tab, the same tab with 10 and 20 new
 items, a scene, a dark scene, an empty tab, another tab, a grid off by half a cell, quad tabs and too few items.
+`frame-source.test.ts` opens the capture with a fake stream, video and canvas. `stash-detector.test.ts` drives the
+detector with fake timers and `FakeScreen` in `fake-capture.ts`, which shows drawn frames and scales them as a canvas
+does: each reason the capture does not run, 2 frames to open and to close, a windowed game, a quad tab, a frame of
+twice the size, failures, retries and their log lines, an ended capture, a late grant and the hotkey.
+`use-stash-detector.test.ts` runs the app's detector with a fake page and `stash-prices-widget.test.ts` renders the
+line.

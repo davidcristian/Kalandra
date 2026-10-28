@@ -153,13 +153,13 @@ describe("the grid in a frame", () => {
 });
 
 describe("sampleArea", () => {
-  it("reads the frame up to the grid's far corner, at the scale of a 16 pixel quad cell", () => {
+  it("reads the frame up to the grid's far corner, at the scale of a 32 pixel quad cell", () => {
     expect(
       sampleArea(
         { width: 3840, height: 2160 },
         { left: 34, top: 253, cell: 105 },
       ),
-    ).toEqual({ width: 34 + 1260, height: 253 + 1260, scale: 16 / 52.5 });
+    ).toEqual({ width: 34 + 1260, height: 253 + 1260, scale: 32 / 52.5 });
   });
 
   it("keeps a small frame at its size and inside its edges", () => {

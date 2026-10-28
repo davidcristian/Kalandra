@@ -17,6 +17,7 @@
         {{ t(":only_newest", { read: state.read, total: state.total }) }}
       </div>
       <div :class="statusClass" class="mt-1">{{ statusText }}</div>
+      <detection-line />
       <pricing-panel :config="config" />
       <button
         class="btn mt-2"
@@ -33,6 +34,7 @@
 import { computed, defineComponent, PropType, watch } from "vue";
 import { DateTime } from "luxon";
 import Widget from "../overlay/Widget.vue";
+import DetectionLine from "./DetectionLine.vue";
 import PricingPanel from "./PricingPanel.vue";
 import type { WidgetSpec } from "../overlay/interfaces";
 import { AppConfig } from "@/web/Config";
@@ -42,6 +44,7 @@ import { RATE_LIMIT_RULES } from "@/web/price-check/trade/common";
 import { clampBudget } from "./reader-settings";
 import type { ReaderStatus } from "./stash-reader";
 import { threeHourSearchCount } from "./stash-requests";
+import { useStashDetector } from "./use-stash-detector";
 import { useStashPricer } from "./use-stash-pricer";
 import { useStashReader } from "./use-stash-reader";
 import { stashPricesDefault, type StashPricesWidget } from "./widget";
@@ -69,7 +72,7 @@ export default defineComponent({
     instances: "single",
     initInstance: stashPricesDefault,
   } satisfies WidgetSpec,
-  components: { Widget, PricingPanel },
+  components: { Widget, DetectionLine, PricingPanel },
   props: {
     config: {
       type: Object as PropType<StashPricesWidget>,
@@ -79,8 +82,9 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18nNs("stash_prices");
     const reader = useStashReader();
-    // The pricer follows the reader's listings from here on
+    // The pricer follows the reader's listings from here on, and the detector the listings and the game's focus
     useStashPricer();
+    useStashDetector();
     const leagues = useLeagues();
     const { state } = reader;
 

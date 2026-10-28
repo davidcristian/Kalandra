@@ -11,6 +11,7 @@ import type { PriceCheckWidget } from "@/web/overlay/widgets";
 import type { ListingPrice } from "@/web/stash-prices/price-item";
 import { countPrices, type PricerState } from "@/web/stash-prices/pricer-state";
 import { readListing } from "@/web/stash-prices/stash-listings";
+import type { DetectorState } from "@/web/stash-prices/stash-detector";
 import type { ReaderState } from "@/web/stash-prices/stash-reader";
 import type * as UseStashReader from "@/web/stash-prices/use-stash-reader";
 import {
@@ -116,15 +117,23 @@ describe("the stash prices widget", () => {
     expect(useStashReader().state.status).toBe("price-check-open");
   });
 
-  /** Renders the panel in English with the reader state `state` and the pricer state `pricing`, and returns its text. */
-  async function panelText(
+  /** Renders the panel in English with the reader, pricer and detector states given, and returns its HTML. */
+  async function panelHtml(
     settings: Partial<StashPricesWidget>,
     state: Partial<ReaderState>,
     pricing: Partial<PricerState> = {},
+    detection: Partial<DetectorState> = {},
   ): Promise<string> {
     setup({ enabled: true, ...settings });
     setupFetchMock();
     vi.stubGlobal("document", { documentElement: { lang: "" } });
+    vi.stubGlobal("window", {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 1,
+      addEventListener: () => {},
+    });
+    vi.stubGlobal("navigator", { userAgent: "Windows NT 10.0 Electron" });
     const { init } = await import("@/web/i18n");
     const { default: panel } = await import(
       "@/web/stash-prices/WidgetStashPrices.vue"
@@ -139,8 +148,18 @@ describe("the stash prices widget", () => {
     // The pricer follows the listings first, then the test sets the state it shows
     await nextTick();
     Object.assign(useStashPricer().state, pricing);
-    const html = await renderToString(app);
-    return html
+    const { useStashDetector } = await import(
+      "@/web/stash-prices/use-stash-detector"
+    );
+    Object.assign(useStashDetector().state, detection);
+    return await renderToString(app);
+  }
+
+  /** Renders the panel as `panelHtml()` does, and returns its text lines joined by `|`. */
+  async function panelText(
+    ...args: Parameters<typeof panelHtml>
+  ): Promise<string> {
+    return (await panelHtml(...args))
       .replace(/<[^>]*>/g, "\n")
       .replaceAll("&#39;", "'")
       .split("\n")
@@ -153,7 +172,7 @@ describe("the stash prices widget", () => {
     const text = await panelText({}, { status: "waiting" });
 
     expect(text).toMatch(
-      /^Stash tab: kalandra-price-check \| Items in the tab: 0 \| Last check: never \| Next check: .+ \| Searches in the last 3 hours: \? of 400 \| The tab is read\. \| Check now/,
+      /^Stash tab: kalandra-price-check \| Items in the tab: 0 \| Last check: never \| Next check: .+ \| Searches in the last 3 hours: \? of 400 \| The tab is read\. \| Stash tab not seen\. Capture off: the tab needs items on 3 cells or more\. \| Check now/,
     );
   });
 
@@ -258,5 +277,62 @@ describe("the stash prices widget", () => {
 
     expect(text).toContain("Priced 0 of 2.");
     expect(text).toContain(shown);
+  });
+
+  it.each([
+    [
+      { open: true, capture: "running", match: { items: 0.956, cells: 0.981 } },
+      "Stash tab seen. Capture: 96% of the item cells and 98% of all cells match.",
+    ],
+    [
+      { capture: "running", match: null },
+      "Stash tab not seen. Capture starts.",
+    ],
+    [
+      { capture: "failed", error: "Permission denied" },
+      "Stash tab not seen. Capture off: Permission denied. It tries again in 30 seconds.",
+    ],
+    [
+      { open: true, source: "hotkey", capture: "not-windows" },
+      "Stash tab shown with the hotkey. Capture off: it works only on Windows.",
+    ],
+    [
+      { source: "hotkey", capture: "paused" },
+      "Stash tab hidden with the hotkey. Capture paused while the game window is not active.",
+    ],
+    [
+      { capture: "browser" },
+      "Capture off: the page is not in the overlay window.",
+    ],
+  ] as const)("says whether it sees the tab: %o", async (detection, shown) => {
+    const match =
+      "match" in detection && detection.match
+        ? { ...detection.match, itemCells: 9, quad: false, seen: true }
+        : null;
+
+    const text = await panelText(
+      {},
+      { status: "waiting" },
+      {},
+      {
+        ...detection,
+        match,
+      },
+    );
+
+    expect(text).toContain(shown);
+  });
+
+  it("names the grid in pixels of the game window when the pointer is on the line", async () => {
+    const html = await panelHtml(
+      {},
+      { status: "waiting" },
+      {},
+      { grid: { left: 17, top: 126.5, cell: 52.5 } },
+    );
+
+    expect(html).toContain(
+      'title="The grid starts at 17, 126.5 with cells of 52.5 pixels of the game window."',
+    );
   });
 });

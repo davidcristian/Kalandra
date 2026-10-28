@@ -120,8 +120,9 @@ are the only code that sends trade requests without a key press, under the rules
   league changes. The panel, in the `Widget.vue` frame, shows the tab name, the number of listings in the tab, the
   times of the last and the next check, the 3 hour search count of the budget (`?` before the site sent that
   window), "Only the newest N of your M listings without a price are read." when the search returned fewer ids
-  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the pricing block, and **Check
-  now**, which calls `checkNow()`.
+  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the line on whether the stash
+  shows the tab ([stash-detection.md](stash-detection.md)), the pricing block, and **Check now**, which calls
+  `checkNow()`.
 - `PricingPanel.vue`, the pricing block, shows only while the tab has listings: "Priced N of M." with the seconds to
   the next search when `nextSearchAt` is set, the counts of the listings with too few listings, unreadable and
   failed, the text of a pricer status that waits or fails (`stash_prices.pricing_*`), and the 8 most valuable

@@ -54,6 +54,35 @@ Its **edit** button opens the **Stash prices** page of the Settings window.
 | The tab is read. | The last check worked. |
 | The trade site failed: | The last check ended with the trade site's error after the colon. It checks again after the interval, and the [Debug](/settings#debug) log has the same message. |
 
+## How Kalandra sees the open tab
+
+To mark the items in the game, Kalandra must know when the stash shows this tab. On Windows it looks at the game
+window: while **Read the tab in the background** is on, the game window is active and the tab holds items on 3 cells
+or more, the overlay captures the game window twice a second. It reads 4 pixels near the corners of each stash cell:
+a cell under an item has a navy background, or a red one for an item your character cannot use, and an empty cell is
+dark gray. When at least 90% of the cells under the items it read from the trade site look filled, and 90% of all
+cells look as those items say, in 2 captures in a row, the tab counts as open. After 2 captures that do not match, it
+counts as closed.
+
+- Kalandra captures the game window alone, the window with the **Window title** of the General settings, not your
+  screen, other windows or its own overlay.
+- The captures stay in memory, Kalandra reads a few pixels of each and keeps none: nothing is stored, logged or sent.
+- Kalandra never presses a key or clicks for this.
+- Items you put in the tab after the last check, and items with a price, count against the match: up to 14 such
+  cells of a normal tab still match. Click **Check now** after you add many items.
+- Linux and macOS have no capture.
+
+The widget's line under the status says what Kalandra sees, and what the capture does:
+
+| Line | What it means |
+| --- | --- |
+| Stash tab seen. / Stash tab not seen. | Whether the stash shows the tab now. |
+| Capture: 96% of the item cells and 98% of all cells match. | The last capture: the share of the cells under the items that look filled, and of all cells that look as the items say. Both must be 90% or more. |
+| Capture paused while the game window is not active. | The capture runs again when you return to the game. |
+| Capture off: the tab needs items on 3 cells or more. | Too few items to tell the tab from an empty one. |
+| Capture off: it works only on Windows. | Linux and macOS. |
+| Capture off: | Any other reason after the colon, such as a game window that Kalandra cannot find. It tries again every 30 seconds, and the [Debug](/settings#debug) log has the reason. |
+
 ## How it uses the trade site
 
 Each check sends one trade search for the listings of your account without a price, newest first, and then reads only

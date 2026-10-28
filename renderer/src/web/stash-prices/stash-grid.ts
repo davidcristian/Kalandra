@@ -119,8 +119,9 @@ export function scaleGrid(grid: Grid, scale: number): Grid {
   };
 }
 
-/** The width of a quad tab's cell, in pixels, in the image that the capture reads from a frame. */
-export const SAMPLE_CELL = 16;
+// The width of a quad tab's cell, in pixels, in the image that the capture reads from a frame. Scaling without
+// smoothing keeps or drops whole grid lines, so a sample needs 3 pixels or more between it and the line
+export const SAMPLE_CELL = 32;
 
 /**
  * Returns the part of a frame to read, from its top left corner to the far corner of the grid, and the scale to read

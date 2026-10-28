@@ -542,7 +542,20 @@
     "pricing_item": "Pricing {name}.",
     "pricing_error": "Pricing failed: {error}",
     "most_valuable": "Most valuable:",
-    "estimate": "estimate"
+    "estimate": "estimate",
+    "tab_seen": "Stash tab seen.",
+    "tab_not_seen": "Stash tab not seen.",
+    "tab_shown": "Stash tab shown with the hotkey.",
+    "tab_hidden": "Stash tab hidden with the hotkey.",
+    "capture_browser": "Capture off: the page is not in the overlay window.",
+    "capture_not_windows": "Capture off: it works only on Windows.",
+    "capture_off": "Capture off: stash prices is off.",
+    "capture_few_items": "Capture off: the tab needs items on 3 cells or more.",
+    "capture_paused": "Capture paused while the game window is not active.",
+    "capture_starting": "Capture starts.",
+    "capture_running": "Capture: {items}% of the item cells and {cells}% of all cells match.",
+    "capture_failed": "Capture off: {error}. It tries again in 30 seconds.",
+    "grid_at": "The grid starts at {left}, {top} with cells of {cell} pixels of the game window."
   },
   "library": {
     "name": "Library",
