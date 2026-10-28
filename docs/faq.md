@@ -41,7 +41,9 @@ the other files in it, and what Kalandra does with a `config.json` it cannot rea
 
 Grinding Gear Games, the developer of Path of Exile 2, does not approve community tools. Kalandra does not read or
 change the game's memory and does not change the game's files. It reads the item text that the game copies to the
-clipboard. With **Allow reading of Client.txt file** on, it also reads the game's log file.
+clipboard. With **Allow reading of Client.txt file** on, it also reads the game's log file. With
+[Stash prices](/stash-prices) on, on Windows, it captures the game window to see when the stash shows your tab, and
+keeps no capture.
 
 Kalandra sends key presses to the game only after you press a key, click or turn the mouse wheel. For example, it
 presses `Ctrl + Alt + C` to copy an item when you press the price check hotkey, and an arrow key for each mouse wheel
@@ -49,6 +51,17 @@ step when stash tab scrolling is on. Read the [terms of use](https://www.pathofe
 to decide.
 
 If your account is banned, contact [Path of Exile support](https://www.pathofexile.com/support).
+
+### Does Kalandra search the trade site when I press no key?
+
+Only while [Stash prices](/stash-prices) is on, which is off by default. Each check of your tab, every 10 minutes by
+default and at least 5 minutes apart, sends one trade search for your listings without a price, and reads only the
+listings it has not read before, 10 per request. Each item without a price estimate then gets one search and two
+requests for its 20 cheapest listings, at most one item every 15 seconds. The checks stop while the searches from your
+IP address in the last 3 hours reach your **Search budget**, 400 by default of the 600 the trade site allows, and the
+pricing a few searches earlier. Both wait while the price check window is open or your own searches wait for the rate
+limit.
+[Stash prices](/stash-prices#how-it-uses-the-trade-site) has the details.
 
 ### Which websites are official?
 
