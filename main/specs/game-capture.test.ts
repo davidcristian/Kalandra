@@ -110,7 +110,7 @@ describe("GameCapture", () => {
   });
 
   it.each(["linux", "darwin"] as const)(
-    "refuses every request on %s without listing the windows",
+    "refuses a request on %s without listing the windows",
     async (platform) => {
       onPlatform(platform);
       const { desktop, logger, capture } = createCapture();
@@ -154,7 +154,7 @@ describe("GameCapture", () => {
     ]);
   });
 
-  it("refuses every request while the overlay window has no page, as with --no-overlay", async () => {
+  it("refuses a request while the overlay window has no page, as with --no-overlay", async () => {
     onPlatform("win32");
     const { capture } = createCapture(null);
 

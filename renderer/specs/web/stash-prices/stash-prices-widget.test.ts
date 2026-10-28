@@ -201,7 +201,7 @@ describe("the stash prices widget", () => {
     expect(await panelText({}, { status })).toContain(shown);
   });
 
-  /** Listings of the saved items 0 to 3, in the tab, with the prices given. */
+  /** Listings of the first saved items in the tab, one for each price given. */
   function priced(prices: ListingPrice[]) {
     const listings = prices.map((_, idx) =>
       present(

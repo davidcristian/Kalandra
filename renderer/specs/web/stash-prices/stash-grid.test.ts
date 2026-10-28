@@ -133,7 +133,7 @@ describe("frameMapping", () => {
 });
 
 describe("the grid in a frame", () => {
-  it("lands on the cells of the 3840 x 2160 reference screenshot", () => {
+  it("matches the cells of the 3840 x 2160 reference screenshot", () => {
     const view: Viewport = { width: 1920, height: 1080, dpr: 2 };
     const frame = { width: 3840, height: 2160 };
 

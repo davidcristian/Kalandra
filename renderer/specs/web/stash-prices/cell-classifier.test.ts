@@ -39,7 +39,7 @@ describe("pixelKind", () => {
     expect(pixelKind(9, 5, 4)).toBe("empty");
   });
 
-  it("reads grid lines, item art and bright game scenes as neither", () => {
+  it("reads grid lines, item art and other scene colors as neither", () => {
     expect(pixelKind(89, 83, 69)).toBe("other");
     expect(pixelKind(88, 88, 96)).toBe("other");
     expect(pixelKind(41, 41, 41)).toBe("other");
@@ -102,7 +102,7 @@ describe("classifyCells", () => {
     expect(states.filter((state) => state === "empty")).toHaveLength(574);
   });
 
-  it("knows nothing of the cells outside the image or over the game scene", () => {
+  it("reads cells outside the image as unknown, and no cell of a game scene as empty", () => {
     const frame = new SyntheticFrame(300, 300).gameWorld();
 
     const outside = classifyCells(frame, { left: 280, top: 280, cell: 50 }, 2);

@@ -123,7 +123,7 @@ describe("openGameCapture", () => {
     ]);
   });
 
-  it("ends when the video track ends, and stops every track on close", async () => {
+  it("ends when the video track ends, and stops the audio track on close", async () => {
     const { env, streams } = fakeEnvironment();
     const capture = await openGameCapture(env);
 

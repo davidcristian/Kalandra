@@ -299,7 +299,7 @@ describe("the highlights over the stash", () => {
     [true, true],
     [false, false],
   ])(
-    "keeps the overlay window shown while the game is active when the tab is open: %s",
+    "asks main to keep the overlay window shown while the tab is open: %s",
     async (open, shouldShow) => {
       vi.stubGlobal("document", {
         documentElement: { lang: "" },

@@ -71,7 +71,9 @@ describe("compareLayout", () => {
     });
     expect(compareLayout([], [])).toEqual({ itemCells: 0, items: 0, cells: 0 });
   });
+});
 
+describe("showsTab", () => {
   it("shows the tab only with 3 item cells and 90% of the item cells and of all cells", () => {
     expect(showsTab({ itemCells: 3, items: 0.9, cells: 0.9 })).toBe(true);
     expect(showsTab({ itemCells: 2, items: 1, cells: 1 })).toBe(false);
@@ -89,7 +91,7 @@ describe("matchTab", () => {
     expect(match.cells).toBeGreaterThanOrEqual(0.9);
   });
 
-  it("still sees the tab with up to 14 new items the listings do not have yet", () => {
+  it("still sees the tab with 10 new items the listings do not have yet, and not with 20", () => {
     const fewMore = frameOf(NORMAL, 12, [...TAB, ...moreItems(10)]);
     const manyMore = frameOf(NORMAL, 12, [...TAB, ...moreItems(20)]);
 
@@ -113,7 +115,7 @@ describe("matchTab", () => {
     expect(matchTab(night, gridOf, TAB).items).toBe(0);
   });
 
-  it("does not see an empty tab for a few items, although most of its cells agree", () => {
+  it("does not see an empty tab for a few items, although most of its cells match", () => {
     const few = [{ x: 0, y: 0, w: 2, h: 2 }];
 
     const match = matchTab(frameOf(NORMAL, 12, []), gridOf, few);

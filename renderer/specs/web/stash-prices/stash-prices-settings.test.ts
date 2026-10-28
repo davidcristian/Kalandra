@@ -158,7 +158,7 @@ describe("the Stash prices settings page", () => {
     });
   });
 
-  it("turns each highlight on and off, and sets the trash threshold at 0 or more", async () => {
+  it("turns each highlight off, and sets the trash threshold at 0 or more", async () => {
     const config = configWith("Seller05#0005");
     const { html, highlights } = await renderPage(config);
 
