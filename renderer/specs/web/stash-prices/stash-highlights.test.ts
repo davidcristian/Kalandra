@@ -272,6 +272,10 @@ describe("the highlights over the stash", () => {
       "Priced 3 of 4. Pricing paused by the trade site&#39;s rate limit.",
     );
     expect(html).toContain("width:75.0%");
+    // The bar starts at its height under the grid and grows with a wait reason that wraps
+    expect(html).toContain(
+      "left:17px;top:761.75px;width:630px;height:auto;min-height:23.625px;",
+    );
     expect(html).not.toContain("background-size");
   });
 

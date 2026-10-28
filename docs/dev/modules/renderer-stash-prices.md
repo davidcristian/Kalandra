@@ -164,8 +164,8 @@ are the only code that sends trade requests without a key press, under the rules
   alignment view as one box with a line every `cell`, and each mark on its cells: `valuable` with a yellow border
   and its price as `suggestedPriceText()` writes it, `trash` with a red fill and the `fa-trash` icon, `unpriced`
   with a dashed gray border and `pricing` with a light blue one. The progress bar under the grid is filled by the
-  share of the listings done and reads "Priced N of M." and `pricingStatusText()`. Its text is 0.28 of a normal
-  tab's cell, at least 10 pixels.
+  share of the listings done and reads "Priced N of M." and `pricingStatusText()`, and grows down when that text
+  wraps. Its text is 0.28 of a normal tab's cell, at least 10 pixels.
 
 ### The settings page
 

@@ -17,7 +17,7 @@
       <i v-if="mark.kind === 'trash'" class="fas fa-trash" />
       <span v-else-if="mark.price" :class="$style.price">{{ mark.price }}</span>
     </div>
-    <div v-if="view.bar" :class="$style.bar" :style="box(view.bar)">
+    <div v-if="view.bar" :class="$style.bar" :style="barBox(view.bar)">
       <div
         :class="$style.fill"
         :style="{ width: `${(view.bar.share * 100).toFixed(1)}%` }"
@@ -55,6 +55,11 @@ function box(rect: Rect) {
   };
 }
 
+// A long wait reason wraps, so the bar grows down from its height
+function barBox(rect: Rect) {
+  return { ...box(rect), height: "auto", minHeight: `${rect.height}px` };
+}
+
 export default defineComponent({
   setup() {
     const { t } = useI18nNs("stash_prices");
@@ -66,6 +71,7 @@ export default defineComponent({
     return {
       view,
       box,
+      barBox,
       fontSize: computed(() => {
         const { grid, quad } = detector.state;
         const normalCell = quad ? grid.cell * 2 : grid.cell;
@@ -144,7 +150,7 @@ export default defineComponent({
 }
 
 .bar {
-  @apply absolute rounded overflow-hidden bg-gray-900/90;
+  @apply absolute flex items-center rounded overflow-hidden bg-gray-900/90;
   @apply border border-gray-600;
 }
 
@@ -153,7 +159,7 @@ export default defineComponent({
 }
 
 .text {
-  @apply relative flex items-center h-full px-2 whitespace-nowrap text-gray-100;
+  @apply relative px-2 py-0.5 leading-tight text-gray-100;
   font-size: 0.85em;
 }
 </style>
