@@ -21,9 +21,9 @@ items it read, so the open tab is the one whose filled and empty cells match tha
 ## Decision
 
 **1. Only stash detection captures, on Windows, while the user turned it on.** `GameCapture` in
-`main/src/windowing/GameCapture.ts` answers each `getDisplayMedia()` request of the default session. It grants one
+`main/src/windowing/GameCapture.ts` handles each `getDisplayMedia()` request of the default session. It grants one
 only on Windows, only while the stash prices widget and its **Find the open tab in the game window** setting are on
-(`stashCapture` in `HostConfig`), and only to the main frame of the overlay window's page, and refuses every other
+(`stashCapture` in `HostConfig`), and only to the main frame of the overlay window's page, and denies every other
 request, such as one from the trade site's web view or a browser tab. Reason: the user decides, and no page but
 Kalandra's own sees the game.
 
@@ -60,7 +60,7 @@ without a capture, and a capture on another platform needs its own check first.
   can correct the grid in the settings.
 - Items that the reader has not read yet, and items with a price, count against the match, since the layout comes
   from the trade site. A tab whose listings fill fewer than 3 cells is never seen by the capture.
-- A capture that main granted runs until the page stops it; turning the feature off refuses the next request.
+- A capture that main granted runs until the page stops it; turning the feature off denies the next request.
 - On 2026-10-28, on Windows 11 with Electron 44.9.3, a fake game window that drew the stash colors was captured this
   way: `getDisplayMedia()` resolved without a user gesture, a translucent window over the stash was not in the frames,
   and drawing and reading the grid's part of a 1920 x 1080 frame took 1 to 3 ms in the page. To measure it again in

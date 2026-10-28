@@ -11,17 +11,17 @@ cells, the match and the capture loop in the renderer. Code that marks the items
 
 ### The capture handler (`main/src/windowing/GameCapture.ts`)
 
-- `GameCapture.handleRequest(request, answer)` answers each `navigator.mediaDevices.getDisplayMedia()` request of
+- `GameCapture.handleRequest(request, answer)` handles each `navigator.mediaDevices.getDisplayMedia()` request of
   the default session. `main.ts` passes it to `session.defaultSession.setDisplayMediaRequestHandler()` after it
   creates the overlay window.
-- It answers with the game window only when all of these hold: `process.platform` is `win32`; the last `update()`
+- It grants the game window only when all of these hold: `process.platform` is `win32`; the last `update()`
   turned it on; the request comes from the main frame of the overlay window's page (`isSameFrame()` with
   `OverlayWindow.pageFrame`, by process and routing number), so a web view or a browser tab gets nothing; and the
   request asks for video alone. The game window is the window that `desktopCapturer.getSources()` lists with the
   name of the `windowTitle` setting, the title `electron-overlay-window` attaches to. It lists the windows with a
   thumbnail size of 0, which captures none of them.
 - Every other request gets `null`, which rejects the page's `getDisplayMedia()` promise.
-- It writes each result to the log once, and again only after a different result: `warn [GameCapture] Refused a
+- It writes each result to the log once, and again only after a different result: `warn [GameCapture] Denied a
   capture: <reason>`, `warn [GameCapture] Found no window named "<title>"`, `error [GameCapture] Cannot list the
   windows: <message>` or `info [GameCapture] Captures the window "<title>"`.
 - `update(enabled, windowTitle)` takes `stashCapture` and `windowTitle` of `CLIENT->MAIN::update-host-config`
@@ -129,7 +129,7 @@ cells, the match and the capture loop in the renderer. Code that marks the items
 - Main grants a capture and never reads a frame: the frames go to the page that asked, and main stores nothing.
 - The page keeps one frame at a time in memory and reads a few pixels of it. No frame is stored, logged or sent; only
   the match leaves the detector.
-- A capture that main granted runs until the page stops it. Turning the feature off refuses the next request only.
+- A capture that main granted runs until the page stops it. Turning the feature off denies the next request only.
 - Window capture shows the game window's own content, so the overlay window over it is not in the frames.
 
 **Dependencies.** Electron's `session`, `desktopCapturer` and `WebFrameMain` (types only in `GameCapture.ts`), and

@@ -60,9 +60,9 @@ export class GameCapture {
   }
 
   handleRequest = (request: CaptureRequest, answer: CaptureAnswer): void => {
-    const refusal = this.refusal(request);
-    if (refusal) {
-      this.log(`warn [GameCapture] Refused a capture: ${refusal}`);
+    const reason = this.denialReason(request);
+    if (reason) {
+      this.log(`warn [GameCapture] Denied a capture: ${reason}`);
       answer(null);
       return;
     }
@@ -87,7 +87,7 @@ export class GameCapture {
       });
   };
 
-  private refusal(request: CaptureRequest): string | null {
+  private denialReason(request: CaptureRequest): string | null {
     if (process.platform !== "win32") {
       return "only Windows captures the game window";
     }

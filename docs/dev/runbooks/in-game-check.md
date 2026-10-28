@@ -233,7 +233,7 @@ General, sets another path), and uses Alt when the file does not set it
   pricing, the capture, the hotkey, the marks and the bar, clicks on a mark, the window shown over the active game, the
   grid alignment view and a paused capture. Read the widget with the overlay key: it shows only while the overlay is
   active, and its `Stash tab` line then names the last capture's percentages.
-- **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal and
+- **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture] Denied a capture` line and
   `warn [renderer] Stash detection cannot capture the game window: <message>`. A failed check of the tab or pricing
   search writes `warn [renderer] [stash-prices] The stash tab check failed: <message>` or
   `warn [renderer] [stash-prices] Pricing a listing failed: <message>`, once for each new message.

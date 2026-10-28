@@ -17,7 +17,7 @@ The entry, the server and the app services, in `main/src/`:
   also resolves when Electron emitted `ready` during that wait, and runs the start function, which creates `Logger`,
   `AppTray`, `GameConfig`, `GameWindow`, `AppUpdater`, `HttpProxy`, `FileWriter` and `GameLogWatcher`, and adds the
   `/uploads/` routes. After a timer, 1 second on Linux, where the window is black instead of transparent otherwise, and
-  0 elsewhere, it creates `OverlayWindow`, `OverlayVisibility`, `Shortcuts` and `GameCapture`, which answers the page's
+  0 elsewhere, it creates `OverlayWindow`, `OverlayVisibility`, `Shortcuts` and `GameCapture`, which handles the page's
   `getDisplayMedia()` requests ([stash-detection.md](stash-detection.md)). It passes the services to
   `passHostConfig()`, then starts `uIOhook`, calls `startServer()` and loads the page. When `startServer()` rejects,
   it shows the error box `Kalandra cannot start` and quits, and any other failure there logs

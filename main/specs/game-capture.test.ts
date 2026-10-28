@@ -67,7 +67,7 @@ function createCapture(pageFrame: PageFrame | null = OVERLAY_PAGE) {
   return { desktop, logger, capture };
 }
 
-/** Sends a request and returns what the handler answered. */
+/** Sends a request and returns the window that the handler passes to its callback. */
 async function ask(
   capture: GameCapture,
   request = overlayRequest(),
@@ -80,7 +80,7 @@ async function ask(
 }
 
 describe("GameCapture", () => {
-  it("answers the overlay page with the window named as the window title setting, on Windows", async () => {
+  it("grants the overlay page the window named as the window title setting, on Windows", async () => {
     onPlatform("win32");
     const { desktop, logger, capture } = createCapture();
 
@@ -110,7 +110,7 @@ describe("GameCapture", () => {
   });
 
   it.each(["linux", "darwin"] as const)(
-    "refuses a request on %s without listing the windows",
+    "denies a request on %s without listing the windows",
     async (platform) => {
       onPlatform(platform);
       const { desktop, logger, capture } = createCapture();
@@ -118,12 +118,12 @@ describe("GameCapture", () => {
       expect(await ask(capture)).toBeNull();
       expect(desktop.requests).toEqual([]);
       expect(logger.lines).toEqual([
-        "warn [GameCapture] Refused a capture: only Windows captures the game window",
+        "warn [GameCapture] Denied a capture: only Windows captures the game window",
       ]);
     },
   );
 
-  it("refuses while stash detection is off, and answers again once it is on", async () => {
+  it("denies while stash detection is off, and grants again once it is on", async () => {
     onPlatform("win32");
     const { desktop, logger, capture } = createCapture();
     capture.update(false, "Path of Exile 2");
@@ -134,7 +134,7 @@ describe("GameCapture", () => {
     capture.update(true, "Path of Exile 2");
     expect(await ask(capture)).toEqual(GAME);
     expect(logger.lines).toEqual([
-      "warn [GameCapture] Refused a capture: stash detection is off",
+      "warn [GameCapture] Denied a capture: stash detection is off",
       'info [GameCapture] Captures the window "Path of Exile 2"',
     ]);
   });
@@ -143,18 +143,18 @@ describe("GameCapture", () => {
     ["a web view in another process", { processId: 9, routingId: 1 }],
     ["another frame of the same process", { processId: 7, routingId: 2 }],
     ["a frame that is gone", null],
-  ])("refuses a request from %s", async (_name, frame) => {
+  ])("denies a request from %s", async (_name, frame) => {
     onPlatform("win32");
     const { desktop, logger, capture } = createCapture();
 
     expect(await ask(capture, overlayRequest({ frame }))).toBeNull();
     expect(desktop.requests).toEqual([]);
     expect(logger.lines).toEqual([
-      "warn [GameCapture] Refused a capture: the request is not from the overlay page",
+      "warn [GameCapture] Denied a capture: the request is not from the overlay page",
     ]);
   });
 
-  it("refuses a request while the overlay window has no page, as with --no-overlay", async () => {
+  it("denies a request while the overlay window has no page, as with --no-overlay", async () => {
     onPlatform("win32");
     const { capture } = createCapture(null);
 
@@ -164,17 +164,17 @@ describe("GameCapture", () => {
   it.each([
     ["audio as well", { audioRequested: true }],
     ["no video", { videoRequested: false }],
-  ])("refuses a request for %s", async (_name, changes) => {
+  ])("denies a request for %s", async (_name, changes) => {
     onPlatform("win32");
     const { logger, capture } = createCapture();
 
     expect(await ask(capture, overlayRequest(changes))).toBeNull();
     expect(logger.lines).toEqual([
-      "warn [GameCapture] Refused a capture: the request must ask for video alone",
+      "warn [GameCapture] Denied a capture: the request must ask for video alone",
     ]);
   });
 
-  it("refuses when no window has the title, and logs it once until something changes", async () => {
+  it("denies when no window has the title, and logs it once until something changes", async () => {
     onPlatform("win32");
     const { desktop, logger, capture } = createCapture();
     desktop.windows = desktop.windows.filter((source) => source !== GAME);
@@ -198,7 +198,7 @@ describe("GameCapture", () => {
     ["an Error", new Error("Failed to get sources."), "Failed to get sources."],
     ["a string", "no access", "no access"],
   ])(
-    "refuses and logs the message when listing the windows fails with %s",
+    "denies and logs the message when listing the windows fails with %s",
     async (_name, failure, message) => {
       onPlatform("win32");
       const { desktop, logger, capture } = createCapture();
