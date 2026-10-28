@@ -414,6 +414,17 @@ describe("OverlayWindow", () => {
     ).toEqual([{ game: true, overlay: false }]);
   });
 
+  it("names the current focus of the game window and the overlay", () => {
+    const { overlay } = createOverlay();
+    expect(overlay.focus).toEqual({ game: false, overlay: false });
+
+    overlay.assertOverlayActive();
+    expect(overlay.focus).toEqual({ game: false, overlay: true });
+
+    overlay.assertGameActive();
+    expect(overlay.focus).toEqual({ game: true, overlay: false });
+  });
+
   it("moves the focus between the game and the overlay", async () => {
     const { overlay } = createOverlay();
 

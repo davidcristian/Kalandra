@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { nextTick } from "vue";
+import { nextTick, type ShallowRef, shallowRef } from "vue";
 import type { IpcEvent } from "@ipc/types";
 import { priceCheckWidgetMock, setupTests } from "@specs/vitest.setup";
 import type { PixelImage } from "@/web/stash-prices/cell-classifier";
@@ -121,8 +121,13 @@ function enabledWidget(): StashPricesWidget {
 describe("useStashDetector", () => {
   let useStashDetector: typeof UseStashDetector.useStashDetector;
   let sent: IpcEvent[];
-  let focus: (payload: { game: boolean; overlay: boolean }) => void;
+  let hostFocus: ShallowRef<{ game: boolean; overlay: boolean }>;
   let widgetAction: (payload: { target: string }) => void;
+
+  // Sets the focus as Host keeps it from main's focus-change messages
+  function focus(payload: { game: boolean; overlay: boolean }) {
+    hostFocus.value = payload;
+  }
 
   async function start(isElectron = true) {
     const { Host } = await import("@/web/background/IPC");
@@ -130,13 +135,12 @@ describe("useStashDetector", () => {
       value: isElectron,
       configurable: true,
     });
+    Host.focus = hostFocus;
     vi.mocked(Host.sendEvent).mockImplementation((event) => {
       sent.push(event);
     });
     vi.mocked(Host.onEvent).mockImplementation((name, cb) => {
-      if (name === "MAIN->OVERLAY::focus-change") {
-        focus = cb as typeof focus;
-      } else if (name === "MAIN->CLIENT::widget-action") {
+      if (name === "MAIN->CLIENT::widget-action") {
         widgetAction = cb as typeof widgetAction;
       }
       return new AbortController();
@@ -155,6 +159,7 @@ describe("useStashDetector", () => {
     vi.useFakeTimers();
     vi.resetModules();
     sent = [];
+    hostFocus = shallowRef({ game: false, overlay: false });
     page = new FakePage();
     vi.stubGlobal("window", page.window);
     vi.stubGlobal("navigator", page.navigator);
@@ -191,6 +196,19 @@ describe("useStashDetector", () => {
     await nextTick();
     expect(page.tracks[0].readyState).toBe("ended");
     expect(state).toMatchObject({ capture: "paused", open: true });
+  });
+
+  it("captures at once when main sent the game's focus before the detector started, as after a reload", async () => {
+    focus({ game: true, overlay: false });
+    page.frame = new SyntheticFrame(1280, 720)
+      .gameWorld()
+      .stash(stashGrid(VIEW, false, NONE), 12, ITEMS);
+
+    const { state } = await start();
+    await vi.advanceTimersByTimeAsync(2 * FRAME_MS);
+
+    expect(page.requests).toHaveLength(1);
+    expect(state).toMatchObject({ capture: "running", open: true });
   });
 
   it("moves the grid when the window changes size", async () => {

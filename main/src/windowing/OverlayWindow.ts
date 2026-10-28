@@ -6,7 +6,7 @@ import {
 } from "electron-overlay-window";
 import { type ListenAddress, pageUrl } from "../listen-option";
 import { isTradeSiteUrl } from "../proxy";
-import type { HostConfig } from "../../../ipc/types";
+import type { HostConfig, IpcEventPayload } from "../../../ipc/types";
 import type { ServerEvents } from "../server";
 import { type Logger, logRejection } from "../RemoteLogger";
 import type { PageFrame } from "./GameCapture";
@@ -100,6 +100,11 @@ export class OverlayWindow {
   /** The main frame of the page in the overlay window, which `GameCapture` lets capture the game window. */
   get pageFrame(): PageFrame | undefined {
     return this.window?.webContents.mainFrame;
+  }
+
+  /** Whether the game window and the overlay have the focus, as `MAIN->OVERLAY::focus-change` sends it. */
+  get focus(): IpcEventPayload<"MAIN->OVERLAY::focus-change"> {
+    return { game: this.poeWindow.isActive, overlay: this.isInteractable };
   }
 
   loadAppPage(address: ListenAddress) {
@@ -230,10 +235,7 @@ export class OverlayWindow {
     }
     this.server.sendEventTo("broadcast", {
       name: "MAIN->OVERLAY::focus-change",
-      payload: {
-        game: isActive,
-        overlay: this.isInteractable,
-      },
+      payload: this.focus,
     });
     this.syncWindowVisibility();
   };

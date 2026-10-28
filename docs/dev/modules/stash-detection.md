@@ -105,10 +105,12 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   layout when the listings stop needing a quad tab, as after a move to a normal tab. The capture changes `quad` again
   only when it sees the tab open or close. `toggle()` does nothing while the widget is off.
 - `useStashDetector()` is the app's one detector, a `createGlobalState`. It reads the widget's `enabled`,
-  `captureEnabled` and `gridCorrection`, the reader's listings, the game's focus from `MAIN->OVERLAY::focus-change`
-  (false until the first one) and the window's size and `devicePixelRatio`, and calls `update()` when one of them
-  changes. It calls `toggle()` on `MAIN->CLIENT::widget-action` with the target `stash-prices-toggle` (`TOGGLE_TARGET`
-  in `widget.ts`). `OverlayWindow.vue` creates it through `useStashHighlights()`.
+  `captureEnabled` and `gridCorrection`, the reader's listings, the game's focus from `Host.focus` and the window's
+  size and `devicePixelRatio`, and calls `update()` when one of them changes. `Host.focus` is the last
+  `MAIN->OVERLAY::focus-change`, which main also sends to a page when it connects, so the capture of a reloaded page
+  does not wait for the focus to move. It calls `toggle()` on `MAIN->CLIENT::widget-action` with the target
+  `stash-prices-toggle` (`TOGGLE_TARGET` in `widget.ts`). `OverlayWindow.vue` creates it through
+  `useStashHighlights()`.
 - `DetectionLine.vue` is the panel's line under the status: `Stash tab seen.`, `Stash tab not seen.`, or `shown`
   or `hidden with the hotkey`, then what the capture does, such as `Capture: 96% of the item cells and 98% of all
   cells match.` or `Capture off: <reason>.` The panel shows only while the overlay is active, when the capture is
@@ -154,6 +156,7 @@ detector with fake timers and `FakeScreen` in `fake-capture.ts`, which shows dra
 does: each reason the capture does not run, 2 frames to open and to close, a windowed game, a quad tab, a frame of
 twice the size, failures, retries and their log lines, an ended capture, a late grant, the hotkey and the layout it
 gives a quad tab.
-`use-stash-detector.test.ts` runs the app's detector with a fake page, the hotkey and the settings, and
-`stash-prices-widget.test.ts` renders the line. `stash-prices-settings.test.ts` sets the detection settings,
-`shortcut-actions.test.ts` reads the hotkey, and `config-upgrade.test.ts` checks the `< 46` step.
+`use-stash-detector.test.ts` runs the app's detector with a fake page, the hotkey, the settings and a focus that main
+sent before the detector started, and `stash-prices-widget.test.ts` renders the line. `stash-prices-settings.test.ts`
+sets the detection settings, `shortcut-actions.test.ts` reads the hotkey, and `config-upgrade.test.ts` checks the
+`< 46` step.

@@ -36,6 +36,11 @@ class HostTransport {
   unregisteredHotkeys = shallowRef<UnregisteredHotkey[]>([]);
   /** Why main sent no saved config at start although config.json exists, which the start message names. */
   configProblem = shallowRef<ConfigProblem | null>(null);
+  /** The focus of the game window and the overlay that main sent last, also sent to each page that connects. */
+  focus = shallowRef<IpcEventPayload<"MAIN->OVERLAY::focus-change">>({
+    game: false,
+    overlay: false,
+  });
 
   async init() {
     this.onEvent("MAIN->CLIENT::log-entry", (entry) => {
@@ -49,6 +54,9 @@ class HostTransport {
     });
     this.onEvent("MAIN->CLIENT::unregistered-hotkeys", (e) => {
       this.unregisteredHotkeys.value = e.hotkeys;
+    });
+    this.onEvent("MAIN->OVERLAY::focus-change", (focus) => {
+      this.focus.value = focus;
     });
     await new Promise((resolve) => {
       this.socket = new Sockette(`ws://${window.location.host}/events`, {

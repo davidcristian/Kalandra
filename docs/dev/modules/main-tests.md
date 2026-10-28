@@ -17,13 +17,14 @@ replaces it with `vi.mock("electron", ...)`.
   fails, with or without an `error` event. It sends each user action and checks again after 16 hours of fake time.
   The fake downloads only while `autoDownload` is on, and the test passes each platform in, with and without
   `--no-updates`, and as the portable build.
-- `start-server.test.ts` calls `startServer()` with a fake updater, checks the address it resolves, reads `GET /config`
-  before and after a `save-config` message and the first `/events` messages, sends overlay events with the User-Agent of
-  the overlay window, of a browser and with none, sends messages main cannot use, and sends client log entries from the
-  overlay window and a browser tab.
-- `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first, and
-  which client receives a `last-active` event after a connect, a `CLIENT->MAIN::used-recently` message and a close.
-  After a close that leaves one client, it checks the `isOverlay` main reports for a browser and the overlay window.
+- `start-server.test.ts` calls `startServer()` with a fake updater and a fake focus, checks the address it resolves,
+  reads `GET /config` before and after a `save-config` message and the first `/events` messages, sends overlay events
+  with the User-Agent of the overlay window, of a browser and with none, sends messages main cannot use, and sends
+  client log entries from the overlay window and a browser tab.
+- `event-clients.test.ts` opens several `/events` clients and checks the events a new client receives first (the log
+  history, the updater state and the focus), and which client receives a `last-active` event after a connect, a
+  `CLIENT->MAIN::used-recently` message and a close. After a close that leaves one client, it checks the `isOverlay`
+  main reports for a browser and the overlay window.
 - `client-log-writer.test.ts` picks the writer from lists of fake clients.
 - `server.test.ts` starts the server and sends `..` paths, foreign origins and host names to the HTTP routes and to
   `/events`, paths and methods that no route serves, and an upgrade request to another path. It reads each directive
@@ -77,9 +78,9 @@ replaces it with `vi.mock("electron", ...)`.
 - `page-watch.test.ts` fails loads of a fake `webContents` and ends its renderer process.
 - `overlay-window.test.ts` creates `OverlayWindow` with a fake `BrowserWindow` and a fake `OverlayController`. It checks
   the window options on each platform, the menu with and without a dev run, the page it loads, a load and a link that
-  fail, the attach to the game window, the focus changes, the overlay key and Escape in the window and in a web view,
-  and Hide overlay on blur, and the page frame it names. It sends `will-attach-webview` with a preload and Node.js
-  on, for the trade site and for addresses the check blocks.
+  fail, the attach to the game window, the focus changes and the focus it names, the overlay key and Escape in the
+  window and in a web view, and Hide overlay on blur, and the page frame it names. It sends `will-attach-webview` with a
+  preload and Node.js on, for the trade site and for addresses the check blocks.
 - `game-capture.test.ts` sends capture requests to `GameCapture` with a fake desktop that lists windows or fails, on
   each platform, and reads the window it grants and the log lines ([stash-detection.md](stash-detection.md)).
 - `widget-area.test.ts` sends `OVERLAY->MAIN::track-area` through the fake server and mouse events through the fake

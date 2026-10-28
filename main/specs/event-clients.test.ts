@@ -32,6 +32,7 @@ const OVERLAY_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) kalandra/1.2.3 Chrome/138.0.7204.235 Electron/37.4.0 Safari/537.36";
 
 const logger = new Logger(new FakeServer());
+const overlay = { focus: { game: false, overlay: false } };
 const opened: EventClient[] = [];
 const usedRecentlyWaiters: Array<(isOverlay: boolean) => void> = [];
 let port = 0;
@@ -41,7 +42,7 @@ beforeAll(async () => {
   const updater: { info: UpdateInfo } = {
     info: { state: "update-not-available", checkedAt: 1 },
   };
-  ({ port } = await startServer(updater, logger));
+  ({ port } = await startServer(updater, logger, overlay));
   onEventAnyClient("CLIENT->MAIN::used-recently", (e) => {
     for (const resolve of usedRecentlyWaiters.splice(0)) resolve(e.isOverlay);
   });
@@ -57,10 +58,11 @@ afterAll(() => {
   fs.rmSync(app.getPath("userData"), { recursive: true, force: true });
 });
 
-// Opens a client and reads the two events main sends to each new client
+// Opens a client and reads the three events main sends to each new client
 async function connect(userAgent?: string): Promise<EventClient> {
   const client = await EventClient.open(port, userAgent);
   opened.push(client);
+  await client.next();
   await client.next();
   await client.next();
   return client;
@@ -79,7 +81,8 @@ const action = (target: string): IpcEvent => ({
 });
 
 describe("a new /events client", () => {
-  it("receives main's log history and then the updater state", async () => {
+  it("receives main's log history, then the updater state, then the focus current when it connects", async () => {
+    overlay.focus = { game: true, overlay: false };
     const client = await EventClient.open(port);
     opened.push(client);
 
@@ -93,6 +96,10 @@ describe("a new /events client", () => {
     expect(await client.next()).toEqual({
       name: "MAIN->CLIENT::updater-state",
       payload: { state: "update-not-available", checkedAt: 1 },
+    });
+    expect(await client.next()).toEqual({
+      name: "MAIN->OVERLAY::focus-change",
+      payload: { game: true, overlay: false },
     });
   });
 });

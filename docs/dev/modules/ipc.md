@@ -40,7 +40,7 @@ neither process's type check reads it. The routes that move the messages are in
 | `MAIN->CLIENT::library-session` | `sessionName`, `result`: `started`, `invalid-name` or `failed` | `FileWriter`, after each `session` start | `library/session.ts` |
 | `MAIN->CLIENT::unregistered-hotkeys` | `hotkeys`, each a `shortcut` and a `reason`: `unknown-key`, `game-key` or `taken` | `Shortcuts`, after each `update-host-config`, which every page sends when it loads, and when the keys another program holds change | `Host` (`Host.unregisteredHotkeys`) |
 | `MAIN->OVERLAY::overlay-attached` | none | `OverlayWindow` | `LoadingAnimation.vue` |
-| `MAIN->OVERLAY::focus-change` | `game`, `overlay` | `OverlayWindow` | `OverlayWindow.vue`, `useStashDetector()` |
+| `MAIN->OVERLAY::focus-change` | `game`, `overlay` | `OverlayWindow`; `server.ts` sends the current focus (`OverlayWindow.focus`) to a new client | `OverlayWindow.vue`, `Host` (`Host.focus`, which `useStashDetector()` reads) |
 | `MAIN->OVERLAY::visibility` | `isVisible` | `OverlayVisibility` | `OverlayWindow.vue` |
 | `MAIN->OVERLAY::hide-exclusive-widget` | none | `WidgetAreaTracker` | `PriceCheckWindow.vue` |
 | `OVERLAY->MAIN::focus-game` | none | `OverlayWindow.vue`, `PriceCheckWindow.vue` | `OverlayWindow.assertGameActive()` |

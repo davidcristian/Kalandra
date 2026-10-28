@@ -1,6 +1,6 @@
 # After a page reload the stash detector waits for the next focus change
 
-**Status:** open
+**Status:** done 2026-10-28
 **Area:** renderer
 **Origin:** [renderer/src/web/stash-prices/use-stash-detector.ts](../../../../renderer/src/web/stash-prices/use-stash-detector.ts)
 **Verified:** 2026-10-28
@@ -17,3 +17,5 @@ that main sends to a client that connects, with a test on each side.
 ## History
 
 - 2026-10-28: Left for later by the stash detection, whose capture waits for the first focus change.
+- 2026-10-28: Done in "fix: send the current focus to each page that connects": `server.ts` sends
+  `OverlayWindow.focus` to each new client, and the detector reads `Host.focus`, which keeps the last focus change.

@@ -40,13 +40,15 @@ class FakeWebSocket {
 let Host: typeof IPC.Host;
 let LOG_LINES: typeof IPC.LOG_LINES;
 
-// Vue reads document on import when window exists, so the stubs come after the import
+// Vue reads document on import when window exists, so the stubs come after the import. init() runs in the
+// overlay window, since a browser tab does not listen for MAIN->OVERLAY events
 beforeAll(async () => {
   ({ Host, LOG_LINES } = await vi.importActual<typeof IPC>(
     "@/web/background/IPC",
   ));
   vi.stubGlobal("window", { location: { host: "localhost:4000" } });
   vi.stubGlobal("WebSocket", FakeWebSocket);
+  vi.stubGlobal("navigator", { userAgent: OVERLAY_USER_AGENT });
   await Host.init();
 });
 
@@ -234,6 +236,22 @@ describe("Host.updateInfo", () => {
       state: "update-downloaded",
       version: "1.2.4",
     });
+  });
+});
+
+describe("Host.focus", () => {
+  it("is the focus that main sent last", () => {
+    socket().receive({
+      name: "MAIN->OVERLAY::focus-change",
+      payload: { game: true, overlay: false },
+    });
+    expect(Host.focus.value).toEqual({ game: true, overlay: false });
+
+    socket().receive({
+      name: "MAIN->OVERLAY::focus-change",
+      payload: { game: false, overlay: true },
+    });
+    expect(Host.focus.value).toEqual({ game: false, overlay: true });
   });
 });
 

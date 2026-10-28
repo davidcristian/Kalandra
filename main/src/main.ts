@@ -123,7 +123,7 @@ void startWhenReady(
       uIOhook.start();
       let address: ListenAddress;
       try {
-        address = await startServer(appUpdater, logger);
+        address = await startServer(appUpdater, logger, overlay);
       } catch (error) {
         dialog.showErrorBox(
           "Kalandra cannot start",

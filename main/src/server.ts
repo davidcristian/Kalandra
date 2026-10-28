@@ -21,6 +21,7 @@ import { clientLogWriter } from "./client-log-writer";
 import { CONTENT_SECURITY_POLICY } from "../../renderer/content-security-policy";
 import type { AppUpdater } from "./AppUpdater";
 import type { Logger } from "./RemoteLogger";
+import type { OverlayWindow } from "./windowing/OverlayWindow";
 
 interface HttpRouteEvents {
   request: [IncomingMessage, ServerResponse];
@@ -173,6 +174,7 @@ async function sendHostState(
 export async function startServer(
   appUpdater: Pick<AppUpdater, "info">,
   logger: Logger,
+  overlay: Pick<OverlayWindow, "focus">,
 ): Promise<ListenAddress> {
   const configStore = new ConfigStore(eventPipe, logger);
 
@@ -243,6 +245,11 @@ export async function startServer(
     sendEventTo("last-active", {
       name: "MAIN->CLIENT::updater-state",
       payload: appUpdater.info,
+    });
+    // OverlayWindow sends focus-change only when the focus moves, so a page that loads again gets the current focus here
+    sendEventTo("last-active", {
+      name: "MAIN->OVERLAY::focus-change",
+      payload: overlay.focus,
     });
   });
 

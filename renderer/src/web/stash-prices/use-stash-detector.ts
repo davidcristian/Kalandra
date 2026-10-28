@@ -46,7 +46,6 @@ function readViewport(): Viewport {
 /** Returns the app's one detector of the open stash tab, which follows the widget, the listings and the game's focus. */
 export const useStashDetector = createGlobalState(() => {
   const reader = useStashReader();
-  const gameActive = shallowRef(false);
   const viewport = shallowRef(readViewport());
   const widget = () =>
     requireWidget<StashPricesWidget>("stash-prices", AppConfig());
@@ -61,15 +60,12 @@ export const useStashDetector = createGlobalState(() => {
       if (!Host.isElectron) return "browser";
       return navigator.userAgent.includes("Windows") ? null : "not-windows";
     },
-    gameActive: () => gameActive.value,
+    gameActive: () => Host.focus.value.game,
     viewport: () => viewport.value,
     openCapture: async () => await openGameCapture(browserCapture()),
     log: (message) => {
       logToMain("warn", message);
     },
-  });
-  Host.onEvent("MAIN->OVERLAY::focus-change", (focus) => {
-    gameActive.value = focus.game;
   });
   Host.onEvent("MAIN->CLIENT::widget-action", (action) => {
     if (action.target === TOGGLE_TARGET) detector.toggle();
@@ -83,7 +79,7 @@ export const useStashDetector = createGlobalState(() => {
       widget().captureEnabled,
       ...Object.values(widget().gridCorrection),
       reader.state.listings,
-      gameActive.value,
+      Host.focus.value.game,
       viewport.value,
     ],
     () => {

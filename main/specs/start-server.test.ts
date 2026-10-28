@@ -34,7 +34,9 @@ let listened: ListenAddress | undefined;
 let port = 0;
 
 beforeAll(async () => {
-  listened = await startServer(updater, logger);
+  listened = await startServer(updater, logger, {
+    focus: { game: false, overlay: false },
+  });
   port = listened.port;
   onEventAnyClient("OVERLAY->MAIN::focus-game", () => {
     handled.push("OVERLAY->MAIN::focus-game");

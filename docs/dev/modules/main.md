@@ -23,8 +23,8 @@ The entry, the server and the app services, in `main/src/`:
   it shows the error box `Kalandra cannot start` and quits, and any other failure there logs
   `error [main] Cannot start the overlay:` with the stack. In development it also installs Vue Devtools.
   `uncaught-errors.ts` logs every uncaught error and unhandled rejection, of any type.
-- `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger)`, which adds the
-  `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
+- `server.ts` exports `server` (the `http.Server`), `httpRoutes`, `startServer(appUpdater, logger, overlay)`, which adds
+  the `/config` route and the `/events` connection handler, listens and returns the address, and `eventPipe`, the
   `ServerEvents` pair of `onEventAnyClient(name, cb)` and `sendEventTo(target, event)`. A class that sends or handles
   messages takes `ServerEvents` in its constructor rather than importing `server.ts`. Every HTTP route listens on
   `httpRoutes`, never on `server`: `server` passes a request on only when `isAllowedRequest()` accepts it, and returns
@@ -34,12 +34,13 @@ The entry, the server and the app services, in `main/src/`:
   to every client, and `"last-active"` to the last active client: the one that connected or sent
   `CLIENT->MAIN::used-recently` last, or the one client left after a close, for which main emits `used-recently` with
   `isOverlay` true for the overlay window, by its User-Agent, and false for a browser. A new client receives the log
-  history and the current updater state, which the first update check can change after the page reads `GET /config`. An
-  `OVERLAY->MAIN::` message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its
-  User-Agent, as the overlay window's does. A message that is not JSON, has no string `name` or names an event without a
-  handler is ignored with a `warn [server]` line, and a handler that throws is logged. It passes on a `client-log-event`
-  only from the client `clientLogWriter()` returns, because every page parses the game log and sends the same entries.
-  The routes and the policy are in [architecture.md](../architecture.md#the-boundary-between-the-processes).
+  history, the current updater state, which the first update check can change after the page reads `GET /config`, and
+  the current focus (`OverlayWindow.focus`), which a reloaded page would otherwise wait for. An `OVERLAY->MAIN::`
+  message is ignored and logged unless the client's WebSocket upgrade request has `Electron` in its User-Agent, as the
+  overlay window's does. A message that is not JSON, has no string `name` or names an event without a handler is ignored
+  with a `warn [server]` line, and a handler that throws is logged. It passes on a `client-log-event` only from the
+  client `clientLogWriter()` returns, because every page parses the game log and sends the same entries. The routes and
+  the policy are in [architecture.md](../architecture.md#the-boundary-between-the-processes).
 - `client-log-writer.ts`: `clientLogWriter(clients, isOverlay, lastActive)` returns the newest overlay window, or
   `lastActive` when no overlay window is connected.
 - `request-origin.ts`: `isAllowedRequest(headers, isWebSocket)` accepts a `Host` that is `localhost` or an IP
@@ -56,15 +57,14 @@ The entry, the server and the app services, in `main/src/`:
   `startServer()` passes the defaults as `fallback` and logs the error. `pageUrl(address)` returns the page's address
   for a browser: `localhost` for `127.0.0.1`, `0.0.0.0` and `::`, else the address, an IPv6 one in brackets.
 - `proxy.ts`: `HttpProxy` forwards `/proxy/<host>/<path>` for the hosts in `PROXY_HOSTS`: the nine official trade sites
-  (`official: true`) and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an
-  `https:` address on an official trade site. It returns 403 for a request without the `x-kalandra-proxy` header, which
-  `Host.proxy()` sends and a page on another site cannot
-  ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops the `sec-*`, `host`, `origin`,
-  `content-length`, `cookie` and `x-kalandra-proxy` request headers, sends the request through `net.request` with
-  `app.userAgentFallback` as the User-Agent and, only to an official trade site, the session's cookies, which hold the
-  sign-in of the built-in browser. It drops `content-encoding` and `set-cookie` from the response. It removes the
-  `Partitioned` attribute from every `set-cookie` in the default session, because Cloudflare sets it and `net.request`
-  cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
+  (`official: true`) and `kalandra.ashoal.com`. `isTradeSiteUrl(url)` returns whether a URL is an `https:` address on an
+  official trade site. It returns 403 for a request without the `x-kalandra-proxy` header, which `Host.proxy()` sends
+  and a page on another site cannot ([ADR-0009](../adr/ADR-0009-local-server-accepts-only-its-own-page.md)). It drops
+  the `sec-*`, `host`, `origin`, `content-length`, `cookie` and `x-kalandra-proxy` request headers, sends the request
+  through `net.request` with `app.userAgentFallback` as the User-Agent and, only to an official trade site, the
+  session's cookies, which hold the sign-in of the built-in browser. It drops `content-encoding` and `set-cookie` from
+  the response. It removes the `Partitioned` attribute from every `set-cookie` in the default session, because
+  Cloudflare sets it and `net.request` cannot give a partition key. An error logs `error [proxy] <message> (<host>)`.
 - `RemoteLogger.ts`: `Logger.write(message)` prefixes the local time, adds the line to `history`, which keeps the last
   1000 entries (`HISTORY_ENTRIES`), and broadcasts `MAIN->CLIENT::log-entry`. `logRejection(logger, source, action)`
   returns a `.catch()` handler that writes `error [<source>] Cannot <action>: <message>`. Callers start a message with

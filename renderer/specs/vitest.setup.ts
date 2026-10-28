@@ -125,6 +125,7 @@ vi.mock("@/web/background/IPC", () => ({
     version: { value: "0.0.00000" },
     updateInfo: { value: { state: "initial" } },
     unregisteredHotkeys: { value: [] },
+    focus: { value: { game: false, overlay: false } },
     isElectron: true,
   },
 }));
