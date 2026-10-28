@@ -62,7 +62,8 @@ default instead, so its result stays the same. A setting that `main` needs also 
   `/proxy/<host>/...`, and `main/src/proxy.ts` forwards only to the hosts in `PROXY_HOSTS`. Adding a host is a
   deliberate change to that list. The official trade site bans clients that exceed its rate limits, so every search,
   fetch and exchange request goes through the `RateLimiter` sets in `renderer/src/web/price-check/trade/common.ts`
-  ([ADR-0005](docs/dev/adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)).
+  ([ADR-0005](docs/dev/adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). Only the stash prices feature searches
+  without a key press, within the user's budget ([ADR-0012](docs/dev/adr/ADR-0012-background-trade-searches.md)).
 - **Prices come from `priceService/`, never from poe.ninja directly.** poe.ninja asks apps to use their own backend,
   so `renderer/src/web/background/Prices.ts` reads `kalandra.ashoal.com/prices/<league>.json` and poe.ninja is not
   in `PROXY_HOSTS`. Both read the categories from `renderer/public/data/namespaceMap.json`. The app searches the
@@ -143,8 +144,7 @@ the dash and banned-word rules; read your own diff for the rest.
   Y") or explains what a better name would say. One or two lines, three at most.
 - **Docstrings.** One line saying what the module, class or function does, three at most, and none on a test.
 - **Docs.** Say what a thing is and does, then why, when the why is not obvious. Keep facts, commands, paths and
-  decisions. Cut the story of how the code got here, repeated explanations (link to the one place instead) and
-  hedging.
+  decisions. Cut the story of how the code got here, repeated explanations (link to the one place instead) and hedging.
 - **Plain words.** Short sentences, one idea each, with the literal verb: "checks", "fails", "returns", "stores",
   "sends". Code does not know, notice, want, refuse, decide, believe, agree, argue, answer, promise or own anything,
   so say what it does. Define a technical term once, where it first appears. No metaphors, idioms, wordplay or

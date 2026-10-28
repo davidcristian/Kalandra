@@ -94,3 +94,4 @@ own clicks.
 - [Main process module](../modules/main.md): `HttpProxy` and the server it listens on.
 - [ADR-0004](ADR-0004-process-boundary.md): the `/proxy` route as part of the process boundary.
 - [ADR-0006](ADR-0006-own-price-service.md): the price service host on the list.
+- [ADR-0012](ADR-0012-background-trade-searches.md): the one feature that sends trade searches without a key press.

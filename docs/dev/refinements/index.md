@@ -176,3 +176,4 @@ layout and its reasons.
 - 112: [Two data builds write different stats files when Python's hash seed differs](tasks/112-dataparser-output-depends-on-hash-seed.md)
 - 113: [A fix outside the app does not start the Build run that a failed upload needs](tasks/113-build-not-started-by-a-fix-outside-the-app.md)
 - 114: [The committed augment lines have a socketBound field that nothing reads](tasks/114-unread-augment-socket-bound-field.md)
+- 115: [The stash prices reader reads only the newest 100 listings of an account](tasks/115-stash-prices-reads-the-newest-100.md)
