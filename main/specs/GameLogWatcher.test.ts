@@ -74,6 +74,12 @@ let server: FakeServer;
 let files: FakeFileWatch;
 let watcher: GameLogWatcher;
 
+const PLATFORM = process.platform;
+
+function onPlatform(platform: NodeJS.Platform) {
+  Object.defineProperty(process, "platform", { value: platform });
+}
+
 function createWatcher(possiblePaths?: string[]) {
   server = new FakeServer();
   logger = new Logger(server);
@@ -98,6 +104,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await watcher.restart("", false);
+  onPlatform(PLATFORM);
   vi.restoreAllMocks();
   unreadableFiles.clear();
   await fs.rm(folder, { recursive: true, force: true });
@@ -310,24 +317,20 @@ describe("GameLogWatcher after the log changes on disk", () => {
     expect(logger.history).not.toContain("Failed to read");
   });
 
-  it.runIf(process.platform === "win32")(
-    "reads the file it has open when Windows fails the open of the new log as it deletes it",
-    async () => {
-      await changeWhileNewLogIsDeleted(epermError());
+  it("reads the file it has open when Windows fails the open of the new log as it deletes it", async () => {
+    onPlatform("win32");
+    await changeWhileNewLogIsDeleted(epermError());
 
-      expect(server.gameLogLines()).toEqual(["an old line"]);
-      expect(logger.history).not.toContain("Failed to read");
-    },
-  );
+    expect(server.gameLogLines()).toEqual(["an old line"]);
+    expect(logger.history).not.toContain("Failed to read");
+  });
 
-  it.skipIf(process.platform === "win32")(
-    "logs a failed read when the open of the new log fails with EPERM outside Windows",
-    async () => {
-      await changeWhileNewLogIsDeleted(epermError());
+  it("logs a failed read when the open of the new log fails with EPERM outside Windows", async () => {
+    onPlatform("linux");
+    await changeWhileNewLogIsDeleted(epermError());
 
-      expect(logger.history).toContain("Failed to read the log file: EPERM");
-    },
-  );
+    expect(logger.history).toContain("Failed to read the log file: EPERM");
+  });
 });
 
 describe("GameLogWatcher after a failed open of a new log", () => {
