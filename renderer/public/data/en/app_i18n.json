@@ -526,7 +526,8 @@
     "status_rate_limited": "Paused by the trade site's rate limit.",
     "status_checking": "Reading the tab.",
     "status_waiting": "The tab is read.",
-    "status_error": "The trade site failed: {error}"
+    "status_error": "The trade site failed: {error}",
+    "unreadable": "Kalandra cannot read this item from the trade site."
   },
   "library": {
     "name": "Library",

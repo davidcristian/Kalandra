@@ -42,6 +42,27 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
   a search response without a query id, string ids or a total, and `readListing()` returns `undefined` for a fetch
   result it cannot read.
 
+### The item of a listing (`item-text.ts`, `mod-text.ts`)
+
+- `listingItem(raw)` returns the `ParsedItem` of a fetch result, or a reason: the parser's error key, or
+  `UNREADABLE` (`stash_prices.unreadable`). It never throws. `listingItemText(item)` writes the item text that the
+  game copies with advanced descriptions, and `listingItem` runs `parseClipboard` on it, so the price check's
+  filters read the item as they read a copied one.
+- The text has the copied item's sections: the item class, rarity and name lines, the properties, the
+  requirements, the sockets (`S` for each augment socket), the item level, the enchant (` (enchant)`) and rune
+  (` (rune)`) lines, the implicits, the granted skills, the explicit modifiers, and the unidentified, corrupted,
+  mirrored and sanctified lines. Each line start the parser reads is a client string, picked by the site's property
+  type (`TradePropType`): the property names of the site, such as `Monster Pack Size`, differ from the game's.
+- Each explicit modifier gets a header such as `{ Fractured Prefix Modifier "Cremating" (Tier: 2) }`, from the
+  site's tier code (`P2`, `S4`) and its fractured, desecrated or crafted flag, prefixes first. Each roll gets its
+  range, as in `111(102-130)`, when a range of its modifier contains it. The site writes two modifiers of one stat
+  as one line: the line gets the sum of their ranges in the older format, whose `extended.hashes` name the
+  modifiers of each line, and no range in the newer one, whose lines list their modifiers. A header leaves out the
+  tier or the name when the language's `MODIFIER_LINE` would not read them back. An unrevealed modifier is its slot's
+  header with `Desecrated Prefix` or `Desecrated Suffix`.
+- A fetch result without a type line or a rarity, or with lines the converter does not write (`logbookMods`,
+  `mutatedMods`), is `UNREADABLE`. The tags of a modifier header are left out, since the site does not send them.
+
 ### The widget and its panel
 
 - `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
@@ -108,4 +129,8 @@ pauses for the price check and the limiter queue, a restriction during the fetch
 lines, and the settings changes. `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the
 fake site, and renders the panel in English for each status. `stash-prices-settings.test.ts` renders the settings
 page and checks the checkbox's flags, the limits of the two number fields and the account name warning. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
-`reindexedIds()`, `threeHourSearchCount()` and the setting limits. No test calls the live site.
+`reindexedIds()`, `threeHourSearchCount()` and the setting limits. `item-text.test.ts` writes and parses the 23 saved
+listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a
+crossbow with every modifier kind, the tiers, ranges and summed lines, an unrevealed modifier, a unique, a waystone,
+a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases. No test
+calls the live site.

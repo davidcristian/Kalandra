@@ -96,7 +96,7 @@ const CONVERT_CURRENCY: Record<string, string> = {
   "perfect-exalted-orb": "P. exalted",
 };
 
-enum TradePropType {
+export enum TradePropType {
   Unused,
   MapTier,
   MapQuantityBonus,
