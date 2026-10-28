@@ -336,6 +336,33 @@ describe("createStashDetector", () => {
     expect(detector.state).toMatchObject({ open: false, source: "hotkey" });
   });
 
+  it("shows a quad tab with the hotkey when the listings need one, else as the capture last saw it", async () => {
+    const detector = createDetector();
+    detector.update();
+    screen.frame = quadFrame;
+    await frames(2);
+    expect(detector.state).toMatchObject({ open: true, quad: true });
+
+    screen.frame = sceneFrame;
+    await frames(2);
+    detector.toggle();
+    expect(detector.state).toMatchObject({ open: true, quad: true });
+    expect(detector.state.grid).toEqual(stashGrid(VIEW, true, NONE));
+
+    // The items move past the 12th column, and then to a normal tab
+    detector.toggle();
+    listings = [...ITEMS, { x: 20, y: 0, w: 1, h: 1 }].map(placed);
+    detector.update();
+    detector.toggle();
+    expect(detector.state).toMatchObject({ open: true, quad: true });
+    detector.toggle();
+    listings = ITEMS.map(placed);
+    detector.update();
+    detector.toggle();
+    expect(detector.state).toMatchObject({ open: true, quad: false });
+    expect(detector.state.grid).toEqual(stashGrid(VIEW, false, NONE));
+  });
+
   it("closes the tab and stops the capture when the feature is turned off", async () => {
     const detector = createDetector();
     detector.update();

@@ -100,9 +100,10 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   It sends each new message once to main's log as `Stash detection cannot capture the game window: <message>`, and
   asks again after 30 seconds (`RETRY_MS`). A capture that main grants after the detector stopped wanting it is
   closed at once.
-- `toggle()` opens or closes the tab with `source` `hotkey`, and `quad` from the last frame that showed the tab, or
-  from `needsQuad()`. The capture changes it again only when it sees the tab open or close. It does nothing while the
-  widget is off.
+- `toggle()` opens or closes the tab with `source` `hotkey`, and `quad` true when the listings need a quad tab
+  (`needsQuad()`), else as the last frame that showed the tab had it, else false. `update()` forgets that frame's
+  layout when the listings stop needing a quad tab, as after a move to a normal tab. The capture changes `quad` again
+  only when it sees the tab open or close. `toggle()` does nothing while the widget is off.
 - `useStashDetector()` is the app's one detector, a `createGlobalState`. It reads the widget's `enabled`,
   `captureEnabled` and `gridCorrection`, the reader's listings, the game's focus from `MAIN->OVERLAY::focus-change`
   (false until the first one) and the window's size and `devicePixelRatio`, and calls `update()` when one of them
@@ -151,7 +152,8 @@ items, a scene, a dark scene, an empty tab, another tab, a grid off by half a ce
 `frame-source.test.ts` opens the capture with a fake stream, video and canvas. `stash-detector.test.ts` drives the
 detector with fake timers and `FakeScreen` in `fake-capture.ts`, which shows drawn frames and scales them as a canvas
 does: each reason the capture does not run, 2 frames to open and to close, a windowed game, a quad tab, a frame of
-twice the size, failures, retries and their log lines, an ended capture, a late grant and the hotkey.
+twice the size, failures, retries and their log lines, an ended capture, a late grant, the hotkey and the layout it
+gives a quad tab.
 `use-stash-detector.test.ts` runs the app's detector with a fake page, the hotkey and the settings, and
 `stash-prices-widget.test.ts` renders the line. `stash-prices-settings.test.ts` sets the detection settings,
 `shortcut-actions.test.ts` reads the hotkey, and `config-upgrade.test.ts` checks the `< 46` step.

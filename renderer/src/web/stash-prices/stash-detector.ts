@@ -101,6 +101,7 @@ export function createStashDetector(sources: DetectorSources) {
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
   let captureOpen = false;
   let seenQuad: boolean | null = null;
+  let listingsNeedQuad = false;
   let run = 0;
   let lastLogged: string | null = null;
 
@@ -218,6 +219,10 @@ export function createStashDetector(sources: DetectorSources) {
 
   /** Starts or stops the capture for the current settings, listings, platform, game focus and window size. */
   function update() {
+    const needQuad = needsQuad(sources.listings());
+    // The last sighting was of a quad layout that the listings no longer have, as after a move to a normal tab
+    if (listingsNeedQuad && !needQuad) seenQuad = null;
+    listingsNeedQuad = needQuad;
     const reason = blocked();
     placeGrid();
     if (reason !== null) {
@@ -245,7 +250,7 @@ export function createStashDetector(sources: DetectorSources) {
     if (!sources.settings().enabled) return;
     state.open = !state.open;
     state.source = "hotkey";
-    state.quad = seenQuad ?? needsQuad(sources.listings());
+    state.quad = needsQuad(sources.listings()) || (seenQuad ?? false);
     placeGrid();
   }
 
