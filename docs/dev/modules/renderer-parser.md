@@ -175,7 +175,7 @@ import into `src/web/` from a file under `src/parser/` or `src/assets/`, a type 
 (`no-restricted-imports` in `renderer/eslint.config.mjs`).
 
 **Tests.** `npx vitest run` in `renderer/`, after `npm run make-index-files`. CI adds `--coverage`, which fails below
-the floor in `renderer/vitest.config.ts` (91.6% of the lines of the `.ts` files in `src/` on 28 Oct 2026). The parser
+the floor in `renderer/vitest.config.ts` (91.7% of the lines of the `.ts` files in `src/` on 28 Oct 2026). The parser
 suites are `renderer/specs/Parser/*.test.ts`, with real copied item text in `specs/Parser/items.ts` (each `TestItem`
 has the text and the expected fields) and `specs/Parser/mods.ts`. A case built by hand from other items says so in a
 comment, and [host task 020](../host/tasks/020-copy-items-for-hand-built-parser-cases.md) lists the copies that
