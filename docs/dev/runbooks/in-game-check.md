@@ -235,10 +235,10 @@ General, sets another path), and uses Alt when the file does not set it
 - **Setting:** on the Stash prices page, **Read the tab in the background** and **Find the open tab in the game
   window** on, and a key in **Hotkey that marks the tab open or closed**. Save. The tab holds items without a price on
   3 cells or more, and the widget lists them after a check ([stash-detection.md](../modules/stash-detection.md)).
-- **Press:** with the widget shown, open the stash on that tab, then on another tab, then close it. Press the hotkey
-  twice with the stash closed. Point at the widget's `Stash tab` line, and take a screenshot of the open tab.
+- **Press:** open the stash on that tab, then another tab, close it, and press the hotkey twice. After each, read the
+  widget's `Stash tab` line with the overlay key: it keeps the last capture. Point at it, and take a screenshot.
 - **See:** `Stash tab seen.` within a second of opening the tab, both percentages 90 or more, and `not seen` on
-  another tab and with the stash closed; `shown` and `hidden with the hotkey`. The tooltip's grid start and cell width
+  another tab and with the stash closed; the hotkey gives `shown` and `hidden`. The tooltip's grid start and cell width
   match the screenshot within 3 pixels; else write down both, with the resolution, for `GRID_LEFT`, `GRID_TOP` and
   `GRID_CELL` in `stash-grid.ts`. Kalandra's CPU use in Task Manager stays near that with the stash closed.
 - **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal

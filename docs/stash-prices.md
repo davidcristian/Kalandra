@@ -88,7 +88,7 @@ The widget's line under the status says what Kalandra sees, and what the capture
 | --- | --- |
 | Stash tab seen. / Stash tab not seen. | Whether the stash shows the tab now. |
 | Capture: 96% of the item cells and 98% of all cells match. | The last capture: the share of the cells under the items that look filled, and of all cells that look as the items say. Both must be 90% or more. |
-| Capture paused while the game window is not active. | The capture runs again when you return to the game. |
+| Capture paused while the game window is not active. | The capture runs again when you return to the game. The widget shows only while the overlay is active, so it also names the shares of the last capture. |
 | Capture off: the tab needs items on 3 cells or more. | Too few items to tell the tab from an empty one. |
 | Capture off: it works only on Windows, so use the hotkey. | Linux and macOS. |
 | Capture off: turned off in the settings, so use the hotkey. | **Find the open tab in the game window** is off. |

@@ -553,6 +553,7 @@
     "capture_setting_off": "Capture off: turned off in the settings, so use the hotkey.",
     "capture_few_items": "Capture off: the tab needs items on 3 cells or more.",
     "capture_paused": "Capture paused while the game window is not active.",
+    "capture_paused_after": "Capture paused while the game window is not active. The last capture: {items}% of the item cells and {cells}% of all cells matched.",
     "capture_starting": "Capture starts.",
     "capture_running": "Capture: {items}% of the item cells and {cells}% of all cells match.",
     "capture_failed": "Capture off: {error}. It tries again in 30 seconds.",

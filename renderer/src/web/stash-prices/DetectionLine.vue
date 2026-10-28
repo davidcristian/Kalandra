@@ -39,7 +39,12 @@ export default defineComponent({
       if (state.capture === "running" && state.match === null) {
         return t(":capture_starting");
       }
-      return t(CAPTURE_TEXT[state.capture], {
+      // The panel shows only while the overlay is active, and then the game is not, so it names the last capture
+      const key =
+        state.capture === "paused" && state.match !== null
+          ? "stash_prices.capture_paused_after"
+          : CAPTURE_TEXT[state.capture];
+      return t(key, {
         error: state.error ?? "",
         items: percent(state.match?.items ?? 0),
         cells: percent(state.match?.cells ?? 0),

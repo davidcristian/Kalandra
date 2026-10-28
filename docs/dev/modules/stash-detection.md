@@ -107,7 +107,8 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   in `widget.ts`). `WidgetStashPrices.vue` creates it.
 - `DetectionLine.vue` is the panel's line under the status: `Stash tab seen.`, `Stash tab not seen.`, or `shown`
   or `hidden with the hotkey`, then what the capture does, such as `Capture: 96% of the item cells and 98% of all
-  cells match.` or `Capture off: <reason>.` Its tooltip gives the grid in pixels of the game window.
+  cells match.` or `Capture off: <reason>.` The panel shows only while the overlay is active, when the capture is
+  `paused`, so the line then names the last capture's shares. Its tooltip gives the grid in pixels of the game window.
 
 ### The settings (`widget.ts`, `DetectionSettings.vue`)
 

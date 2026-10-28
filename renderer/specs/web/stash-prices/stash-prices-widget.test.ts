@@ -301,6 +301,10 @@ describe("the stash prices widget", () => {
       "Stash tab hidden with the hotkey. Capture paused while the game window is not active.",
     ],
     [
+      { open: true, capture: "paused", match: { items: 0.97, cells: 1 } },
+      "Stash tab seen. Capture paused while the game window is not active. The last capture: 97% of the item cells and 100% of all cells matched.",
+    ],
+    [
       { capture: "setting-off" },
       "Capture off: turned off in the settings, so use the hotkey.",
     ],
