@@ -6,10 +6,10 @@
 484 renderer/src/assets/data/index.ts
 1758 renderer/src/parser/Parser.ts
 372 renderer/src/parser/stat-translations.ts
-752 renderer/src/web/Config.ts
+760 renderer/src/web/Config.ts
 565 renderer/src/web/background/Prices.ts
 373 renderer/src/web/item-search/WidgetItemSearch.vue
-394 renderer/src/web/overlay/OverlayWindow.vue
+404 renderer/src/web/overlay/OverlayWindow.vue
 424 renderer/src/web/overlay/Widget.vue
 311 renderer/src/web/price-check/CheckedItem.vue
 433 renderer/src/web/price-check/PriceCheckWindow.vue

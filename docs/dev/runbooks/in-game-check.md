@@ -1,44 +1,37 @@
 # Runbook: checking in-game behavior on Windows
 
-An agent cannot run Path of Exile 2, so the behaviors below need the maintainer on Windows with
-the game running ([AGENTS.md](../../../AGENTS.md#what-every-change-must-pass), rule 9). Each entry
-says what to press, what you should see and where the logs are. The default keys come from
-`defaultConfig()` in `renderer/src/web/Config.ts` and from each widget's `initInstance()`, not from
-the user pages. A change that leaves an entry unchecked names it in its summary, and a check that
-waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
+An agent cannot run Path of Exile 2, so the behaviors below need the maintainer on Windows with the game running
+([AGENTS.md](../../../AGENTS.md#what-every-change-must-pass), rule 9). Each entry says what to press, what you should
+see and where the logs are. The default keys come from `defaultConfig()` in `renderer/src/web/Config.ts` and from each
+widget's `initInstance()`, not from the user pages. A change that leaves an entry unchecked names it in its summary, and
+a check that waits for the maintainer is a task in [docs/dev/host/](../host/index.md).
 
 ## Before you start
 
-- **The game** runs in Windowed Fullscreen or Windowed mode, the modes the
-  [download page](../../download.md) lists as supported.
-- **The build under test** is a dev run ([DEVELOPING.md](../../../DEVELOPING.md)) or a packaged
-  build. A dev run keeps its settings in `config.dev.json` beside `config.json`, which it copies
-  the first time ([DEVELOPING.md](../../../DEVELOPING.md)), so a setting changed during the check
-  does not reach the installed app.
-- **The defaults** below are those of a new config. An existing config keeps its own keys. To check
-  the defaults, quit Kalandra, move `%APPDATA%\kalandra\apt-data\config.json` aside and start it
-  again. Put the file back afterwards.
-- **The language** in Settings, General, Language matches the game's language, since the parser
-  reads item text in the app's language.
-- **The rights** of both programs match. When the game runs as administrator, start Kalandra as
-  administrator too.
+- **The game** runs in Windowed Fullscreen or Windowed mode, the modes the [download page](../../download.md) lists as
+  supported.
+- **The build under test** is a dev run ([DEVELOPING.md](../../../DEVELOPING.md)) or a packaged build. A dev run keeps
+  its settings in `config.dev.json` beside `config.json`, which it copies the first time
+  ([DEVELOPING.md](../../../DEVELOPING.md)), so a setting changed during the check does not reach the installed app.
+- **The defaults** below are those of a new config. An existing config keeps its own keys. To check the defaults, quit
+  Kalandra, move `%APPDATA%\kalandra\apt-data\config.json` aside and start it again. Put the file back afterwards.
+- **The language** in Settings, General, Language matches the game's language, since the parser reads item text in the
+  app's language.
+- **The rights** of both programs match. When the game runs as administrator, start Kalandra as administrator too.
 
 ## Where the logs are
 
 - **Settings, Debug** shows the last 1000 lines main has written since it started (`Logger` in
-  `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. A line the page
-  sends to main has the area `renderer` (`main/src/renderer-log.ts`). To open Settings, press the
-  overlay key (Shift + Space) and click the cog icon in the main button bar. The tray item
-  Settings/League only shows a message that says this.
-- **Record all key presses**, a checkbox in Settings, Debug, makes main log every key pressed
-  while the game window is active as `debug [Shortcuts] Keydown <keys>` and
-  `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
-  `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`,
-  `paste-in-chat`, `stash-search` or `trigger-event`.
-- **The renderer's console** holds what the page logs. A dev run opens the developer tools at
-  start. In a packaged build, focus the overlay and press Ctrl + Shift + I: the overlay window's
-  menu has the `toggleDevTools` role (`main/src/windowing/OverlayWindow.ts`), and Electron binds
-  that role to Ctrl + Shift + I on Windows.
+  `main/src/RemoteLogger.ts`), as `[<local time>] <level> [<area>] <message>`. A line the page sends to main has the
+  area `renderer` (`main/src/renderer-log.ts`). To open Settings, press the overlay key (Shift + Space) and click the
+  cog icon in the main button bar. The tray item Settings/League only shows a message that says this.
+- **Record all key presses**, a checkbox in Settings, Debug, makes main log every key pressed while the game window is
+  active as `debug [Shortcuts] Keydown <keys>` and `debug [Shortcuts] Keyup <key>`, and every hotkey it handles as
+  `debug [Shortcuts] Action type: <type>`, where the type is `copy-item`, `toggle-overlay`, `paste-in-chat`,
+  `stash-search` or `trigger-event`.
+- **The renderer's console** holds what the page logs. A dev run opens the developer tools at start. In a packaged
+  build, focus the overlay and press Ctrl + Shift + I: the overlay window's menu has the `toggleDevTools` role
+  (`main/src/windowing/OverlayWindow.ts`), and Electron binds that role to Ctrl + Shift + I on Windows.
 - **Console lines that Settings, Debug also shows** are sent with `logToMain()`
   (`renderer/src/web/background/log-to-main.ts`):
   - `warn [renderer] Loading prices failed: <reason>` ([section 4](#4-the-price-check-keys)).
@@ -230,17 +223,24 @@ General, sets another path), and uses Alt when the file does not set it
     file was emptied, or `info [GameLogWatcher] The log file was replaced, reading the new file
     from the start` when the editor saved a new file in its place.
 
-## 8. Stash detection and the grid
+## 8. Stash detection, the grid and the marks
 
 - **Setting:** on the Stash prices page, **Read the tab in the background** and **Find the open tab in the game
   window** on, and a key in **Hotkey that marks the tab open or closed**. Save. The tab holds items without a price on
-  3 cells or more, and the widget lists them after a check ([stash-detection.md](../modules/stash-detection.md)).
+  3 cells or more, and the widget lists them after a check and has priced a few
+  ([stash-detection.md](../modules/stash-detection.md), [renderer-stash-prices.md](../modules/renderer-stash-prices.md)).
 - **Press:** open the stash on that tab, then another tab, close it, and press the hotkey twice. After each, read the
-  widget's `Stash tab` line with the overlay key: it keeps the last capture. Point at it, and take a screenshot.
-- **See:** `Stash tab seen.` within a second of opening the tab, both percentages 90 or more, and `not seen` on
-  another tab and with the stash closed; the hotkey gives `shown` and `hidden`. The tooltip's grid start and cell width
-  match the screenshot within 3 pixels; else write down both, with the resolution, for `GRID_LEFT`, `GRID_TOP` and
-  `GRID_CELL` in `stash-grid.ts`. Kalandra's CPU use in Task Manager stays near that with the stash closed.
+  widget's `Stash tab` line with the overlay key: it keeps the last capture. Point at it, and take a screenshot. With
+  the tab open, click a marked item, once with the game active and once with the overlay active, and hold `Alt`.
+  Then turn on **Grid alignment view** and look at the stash, open and closed.
+- **See:** `Stash tab seen.` and the marks within a second of opening the tab, both percentages 90 or more, and `not
+  seen` and no marks on another tab and with the stash closed; the hotkey gives `shown` and `hidden` and the marks
+  with them. Each mark lies on its item, a price on each yellow frame, a trash icon on each red one, and the
+  progress bar under the grid covers no button you need. A click on a mark reaches the game, or the overlay's
+  background, never the mark, and `Alt` hides the marks. The alignment view's lines, and the tooltip's grid start
+  and cell width, match the screenshot within 3 pixels; else write down both, with the resolution, for `GRID_LEFT`,
+  `GRID_TOP` and `GRID_CELL` in `stash-grid.ts`. Kalandra's CPU use in Task Manager stays near that with the stash
+  closed.
 - **Logs:** `info [GameCapture] Captures the window "<title>"` once, or the `warn [GameCapture]` line of a refusal
   and `warn [renderer] Stash detection cannot capture the game window: <message>`.
 

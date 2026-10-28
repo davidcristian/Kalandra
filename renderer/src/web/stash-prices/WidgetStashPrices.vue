@@ -82,7 +82,7 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18nNs("stash_prices");
     const reader = useStashReader();
-    // The pricer follows the reader's listings from here on, and the detector the listings and the game's focus
+    // OverlayWindow.vue creates both first through useStashHighlights(); they run while the panel is hidden
     useStashPricer();
     useStashDetector();
     const leagues = useLeagues();

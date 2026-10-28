@@ -4,8 +4,9 @@ title: Stash prices
 
 Stash prices reads one public stash tab of yours from the official trade site while Kalandra runs, lists the items in
 it that have no price, and prices each of them as a [price check](/price-check) would. You put items into that tab,
-and Kalandra finds and prices them there without a key press. Its widget shows what it read and priced, when it
-searches next and how many trade searches it may still use. It is off until you turn it on.
+and Kalandra finds and prices them there without a key press. When you open the tab in the game, Kalandra marks each
+item over the stash with its price or as trash. Its widget shows what it read and priced, when it searches next and how
+many trade searches it may still use. It is off until you turn it on.
 
 ## Set up the tab
 
@@ -94,6 +95,26 @@ The widget's line under the status says what Kalandra sees, and what the capture
 | Capture off: turned off in the settings, so use the hotkey. | **Find the open tab in the game window** is off. |
 | Stash tab shown with the hotkey. / Stash tab hidden with the hotkey. | You pressed the hotkey last. |
 | Capture off: | Any other reason after the colon, such as a game window that Kalandra cannot find. It tries again every 30 seconds, and the [Debug](/settings#debug) log has the reason. |
+
+## The marks over the stash
+
+While the stash shows the tab, Kalandra draws over it:
+
+- A bar under the grid, filled by the share of the items done, that says **Priced 14 of 40.** and why pricing waits,
+  as the [pricing table](#how-kalandra-prices-the-items) says.
+- On a **valuable** item, whose whole stack is worth the trash threshold or more: a yellow frame with its price,
+  written as the [suggested price](/suggested-price) writes it.
+- On a **trash** item, whose whole stack is worth less than the threshold: a red fill with a trash icon.
+- On an item without a price, with too few listings, unreadable or after a failed search: a dashed gray frame, so you
+  know Kalandra tried it.
+- On the item that a search prices now: a thin blue frame. An item that waits for its search has no mark.
+
+The trash threshold is 1 Chaos Orb, compared with the value of the whole stack, not of one item: a stack of 20 Chaos
+Orbs is worth 20 Chaos Orbs. Kalandra converts it with the price of a Chaos Orb in the price file, and when the price
+file has none, no item is trash.
+
+The marks show while the game window is active, and go when the tab or the stash closes, about a second later, or
+when you press the hotkey. Holding `Alt` hides them with the rest of the overlay. They never take a click.
 
 ## How it uses the trade site
 

@@ -628,6 +628,42 @@ describe("upgradeConfig", () => {
     expect(upgrade(config)).toEqual(expected);
   });
 
+  it("adds the highlights, the trash threshold and the grid alignment view to the stash prices widget of a version 46 config", () => {
+    const expected = asSaved(actual.defaultConfig());
+    const config = asSaved(expected);
+    config.configVersion = 46;
+    for (const key of [
+      "highlightValuable",
+      "highlightTrash",
+      "trashThreshold",
+      "alignmentView",
+    ]) {
+      Reflect.deleteProperty(stashPricesOf(config), key);
+    }
+
+    expect(upgrade(config)).toEqual(expected);
+    expect(stashPricesOf(expected)).toMatchObject({
+      highlightValuable: true,
+      highlightTrash: true,
+      trashThreshold: { amount: 1, currency: "chaos" },
+      alignmentView: false,
+    });
+  });
+
+  it("keeps the highlights, the trash threshold and the grid alignment view a version 46 config has", () => {
+    const expected = asSaved(actual.defaultConfig());
+    Object.assign(stashPricesOf(expected), {
+      highlightValuable: false,
+      highlightTrash: false,
+      trashThreshold: { amount: 0.5, currency: "div" },
+      alignmentView: true,
+    });
+    const config = asSaved(expected);
+    config.configVersion = 46;
+
+    expect(upgrade(config)).toEqual(expected);
+  });
+
   it("keeps the stash prices widget of a version 44 config and adds no second one", () => {
     const expected = asSaved(actual.defaultConfig());
     Object.assign(stashPricesOf(expected), {

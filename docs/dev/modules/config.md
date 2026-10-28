@@ -19,7 +19,7 @@ old one and keep that file, so a saved config must survive every update: this is
   `windowTitle`, `logKeys`, `accountName`, `stashScroll`, `language`, `preferredTradeSite`, `realm`, `fontSize`,
   `widgets`, `enableAlphas`, `alphas` (the experimental features turned on: `library`),
   `tipsFrequency` (a `TipsFrequency`) and `readClientLog`.
-- `defaultConfig()` returns a new default config with `configVersion` 46. Among its defaults: `overlayKey` is
+- `defaultConfig()` returns a new default config with `configVersion` 47. Among its defaults: `overlayKey` is
   `Shift + Space`, `windowTitle` is `Path of Exile 2`, `language` is `en`, `realm` is `pc-ggg`, `fontSize` is 16,
   `stashScroll` is true, and `restoreClipboard`, `hideOverlayOnBlur`, `readClientLog` and `enableAlphas` are false.
   `commands` has six entries: `/hideout` on `F5`, `/exit` on `F9`, and `@last ty`, `/invite @last`,
@@ -75,8 +75,10 @@ old one and keep that file, so a saved config must survive every update: this is
 - The `< 45` step passes `stashPricesDefault()` from `renderer/src/web/stash-prices/widget.ts` to `addNewWidget()` in
   `missing-widgets.ts`, which appends it with the next free `wmId` unless the config has a stash prices widget. It
   is off and has `menu::skip` ([renderer-stash-prices.md](renderer-stash-prices.md)).
-- The `< 46` step runs `addDetectionSettings()` from `stash-prices/saved-settings.ts`: a stash prices widget without
-  them gets `captureEnabled` true, `toggleKey` null and `gridCorrection` in pixels with 0 for each value.
+- The `< 46` and `< 47` steps run `addDetectionSettings()` and `addHighlightSettings()` from
+  `stash-prices/saved-settings.ts`, which give a stash prices widget each setting it lacks: `captureEnabled` true,
+  `toggleKey` null and `gridCorrection` in pixels with 0 for each value, then `highlightValuable` and
+  `highlightTrash` true, `trashThreshold` 1 `chaos` and `alignmentView` false.
 - `initConfig()` loads the config at start and listens for `MAIN->CLIENT::config-changed`. With no contents from
   main it uses `defaultConfig()`, and otherwise `upgradeConfig()` of the parsed file. `Host.configProblem` keeps
   the `ConfigProblem` main sent, and `LoadingAnimation.vue` names it, with the file's path, in the banner it shows
@@ -127,32 +129,31 @@ old one and keep that file, so a saved config must survive every update: this is
 `main/src/host-files/ConfigStore.ts`:
 
 - `ConfigStore` keeps the file at `apt-data/config.json` under Electron's `userData` folder. `load()` returns a
-  `LoadedConfig`: the file's text, or `null` when there is no file, and `problem` null. Any other read error, such
-  as `EBUSY` while another program holds the file, gives `null` and a `ConfigProblem` with reason `unreadable`, the
-  path and the error message, and logs `error [ConfigStore] Failed to read <path>: <message>`. Until a later read
-  succeeds, each save is skipped with `warn [ConfigStore] Did not save the config`, so the page, which runs on the
-  defaults, never replaces the file. `server.ts` returns both in `HostState` from `GET /config`. On
-  `CLIENT->MAIN::save-config` it sends the text to every client as `MAIN->CLIENT::config-changed` at once and
-  queues the write. Reads and writes of the file run one at a time in the order they arrive, so the last save is
-  the one on disk, and `load()` returns the text of a save that is still being written. A file that is not a JSON
-  object, such as one cut short or emptied, moves to `config-broken-<time>.json` beside it, with `warn
-  [ConfigStore] <path> is not JSON, so it was moved to <backup>` in the log, and `load()` returns `null` and a
-  `ConfigProblem` with reason `not-json` and the `backup` path. The page then starts from the defaults, and its
-  first save writes a new `config.json`. A move that fails is handled as a read error. It
-  creates `apt-data` when it is missing. A write goes to the file's name with `.new` added, is flushed to disk and
-  is renamed over the file, so a crash or a power loss during a save leaves the previous file whole. Windows fails
-  a rename over a file that another program has open, so the rename is tried again for up to 750 ms. When the
-  write or the rename fails, the file stays as it was, `error [ConfigStore] Failed to save the config: <message>`
-  goes to the log and the app keeps running; the next save writes the whole config to the `.new` file again. In
-  development (`VITE_DEV_SERVER_URL` is set) the file is `apt-data/config.dev.json`, and while it is missing,
-  `load()` returns the text of `config.json` when that is a JSON object, so a dev run never writes `config.json`.
+  `LoadedConfig`: the file's text, or `null` when there is no file, and `problem` null. Any other read error, such as
+  `EBUSY` while another program holds the file, gives `null` and a `ConfigProblem` with reason `unreadable`, the path
+  and the error message, and logs `error [ConfigStore] Failed to read <path>: <message>`. Until a later read succeeds,
+  each save is skipped with `warn [ConfigStore] Did not save the config`, so the page, which runs on the defaults, never
+  replaces the file. `server.ts` returns both in `HostState` from `GET /config`. On `CLIENT->MAIN::save-config` it sends
+  the text to every client as `MAIN->CLIENT::config-changed` at once and queues the write. Reads and writes of the file
+  run one at a time in the order they arrive, so the last save is the one on disk, and `load()` returns the text of a
+  save that is still being written. A file that is not a JSON object, such as one cut short or emptied, moves to
+  `config-broken-<time>.json` beside it, with `warn [ConfigStore] <path> is not JSON, so it was moved to <backup>` in
+  the log, and `load()` returns `null` and a `ConfigProblem` with reason `not-json` and the `backup` path. The page then
+  starts from the defaults, and its first save writes a new `config.json`. A move that fails is handled as a read error.
+  It creates `apt-data` when it is missing. A write goes to the file's name with `.new` added, is flushed to disk and is
+  renamed over the file, so a crash or a power loss during a save leaves the previous file whole. Windows fails a rename
+  over a file that another program has open, so the rename is tried again for up to 750 ms. When the write or the rename
+  fails, the file stays as it was, `error [ConfigStore] Failed to save the config: <message>` goes to the log and the
+  app keeps running; the next save writes the whole config to the `.new` file again. In development
+  (`VITE_DEV_SERVER_URL` is set) the file is `apt-data/config.dev.json`, and while it is missing, `load()` returns the
+  text of `config.json` when that is a JSON object, so a dev run never writes `config.json`.
 
 ## Invariants
 
 - A change to the config shape follows [the one hard rule](../../../AGENTS.md#the-one-hard-rule). A widget's
   default goes in its `initInstance()` or `defaultInstances()`, which `defaultConfig()` calls.
-- `defaultConfig()` returns `configVersion` 46, so the next step is `if (config.configVersion < 47)`, ending with
-  `config.configVersion = 47`, and `defaultConfig()` then returns 47. The last step of `upgradeConfig()` shows the
+- `defaultConfig()` returns `configVersion` 47, so the next step is `if (config.configVersion < 48)`, ending with
+  `config.configVersion = 48`, and `defaultConfig()` then returns 48. The last step of `upgradeConfig()` shows the
   current number. The existing steps have two gaps: no `< 20` step exists (`< 19` is followed by `< 21`), and the
   `< 33` step sets version 34, so no `< 34` step exists. The code between the `< 21` and `< 22` steps runs on every
   load and sets three fields when they are missing: `rememberCurrency` on the price check widget, `enableHotkeys`
@@ -187,9 +188,8 @@ old one and keep that file, so a saved config must survive every update: this is
   `addMissingWidgets()` and the code between the `< 21` and `< 22` steps, and is used as it is: its `configVersion`
   stays, and the fields and widgets the app does not have stay in every save. `initConfig()` writes a warning with
   both numbers to main's log ([ADR-0003](../adr/ADR-0003-config-survives-updates.md), decision 8).
-- main reads no setting from the config: it parses the text only to check that it is a JSON object, stores it,
-  and reads only `HostConfig`. A setting main needs goes through
-  `getConfigForHost()` into `HostConfig` ([ipc.md](ipc.md)).
+- main reads no setting from the config: it parses the text only to check that it is a JSON object, stores it, and reads
+  only `HostConfig`. A setting main needs goes through `getConfigForHost()` into `HostConfig` ([ipc.md](ipc.md)).
 - No `config.json` is committed to the repo ([AGENTS.md](../../../AGENTS.md#safety)).
 
 **Dependencies.** `HostConfig` and `ShortcutAction` from `ipc/types.ts`, `Host` from
@@ -199,52 +199,51 @@ default widgets, `vue` and `fast-deep-equal`.
 the `Logger` from `main/src/RemoteLogger.ts`. Its tests also pass the file functions (`ConfigFiles`) and the wait
 between rename retries.
 
-**Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()`
-returns the config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only
-the price check widget, so `tsc` fails on it when a new required `Config` field is missing from it.
-`priceCheckWidgetMock()` builds that widget with the settings a test passes, as in
-`setupTests({ widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })] })`.
-`renderer/specs/web/widget-registry.test.ts` loads the real module with `vi.importActual`, checks the widgets of
+**Tests.** `renderer/specs/vitest.setup.ts` replaces `@/web/Config` with a mock in every test: `AppConfig()` returns the
+config `defaultConfigMock()` builds, a typed `Config` literal with `configVersion` 99999999 and only the price check
+widget, so `tsc` fails on it when a new required `Config` field is missing from it. `priceCheckWidgetMock()` builds that
+widget with the settings a test passes, as in `setupTests({ widgets: [priceCheckWidgetMock({ apiLatencySeconds: 2 })]
+})`. `renderer/specs/web/widget-registry.test.ts` loads the real module with `vi.importActual`, checks the widgets of
 `defaultConfig()` and checks that the mock has each top-level field of `defaultConfig()`.
 `renderer/specs/web/config-upgrade.test.ts` runs the real `upgradeConfig()` on the saved configs in
 `renderer/specs/saved-configs/`: a new install's config of versions 2, 16, 25, 28, 32 and 36, each built from the
-defaults at that version's commits, with a changed league, hotkeys and widget position. It checks that each ends at
-the current version with every key of `defaultConfig()`, gets the default of each key the `< 38` step sets, keeps the
-user's choices, and runs each step once and in order, with the same result when every version in between saved the
-file. It also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that the
-`< 39` and `< 40` steps name the default stash searches of a version 36 config by preset, that the `< 39` step
-leaves the two that the `< 40` step names, and that a widget of an unknown type stays. For the `< 41` step it checks
-that no saved config keeps a Delve grid or the default `Cheat sheets` strip, that a version 40 config loses a Delve
-grid with a hotkey, which strips keep their own images and which go, and that the step runs only at version 41.
-For the `< 42` step it checks that a version 41 config gets each saved `maritalWeapon` set, an empty one too, under
-`martialWeapon` on every price check widget, keeps a `martialWeapon` set already there, and skips a price check
-widget without saved augments. For the `< 43` step it checks that a version 42 config loses `modOpts` from every
-profile of every library widget and keeps the other fields, that a config without a library widget, with
-`modOpts` on a widget of another type, or with missing or malformed profiles stays the same, and that a version 28
-or 32 config still gets `generation` from the `< 33` step before the `< 43` step removes `modOpts`. For the `< 44`
-step it checks that a version 43 config gets `suggestedPrice` on every price check widget. For the `< 45` step it
-checks that a version 44 config gets the stash prices widget with the `wmId` after a widget the user added, and that a
-stash prices widget it has stays without a second one. For the `< 46` step it checks that a version 45 config gets the
-three settings of stash detection, and keeps the ones it has. It runs the real `initConfig()` with a fake
-`Host.getConfig()` and checks that a saved config loads as `upgradeConfig()` returns it, that a config without the
-price check or another single instance widget gets the default one with a new `wmId` and a log line, that a version 32
-config without a library widget gets the one with `modOpts`, and that a version 2 config without its map check widget
-and a version 15 config without its Delve grid still throw. It reads the `log-entry` events that `initConfig()` sends:
-a config one version above the current one, with a field and a widget the app does not have, loads unchanged and sends
-one warning with both numbers, and a saved or current config sends none. It takes the last step version from
-`defaultConfig()`, so a new step needs no change to the spec. `renderer/specs/web/host-config.test.ts` sets configs
-with the real `updateConfig()` and checks the `HostConfig` that `pushHostConfig()` sends: each field, from the config
-and its price check and library widgets, and `libraryAlpha`, which is true only when `enableAlphas` is on and `alphas`
-includes `library`. `renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and
-checks that Save sends `save-config` with the edited copy and the window hidden, then `update-host-config`.
+defaults at that version's commits, with a changed league, hotkeys and widget position. It checks that each ends at the
+current version with every key of `defaultConfig()`, gets the default of each key the `< 38` step sets, keeps the user's
+choices, and runs each step once and in order, with the same result when every version in between saved the file. It
+also checks that a current config stays unchanged, that the `< 38` step keeps each saved value, that the `< 39` and `<
+40` steps name the default stash searches of a version 36 config by preset, that the `< 39` step leaves the two that the
+`< 40` step names, and that a widget of an unknown type stays. For the `< 41` step it checks that no saved config keeps
+a Delve grid or the default `Cheat sheets` strip, that a version 40 config loses a Delve grid with a hotkey, which
+strips keep their own images and which go, and that the step runs only at version 41. For the `< 42` step it checks that
+a version 41 config gets each saved `maritalWeapon` set, an empty one too, under `martialWeapon` on every price check
+widget, keeps a `martialWeapon` set already there, and skips a price check widget without saved augments. For the `< 43`
+step it checks that a version 42 config loses `modOpts` from every profile of every library widget and keeps the other
+fields, that a config without a library widget, with `modOpts` on a widget of another type, or with missing or malformed
+profiles stays the same, and that a version 28 or 32 config still gets `generation` from the `< 33` step before the `<
+43` step removes `modOpts`. For the `< 44` step it checks that a version 43 config gets `suggestedPrice` on every price
+check widget. For the `< 45` step it checks that a version 44 config gets the stash prices widget with the `wmId` after
+a widget the user added, and that a stash prices widget it has stays without a second one. For the `< 46` and `< 47`
+steps it checks that a version 45 config gets the three settings of stash detection and a version 46 config the four of
+the marks, and keeps the ones it has. It runs the real `initConfig()` with a fake `Host.getConfig()` and checks that a
+saved config loads as `upgradeConfig()` returns it, that a config without the price check or another single instance
+widget gets the default one with a new `wmId` and a log line, that a version 32 config without a library widget gets the
+one with `modOpts`, and that a version 2 config without its map check widget and a version 15 config without its Delve
+grid still throw. It reads the `log-entry` events that `initConfig()` sends: a config one version above the current one,
+with a field and a widget the app does not have, loads unchanged and sends one warning with both numbers, and a saved or
+current config sends none. It takes the last step version from `defaultConfig()`, so a new step needs no change to the
+spec. `renderer/specs/web/host-config.test.ts` sets configs with the real `updateConfig()` and checks the `HostConfig`
+that `pushHostConfig()` sends: each field, from the config and its price check and library widgets, and `libraryAlpha`,
+which is true only when `enableAlphas` is on and `alphas` includes `library`.
+`renderer/specs/web/settings/save-settings.test.ts` runs `saveSettings()` on the real module and checks that Save sends
+`save-config` with the edited copy and the window hidden, then `update-host-config`.
 `renderer/specs/web/shortcut-actions.test.ts` checks the hotkey list that `shortcutActions()` builds.
 `renderer/specs/web/config-repair.test.ts` checks `repairSavedConfig()` on the widget lists that the `< 29` and `< 30`
 steps left in saved configs, and `renderer/specs/web/map-check-marks.test.ts` checks `nameDefaultMarksByRef()`, and
 `trade-host.test.ts` beside it the host `tradeHost()` returns for each language and realm.
-`main/specs/ConfigStore.test.ts` checks `ConfigStore` in a temporary folder: the order of its reads and writes, a
-write that stops partway, a rename that fails while another program has the file open, with the 750 ms of retries on a
-fake clock and the log line of each failed save, a dev run's own file and its copy of `config.json`, a `config.json`
-that is not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that
-fails with `EBUSY`, after which no save replaces the file until a read succeeds. `main/specs/start-server.test.ts`
-reads `GET /config` after a `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that
-`Host.getConfig()` keeps the `ConfigProblem`.
+`main/specs/ConfigStore.test.ts` checks `ConfigStore` in a temporary folder: the order of its reads and writes, a write
+that stops partway, a rename that fails while another program has the file open, with the 750 ms of retries on a fake
+clock and the log line of each failed save, a dev run's own file and its copy of `config.json`, a `config.json` that is
+not a JSON object and one whose move to a backup fails, a `config.json` that is a folder, and a read that fails with
+`EBUSY`, after which no save replaces the file until a read succeeds. `main/specs/start-server.test.ts` reads `GET
+/config` after a `save-config` message, and `renderer/specs/web/host-events.test.ts` checks that `Host.getConfig()`
+keeps the `ConfigProblem`.

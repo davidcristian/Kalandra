@@ -104,7 +104,7 @@ cells, the match and the capture loop in the renderer. Code that marks the items
   `captureEnabled` and `gridCorrection`, the reader's listings, the game's focus from `MAIN->OVERLAY::focus-change`
   (false until the first one) and the window's size and `devicePixelRatio`, and calls `update()` when one of them
   changes. It calls `toggle()` on `MAIN->CLIENT::widget-action` with the target `stash-prices-toggle` (`TOGGLE_TARGET`
-  in `widget.ts`). `WidgetStashPrices.vue` creates it.
+  in `widget.ts`). `OverlayWindow.vue` creates it through `useStashHighlights()`.
 - `DetectionLine.vue` is the panel's line under the status: `Stash tab seen.`, `Stash tab not seen.`, or `shown`
   or `hidden with the hotkey`, then what the capture does, such as `Capture: 96% of the item cells and 98% of all
   cells match.` or `Capture off: <reason>.` The panel shows only while the overlay is active, when the capture is

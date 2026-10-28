@@ -9,6 +9,7 @@
       :style="{ background: overlayBackground }"
       @click="handleBackgroundClick"
     ></div>
+    <stash-highlights v-if="stashHighlights" />
     <template v-for="widget of widgets" :key="widget.wmId">
       <component
         v-show="isVisible(widget.wmId)"
@@ -66,6 +67,8 @@ import { Widget, WidgetManager } from "./interfaces";
 import { registry } from "./widget-registry.js";
 import { AppConfig, saveConfig, pushHostConfig } from "@/web/Config";
 import LoadingAnimation from "./LoadingAnimation.vue";
+import StashHighlights from "@/web/stash-prices/StashHighlights.vue";
+import { useStashHighlights } from "@/web/stash-prices/use-stash-highlights";
 import { usePoeninja } from "@/web/background/Prices";
 import { useLeagues } from "@/web/background/Leagues";
 import { useClientLog } from "@/web/client-log/client-log";
@@ -75,6 +78,7 @@ type WMID = Widget["wmId"];
 export default defineComponent({
   components: {
     LoadingAnimation,
+    StashHighlights,
   },
   setup() {
     usePoeninja();
@@ -254,11 +258,16 @@ export default defineComponent({
       }));
     });
 
+    // The marks over the stash have no widget, so they keep the window shown while the game is active
+    const highlights = useStashHighlights().shown;
+    const stashHighlights = computed(() => highlights.value && !hideUI.value);
+
     const isOverlayVisible = computed(() => {
       if (!Host.isElectron) return true;
       if (active.value) return true;
       if (showEditingNotification.value) return true;
       if (AppConfig().logKeys) return true;
+      if (stashHighlights.value) return true;
 
       return visibilityState.value.some((w) => w.isVisible);
     });
@@ -388,6 +397,7 @@ export default defineComponent({
         () => !active.value && showEditingNotification.value,
       ),
       registry,
+      stashHighlights,
     };
   },
 });

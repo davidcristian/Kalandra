@@ -1,6 +1,10 @@
 import type { Anchor, Widget } from "../overlay/widgets";
 import { disableWidget, enableWidget } from "../settings/utils";
 import {
+  DEFAULT_THRESHOLD_AMOUNT,
+  type TrashThreshold,
+} from "./highlight-marks";
+import {
   DEFAULT_INTERVAL_MINUTES,
   DEFAULT_SEARCH_BUDGET,
 } from "./reader-settings";
@@ -19,6 +23,13 @@ export interface StashPricesWidget extends Widget {
   /** The hotkey that marks the tab open or closed by hand. */
   toggleKey: string | null;
   gridCorrection: GridCorrection;
+  /** Whether an item at or above the trash threshold gets a highlight with its price over the open tab. */
+  highlightValuable: boolean;
+  /** Whether an item below the trash threshold gets a highlight with a trash icon. */
+  highlightTrash: boolean;
+  trashThreshold: TrashThreshold;
+  /** Whether the overlay draws every cell of the grid, to show where Kalandra places it. */
+  alignmentView: boolean;
 }
 
 /** The target of the `trigger-event` hotkey that marks the tab open or closed. */
@@ -44,6 +55,10 @@ export function stashPricesDefault(): StashPricesWidget {
     captureEnabled: true,
     toggleKey: null,
     gridCorrection: { unit: "px", left: 0, top: 0, cell: 0 },
+    highlightValuable: true,
+    highlightTrash: true,
+    trashThreshold: { amount: DEFAULT_THRESHOLD_AMOUNT, currency: "chaos" },
+    alignmentView: false,
   };
 }
 

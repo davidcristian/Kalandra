@@ -33,15 +33,17 @@ that a saved config survives every update covers it ([config.md](config.md),
   `wmId` counting from 1.
 - [OverlayWindow.vue](../../../renderer/src/web/overlay/OverlayWindow.vue) renders the component of each entry in
   `AppConfig().widgets` with the entry as its `config` prop, and provides the `WidgetManager`
-  ([interfaces.ts](../../../renderer/src/web/overlay/interfaces.ts)) as `wm`: `show`, `hide`, `remove`,
-  `bringToTop`, `create(wmType)`, `setFlag`, `widgets`, `active`, `size` and `poePanelWidth`. A widget reads it
-  with `injectWidgetManager()` from `overlay/injections.ts`, which throws when nothing provides it. Showing a widget
-  hides the `exclusive` widget that is shown, if any. It sends `OVERLAY->MAIN::render-state` with `shouldShow`
-  whenever the overlay starts or stops having something to draw, saves the config when the window loses focus,
-  and starts the background state: `usePoeninja()`, `useLeagues().load()` and `useClientLog()`, the shared
-  `createClientLog()` state, whose `handleLines()` reads the `MAIN->CLIENT::game-log` lines in order. A line that
-  throws is logged with `console.error` and skipped, and the lines after it are still read. `logToMain()` sends the
-  error of the first such line of a run, without the line, which can hold chat text.
+  ([interfaces.ts](../../../renderer/src/web/overlay/interfaces.ts)) as `wm`: `show`, `hide`, `remove`, `bringToTop`,
+  `create(wmType)`, `setFlag`, `widgets`, `active`, `size` and `poePanelWidth`. A widget reads it with
+  `injectWidgetManager()` from `overlay/injections.ts`, which throws when nothing provides it. Showing a widget hides
+  the `exclusive` widget that is shown, if any. Under the widgets it renders the stash prices layer, which is not a
+  widget, while `useStashHighlights().shown` holds ([renderer-stash-prices.md](renderer-stash-prices.md)). It sends
+  `OVERLAY->MAIN::render-state` with `shouldShow` whenever the overlay starts or stops having something to draw, the
+  layer included, saves the config when the window loses focus, and starts the background state: `usePoeninja()`,
+  `useLeagues().load()` and `useClientLog()`, the shared `createClientLog()` state, whose `handleLines()` reads the
+  `MAIN->CLIENT::game-log` lines in order. A line that throws is logged with `console.error` and skipped, and the lines
+  after it are still read. `logToMain()` sends the error of the first such line of a run, without the line, which can
+  hold chat text.
 - [Widget.vue](../../../renderer/src/web/overlay/Widget.vue) is the frame, with the "hide", "edit", "move" and
   "delete" buttons. Its props: `config` (a widget with an `anchor`: `pos` such as `tl` or `cc`, and `x` and `y` in
   percent of the screen), `moveHandles`, `readonly`, `removable`, `hideable` and `inlineEdit`. With `inlineEdit`

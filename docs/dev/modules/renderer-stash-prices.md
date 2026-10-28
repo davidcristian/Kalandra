@@ -85,7 +85,8 @@ are the only code that sends trade requests without a key press, under the rules
 - `status` is `off`, `no-league`, `no-prices` (the price file is not loaded), `reading` (the reader checks),
   `price-check-open`, `busy`, `budget-reached`, `rate-limited`, `pricing`, `waiting` (for the next search), `done`
   or `error`. `useStashPricer()` in `use-stash-pricer.ts` is the app's one pricer: it reads the widget's config and
-  the reader's state, and calls `sync()` whenever the reader's listings change. `WidgetStashPrices.vue` creates it.
+  the reader's state, and calls `sync()` whenever the reader's listings change. `OverlayWindow.vue` creates it
+  through `useStashHighlights()`.
 
 ### The order of a pricing run
 
@@ -107,8 +108,9 @@ are the only code that sends trade requests without a key press, under the rules
 
 - `StashPricesWidget` ([widget.ts](../../../renderer/src/web/stash-prices/widget.ts)) adds `anchor`, `enabled`
   (false), `tabName` (`kalandra-price-check`), `intervalMinutes` (10) and `searchBudget` (400) to `Widget`, and the
-  settings of [stash detection](stash-detection.md): `captureEnabled`, `toggleKey` and `gridCorrection`.
-  `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags `invisible-on-blur` and
+  settings of [stash detection](stash-detection.md): `captureEnabled`, `toggleKey` and `gridCorrection`, and of the
+  marks: `highlightValuable` and `highlightTrash` (true), `trashThreshold` (1 `chaos`) and `alignmentView` (false),
+  which the `< 47` step adds. `stashPricesDefault()` is the widget's `initInstance()`: title `{icon=fa-tags}`, flags `invisible-on-blur` and
   `menu::skip`, at the top left under the main button bar. The `< 45` step adds it to a saved config
   ([config.md](config.md)).
 - `useStashReader()` in `use-stash-reader.ts` returns the app's one reader, a `createGlobalState`. Its sources are
@@ -143,6 +145,27 @@ are the only code that sends trade requests without a key press, under the rules
 - `highlightView(input)` returns what to draw: while the tab is open, each mark on its item's cells (`itemRect()`,
   `grid.left + x * grid.cell` and so on) and the progress bar, as wide as the grid, under it; and the grid's cells
   for the grid alignment view, whether the tab is open or not.
+
+### The layer over the stash (`use-stash-highlights.ts`, `StashHighlights.vue`)
+
+- `useStashHighlights()` is the app's one set of highlights, a `createGlobalState`: `threshold` (the widget's
+  `trashThreshold` through `thresholdInDivine()` with `findPriceByQuery({ ns: "ITEM", name })`, computed again when
+  `xchgRate` changes, since each price file that loads sets it), `view` (`highlightView()` of the detector's `open`,
+  `quad` and `grid`, the reader's listings, the pricer's prices and counts, and the widget's toggles), and `shown`:
+  the widget is `enabled` and the tab is open or `alignmentView` is on.
+- `OverlayWindow.vue` renders `StashHighlights.vue` before the widgets while `shown` holds and the UI is not hidden
+  (`Alt` held), and counts it in `isOverlayVisible`. The panel is `invisible-on-blur`, and main hides the whole
+  window while the game is active unless the page sends `OVERLAY->MAIN::render-state` with `shouldShow` true, so
+  the marks need that. A second widget without `invisible-on-blur` was not used: showing it would change `wmWants`
+  on each open and close of the tab, which the next `saveConfig()` writes to `config.json`, and a saved `show` would
+  draw the marks at the next start. Calling `useStashHighlights()` there creates the reader, pricer and detector
+  before the widget mounts.
+- `StashHighlights.vue` covers the overlay with `pointer-events: none`, so it never takes a click. It draws the
+  alignment view as one box with a line every `cell`, and each mark on its cells: `valuable` with a yellow border
+  and its price as `suggestedPriceText()` writes it, `trash` with a red fill and the `fa-trash` icon, `unpriced`
+  with a dashed gray border and `pricing` with a light blue one. The progress bar under the grid is filled by the
+  share of the listings done and reads "Priced N of M." and `pricingStatusText()`. Its text is 0.28 of a normal
+  tab's cell, at least 10 pixels.
 
 ### The settings page
 
@@ -199,7 +222,9 @@ page and checks the checkbox's flags, the limits of the two number fields and th
 listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a
 crossbow with every modifier kind, the tiers, ranges and summed lines, an unrevealed modifier, a unique, a waystone,
 a rune from a socket as a currency stack, a barya, a relic, an unidentified copy and the unreadable cases.
-`highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
+`stash-highlights.test.ts` runs `useStashHighlights()` on the test config: when it shows, the threshold from the
+price file fixture, without its Chaos Orb and in Divine Orbs, and renders the layer and `OverlayWindow.vue` (with
+no widgets), whose `render-state` follows the open tab. `highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
 view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers, `FakeTradeSite` (whose `offers` answer the item searches)
 and the price file fixture with a unique and a rune added: the price file estimates, the search body with the
 valuable stats, the 20 cheapest, the order and the 15 seconds between searches, too few listings, the unreadable
