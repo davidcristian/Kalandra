@@ -70,14 +70,15 @@ https://davidcristian.github.io/Kalandra/ (each link opens the page's source).
 | `image-strip` | `overlay/WidgetImageStrip.vue` | `ImageStripWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `notepad` | `notepad/WidgetNotepad.vue` | `NotepadWidget` (`overlay/widgets.ts`) | multi | [`/extra-widgets`](../../extra-widgets.md) |
 | `library` | `library/WidgetLibrary.vue` | `LibraryWidget` (`library/widget.ts`) | single | [`/item-data`](../../item-data.md) |
-| `stash-prices` | `stash-prices/WidgetStashPrices.vue` | `StashPricesWidget` (`stash-prices/widget.ts`) | single | none yet |
+| `stash-prices` | `stash-prices/WidgetStashPrices.vue` | `StashPricesWidget` (`stash-prices/widget.ts`) | single | [`/stash-prices`](../../stash-prices.md) |
 
 The menu, price check, item check, library and stash prices start with `menu::skip`. In the copy that the settings
 window edits, two widgets get the flag from a setting when the window opens and when the setting changes: the XP
 tracker has it while "Allow reading of Client.txt file" is off, and the library unless both "Enable experimental
 features" and "Item Data Collection" are on (`enableWidget` and `disableWidget` in `settings/utils.ts`). Adding the
-flag also hides the widget. The price check is in [renderer-price-check.md](renderer-price-check.md), and the stash
-prices widget in [renderer-stash-prices.md](renderer-stash-prices.md).
+flag also hides the widget. The Stash prices page removes the flag when "Read the tab in the background" is checked
+and adds it when it is unchecked. The price check is in [renderer-price-check.md](renderer-price-check.md), and the
+stash prices widget in [renderer-stash-prices.md](renderer-stash-prices.md).
 
 ### Stash search presets
 

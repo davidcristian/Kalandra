@@ -7,8 +7,8 @@ by default) and click the cog icon in the main button bar, the row of icons that
 its widgets. Click **Save** at the bottom of the window to apply your changes and store them in `config.json`
 ([where it is](/download#where-kalandra-keeps-your-settings)), or **Cancel** to close the window without them.
 
-The menu on the left lists the pages in this order: Hotkeys, Chat, General, Price check, Map check, Item info,
-Leveling, Help, Debug and About. The **Quit** button under the menu closes Kalandra.
+The menu on the left lists the pages in this order: Hotkeys, Chat, General, Price check, Stash prices, Map check,
+Item info, Leveling, Help, Debug and About. The **Quit** button under the menu closes Kalandra.
 
 A bar under the window scrolls the names of Awakened PoE Trade's patrons, as thanks to the project that Kalandra is
 built on. Move the mouse over the bar to see all the names at once.
@@ -87,6 +87,11 @@ path of the one you play.
 This page sets the league, your account name, how stat filters are filled, how prices are shown, the built-in
 browser and the timing of price checks. [Price check](/price-check#settings) documents this page.
 
+## Stash prices
+
+This page turns on the reading of a public stash tab in the background, and sets the tab's name, how often Kalandra
+checks it and how many trade searches it may use. [Stash prices](/stash-prices#settings) documents this page.
+
 ## Map check
 
 This page sets which map mods Map check marks with a warning, danger or good icon. It keeps the choices in profiles.
@@ -149,6 +154,7 @@ The **edit** button of these widgets opens the settings window with only that wi
   documents it.
 - **Library**: the hotkey that logs an item, the output folder and which mods a recording keeps.
   [Item data](/item-data) documents it.
+- **Stash prices**: the **Stash prices** page. [Stash prices](/stash-prices) documents it.
 - **XP tracker**: the **Leveling** page, with **PoE log file**, **Allow reading of Client.txt file** and
   **Show experience gain percentage**. [XP tracker](/xp-tracker) documents it.
 

@@ -64,6 +64,14 @@ Details: [Stash search](/stash-search).
 
 ![The Dump sorting widget with its saved searches](/reference-images/DumpSortWidget.png)
 
+## Stash prices
+
+Reads one public stash tab of yours from the trade site every few minutes, without a key press, and lists the items
+in it that have no price. It is off until you turn it on in Settings, Stash prices, and it uses trade searches only
+within the budget you set there.
+
+Details: [Stash prices](/stash-prices).
+
 ## Chat commands
 
 A chat command sends a line of text to the game chat with one key. By default `F5` sends `/hideout` and `F9` sends

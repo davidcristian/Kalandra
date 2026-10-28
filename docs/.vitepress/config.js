@@ -55,6 +55,7 @@ export default defineConfig({
         items: [
           { text: 'Widgets', link: '/widgets' },
           { text: 'Stash search', link: '/stash-search' },
+          { text: 'Stash prices', link: '/stash-prices' },
           { text: 'XP tracker', link: '/xp-tracker' },
           { text: 'Extra widgets', link: '/extra-widgets' },
           { text: 'Chat commands', link: '/chat-commands' },

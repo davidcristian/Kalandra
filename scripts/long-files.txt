@@ -22,4 +22,4 @@
 379 renderer/src/web/price-check/settings-price-check.vue
 400 renderer/src/web/price-check/trade/TooltipItem.vue
 1816 renderer/src/web/price-check/trade/pathofexile-trade.ts
-511 renderer/src/web/settings/SettingsWindow.vue
+513 renderer/src/web/settings/SettingsWindow.vue

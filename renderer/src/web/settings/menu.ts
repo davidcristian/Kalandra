@@ -12,7 +12,8 @@ export type SettingsPage =
   | "about"
   | "stash-search"
   | "stopwatch"
-  | "library";
+  | "library"
+  | "stash-prices";
 
 /** Returns the menu's groups of pages for a widget type, or for the whole window when no type is given. */
 export function menuPages(type?: string): SettingsPage[][] {
@@ -29,11 +30,13 @@ export function menuPages(type?: string): SettingsPage[][] {
       return [["library"]];
     case "experience-tracker":
       return [["leveling"]];
+    case "stash-prices":
+      return [["stash-prices"]];
     default:
       return [
         ["hotkeys", "chat"],
         ["general"],
-        ["price-check", "maps", "item-check"],
+        ["price-check", "stash-prices", "maps", "item-check"],
         ["leveling"],
         ["help", "debug", "about"],
       ];

@@ -1,4 +1,5 @@
 import type { Anchor, Widget } from "../overlay/widgets";
+import { disableWidget, enableWidget } from "../settings/utils";
 import {
   DEFAULT_INTERVAL_MINUTES,
   DEFAULT_SEARCH_BUDGET,
@@ -29,4 +30,17 @@ export function stashPricesDefault(): StashPricesWidget {
     intervalMinutes: DEFAULT_INTERVAL_MINUTES,
     searchBudget: DEFAULT_SEARCH_BUDGET,
   };
+}
+
+/** Turns the reading on or off; the widget has a button in the main button bar only while it is on. */
+export function setStashPricesEnabled(
+  widget: StashPricesWidget,
+  enabled: boolean,
+): void {
+  widget.enabled = enabled;
+  if (enabled) {
+    enableWidget(widget);
+  } else {
+    disableWidget(widget);
+  }
 }

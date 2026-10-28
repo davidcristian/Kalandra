@@ -117,6 +117,7 @@ import SettingsStashSearch from "../stash-search/stash-search-editor.vue";
 import SettingsStopwatch from "../stopwatch/settings-stopwatch.vue";
 import SettingsLeveling from "../leveling/settings-leveling.vue";
 import SettingsLibrary from "../library/settings-library.vue";
+import SettingsStashPrices from "../stash-prices/settings-stash-prices.vue";
 import { disableWidget, enableWidget, findWidget } from "./utils";
 import { settingsDraft } from "./draft";
 import { saveSettings } from "./save-settings";
@@ -136,6 +137,7 @@ const PAGES: Record<SettingsPage, Component> = {
   "stash-search": SettingsStashSearch,
   "stopwatch": SettingsStopwatch,
   "library": SettingsLibrary,
+  "stash-prices": SettingsStashPrices,
 };
 
 function shuffle<T>(array: T[]): T[] {

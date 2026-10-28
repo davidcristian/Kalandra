@@ -6,7 +6,7 @@ describe("the pages the Settings window menu lists", () => {
     expect(menuPages()).toEqual([
       ["hotkeys", "chat"],
       ["general"],
-      ["price-check", "maps", "item-check"],
+      ["price-check", "stash-prices", "maps", "item-check"],
       ["leveling"],
       ["help", "debug", "about"],
     ]);
@@ -22,6 +22,10 @@ describe("the pages the Settings window menu lists", () => {
 
   it("lists only the Leveling page for the XP tracker", () => {
     expect(menuPages("experience-tracker")).toEqual([["leveling"]]);
+  });
+
+  it("lists only the Stash prices page for the stash prices widget", () => {
+    expect(menuPages("stash-prices")).toEqual([["stash-prices"]]);
   });
 
   it("lists every page for a widget without its own settings", () => {

@@ -61,6 +61,16 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
   than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), and **Check now**, which calls
   `checkNow()`.
 
+### The settings page
+
+`settings-stash-prices.vue` is the `stash-prices` page of Settings (`SettingsPage` and `menuPages()` in
+`settings/menu.ts`), after Price check in the whole window's menu and alone for the widget's edit button. Its
+**Read the tab in the background** checkbox calls `setStashPricesEnabled()` in `widget.ts`, which sets `enabled` and
+removes `menu::skip` with `enableWidget()`, or adds it and hides the widget with `disableWidget()`. **Stash tab
+name** is trimmed, **Check the tab every** goes through `clampInterval()` and **Search budget for 3 hours** through
+`clampBudget()` when the field loses focus. The page lists the steps that set up the tab and warns when the account
+name on the Price check page is empty. Settings edits a copy of the config, so the reader sees a change on Save.
+
 ### The order of a check
 
 1. Not `enabled`: `stop()`. No account name: `no-account`. No league in `leagueId()`: `no-league`.
@@ -95,5 +105,6 @@ search body, the fetches of new ids only, the tab filter, a gone and a returning
 tab, an unreadable fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the
 pauses for the price check and the limiter queue, a restriction during the fetches, the trade errors and their log
 lines, and the settings changes. `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the
-fake site, and renders the panel in English for each status. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
+fake site, and renders the panel in English for each status. `stash-prices-settings.test.ts` renders the settings
+page and checks the checkbox's flags, the limits of the two number fields and the account name warning. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
 `reindexedIds()`, `threeHourSearchCount()` and the setting limits. No test calls the live site.

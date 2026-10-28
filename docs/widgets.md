@@ -27,9 +27,10 @@ The main button bar is the widget in the top left corner of the overlay.
 
 - **A button for each hidden widget.** Click it to show that widget. The button shows the widget title or an icon:
   the cog opens the [Settings window](/settings), the magnifier shows Item search, `XP` shows the
-  [XP tracker](/xp-tracker) while `Allow reading of Client.txt file` is checked in Settings, and the book shows the
-  Library widget while the experimental Item Data Collection feature is on. A widget with no title shows `#` and a
-  number.
+  [XP tracker](/xp-tracker) while `Allow reading of Client.txt file` is checked in Settings, the book shows the
+  Library widget while the experimental Item Data Collection feature is on, and the tags icon shows
+  [Stash prices](/stash-prices) while its `Read the tab in the background` setting is on. A widget with no title
+  shows `#` and a number.
 - **The three dots.** Hover over them to show the `add widget…` menu, then click a name to add a new widget of that
   type: `Stopwatch`, `Stash search`, `Image strip` or `Notepad`. You can add any number of each. The other widgets
   exist once and cannot be added.
@@ -48,7 +49,7 @@ Hover over a widget to show its buttons. Not every widget has all four:
 | --- | --- |
 | Stash search, Image strip, Notepad | `hide`, `edit`, `move`, `delete` |
 | Stopwatch | `edit`, `move`, `delete` |
-| XP tracker, Library | `hide`, `edit`, `move` |
+| XP tracker, Library, Stash prices | `hide`, `edit`, `move` |
 | Item search | `hide`, `move` |
 | Main button bar | `edit`, `move` |
 | Item info, Map check | `hide`, `edit` |
@@ -115,6 +116,7 @@ register because it presses them itself to copy items and to type into the game.
 - [Price check](/price-check), [Item info](/item-info) and [Map check](/map-check) open when you press their
   hotkeys over an item.
 - [Stash search](/stash-search) types saved searches into the stash search box.
+- [Stash prices](/stash-prices) reads a public stash tab of yours in the background.
 - [XP tracker](/xp-tracker) shows your experience multiplier while you level.
 - [Extra widgets](/extra-widgets) covers the image strip, stopwatch, notepad and item search.
 - [Item data](/item-data) covers the Library widget of the experimental Item Data Collection feature.
