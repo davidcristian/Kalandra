@@ -120,8 +120,13 @@ are the only code that sends trade requests without a key press, under the rules
   league changes. The panel, in the `Widget.vue` frame, shows the tab name, the number of listings in the tab, the
   times of the last and the next check, the 3 hour search count of the budget (`?` before the site sent that
   window), "Only the newest N of your M listings without a price are read." when the search returned fewer ids
-  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), and **Check now**, which calls
-  `checkNow()`.
+  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the pricing block, and **Check
+  now**, which calls `checkNow()`.
+- `PricingPanel.vue`, the pricing block, shows only while the tab has listings: "Priced N of M." with the seconds to
+  the next search when `nextSearchAt` is set, the counts of the listings with too few listings, unreadable and
+  failed, the text of a pricer status that waits or fails (`stash_prices.pricing_*`), and the 8 most valuable
+  priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and its
+  reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
 
 ### The settings page
 
@@ -170,7 +175,9 @@ search body, the fetches of new ids only, the tab filter, a gone and a returning
 tab, an unreadable fetch result, the newest 100 of 150 listings, the interval and its minimum, the budget, the
 pauses for the price check and the limiter queue, a restriction during the fetches, the trade errors and their log
 lines, and the settings changes. `stash-prices-widget.test.ts` runs `useStashReader()` on the test config with the
-fake site, and renders the panel in English for each status. `stash-prices-settings.test.ts` renders the settings
+fake site, and renders the panel in English for each status. It also checks that `useStashPricer()` follows the
+reader's listings and stops with it, and renders the pricing block: the progress, the next search, the most valuable
+first, and the text of each pricer status. `stash-prices-settings.test.ts` renders the settings
 page and checks the checkbox's flags, the limits of the two number fields and the account name warning. `stash-listings.test.ts` checks `readSearch()`, `readListing()`,
 `reindexedIds()`, `threeHourSearchCount()` and the setting limits. `item-text.test.ts` writes and parses the 23 saved
 listings of `specs/docs/fetchResponses.json` and `fetchResponses2.json`: the exact text of a magic helmet and of a

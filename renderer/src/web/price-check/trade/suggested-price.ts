@@ -15,6 +15,16 @@ export interface PricedListing {
 
 export type Reliability = "high" | "medium" | "low";
 
+/** The `app_i18n.json` key and the text color of each reliability, as the suggested price line shows them. */
+export const RELIABILITY_TEXT: Record<
+  Reliability,
+  { key: string; class: string }
+> = {
+  high: { key: "trade_result.reliability_high", class: "text-green-500" },
+  medium: { key: "trade_result.reliability_medium", class: "text-yellow-500" },
+  low: { key: "trade_result.reliability_low", class: "text-orange-500" },
+};
+
 export interface SuggestedPrice {
   /** The suggested price, in Divine Orbs. */
   price: number;
@@ -87,7 +97,9 @@ export function suggestPrice(
 }
 
 /** Writes the price and range in Divine Orbs when the whole range is above one, else in the core currency. */
-export function suggestedPriceText(suggested: SuggestedPrice): {
+export function suggestedPriceText(
+  suggested: Pick<SuggestedPrice, "price" | "low" | "high">,
+): {
   price: string;
   range: string;
 } {

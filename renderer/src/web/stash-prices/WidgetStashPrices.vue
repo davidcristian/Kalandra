@@ -17,6 +17,7 @@
         {{ t(":only_newest", { read: state.read, total: state.total }) }}
       </div>
       <div :class="statusClass" class="mt-1">{{ statusText }}</div>
+      <pricing-panel :config="config" />
       <button
         class="btn mt-2"
         :disabled="state.status === 'checking'"
@@ -32,6 +33,7 @@
 import { computed, defineComponent, PropType, watch } from "vue";
 import { DateTime } from "luxon";
 import Widget from "../overlay/Widget.vue";
+import PricingPanel from "./PricingPanel.vue";
 import type { WidgetSpec } from "../overlay/interfaces";
 import { AppConfig } from "@/web/Config";
 import { useLeagues } from "@/web/background/Leagues";
@@ -67,7 +69,7 @@ export default defineComponent({
     instances: "single",
     initInstance: stashPricesDefault,
   } satisfies WidgetSpec,
-  components: { Widget },
+  components: { Widget, PricingPanel },
   props: {
     config: {
       type: Object as PropType<StashPricesWidget>,

@@ -42,7 +42,7 @@ import { usePoeninja } from "@/web/background/Prices";
 import { suggestedPriceEnabled } from "@/web/price-check/price-check-config";
 import {
   PricedListing,
-  Reliability,
+  RELIABILITY_TEXT,
   suggestedPriceText,
   suggestPrice,
 } from "./suggested-price";
@@ -63,24 +63,13 @@ export default defineComponent({
     const { t } = useI18nNs("trade_result");
     const { xchgRate } = usePoeninja();
 
-    function reliabilityText(reliability: Reliability) {
-      switch (reliability) {
-        case "high":
-          return { text: t(":reliability_high"), class: "text-green-500" };
-        case "medium":
-          return { text: t(":reliability_medium"), class: "text-yellow-500" };
-        case "low":
-          return { text: t(":reliability_low"), class: "text-orange-500" };
-      }
-    }
-
     const text = computed(() => {
       const suggested = suggestPrice(props.listings);
       if (!suggested) return null;
-      const reliability = reliabilityText(suggested.reliability);
+      const reliability = RELIABILITY_TEXT[suggested.reliability];
       return {
         ...suggestedPriceText(suggested),
-        reliability: reliability.text,
+        reliability: t(reliability.key),
         reliabilityClass: reliability.class,
         sellers: suggested.sellers,
         leftOut: suggested.leftOut,

@@ -66,9 +66,9 @@ Details: [Stash search](/stash-search).
 
 ## Stash prices
 
-Reads one public stash tab of yours from the trade site every few minutes, without a key press, and lists the items
-in it that have no price. It is off until you turn it on in Settings, Stash prices, and it uses trade searches only
-within the budget you set there.
+Reads one public stash tab of yours from the trade site every few minutes, without a key press, lists the items in it
+that have no price, and prices each of them as a price check would. It is off until you turn it on in Settings, Stash
+prices, and it uses trade searches only within the budget you set there.
 
 Details: [Stash prices](/stash-prices).
 

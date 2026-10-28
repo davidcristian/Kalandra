@@ -1,19 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSSRApp } from "vue";
+import { createSSRApp, nextTick } from "vue";
 import { renderToString } from "vue/server-renderer";
+import { present } from "@specs/present";
 import {
   priceCheckWidgetMock,
   setupFetchMock,
   setupTests,
 } from "@specs/vitest.setup";
 import type { PriceCheckWidget } from "@/web/overlay/widgets";
+import type { ListingPrice } from "@/web/stash-prices/price-item";
+import { countPrices, type PricerState } from "@/web/stash-prices/pricer-state";
+import { readListing } from "@/web/stash-prices/stash-listings";
 import type { ReaderState } from "@/web/stash-prices/stash-reader";
 import type * as UseStashReader from "@/web/stash-prices/use-stash-reader";
 import {
   stashPricesDefault,
   type StashPricesWidget,
 } from "@/web/stash-prices/widget";
-import { FakeTradeSite } from "./fake-trade-site";
+import { copyOf, FakeTradeSite, SAVED } from "./fake-trade-site";
 
 // PriceTrend.vue imports vue3-apexcharts, which reads window when it loads; no test draws a chart
 vi.mock("vue3-apexcharts", () => ({ default: {} }));
@@ -112,10 +116,11 @@ describe("the stash prices widget", () => {
     expect(useStashReader().state.status).toBe("price-check-open");
   });
 
-  /** Renders the panel in English with the reader state `state`, and returns its text. */
+  /** Renders the panel in English with the reader state `state` and the pricer state `pricing`, and returns its text. */
   async function panelText(
     settings: Partial<StashPricesWidget>,
     state: Partial<ReaderState>,
+    pricing: Partial<PricerState> = {},
   ): Promise<string> {
     setup({ enabled: true, ...settings });
     setupFetchMock();
@@ -124,10 +129,16 @@ describe("the stash prices widget", () => {
     const { default: panel } = await import(
       "@/web/stash-prices/WidgetStashPrices.vue"
     );
+    const { useStashPricer } = await import(
+      "@/web/stash-prices/use-stash-pricer"
+    );
     const app = createSSRApp(panel, { config: stashPrices(settings) });
     app.use(await init("en"));
     app.provide("wm", {});
     Object.assign(useStashReader().state, state);
+    // The pricer follows the listings first, then the test sets the state it shows
+    await nextTick();
+    Object.assign(useStashPricer().state, pricing);
     const html = await renderToString(app);
     return html
       .replace(/<[^>]*>/g, "\n")
@@ -169,5 +180,83 @@ describe("the stash prices widget", () => {
     ["checking", "Reading the tab."],
   ] as const)("shows why it waits: %s", async (status, shown) => {
     expect(await panelText({}, { status })).toContain(shown);
+  });
+
+  /** Listings of the saved items 0 to 3, in the tab, with the prices given. */
+  function priced(prices: ListingPrice[]) {
+    const listings = prices.map((_, idx) =>
+      present(
+        readListing(
+          copyOf(SAVED[idx], `listing-${idx}`, "kalandra-price-check"),
+        ),
+      ),
+    );
+    const map = new Map(prices.map((price, idx) => [`listing-${idx}`, price]));
+    return { listings, map };
+  }
+
+  it("shows the pricing progress, the next search and the most valuable items first", async () => {
+    const { listings, map } = priced([
+      {
+        status: "priced",
+        value: 0.5,
+        low: 0.5,
+        high: 0.5,
+        reliability: null,
+        source: "price-file",
+      },
+      {
+        status: "priced",
+        value: 2,
+        low: 2,
+        high: 3,
+        reliability: "high",
+        source: "listings",
+      },
+      { status: "too-few" },
+      { status: "cannot-read", reason: "stash_prices.unreadable" },
+      { status: "queued" },
+    ]);
+
+    const text = await panelText(
+      {},
+      { status: "waiting", listings },
+      {
+        status: "waiting",
+        prices: map,
+        counts: countPrices(map),
+        nextSearchAt: Date.now() + 12_000,
+      },
+    );
+
+    // Without a core currency from a price file, the suggested price text writes Divine Orbs
+    expect(text).toContain(
+      "Priced 4 of 5, next search in 12 s. | Not priced: 1 with too few listings, 1 unreadable, 0 failed. | Most valuable: | Phoenix Brand | ~ 2 div | high reliability | Collector's Corsair Cap of Curvation | ~ 0 . 5 div | estimate",
+    );
+  });
+
+  it.each([
+    ["budget-reached", {}, "less the 18 kept for the checks of the tab."],
+    ["pricing", { pricing: "listing-1" }, "Pricing Phoenix Brand."],
+    [
+      "error",
+      { error: "Rate limit exceeded" },
+      "Pricing failed: Rate limit exceeded",
+    ],
+    ["no-prices", {}, "Pricing waits for the price file of the league."],
+  ] as const)("shows why pricing waits: %s", async (status, more, shown) => {
+    const { listings, map } = priced([
+      { status: "queued" },
+      { status: "queued" },
+    ]);
+
+    const text = await panelText(
+      {},
+      { status: "waiting", listings },
+      { status, prices: map, counts: countPrices(map), ...more },
+    );
+
+    expect(text).toContain("Priced 0 of 2.");
+    expect(text).toContain(shown);
   });
 });

@@ -47,7 +47,7 @@ issue on [GitHub](https://github.com/davidcristian/Kalandra/issues).
 
 - [Widgets](/widgets): the main button bar of the overlay, and how to move, edit, hide and delete widgets.
 - [Stash search](/stash-search): saved search texts that Kalandra types into the game's search box.
-- [Stash prices](/stash-prices): reads a public stash tab of yours in the background and lists its items without a
+- [Stash prices](/stash-prices): reads a public stash tab of yours in the background and prices its items without a
   price.
 - [XP tracker](/xp-tracker): a widget that shows your level, your experience multiplier in the current area and how
   far you are from the level penalty.
