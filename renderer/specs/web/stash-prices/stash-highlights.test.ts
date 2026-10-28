@@ -33,9 +33,16 @@ vi.mock("@/web/background/Leagues", async () => {
 
 const GRID = { left: 17, top: 126.5, cell: 52.5 };
 
-/** The price file fixture of priceService/tests, without its Chaos Orb when `chaos` is false. */
-function priceFile(chaos = true): string {
-  const file = JSON.parse(
+// The Chaos Orb price in the price file fixture, in Divine Orbs
+const CHAOS_PRICE = 0.1173;
+
+/** The price file fixture of priceService/tests, with its Chaos Orb at `chaos` Divine Orbs, or without it for null. */
+function priceFile(chaos: number | null = CHAOS_PRICE): string {
+  const file: {
+    itemOverviews: Array<{
+      lines: Array<{ name: string; primaryValue: number }>;
+    }>;
+  } = JSON.parse(
     fs.readFileSync(
       path.resolve(
         __dirname,
@@ -44,12 +51,14 @@ function priceFile(chaos = true): string {
       "utf8",
     ),
   );
-  if (!chaos) {
-    for (const overview of file.itemOverviews) {
-      overview.lines = overview.lines.filter(
-        (line: { name: string }) => line.name !== "Chaos Orb",
+  for (const overview of file.itemOverviews) {
+    overview.lines = overview.lines
+      .filter((line) => chaos !== null || line.name !== "Chaos Orb")
+      .map((line) =>
+        line.name === "Chaos Orb" && chaos !== null
+          ? { ...line, primaryValue: chaos }
+          : line,
       );
-    }
   }
   return JSON.stringify(file);
 }
@@ -161,8 +170,9 @@ describe("the highlights over the stash", () => {
     file = contents;
     const { usePoeninja } = await import("@/web/background/Prices");
     const poeninja = usePoeninja();
+    const before = poeninja.loadedAt.value;
     poeninja.queuePricesFetch();
-    await vi.waitFor(() => expect(poeninja.xchgRate.value).toBeDefined());
+    await vi.waitFor(() => expect(poeninja.loadedAt.value).not.toBe(before));
   }
 
   it("shows the layer only while stash prices is on and the tab is open or the grid alignment view is on", async () => {
@@ -199,6 +209,21 @@ describe("the highlights over the stash", () => {
     },
   );
 
+  it("converts the threshold again with each price file, also at the same exchange rate", async () => {
+    const { threshold } = await setup(
+      { trashThreshold: { amount: 1, currency: "chaos" } },
+      [],
+    );
+    await loadPrices(priceFile());
+    expect(threshold.value).toBeCloseTo(CHAOS_PRICE, 9);
+
+    // The app loads the price file again once its last load is over 31 minutes old
+    vi.setSystemTime(Date.now() + 31 * 60 * 1000);
+    await loadPrices(priceFile(0.125));
+
+    expect(threshold.value).toBeCloseTo(0.125, 9);
+  });
+
   it("needs no price file for a threshold in Divine Orbs", async () => {
     const { threshold } = await setup(
       { trashThreshold: { amount: 0.5, currency: "div" } },
@@ -214,7 +239,7 @@ describe("the highlights over the stash", () => {
       [1, 0, 1, 1, priced(0.001)],
     ]);
 
-    await loadPrices(priceFile(false));
+    await loadPrices(priceFile(null));
 
     expect(threshold.value).toBeNull();
     expect(view.value.marks.map((mark) => mark.kind)).toEqual([

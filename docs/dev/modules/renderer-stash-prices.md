@@ -150,9 +150,8 @@ are the only code that sends trade requests without a key press, under the rules
 ### The layer over the stash (`use-stash-highlights.ts`, `StashHighlights.vue`)
 
 - `useStashHighlights()` is the app's one set of highlights, a `createGlobalState`: `threshold` (the widget's
-  `trashThreshold` through `thresholdInDivine()` with `findPriceByQuery({ ns: "ITEM", name })`, computed again when
-  `xchgRate` changes value, since `findPriceByQuery` is not reactive, so a new price file with the same rate keeps the
-  old threshold ([refinement 125](../refinements/tasks/125-stash-threshold-after-a-new-price-file.md))), `view`
+  `trashThreshold` through `thresholdInDivine()` with `findPriceByQuery({ ns: "ITEM", name })`, computed again after
+  each load of the price file and each change of league, since it reads `loadedAt` and `xchgRate`), `view`
   (`highlightView()` of the detector's `open`, `quad` and `grid`, the reader's listings, the pricer's prices and counts,
   and the widget's toggles), and `shown`: the widget is `enabled` and the tab is open or `alignmentView` is on.
 - `OverlayWindow.vue` renders `StashHighlights.vue` before the widgets while `shown` holds and the UI is not hidden
@@ -238,8 +237,9 @@ buttons, the threshold's currencies and the alignment view.
 `fetchResponses2.json`: the exact text of a magic helmet and of a crossbow with every modifier kind, the tiers, ranges
 and summed lines, an unrevealed modifier, a unique, a waystone, a rune from a socket as a currency stack, a barya, a
 relic, an unidentified copy and the unreadable cases. `stash-highlights.test.ts` runs `useStashHighlights()` on the test
-config: when it shows, the threshold from the price file fixture, without its Chaos Orb and in Divine Orbs, and renders
-the layer, with the bar's countdown, and `OverlayWindow.vue` (with no widgets), whose `render-state` follows the tab.
+config: when it shows, the threshold from the price file fixture, then from a copy with the same rate and another Chaos
+Orb price, without its Chaos Orb and in Divine Orbs, and renders the layer, with the bar's countdown, and
+`OverlayWindow.vue` (with no widgets), whose `render-state` follows the tab.
 `highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
 view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers,
 `FakeTradeSite` (whose `offers` are the results of the item searches) and the price file fixture with a unique and a

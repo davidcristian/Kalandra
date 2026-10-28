@@ -23,9 +23,9 @@ export const useStashHighlights = createGlobalState(() => {
 
   const threshold = computed(() => {
     const { trashThreshold } = widget();
-    // findPriceByQuery is not reactive, so this reads the exchange rate, which a price file with another rate changes
+    // findPriceByQuery is not reactive, so this reads the load time, and the rate that a league change clears
     if (
-      poeninja.xchgRate.value === undefined &&
+      (!poeninja.loadedAt.value || poeninja.xchgRate.value === undefined) &&
       trashThreshold.currency !== "div"
     ) {
       return null;

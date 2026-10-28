@@ -148,7 +148,7 @@ export const usePoeninja = createGlobalState(() => {
 
   const isLoading = shallowRef(false);
   let PRICES_DB: PriceDatabase = [];
-  let lastUpdateTime = 0;
+  const loadedAt = shallowRef(0);
   let downloadController: AbortController | undefined;
   let lastInterestTime = 0;
 
@@ -159,7 +159,7 @@ export const usePoeninja = createGlobalState(() => {
     if (!league || !league.isPopular || league.realm !== "pc-ggg") return;
     if (
       !force &&
-      (Date.now() - lastUpdateTime < UPDATE_INTERVAL_MS ||
+      (Date.now() - loadedAt.value < UPDATE_INTERVAL_MS ||
         Date.now() - lastInterestTime > INTEREST_SPAN_MS)
     )
       return;
@@ -213,10 +213,9 @@ export const usePoeninja = createGlobalState(() => {
         }
       }
 
-      // Clear cache
       priceCache = new Map<string, CurrencyValue>();
 
-      lastUpdateTime = Date.now();
+      loadedAt.value = Date.now();
     } catch (e) {
       if (controller === downloadController) {
         console.warn(e);
@@ -421,6 +420,7 @@ export const usePoeninja = createGlobalState(() => {
   return {
     xchgRate: readonly(xchgRate),
     xchgRateCurrency: readonly(activeCoreCurrency),
+    loadedAt: readonly(loadedAt),
     findPriceByQuery,
     autoCurrency,
     queuePricesFetch,

@@ -1,6 +1,6 @@
 # The trash threshold keeps an old currency price while the exchange rate stays the same
 
-**Status:** open
+**Status:** done 2026-10-28
 **Area:** renderer
 **Origin:** [renderer/src/web/stash-prices/use-stash-highlights.ts](../../../../renderer/src/web/stash-prices/use-stash-highlights.ts)
 **Verified:** 2026-10-28
@@ -18,3 +18,4 @@ prices.
 ## History
 
 - 2026-10-28: Left for later by the stash marks, whose threshold follows the exchange rate.
+- 2026-10-28: Became "fix(renderer): convert the trash threshold again after each price file".
