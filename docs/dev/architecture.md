@@ -1,10 +1,8 @@
 # Kalandra architecture
 
-This document maps Kalandra: its parts, the boundary between its two processes, how a price check, the config and
-the game data move through them, the CI workflows, and where each part lives in the repo. Kalandra is a Path of
-Exile 2 overlay for price checking items, with widgets for maps, stash search, XP tracking and more. The rules are
-in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
-[ADR-0004](adr/ADR-0004-process-boundary.md).
+This document maps Kalandra: its parts, the boundary between its two processes, how a price check, stash prices, the
+config and the game data move through them, the CI workflows, and where each part lives in the repo. The rules are in
+[AGENTS.md](../../AGENTS.md), and the reasons for the two processes in [ADR-0004](adr/ADR-0004-process-boundary.md).
 
 ## Components
 
@@ -13,7 +11,7 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 |                                                              |
 |  main/  the main process (Node.js)                           |
 |    shortcuts/   hotkeys, key presses, the clipboard          |
-|    windowing/   the overlay window over the game window      |
+|    windowing/   the overlay window, the game window capture  |
 |    host-files/  apt-data files, Client.txt, game config      |    +-- outside hosts, over HTTPS ----+
 |    AppUpdater   updates from GitHub releases                 |    | official trade sites:           |
 |    AppTray      the tray icon and its menu                   |    |   www.pathofexile.com and       |
@@ -24,7 +22,7 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 |        | GET /config, /uploads, /proxy, the page's files     |    priceService/ (Python, on a server)
 |        v                                                     |                     ^
 |  renderer/  the Vue 3 page in the overlay window             |                     | its own requests
-|    parser/, price-check/, widgets, settings                  |                 poe.ninja
+|    parser/, price-check/, stash-prices/, widgets, settings   |                 poe.ninja
 |    loads data/<lang>/ game data from main's server           |
 +--------------------------------------------------------------+
         ^
@@ -46,9 +44,8 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
   ([modules/renderer-price-check.md](modules/renderer-price-check.md)), `src/web/overlay/` places the widgets
   ([modules/renderer-widgets.md](modules/renderer-widgets.md)), `src/web/Config.ts` holds the user's settings
   ([modules/config.md](modules/config.md)) and `src/assets/data/` loads the game data.
-- **ipc** (`ipc/`) holds the types and key tables both processes import: `HostConfig`, `ShortcutAction`, the
-  `IpcEvent` union and `ClientLogEvent` in `types.ts`, and the key name tables in `KeyToCode.ts`. See
-  [modules/ipc.md](modules/ipc.md).
+- **ipc** (`ipc/`) holds the types and key tables both processes import: `HostConfig`, `ShortcutAction`, the `IpcEvent`
+  union and `ClientLogEvent` in `types.ts`, and the key tables in `KeyToCode.ts` ([modules/ipc.md](modules/ipc.md)).
 - **The outside hosts** are reached through main's proxy, except the item icons, which the page loads from
   `web.poecdn.com` ([ADR-0005](adr/ADR-0005-proxy-hosts-and-trade-rate-limits.md)). The official trade sites serve
   searches, listings, bulk exchange queries, the league list and the trade stat and item lists. `poeWebApi()` in
@@ -71,8 +68,8 @@ in [AGENTS.md](../../AGENTS.md), and the reasons for the process boundary are in
 and `--listen=[host][:port]` sets either part; when it cannot listen on that address, it uses the default one. In
 development, main listens on port 8584, and Vite's dev server on `localhost:5173` forwards these routes to it
 (`server.proxy` in `renderer/vite.config.mts`). Every request passes one check first: its `Host` must be
-`localhost` or an IP address, and its `Origin`, which a WebSocket must send, must match `Host`.
-A request that fails gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
+`localhost` or an IP address, and its `Origin`, which a WebSocket must send, must match `Host`. A request that fails
+gets 403 ([ADR-0009](adr/ADR-0009-local-server-accepts-only-its-own-page.md)).
 
 | Route | What it does | Renderer side |
 | --- | --- | --- |
@@ -101,15 +98,13 @@ its direction:
 | `OVERLAY->MAIN::` | the overlay window | main, which ignores these from a page outside Electron |
 
 The last active client is the one that most recently connected or sent `CLIENT->MAIN::used-recently`, or the only
-client left after another one disconnects. A new message starts as a new member of the `IpcEvent` union, then gets
-its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event with both ends.
+client left after another one disconnects. [modules/ipc.md](modules/ipc.md) lists every event with both ends.
 
 ## A price check, from hotkey to price
 
-1. The player points at an item in the game and presses the price check hotkey, `Ctrl + D` by default
-   (`hotkeyHold` plus `hotkey` in the price check widget's config). `Shortcuts` in
-   `main/src/shortcuts/Shortcuts.ts` registers every hotkey with Electron's `globalShortcut` while the game window
-   is active.
+1. The player points at an item in the game and presses the price check hotkey, `Ctrl + D` by default (`hotkeyHold`
+   plus `hotkey` in the price check widget's config). `Shortcuts` in `main/src/shortcuts/Shortcuts.ts` registers every
+   hotkey with Electron's `globalShortcut` while the game window is active.
 2. main starts `HostClipboard.readItemText()` and presses the game's copy keys through `uiohook-napi`: `Ctrl + C`
    together with the game's advanced item description key, which `GameConfig` reads from
    `poe2_production_Config.ini` (`Alt` when the file sets none). The game copies the item text to the clipboard.
@@ -138,21 +133,33 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
    for a trade site and `app.userAgentFallback` as the User-Agent, and returns the response with its
    `content-encoding` and `set-cookie` headers removed.
 
+## Stash prices, without a key press
+
+1. With **Read the tab in the background** on, `renderer/src/web/stash-prices/` reads the account's listings without a
+   price in the named public tab once per interval, and prices each from the price file or with one trade search, after
+   the user's own requests and within a search budget ([ADR-0012](adr/ADR-0012-background-trade-searches.md)).
+2. On Windows, main lets the overlay page capture the game window alone (`GameCapture`), and the page compares 4 pixels
+   of each stash cell with the listings' places, twice a second, to see when the stash shows the tab; Linux and macOS
+   use a hotkey ([ADR-0013](adr/ADR-0013-game-capture.md), [modules/stash-detection.md](modules/stash-detection.md)).
+3. While the tab is open, `OverlayWindow.vue` draws a layer that is not a widget and takes no click, with a mark on each
+   item and a progress bar, and counts it in `render-state` so main keeps the window shown over the active game
+   ([modules/renderer-stash-prices.md](modules/renderer-stash-prices.md)).
+
 ## The config, from file to settings
 
 1. At start, `initConfig()` in `renderer/src/web/Config.ts` fetches `GET /config`. main returns the text of
-   `apt-data/config.json` from `ConfigStore.load()`; on Windows the file is
-   `%APPDATA%\kalandra\apt-data\config.json`.
-2. With no file, the renderer uses `defaultConfig()`. Otherwise `addMissingWidgets()` adds each single instance
-   widget the file lacks, and `upgradeConfig()` runs every upgrade step above the file's `configVersion`. main
-   moves a file that is not a JSON object to a backup beside it, so the page starts from `defaultConfig()`, and
-   skips saves after a read that fails ([modules/config.md](modules/config.md)).
+   `apt-data/config.json` from `ConfigStore.load()`; on Windows the file is `%APPDATA%\kalandra\apt-data\config.json`.
+2. With no file, the renderer uses `defaultConfig()`. Otherwise `addMissingWidgets()` adds each single instance widget
+   the file lacks, and `upgradeConfig()` runs every upgrade step above the file's `configVersion`, so a saved config
+   survives every update ([ADR-0003](adr/ADR-0003-config-survives-updates.md)). main moves a file that is not a JSON
+   object to a backup beside it, so the page starts from `defaultConfig()`, and skips saves after a read that fails
+   ([modules/config.md](modules/config.md)).
 3. When the overlay mounts, `pushHostConfig()` sends `CLIENT->MAIN::update-host-config` with the `HostConfig` that
    `getConfigForHost()` builds: every hotkey as a `ShortcutAction` (`shortcutActions()` in
-   `renderer/src/web/shortcut-actions.ts`), and the settings main reads. The handler in
-   `main/src/main.ts` passes them to the overlay window, the shortcuts, the clipboard, the log watcher, the game
-   config reader, the tray and the file writer. The updater's first check does not wait for this: `AppUpdater`
-   starts it when main creates it.
+   `renderer/src/web/shortcut-actions.ts`), and the settings main reads. The handler in `main/src/main.ts` passes them
+   to the overlay window, the shortcuts, the clipboard, the log watcher, the game config reader, the game capture, the
+   tray and the file writer. The updater's first check does not wait for this: `AppUpdater` starts it when main creates
+   it.
 4. `saveConfig()` sends `CLIENT->MAIN::save-config` with the whole config as JSON when it differs from the last
    one sent or received, and never while an exclusive widget is shown. It runs when the overlay window loses
    focus, after an exclusive widget other than the settings window closes, and on Save in the settings window.
@@ -162,9 +169,6 @@ its sender and its handler. [modules/ipc.md](modules/ipc.md) lists every event w
 5. `ConfigStore` sends `MAIN->CLIENT::config-changed` to every client, and each client replaces its config with
    the one sent. It writes the file after any earlier save, so the last save is the one on disk. In development,
    main writes no file.
-
-A saved config must survive every update: [the one hard rule](../../AGENTS.md#the-one-hard-rule),
-[ADR-0003](adr/ADR-0003-config-survives-updates.md) and [modules/config.md](modules/config.md).
 
 ## The game data, from patch to parser
 
@@ -212,8 +216,7 @@ Every job runs on `ubuntu-latest` unless the table names other runners, and ever
   not in the git config while `npm ci` runs the install scripts of the dependencies.
 - A push that changes only `docs/dev/` or a markdown file at the repo root other than `AGENTS.md` runs only Changed
   paths and Lint & Format in `test.yml`. A change to `AGENTS.md` also runs Scripts, whose tests read its banned words
-  table and its scope list. A change to `docs/dev/refinements/index.md` also runs Scripts, whose tests read its task
-  template.
+  table and scope list, and so does a change to `docs/dev/refinements/index.md`, whose task template they read.
 
 The package job's upload outcomes and the release steps are in [runbooks/release.md](runbooks/release.md), and
 working on the docs site in [runbooks/docs-site.md](runbooks/docs-site.md).
@@ -225,7 +228,7 @@ main/              the Electron main process: TypeScript bundled by esbuild, pac
   src/             main.ts (entry), startup.ts, server.ts, request-origin.ts, listen-option.ts, served-file.ts,
                    client-log-writer.ts, proxy.ts, AppUpdater.ts, AppTray.ts, RemoteLogger.ts
     shortcuts/     hotkeys, key presses, reading item text, typing chat commands and stash searches
-    windowing/     the overlay window, the game window, overlay visibility, the widget area tracker
+    windowing/     the overlay window, the game window, overlay visibility, the widget area tracker, the game capture
     host-files/    config.json, uploads, the Client.txt watcher, the game config, the data file writer
   build/           script.mjs (the esbuild build and dev runner) and the app icons
   electron-builder.yml  NSIS installer and portable on Windows, AppImage on Linux, universal dmg on macOS
