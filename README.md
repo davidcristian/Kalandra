@@ -1,6 +1,6 @@
 # ![Perfect Jewelers Orb](./renderer/public/images/jeweler.png) Kalandra
 
-[![GitHub Downloads (specific asset, latest release)](https://img.shields.io/github/downloads/davidcristian/Kalandra/latest/Kalandra-Setup-0.17.0.exe?style=plastic)](https://tooomm.github.io/github-release-stats/?username=davidcristian&repository=Kalandra)
+[![GitHub Downloads (specific asset, latest release)](https://img.shields.io/github/downloads/davidcristian/Kalandra/latest/Kalandra-Setup-0.18.0.exe?style=plastic)](https://tooomm.github.io/github-release-stats/?username=davidcristian&repository=Kalandra)
 [![GitHub Tag](https://img.shields.io/github/v/tag/davidcristian/Kalandra?style=plastic&label=latest%20version)](https://github.com/davidcristian/Kalandra/releases/latest)
 [![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/davidcristian/Kalandra/latest/master?style=plastic)](https://github.com/davidcristian/Kalandra/commits/master/)
 [![license: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-3b82f6)](LICENSE)

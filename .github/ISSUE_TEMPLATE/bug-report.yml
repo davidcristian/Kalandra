@@ -57,6 +57,7 @@ body:
       label: Version
       description: What version of Kalandra are you running? You can see this in Settings -> About
       options:
+        - 0.18.0
         - 0.17.0
         - 0.16.3
         - 0.16.2
