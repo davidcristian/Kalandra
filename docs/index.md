@@ -11,6 +11,15 @@ Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-
 
 ![The Kalandra price check window for a rare pair of boots, next to the game's inventory](/reference-images/RareCheck.png){:.rounded}
 
+## Highlights
+
+- [Suggested price](/suggested-price): a price check suggests a price, a range and how reliable they are for any
+  item, rares included, from the listings it already got. On by default.
+- [Stash prices](/stash-prices): put your loot into one public stash tab, and Kalandra prices every item in it in the
+  background and marks each one over the stash with its price, or as trash, when you open the tab in the game.
+
+![A stash tab in the game, with a yellow price frame on each valuable item and a red trash mark on the rest](/reference-images/StashPricesMarks.png){:.rounded}
+
 ## Start here
 
 1. [Download](/download): install Kalandra.

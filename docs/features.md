@@ -73,6 +73,8 @@ Stash prices, and it uses trade searches only within the budget you set there.
 
 Details: [Stash prices](/stash-prices).
 
+![A stash tab in the game, with a yellow price frame on each valuable item and a red trash mark on the rest](/reference-images/StashPricesMarks.png)
+
 ## Chat commands
 
 A chat command sends a line of text to the game chat with one key. By default `F5` sends `/hideout` and `F9` sends

@@ -13,6 +13,26 @@ Kalandra continues [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-
 The only official download sites are <https://davidcristian.github.io/Kalandra/download> and
 <https://github.com/davidcristian/Kalandra/releases>. Any other location is not official and may be malicious.
 
+## Highlights
+
+### Suggested price
+
+A price check suggests a price for any item, rares included. Kalandra works out one price, a range and how reliable
+they are from the listings the search already got, leaves out likely price fixing, and for a rare turns on the stats
+that set its price, so the search finds items that sell for the same reasons as yours. It is on by default:
+[how it works](https://davidcristian.github.io/Kalandra/suggested-price).
+
+![A price check of a rare item, with the suggested price line above the listings](./docs/reference-images/SuggestedPrice.png)
+
+### Stash prices
+
+Put your loot into one public stash tab and go back to mapping. Kalandra reads the tab from the trade site in the
+background, prices every item in it with the suggested price, within a trade search budget you set, and when you open
+the tab in the game it marks each item over the stash with its price, or as trash. Turn it on under the suggested
+price setting: [how to set it up](https://davidcristian.github.io/Kalandra/stash-prices).
+
+![A stash tab in the game, with a yellow price frame on each valuable item and a red trash mark on the rest](./docs/reference-images/StashPricesMarks.png)
+
 ## Moving from Exiled Exchange 2 or Awakened PoE Trade
 
 Kalandra installs beside both and keeps its settings in its own folder. The
