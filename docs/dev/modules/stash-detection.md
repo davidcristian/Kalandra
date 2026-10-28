@@ -3,7 +3,7 @@
 **Purpose.** The stash prices feature ([renderer-stash-prices.md](renderer-stash-prices.md)) marks the items of one
 stash tab while the user has that tab open in the game. On Windows the overlay page finds that out from a capture of
 the game window, which only main can grant ([ADR-0004](../adr/ADR-0004-process-boundary.md)). This document covers
-the capture handler in main and the grid of the tab in the renderer.
+the capture handler in main, and the grid, the cells and the match in the renderer.
 
 ## Public contract
 
@@ -46,6 +46,31 @@ the capture handler in main and the grid of the tab in the renderer.
 - `sampleArea(frame, normal)` returns the part of the frame to read, from its top left corner to the far corner of
   the grid, and the scale that keeps a quad cell 16 pixels wide (`SAMPLE_CELL`), or 1 for a smaller frame.
 
+### The cells and the match (`cell-classifier.ts`, `tab-match.ts`)
+
+- In the game, a cell under an item has a navy background, or a red one for an item the character cannot use, and an
+  empty cell is dark gray with a lighter clover in its middle. Item art covers the middle of a cell, so
+  `classifyCells(image, grid, side)` reads four pixels of each cell, at `CORNER_INSET` (a tenth of the cell) from its
+  corners, of a `PixelImage` (RGBA rows, as `ImageData`).
+- `pixelKind(r, g, b)` returns `item` for blue at least 18 above red and green, or red at least 25 above green and
+  blue; `empty` for a pixel no brighter than 40 whose channels differ by at most 10; and `other` for the rest, such as
+  a grid line, item art or a bright scene. The thresholds fit the reference screenshot, whose navy is about
+  (4, 4, 42), red (60, 4, 5) and empty corner (8, 8, 8), and its navy after a window capture, (3, 6, 40). They are
+  **estimates for other screens**: a brightness setting or an HDR screen is not checked. A pixel outside the image is
+  `other`.
+- `cellState(kinds)` returns `filled` for two `item` pixels or more, `empty` for three `empty` pixels and no `item`
+  one, and `unknown` otherwise.
+- `expectedCells(listings, side)` marks the cells under each listing (`x`, `y`, `w`, `h`), and
+  `compareLayout(states, expected)` returns `itemCells` (the cells under the listings), `items` (their share that is
+  `filled`) and `cells` (the share of all cells that is `filled` under a listing and `empty` elsewhere).
+- `showsTab(match)` holds for at least 3 item cells (`MIN_ITEM_CELLS`) and at least 90% (`MIN_AGREEMENT`) of `items`
+  and of `cells`. The item share keeps a mostly empty tab or a dark scene from matching a tab with few items, and the
+  cell share keeps another tab with items in the same places from matching. Items the listings do not have yet, such as
+  new items before the next check of the tab, count against `cells`: 14 such cells of a normal tab still match.
+- `matchTab(image, gridOf, listings)` compares the image as a quad tab, and also as a normal tab when the listings fit
+  one (`needsQuad()`), and returns the layout that shows the tab, or else the one with the higher `cells`, with
+  `quad` and `seen`.
+
 ## Invariants
 
 - Main grants a capture and never reads a frame: the frames go to the page that asked, and main stores nothing.
@@ -62,3 +87,8 @@ video, with no window of the title and with a list that fails, and reads the log
 `host-config.test.ts` checks that `stashCapture` and `windowTitle` reach `GameCapture.update()`.
 `renderer/specs/web/stash-prices/stash-grid.test.ts` checks the grid at several window sizes, both tab kinds, each
 correction unit, a frame of a borderless, a windowed and a scaled game, and the reference screenshot's cells.
+`cell-classifier.test.ts` reads the colors of a tab and the corner samples of all 144 cells of the reference
+screenshot (`reference-cells.ts`), and classifies drawn tabs. `SyntheticFrame` in `synthetic-stash.ts` draws them from
+the reference colors: navy and red items with art in their middle, clover in the empty cells, grid lines, noise on
+every pixel, over a scene of random colors. `tab-match.test.ts` matches a drawn tab, the same tab with 10 and 20 new
+items, a scene, a dark scene, an empty tab, another tab, a grid off by half a cell, quad tabs and too few items.
