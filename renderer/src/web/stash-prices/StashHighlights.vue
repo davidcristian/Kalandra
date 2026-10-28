@@ -29,13 +29,14 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
+import { useNow } from "@vueuse/core";
 import { AppConfig } from "@/web/Config";
 import { useI18nNs } from "@/web/i18n";
 import { suggestedPriceText } from "@/web/price-check/trade/suggested-price";
 import { requireWidget } from "@/web/settings/utils";
 import type { Rect } from "./highlight-marks";
 import { readerReserve } from "./pricer-state";
-import { listingNames, pricingStatusText } from "./pricing-text";
+import { listingNames, pricingStatusText, progressText } from "./pricing-text";
 import { useStashDetector } from "./use-stash-detector";
 import { useStashHighlights } from "./use-stash-highlights";
 import { useStashPricer } from "./use-stash-pricer";
@@ -67,6 +68,7 @@ export default defineComponent({
     const detector = useStashDetector();
     const pricer = useStashPricer();
     const reader = useStashReader();
+    const now = useNow({ interval: 1000 });
 
     return {
       view,
@@ -88,11 +90,11 @@ export default defineComponent({
         })),
       ),
       barText: computed(() => {
-        const { bar } = view.value;
-        const progress = t(":priced", {
-          done: bar?.done ?? 0,
-          total: bar?.total ?? 0,
-        });
+        const progress = progressText(
+          pricer.state,
+          now.value.getTime(),
+          (key, values) => t(key, values),
+        );
         const widget = requireWidget<StashPricesWidget>(
           "stash-prices",
           AppConfig(),

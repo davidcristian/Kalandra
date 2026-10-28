@@ -30,6 +30,20 @@ export function listingNames(
   );
 }
 
+/** Returns the progress line: the items priced so far, and the seconds to the next search when one is set. */
+export function progressText(
+  state: Pick<PricerState, "counts" | "nextSearchAt">,
+  now: number,
+  t: Translate,
+): string {
+  const { done, listings: total } = state.counts;
+  if (state.nextSearchAt === null) {
+    return t("stash_prices.priced", { done, total });
+  }
+  const seconds = Math.max(0, Math.ceil((state.nextSearchAt - now) / 1000));
+  return t("stash_prices.priced_next", { done, total, seconds });
+}
+
 /** Returns the line that says why pricing waits or which item it prices, or null when the status has no line. */
 export function pricingStatusText(
   state: Pick<PricerState, "status" | "error" | "pricing">,

@@ -27,7 +27,7 @@ import {
   suggestedPriceText,
 } from "@/web/price-check/trade/suggested-price";
 import { readerReserve } from "./pricer-state";
-import { listingNames, pricingStatusText } from "./pricing-text";
+import { listingNames, pricingStatusText, progressText } from "./pricing-text";
 import { useStashPricer } from "./use-stash-pricer";
 import { useStashReader } from "./use-stash-reader";
 import type { StashPricesWidget } from "./widget";
@@ -52,15 +52,11 @@ export default defineComponent({
     return {
       t,
       state,
-      progress: computed(() => {
-        const { done, listings } = state.counts;
-        if (state.nextSearchAt === null) {
-          return t(":priced", { done, total: listings });
-        }
-        const ms = state.nextSearchAt - now.value.getTime();
-        const seconds = Math.max(0, Math.ceil(ms / 1000));
-        return t(":priced_next", { done, total: listings, seconds });
-      }),
+      progress: computed(() =>
+        progressText(state, now.value.getTime(), (key, values) =>
+          t(key, values),
+        ),
+      ),
       notPriced: computed(() => {
         const { tooFew, cannotRead, failed } = state.counts;
         if (!tooFew && !cannotRead && !failed) return null;

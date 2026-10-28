@@ -279,6 +279,22 @@ describe("the highlights over the stash", () => {
     expect(html).not.toContain("background-size");
   });
 
+  it("counts down to the next search on the progress bar, also before anything is priced", async () => {
+    await setup(
+      {},
+      [
+        [0, 0, 1, 1, { status: "queued" }],
+        [1, 0, 1, 1, { status: "queued" }],
+      ],
+      {},
+      { status: "waiting", nextSearchAt: Date.now() + 12_000 },
+    );
+
+    expect(await layerHtml()).toContain("Priced 0 of 2, next search in 12 s.");
+    vi.advanceTimersByTime(4_500);
+    expect(await layerHtml()).toContain("Priced 0 of 2, next search in 8 s.");
+  });
+
   it("draws the cells of a quad tab with the grid alignment view and no mark while the tab is closed", async () => {
     await setup({ alignmentView: true }, [[0, 0, 1, 1, priced(2)]], {
       open: false,

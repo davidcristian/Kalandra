@@ -119,8 +119,9 @@ The widget's line under the status says what Kalandra sees, and what the capture
 
 While the stash shows the tab, Kalandra draws over it:
 
-- A bar under the grid, filled by the share of the items done, that says **Priced 14 of 40.** and why pricing waits,
-  as the [pricing table](#how-kalandra-prices-the-items) says.
+- A bar under the grid, filled by the share of the items done, that says **Priced 14 of 40, next search in 12 s.**,
+  with the seconds to the next pricing search, and why pricing waits, as the
+  [pricing table](#how-kalandra-prices-the-items) says.
 - On a **valuable** item, whose whole stack is worth the trash threshold or more: a yellow frame with its price,
   written as the [suggested price](/suggested-price) writes it.
 - On a **trash** item, whose whole stack is worth less than the threshold: a red fill with a trash icon.

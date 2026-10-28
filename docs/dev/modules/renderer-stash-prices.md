@@ -127,11 +127,11 @@ are the only code that sends trade requests without a key press, under the rules
   than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the line on whether the stash
   shows the tab ([stash-detection.md](stash-detection.md)), the pricing block, and **Check now**, which calls
   `checkNow()`.
-- `PricingPanel.vue`, the pricing block, shows only while the tab has listings: "Priced N of M." with the seconds to
-  the next search when `nextSearchAt` is set, the counts of the listings with too few listings, unreadable and
-  failed, the text of a pricer status that waits or fails (`pricingStatusText()` in `pricing-text.ts`), and the 8
-  most valuable priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and
-  its reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
+- `PricingPanel.vue`, the pricing block, shows only while the tab has listings: `progressText()` in `pricing-text.ts`
+  ("Priced N of M." with the seconds to the next search when `nextSearchAt` is set), the counts of too few listings,
+  unreadable and failed, the text of a pricer status that waits or fails (`pricingStatusText()`), and the 8 most
+  valuable priced listings: the name, the price as `suggestedPriceText()` writes the suggested price line, and its
+  reliability with the colors of `RELIABILITY_TEXT` in `suggested-price.ts`, or "estimate" for the price file.
 
 ### The marks over the stash (`highlight-marks.ts`)
 
@@ -166,8 +166,8 @@ are the only code that sends trade requests without a key press, under the rules
   alignment view as one box with a line every `cell`, and each mark on its cells: `valuable` with a yellow border
   and its price as `suggestedPriceText()` writes it, `trash` with a red fill and the `fa-trash` icon, `unpriced`
   with a dashed gray border and `pricing` with a light blue one. The progress bar under the grid is filled by the
-  share of the listings done and reads "Priced N of M." and `pricingStatusText()`, and grows down when that text
-  wraps. Its text is 0.28 of a normal tab's cell, at least 10 pixels.
+  share of the listings done and reads `progressText()` and `pricingStatusText()`, as the pricing block does, and
+  grows down when that text wraps. Its text is 0.28 of a normal tab's cell, at least 10 pixels.
 
 ### The settings page
 
@@ -239,7 +239,7 @@ buttons, the threshold's currencies and the alignment view.
 and summed lines, an unrevealed modifier, a unique, a waystone, a rune from a socket as a currency stack, a barya, a
 relic, an unidentified copy and the unreadable cases. `stash-highlights.test.ts` runs `useStashHighlights()` on the test
 config: when it shows, the threshold from the price file fixture, without its Chaos Orb and in Divine Orbs, and renders
-the layer and `OverlayWindow.vue` (with no widgets), whose `render-state` follows the open tab.
+the layer, with the bar's countdown, and `OverlayWindow.vue` (with no widgets), whose `render-state` follows the tab.
 `highlight-marks.test.ts` checks each mark, the toggles, the threshold in each currency and without a price, and the
 view of a normal and a quad tab, open and closed. `stash-pricer.test.ts` drives the pricer with fake timers,
 `FakeTradeSite` (whose `offers` are the results of the item searches) and the price file fixture with a unique and a
