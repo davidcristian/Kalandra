@@ -151,10 +151,10 @@ are the only code that sends trade requests without a key press, under the rules
 
 - `useStashHighlights()` is the app's one set of highlights, a `createGlobalState`: `threshold` (the widget's
   `trashThreshold` through `thresholdInDivine()` with `findPriceByQuery({ ns: "ITEM", name })`, computed again when
-  `xchgRate` changes value, since `findPriceByQuery` is not reactive, so a new price file with the same rate keeps
-  the old threshold), `view` (`highlightView()` of the detector's `open`,
-  `quad` and `grid`, the reader's listings, the pricer's prices and counts, and the widget's toggles), and `shown`:
-  the widget is `enabled` and the tab is open or `alignmentView` is on.
+  `xchgRate` changes value, since `findPriceByQuery` is not reactive, so a new price file with the same rate keeps the
+  old threshold ([refinement 125](../refinements/tasks/125-stash-threshold-after-a-new-price-file.md))), `view`
+  (`highlightView()` of the detector's `open`, `quad` and `grid`, the reader's listings, the pricer's prices and counts,
+  and the widget's toggles), and `shown`: the widget is `enabled` and the tab is open or `alignmentView` is on.
 - `OverlayWindow.vue` renders `StashHighlights.vue` before the widgets while `shown` holds and the UI is not hidden
   (`Alt` held), and counts it in `isOverlayVisible`. The panel is `invisible-on-blur`, and with `hideOverlayOnBlur` on
   main hides the whole window while the game is active unless the page sends `OVERLAY->MAIN::render-state` with
