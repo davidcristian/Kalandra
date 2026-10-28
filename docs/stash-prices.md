@@ -157,10 +157,11 @@ The budget is where Kalandra stops its own searches, and the rest up to 600 stay
 When you price check a lot, the count reaches the budget sooner, and the checks wait until it falls below the budget
 again. A longer interval and a lower budget leave more searches for your price checks.
 
-A search returns the newest 100 listings. When your account has more listings without a price, for example in other
-public tabs, the widget says `Only the newest 100 of your N listings without a price are read`, and an item in the tab
-that is older than those 100 is not found. Set a price on the items in your other public tabs to keep the count
-under 100.
+A search returns the newest 100 listings, and Kalandra reads only those: reading more would take more searches and
+fetches each check than the trade site allows. When your account has more listings without a price, for example in
+other public tabs, the widget says `Only the newest 100 of your N listings without a price are read`, and an item in
+the tab that is older than those 100 is not found. Set a price on the items in your other public tabs, or make those
+tabs private, to keep the count at 100 or less.
 
 ## How Kalandra prices the items
 
@@ -194,8 +195,6 @@ the others.
 
 ## What it does not do yet
 
-- It reads only the newest 100 listings of your account without a price, as
-  [above](#how-it-uses-the-trade-site).
 - It cannot read an Expedition Logbook or an item with mutated modifiers from the trade site, so these count as
   unreadable.
 - With an app **Language** other than English, the items come from the trade site in the language of

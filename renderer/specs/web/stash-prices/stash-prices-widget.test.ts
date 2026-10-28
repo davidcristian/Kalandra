@@ -176,7 +176,7 @@ describe("the stash prices widget", () => {
     );
   });
 
-  it("shows the error, the newest 100 of more listings and a budget limited to 600", async () => {
+  it("shows the error, the newest 100 of more listings with how to read all, and a budget limited to 600", async () => {
     const text = await panelText(
       { searchBudget: 900 },
       { status: "error", error: "Rate limit exceeded", total: 150, read: 100 },
@@ -184,7 +184,7 @@ describe("the stash prices widget", () => {
 
     expect(text).toContain("of 600");
     expect(text).toContain(
-      "Only the newest 100 of your 150 listings without a price are read.",
+      "Only the newest 100 of your 150 listings without a price are read. To read them all, set a price on the items in your other public tabs, or make those tabs private.",
     );
     expect(text).toContain("The trade site failed: Rate limit exceeded");
   });

@@ -518,6 +518,7 @@
     "next_check": "Next check: {time}",
     "searches": "Searches in the last 3 hours: {count} of {budget}",
     "only_newest": "Only the newest {read} of your {total} listings without a price are read.",
+    "price_other_tabs": "To read them all, set a price on the items in your other public tabs, or make those tabs private.",
     "check_now": "Check now",
     "status_off": "Off. Turn it on under Show a suggested price on the Price check page.",
     "status_no_account": "Set your account name on the Price check page of the settings.",

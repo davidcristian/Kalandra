@@ -123,8 +123,8 @@ are the only code that sends trade requests without a key press, under the rules
   `refresh()` at once and whenever `enabled`, `tabName`, `intervalMinutes`, `searchBudget`, the account name or the
   league changes. The panel, in the `Widget.vue` frame, shows the tab name, the number of listings in the tab, the
   times of the last and the next check, the 3 hour search count of the budget (`?` before the site sent that
-  window), "Only the newest N of your M listings without a price are read." when the search returned fewer ids
-  than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the line on whether the stash
+  window), "Only the newest N of your M listings without a price are read." and how to read them all when the
+  search returned fewer ids than `total`, the text of the status (`stash_prices.status_*` in `app_i18n.json`), the line on whether the stash
   shows the tab ([stash-detection.md](stash-detection.md)), the pricing block, and **Check now**, which calls
   `checkNow()`.
 - `PricingPanel.vue`, the pricing block, shows only while the tab has listings: `progressText()` in `pricing-text.ts`
@@ -209,8 +209,8 @@ Under the reading settings are `DetectionSettings.vue` ([stash-detection.md](sta
 - **Only the reader and the pricer send trade requests without a key press**
   ([ADR-0012](../adr/ADR-0012-background-trade-searches.md)). They use the same limiter sets as the price check and
   no limiter of their own, since the site counts per IP.
-- **A check reads at most the newest 100 listings.** The search is not split when `total` is above 100
-  ([refinement 115](../refinements/tasks/115-stash-prices-reads-the-newest-100.md)).
+- **A check reads at most the newest 100 listings.** The search is never split when `total` is above 100, since a
+  split needs more searches and fetches than the site allows ([ADR-0012](../adr/ADR-0012-background-trade-searches.md)).
 - **Trade responses are untrusted.** A malformed search response is an `error`, and a malformed fetch result is
   skipped.
 

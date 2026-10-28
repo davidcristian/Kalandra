@@ -1,6 +1,6 @@
 # ADR-0012: Trade searches without a key press only for stash prices, within the user's budget
 
-**Status:** Accepted (2026-10-28)
+**Status:** Accepted (2026-10-29)
 
 ## Context
 
@@ -32,7 +32,11 @@ least. It fetches every listing the search returns, 10 per request and one reque
 a check. The pricer sends at most one search every 15 seconds, never two at once, and fetches the 20 cheapest listings
 of it in two requests; an item that the price file prices needs no request. Reason: the search order does not change
 when an item moves within the tab or a whole tab moves, so only a fetch shows an item's place; 15 seconds keeps the
-pricer at 20 of the 60 searches the site allows in 5 minutes.
+pricer at 20 of the 60 searches the site allows in 5 minutes. The search is never split, so a check reads at most
+the newest 100 listings of the account, and the panel tells the user to price or make private their other public
+tabs. Reason: on 2026-10-28 a split by item category needed 11 to 64 searches and 138 fetches a check for an account
+of 1373 listings, more than the site allows at the default interval
+([refinement 115](../refinements/tasks/115-stash-prices-reads-the-newest-100.md) has the figures).
 
 **4. It stays within the user's search budget.** No search goes out while the 3 hour search count is at or above the
 `searchBudget` setting: 400 by default, 0 to 600. The pricer stops earlier, at the budget less the searches the reader
@@ -58,8 +62,8 @@ IP, so a separate limiter set would not count the price checks.
 
 - A price check can find one more search and up to ten more fetches in the limiters from the last background check.
 - Pricing 60 items that need a search takes at least 15 minutes and 60 searches of the budget.
-- A check reads at most the newest 100 listings of the account, since a search returns 100 ids and a split search
-  would cost more of the budget ([refinement 115](../refinements/tasks/115-stash-prices-reads-the-newest-100.md)).
+- An item in the tab that is older than the account's newest 100 listings without a price is not read until the user
+  prices the newer ones or makes their tabs private.
 - `specs/web/stash-prices/stash-reader.test.ts` and `stash-pricer.test.ts` check each decision against a fake trade
   site with fake timers.
 

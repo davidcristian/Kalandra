@@ -15,6 +15,7 @@
       <div>{{ t(":searches", { count: searches, budget }) }}</div>
       <div v-if="onlyNewest" class="text-orange-400">
         {{ t(":only_newest", { read: state.read, total: state.total }) }}
+        {{ t(":price_other_tabs") }}
       </div>
       <div :class="statusClass" class="mt-1">{{ statusText }}</div>
       <detection-line />

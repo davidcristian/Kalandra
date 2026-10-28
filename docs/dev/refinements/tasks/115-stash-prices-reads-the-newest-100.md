@@ -1,9 +1,9 @@
 # The stash prices reader reads only the newest 100 listings of an account
 
-**Status:** open
+**Status:** declined 2026-10-29
 **Area:** trade
 **Origin:** [renderer/src/web/stash-prices/stash-reader.ts](../../../../renderer/src/web/stash-prices/stash-reader.ts)
-**Verified:** 2026-10-28
+**Verified:** 2026-10-29
 
 The reader searches every listing of the account without a price, sorted by the time the trade site
 indexed it, and a search returns at most 100 ids with `total` the full count. When `total` is above
@@ -40,3 +40,6 @@ list from the site's data once, not from a list in the code.
 - 2026-10-28: Checked against the code and left open: the split waits for the decision above, since
   at the default settings its searches and fetches for an account of 1373 listings exceed the search
   budget and the site's fetch limit.
+- 2026-10-29: Declined. The maintainer chose to keep reading the newest 100 listings, since a split
+  costs more searches and fetches a check than the site allows. The panel now tells the user to price
+  the items in their other public tabs, or make those tabs private, to read them all.
