@@ -28,8 +28,9 @@ of [ADR-0012](../adr/ADR-0012-background-trade-searches.md). The trade site, the
   fetches the ids it has not fetched, 10 per request (`/api/trade2/fetch/<ids>?query=<id>`), one request at a time,
   and keeps each listing whose `listing.stash.name` is `tabName`. A fetch result without a readable id, size or
   stash place is logged with `console.warn` and not fetched again while the search lists it.
-- `refresh()` applies changed settings: off stops the reader, a changed tab name, account or league stops a running
-  check and checks at once with nothing fetched, and otherwise the next check is at the last one plus the interval.
+- `refresh()` applies changed settings: off stops the reader, a changed tab name, account or league empties
+  `listings`, stops a running check and checks at once with nothing fetched, and otherwise the next check is at the
+  last one plus the interval.
   `checkNow()` checks at once unless a check runs. `stop()` clears the timer, ends the running check and forgets
   every listing.
 - `reader-settings.ts`: `clampInterval()` (at least 5 minutes, 10 for a value that is not a number) and

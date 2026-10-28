@@ -236,26 +236,28 @@ export function createStashReader(sources: ReaderSources) {
     }
   }
 
+  function forget() {
+    fetched.clear();
+    fetchedFor = null;
+    order = [];
+    Object.assign(state, { listings: [], total: null, read: 0 });
+  }
+
   /** Stops the timer and the running check, and forgets every listing. */
   function stop() {
     runId++;
     running = false;
     clearTimeout(timer);
-    fetched.clear();
-    fetchedFor = null;
-    order = [];
+    forget();
     Object.assign(state, {
       status: "off",
       error: null,
-      listings: [],
-      total: null,
-      read: 0,
       lastCheckAt: null,
       nextCheckAt: null,
-    } satisfies ReaderState);
+    });
   }
 
-  /** Applies changed settings: stops when off, checks at once for another tab, account or league, else keeps the schedule. */
+  /** Applies changed settings: stops when off, forgets the listings and checks at once for another tab, account or league. */
   function refresh() {
     const settings = sources.settings();
     if (!settings.enabled) {
@@ -268,6 +270,7 @@ export function createStashReader(sources: ReaderSources) {
       runId++;
       running = false;
     }
+    if (changed) forget();
     const due =
       state.lastCheckAt === null || changed
         ? Date.now()

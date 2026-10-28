@@ -463,6 +463,19 @@ describe("the stash tab reader", () => {
     expect(reader.state.status).toBe("waiting");
   });
 
+  it("forgets the listings of the old account at once when the account name changes", async () => {
+    await checkNow();
+    expect(reader.state.listings).toHaveLength(3);
+    app.accountName = "";
+
+    reader.refresh();
+    expect(reader.state).toMatchObject({ listings: [], total: null, read: 0 });
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(reader.state.status).toBe("no-account");
+    expect(site.searches).toHaveLength(1);
+  });
+
   it("keeps one check when Check now or a refresh comes during it", async () => {
     site.afterFetch = () => {
       void reader.checkNow();
