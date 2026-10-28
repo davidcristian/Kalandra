@@ -18,7 +18,9 @@ many trade searches it may still use. It is off until you turn it on.
    **Account name** with its number, such as `Name#1234`, on the **Price check** page.
 4. On the **Stash prices** page, check **Read the tab in the background** and click **Save**.
 
-The trade site lists an item some time after it reaches a public tab, so an item can first appear at a later check.
+Kalandra checks the tab once it has loaded the league list from the trade site, and again after each **Check the tab
+every** interval. The trade site lists an item some time after it reaches a public tab, so an item can first appear at
+a later check. Click **Check now** in the widget to check at once.
 
 ## The widget
 
@@ -47,7 +49,7 @@ Its **edit** button opens the **Stash prices** page of the Settings window.
 | Off. Turn it on in the settings. | **Read the tab in the background** is off. |
 | Set your account name on the Price check page of the settings. | The **Account name** on the Price check page is empty. |
 | Waiting for the league list. | Kalandra has not loaded the league list from the trade site yet. It tries again every 30 seconds. |
-| Paused while the price check is open. | It checks 30 seconds after the price check window closes. |
+| Paused while the price check is open. | It tries again every 30 seconds, and checks once the price check window is closed. |
 | Paused while your own price checks wait for the rate limit. | Your price checks go first. It tries again 30 seconds later. |
 | Paused: the searches of the last 3 hours reached the budget. | It tries again after the interval. |
 | Paused by the trade site's rate limit. | The rate limit holds the next search, for example after a `Rate limit exceeded` error. It tries again 30 seconds later. |
@@ -65,8 +67,8 @@ dark gray. When at least 90% of the cells under the items it read from the trade
 cells look as those items say, in 2 captures in a row, the tab counts as open. After 2 captures that do not match, it
 counts as closed.
 
-- Kalandra captures the game window alone, the window with the **Window title** of the General settings, not your
-  screen, other windows or its own overlay.
+- Kalandra captures the game window alone, the window named as **PoE window title** on the General page says, not
+  your screen, other windows or its own overlay.
 - The captures stay in memory, Kalandra reads a few pixels of each and keeps none: nothing is stored, logged or sent.
 - Kalandra never presses a key or clicks for this.
 - Items you put in the tab after the last check, and items with a price, count against the match: up to 14 such
@@ -97,9 +99,18 @@ The widget's line under the status says what Kalandra sees, and what the capture
 | Capture paused while the game window is not active. | The capture runs again when you return to the game. The widget shows only while the overlay is active, so it also names the shares of the last capture. |
 | Capture off: the tab needs items on 3 cells or more. | Too few items to tell the tab from an empty one. |
 | Capture off: it works only on Windows, so use the hotkey. | Linux and macOS. |
-| Capture off: turned off in the settings, so use the hotkey. | **Find the open tab in the game window** is off. |
+| Capture off: turned off in the settings, so use the hotkey. | **Find the open tab in the game window (Windows)** is off. |
 | Stash tab shown with the hotkey. / Stash tab hidden with the hotkey. | You pressed the hotkey last. |
 | Capture off: | Any other reason after the colon, such as a game window that Kalandra cannot find. It tries again every 30 seconds, and the [Debug](/settings#debug) log has the reason. |
+
+**When the capture does not see the tab:**
+
+- The line says `Capture off:` with a reason: open the [Debug](/settings#debug) page. `Found no window named` means
+  that **PoE window title** on the General page is not the title of the game window, `Path of Exile 2` by default.
+  When the game runs as administrator, start Kalandra as administrator too.
+- The capture runs, but the percentages stay low with the tab open: the grid is in the wrong place. Turn on **Grid
+  alignment view** and set the **Grid correction**, as above.
+- Nothing helps: turn off **Find the open tab in the game window (Windows)** and use the hotkey, as on Linux and macOS.
 
 ## The marks over the stash
 
@@ -120,8 +131,9 @@ amount of Chaos Orbs, Exalted Orbs or Divine Orbs. It is compared with the value
 stack of 20 Chaos Orbs is worth 20 Chaos Orbs. Kalandra converts it with the price of that currency in the price file,
 and when the price file has none, no item is trash.
 
-The marks show while the game window is active, and go when the tab or the stash closes, about a second later, or
-when you press the hotkey. Holding `Alt` hides them with the rest of the overlay. They never take a click.
+The marks show while the game window is active, and stay while you use the overlay, since the capture then pauses.
+They go about a second after the tab or the stash closes, or when you press the hotkey. Holding `Alt` hides them with
+the rest of the overlay. They never take a click.
 
 ## How it uses the trade site
 
@@ -134,6 +146,11 @@ limit errors for up to an hour. So Kalandra checks the tab only:
 - once per **Check the tab every** interval, or when you click **Check now**,
 - while the count of searches in the last 3 hours is below your **Search budget**,
 - while the price check window is closed and none of your own searches waits for the rate limit.
+
+The count is the trade site's count for your IP address, so your own price checks and the trade website fill it too.
+The budget is where Kalandra stops its own searches, and the rest up to 600 stays for you: 200 with the default 400.
+When you price check a lot, the count reaches the budget sooner, and the checks wait until it falls below the budget
+again. A longer interval and a lower budget leave more searches for your price checks.
 
 A search returns the newest 100 listings. When your account has more listings without a price, for example in other
 public tabs, the widget says `Only the newest 100 of your N listings without a price are read`, and an item in the tab
@@ -155,24 +172,38 @@ Kalandra prices the newest item first, and keeps each price while the item stays
 Kalandra sends at most one pricing search every 15 seconds, so 60 items that need a search take at least 15 minutes.
 It prices the items only while the count of searches in the last 3 hours is below your **Search budget** less the
 searches the checks of the tab need in 3 hours: 18 when it checks every 10 minutes, 36 every 5 minutes. A trade site
-error, such as `Rate limit exceeded`, stops the pricing until the next check interval, and the item is priced again
-after the others.
+error, such as `Rate limit exceeded`, stops the pricing for one check interval, and the item is priced again after
+the others.
 
 | Line | What it means |
 | --- | --- |
 | Pricing waits for the league list. | Kalandra has not loaded the league list yet. |
 | Pricing waits for the price file of the league. | The prices of the league are not loaded, as in a private league. |
 | Pricing waits while the tab is read. | A check of the tab runs. Pricing tries again 30 seconds later. |
-| Pricing paused while the price check is open. | It tries again 30 seconds after the price check window closes. |
+| Pricing paused while the price check is open. | It tries again every 30 seconds, and prices once the price check window is closed. |
 | Pricing paused while your own price checks wait for the rate limit. | Your price checks go first. |
 | Pricing paused: the searches of the last 3 hours reached the budget less the 18 kept for the checks of the tab. | It tries again after the check interval. |
 | Pricing paused by the trade site's rate limit. | It tries again 30 seconds later. |
+| Pricing Hunter Hood. | A search prices this item now. |
 | Pricing failed: | The trade site's error after the colon. The [Debug](/settings#debug) log has the same message. |
+
+## What it does not do yet
+
+- It reads only the newest 100 listings of your account without a price, as
+  [above](#how-it-uses-the-trade-site).
+- It cannot read an Expedition Logbook or an item with mutated modifiers from the trade site, so these count as
+  unreadable.
+- With an app **Language** other than English, the items come from the trade site in the language of
+  **Preferred trade site** on the General page. Keep it on the site for your language: from `www.pathofexile.com`
+  the items come in English, and Kalandra cannot read them.
+- The capture works only on Windows. Linux and macOS use the hotkey.
+- Kalandra places the grid from screenshots of the game at 16:9, such as 1920 x 1080. At another aspect ratio, or
+  when the grid is off, set the **Grid correction**.
+- The text of the widget, the marks and the settings page is in English in every app language.
 
 ## Settings
 
-The **Stash prices** page of the Settings window, which is also in the menu of the whole window under **Price
-check**:
+The **Stash prices** page of the Settings window, which the menu lists after **Price check**:
 
 | Setting | Default | What it changes |
 | --- | --- | --- |
